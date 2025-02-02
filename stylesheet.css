@@ -41,6 +41,13 @@ body {
     background-color: #444;
     border: 2px solid #AAA;
     border-radius: 15px;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .main_container-box-titel{
@@ -64,10 +71,13 @@ body {
 
     font-weight: bold;
 
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
     &:hover {
         background-color: #AAA;
         cursor: pointer;
         color: white;
+        transform: scale(1.05);
     }
 }
 
