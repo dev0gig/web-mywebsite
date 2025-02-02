@@ -28,7 +28,7 @@ body {
 
 /* MAIN */
 .main_container {
-    margin: 50px 300px;
+    margin: 50px 250px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
