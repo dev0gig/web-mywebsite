@@ -37,7 +37,6 @@ body {
 
 .main_container-box {
     flex: 1 300px;
-    padding: 0px 20px 20px 20px;
     background-color: #444;
     border: 2px solid #AAA;
     border-radius: 15px;
@@ -45,21 +44,23 @@ body {
 
 .main_container-box-titel {
     font-weight: bold;
+    font-size: larger;
     text-align: center;
 }
 
 .button-container {
     display: flex;
     gap: 30px;
-    padding: 20px;
+    justify-content: center;
+    padding: 10px;
     flex-wrap: wrap;
 }
 
 .button-wrapper {
+    width: 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
 }
 
 .button-kreis {
@@ -80,20 +81,4 @@ body {
 
 .button-label {
     text-align: center;
-}
-
-/* FOOTER */
-.footer_container {
-    display: flex;
-    justify-content: space-between;
-
-    height: 80px;
-    line-height: 40px;
-    width: 100%;
-
-    background-color: #111;
-}
-
-h4 {
-    padding-left: 100px;
 }
