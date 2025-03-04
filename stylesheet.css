@@ -28,7 +28,7 @@ body {
 
 /* MAIN */
 .main_container {
-    margin: 50px 300px;
+    margin: 50px 50px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -41,44 +41,45 @@ body {
     background-color: #444;
     border: 2px solid #AAA;
     border-radius: 15px;
-
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    }
 }
 
-.main_container-box-titel{
+.main_container-box-titel {
     font-weight: bold;
     text-align: center;
 }
 
-.button-group {
+.button-container {
     display: flex;
-    flex-direction: row;
+    gap: 30px;
+    padding: 20px;
     flex-wrap: wrap;
-    gap: 15px;
 }
 
-.button-links {
+.button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.button-kreis {
+    width: 50px;
     height: 50px;
-    flex: 1;
-
-    border: 2px solid #AAA;
-    border-radius: 50px;
-
-    font-weight: bold;
-
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 50%;
+    border: none;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
 
     &:hover {
-        background-color: #AAA;
+        transform: scale(1.1);
         cursor: pointer;
-        color: white;
-        transform: scale(1.05);
     }
+}
+
+.button-label {
+    text-align: center;
 }
 
 /* FOOTER */
@@ -93,6 +94,6 @@ body {
     background-color: #111;
 }
 
-h4{
+h4 {
     padding-left: 100px;
 }
