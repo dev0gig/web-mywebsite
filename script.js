@@ -46,6 +46,7 @@ const categories = [
             { label: "DeepL", url: "https://www.deepl.com/en/translator", img: "https://play-lh.googleusercontent.com/0IH4L3pX-jqQXKYCDmxTM5t3Tvak2cb_zUuIs9nKCHPeOqkaRJ_bRTq1qKawsSvunw=w240-h480-rw" },
             { label: "deepseek", url: "https://chat.deepseek.com/", img: "https://play-lh.googleusercontent.com/d2zqBFBEymSZKaVg_dRo1gh3hBFn7_Kl9rO74xkDmnJeLgDW0MoJD3cUx0QzZN6jdsg=w240-h480-rw" },
             { label: "Copilot", url: "https://copilot.microsoft.com/", img: "https://play-lh.googleusercontent.com/p8R1lAZI5_WCOzmvBYnOQasCWcjc9d2vM7z4PaVku8b9AfxGhqQqM0ldJ8KULHblVj-g=w240-h480-rw" },
+            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://static.wikia.nocookie.net/logopedia/images/4/4c/NotebookLM_icon.svg/revision/latest/scale-to-width-down/250?cb=20241119212544" },
 
         ]
     },
