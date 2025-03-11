@@ -4,7 +4,10 @@ const categories = [
         buttons: [
             { label: "Post", url: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen", img: "https://play-lh.googleusercontent.com/LCn0zMVjJXauMDNclMVMv8Ht-TNHHLqbCA61Xa7OR3X489dtOgpdFpzXT7H8KM_yTppO=s48-rw" },
             { label: "Simplr", url: "https://login.simplr.de/", img: "https://play-lh.googleusercontent.com/2lDYD2Gd75L9qSeGKQgHp2enMlLGOopURlA2cEqbS7zyQakEg0Z2eo-C_z9mTpt5Gg=w240-h480-rw" },
-            { label: "Simplr", url: "https://losleben.wienerstaedtische.at/app/dashboard", img: "https://play-lh.googleusercontent.com/w_Q8D-sCwYn5eKykRC-0377S9V8a2a_syDJ64hfDsenJmtjHAdLTZ7FEEaJWRQrgHzs=s48-rw" }
+            { label: "Wiener Städtische", url: "https://losleben.wienerstaedtische.at/app/dashboard", img: "https://play-lh.googleusercontent.com/w_Q8D-sCwYn5eKykRC-0377S9V8a2a_syDJ64hfDsenJmtjHAdLTZ7FEEaJWRQrgHzs=s48-rw" },
+            { label: "SmartMeter", url: "https://smartmeter-web.wienernetze.at/uebersicht", img: "https://www.wienernetze.at/documents/34846/0/raute_freigestellt.png/198df669-6c8c-b05a-df7c-ef0be7a027ee?version=1.0&t=1583916092746&imagePreview=1" },
+            { label: "WienEnergie", url: "https://meine.wienenergie.at/privat/meine-produkte", img: "https://avatars.githubusercontent.com/u/55399799?s=200&v=4" },
+        
         ]
     },
     {
@@ -15,7 +18,7 @@ const categories = [
             { label: "Office.com", url: "https://m365.cloud.microsoft/?auth=1", img: "https://play-lh.googleusercontent.com/Cf6rGlvAZJx2iG4c5f5H5N5XWGKFk5XZ_uz0A0YIIyuFPFybIfQaxSlDIQyU2W8btfv6=w240-h480-rw" },
             { label: "Github", url: "https://github.com/dev0gig", img: "https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU=s48-rw" },
             { label: "Microsoft Loop", url: "https://loop.cloud.microsoft/", img: "https://play-lh.googleusercontent.com/bocU4qigmyfnyh2_jBpW-16ViPa7YoT3Oj8lECr68l7hWkCyYPKYG5nQ3VJW3rd8H3Le=w240-h480-rw" },
-            { label: "Microsoft Whiteboard", url: "https://whiteboard.office.com/", img: "https://play-lh.googleusercontent.com/vlO4VHErW6ZKSRHkTu2GA9qi-DuYkO3sxKw5wlV6_kpyzFEwGZ5zLQaPpRLqNuOmeMo=w240-h480-rw" }
+            { label: "Microsoft Whiteboard", url: "https://whiteboard.office.com/", img: "https://play-lh.googleusercontent.com/vlO4VHErW6ZKSRHkTu2GA9qi-DuYkO3sxKw5wlV6_kpyzFEwGZ5zLQaPpRLqNuOmeMo=w240-h480-rw" },
 
         ]
     },
