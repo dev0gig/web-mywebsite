@@ -46,7 +46,7 @@ const categories = [
             { label: "DeepL", url: "https://www.deepl.com/en/translator", img: "https://play-lh.googleusercontent.com/0IH4L3pX-jqQXKYCDmxTM5t3Tvak2cb_zUuIs9nKCHPeOqkaRJ_bRTq1qKawsSvunw=w240-h480-rw" },
             { label: "deepseek", url: "https://chat.deepseek.com/", img: "https://play-lh.googleusercontent.com/d2zqBFBEymSZKaVg_dRo1gh3hBFn7_Kl9rO74xkDmnJeLgDW0MoJD3cUx0QzZN6jdsg=w240-h480-rw" },
             { label: "Copilot", url: "https://copilot.microsoft.com/", img: "https://play-lh.googleusercontent.com/p8R1lAZI5_WCOzmvBYnOQasCWcjc9d2vM7z4PaVku8b9AfxGhqQqM0ldJ8KULHblVj-g=w240-h480-rw" },
-            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://static.wikia.nocookie.net/logopedia/images/4/4c/NotebookLM_icon.svg/revision/latest/scale-to-width-down/250?cb=20241119212544" },
+            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://pbs.twimg.com/profile_images/1861084152054849547/uKBhfKBo_400x400.jpg" },
 
         ]
     },
@@ -69,7 +69,8 @@ const categories = [
             { label: "Duolingo", url: "https://www.duolingo.com/learn", img: "https://play-lh.googleusercontent.com/xAps4eknm7glMBG8HkYnDaInFYadN-5l2wumOQB3tzdf_JYerNLYphUma4A8kjD07Zh0=w240-h480-rw" },
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
             { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
-        
+            { label: "Tolino", url: "https://webreader.mytolino.com/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s96-rw" },
+
         ]
     },
     {
@@ -90,6 +91,7 @@ const categories = [
             { label: "Willhaben", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/_35j5GWebpnajJ5jCHVEtvbBm6Xt5CrkeTZ2mWqX-p7e2iCvNSO3qMf6mDWF6x5ZPg=w240-h480-rw" },
             { label: "Amazon", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/1Ns1T_qN0pEXMvZeZ5lQNAR8z4blP7ce2J2Nn5doXvt2T1g_W7VMORdWHaApkOooupI=s48-rw" },
             { label: "Vinted", url: "https://www.vinted.at/member/256995910", img: "https://play-lh.googleusercontent.com/5VIkArx-vDA60B6jW8yRucfeLlGwNIIbJIIiYw67McfQCiLI_Mv4qd-dTEvbSwkT7SY=w240-h480-rw" },
+            { label: "Thalia", url: "https://www.thalia.at/", img: "https://play-lh.googleusercontent.com/Z2mljIDYihYbBWuyp-rcUAi-G-ThgexF1wekQboFfxkTBIoSEfj8M_6LdZJfwqMYhUk=w480-h960-rw" },
 
         ]
     },
