@@ -17,8 +17,7 @@ const categories = [
             { label: "Outlook", url: "https://outlook.live.com/mail/0//", img: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=w240-h480-rw" },
             { label: "Office.com", url: "https://m365.cloud.microsoft/?auth=1", img: "https://play-lh.googleusercontent.com/Cf6rGlvAZJx2iG4c5f5H5N5XWGKFk5XZ_uz0A0YIIyuFPFybIfQaxSlDIQyU2W8btfv6=w240-h480-rw" },
             { label: "Github", url: "https://github.com/dev0gig", img: "https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU=s48-rw" },
-            { label: "Microsoft Loop", url: "https://loop.cloud.microsoft/", img: "https://play-lh.googleusercontent.com/bocU4qigmyfnyh2_jBpW-16ViPa7YoT3Oj8lECr68l7hWkCyYPKYG5nQ3VJW3rd8H3Le=w240-h480-rw" },
-            { label: "Microsoft Whiteboard", url: "https://whiteboard.office.com/", img: "https://play-lh.googleusercontent.com/vlO4VHErW6ZKSRHkTu2GA9qi-DuYkO3sxKw5wlV6_kpyzFEwGZ5zLQaPpRLqNuOmeMo=w240-h480-rw" },
+            { label: "Jira", url: "https://dev0gig.atlassian.net/jira/your-work", img: "https://play-lh.googleusercontent.com/_AZCbg39DTuk8k3DiPRASr9EwyW058pOfzvAu1DsfN9ygtbOlbuucmXaHJi5ooYbokQX=w240-h480-rw" },
 
         ]
     },
@@ -33,7 +32,7 @@ const categories = [
         title: "CloudStorage",
         buttons: [
             { label: "pCloud", url: "https://my.pcloud.com/", img: "https://play-lh.googleusercontent.com/5C2U8bk9x9-SzmJqy4xb9urLqwY1JvX-kU4EEVL-bSSEjv1wyM7IT7o4svuAKbsHUoA=w240-h480-rw" },
-            { label: "Google Drive", url: "https://drive.google.com/drive/my-drive/", img: "https://play-lh.googleusercontent.com/t-juVwXA8lDAk8uQ2L6d6K83jpgQoqmK1icB_l9yvhIAQ2QT_1XbRwg5IpY08906qEw=w240-h480-rw" },
+            { label: "Google Drive", url: "https://drive.google.com/", img: "https://play-lh.googleusercontent.com/t-juVwXA8lDAk8uQ2L6d6K83jpgQoqmK1icB_l9yvhIAQ2QT_1XbRwg5IpY08906qEw=w240-h480-rw" },
             { label: "OneDrive", url: "https://onedrive.live.com/?id=root&cid=0C6CCA416C0AEF80", img: "https://play-lh.googleusercontent.com/6AWr-qrhGT0ohjw0koq3bM8GHEFg1gTurald4FjCDg2RulTp4y_VVsYWUtw7Fo6lsQo=s48-rw" },
         ]
     },
@@ -46,7 +45,7 @@ const categories = [
             { label: "DeepL", url: "https://www.deepl.com/en/translator", img: "https://play-lh.googleusercontent.com/0IH4L3pX-jqQXKYCDmxTM5t3Tvak2cb_zUuIs9nKCHPeOqkaRJ_bRTq1qKawsSvunw=w240-h480-rw" },
             { label: "deepseek", url: "https://chat.deepseek.com/", img: "https://play-lh.googleusercontent.com/d2zqBFBEymSZKaVg_dRo1gh3hBFn7_Kl9rO74xkDmnJeLgDW0MoJD3cUx0QzZN6jdsg=w240-h480-rw" },
             { label: "Copilot", url: "https://copilot.microsoft.com/", img: "https://play-lh.googleusercontent.com/p8R1lAZI5_WCOzmvBYnOQasCWcjc9d2vM7z4PaVku8b9AfxGhqQqM0ldJ8KULHblVj-g=w240-h480-rw" },
-            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://static.wikia.nocookie.net/logopedia/images/4/4c/NotebookLM_icon.svg/revision/latest/scale-to-width-down/250?cb=20241119212544" },
+            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://pbs.twimg.com/profile_images/1861084152054849547/uKBhfKBo_400x400.jpg" },
 
         ]
     },
@@ -69,7 +68,8 @@ const categories = [
             { label: "Duolingo", url: "https://www.duolingo.com/learn", img: "https://play-lh.googleusercontent.com/xAps4eknm7glMBG8HkYnDaInFYadN-5l2wumOQB3tzdf_JYerNLYphUma4A8kjD07Zh0=w240-h480-rw" },
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
             { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
-        
+            { label: "Tolino", url: "https://webreader.mytolino.com/library/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s48-rw" },
+
         ]
     },
     {
@@ -89,7 +89,7 @@ const categories = [
             { label: "Hockerty", url: "https://www.hockerty.at", img: "https://s3-eu-west-1.amazonaws.com/tpd/logos/5cdad622334459000156b02a/0x0.png" },
             { label: "Willhaben", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/_35j5GWebpnajJ5jCHVEtvbBm6Xt5CrkeTZ2mWqX-p7e2iCvNSO3qMf6mDWF6x5ZPg=w240-h480-rw" },
             { label: "Amazon", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/1Ns1T_qN0pEXMvZeZ5lQNAR8z4blP7ce2J2Nn5doXvt2T1g_W7VMORdWHaApkOooupI=s48-rw" },
-            { label: "Vinted", url: "https://www.vinted.at/member/256995910", img: "https://play-lh.googleusercontent.com/5VIkArx-vDA60B6jW8yRucfeLlGwNIIbJIIiYw67McfQCiLI_Mv4qd-dTEvbSwkT7SY=w240-h480-rw" },
+            { label: "Thalia", url: "https://www.thalia.at/", img: "https://play-lh.googleusercontent.com/Z2mljIDYihYbBWuyp-rcUAi-G-ThgexF1wekQboFfxkTBIoSEfj8M_6LdZJfwqMYhUk=w240-h480-rw" },
 
         ]
     },
