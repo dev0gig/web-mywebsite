@@ -69,6 +69,7 @@ const categories = [
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
             { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
             { label: "Tolino", url: "https://webreader.mytolino.com/library/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s48-rw" },
+            { label: "Notion", url: "https://notion.so/", img: "https://play-lh.googleusercontent.com/f5N_uqyacp9ZPC4lWkZznsxCTOfGrkDAMAkw8o9XAdfsacVgXZYwjsbUoyDpALoGvE7f=w240-h480-rw" },
 
         ]
     },
