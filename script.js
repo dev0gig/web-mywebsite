@@ -17,7 +17,7 @@ const categories = [
             { label: "Outlook", url: "https://outlook.live.com/mail/0//", img: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=w240-h480-rw" },
             { label: "Office.com", url: "https://m365.cloud.microsoft/?auth=1", img: "https://play-lh.googleusercontent.com/Cf6rGlvAZJx2iG4c5f5H5N5XWGKFk5XZ_uz0A0YIIyuFPFybIfQaxSlDIQyU2W8btfv6=w240-h480-rw" },
             { label: "Github", url: "https://github.com/dev0gig", img: "https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU=s48-rw" },
-            { label: "Jira", url: "https://dev0gig.atlassian.net/jira/your-work", img: "https://play-lh.googleusercontent.com/_AZCbg39DTuk8k3DiPRASr9EwyW058pOfzvAu1DsfN9ygtbOlbuucmXaHJi5ooYbokQX=w240-h480-rw" },
+            { label: "Notion", url: "https://notion.so/", img: "https://play-lh.googleusercontent.com/f5N_uqyacp9ZPC4lWkZznsxCTOfGrkDAMAkw8o9XAdfsacVgXZYwjsbUoyDpALoGvE7f=w240-h480-rw" },
 
         ]
     },
@@ -69,7 +69,6 @@ const categories = [
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
             { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
             { label: "Tolino", url: "https://webreader.mytolino.com/library/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s48-rw" },
-            { label: "Notion", url: "https://notion.so/", img: "https://play-lh.googleusercontent.com/f5N_uqyacp9ZPC4lWkZznsxCTOfGrkDAMAkw8o9XAdfsacVgXZYwjsbUoyDpALoGvE7f=w240-h480-rw" },
 
         ]
     },
