@@ -17,7 +17,7 @@ const categories = [
             { label: "Outlook", url: "https://outlook.live.com/mail/0//", img: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=w240-h480-rw" },
             { label: "Office.com", url: "https://m365.cloud.microsoft/?auth=1", img: "https://play-lh.googleusercontent.com/Cf6rGlvAZJx2iG4c5f5H5N5XWGKFk5XZ_uz0A0YIIyuFPFybIfQaxSlDIQyU2W8btfv6=w240-h480-rw" },
             { label: "Github", url: "https://github.com/dev0gig", img: "https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU=s48-rw" },
-            { label: "Notion", url: "https://notion.so/", img: "https://play-lh.googleusercontent.com/f5N_uqyacp9ZPC4lWkZznsxCTOfGrkDAMAkw8o9XAdfsacVgXZYwjsbUoyDpALoGvE7f=w240-h480-rw" },
+            { label: "AFFiNE", url: "https://app.affine.pro/", img: "https://app.affine.pro/api/workspaces/qf73AF6vzWphbTJdN7KiX/blobs/zaFAx1uVZi_n4TTnQtMo2zC1JgPOBZnYf2BxYVInhc0=" },
             { label: "Google Calendar", url: "https://calendar.google.com/", img: "https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480" },
 
         ]
