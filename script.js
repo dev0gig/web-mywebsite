@@ -89,7 +89,7 @@ const categories = [
             { label: "Etsy", url: "https://www.etsy.com", img: "https://play-lh.googleusercontent.com/giKCCPigafUbKQ1AkXVxSjQ1PggetEI96ORNKxxhQdvGAFhto71kO4zf7gZ9oOdLIQe5=w240-h480-rw" },
             { label: "Hockerty", url: "https://www.hockerty.at", img: "https://s3-eu-west-1.amazonaws.com/tpd/logos/5cdad622334459000156b02a/0x0.png" },
             { label: "Willhaben", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/_35j5GWebpnajJ5jCHVEtvbBm6Xt5CrkeTZ2mWqX-p7e2iCvNSO3qMf6mDWF6x5ZPg=w240-h480-rw" },
-            { label: "Amazon", url: "https://www.willhaben.at", img: "https://play-lh.googleusercontent.com/1Ns1T_qN0pEXMvZeZ5lQNAR8z4blP7ce2J2Nn5doXvt2T1g_W7VMORdWHaApkOooupI=s48-rw" },
+            { label: "Amazon", url: "https://www.amazon.de", img: "https://play-lh.googleusercontent.com/1Ns1T_qN0pEXMvZeZ5lQNAR8z4blP7ce2J2Nn5doXvt2T1g_W7VMORdWHaApkOooupI=s48-rw" },
             { label: "Thalia", url: "https://www.thalia.at/", img: "https://play-lh.googleusercontent.com/Z2mljIDYihYbBWuyp-rcUAi-G-ThgexF1wekQboFfxkTBIoSEfj8M_6LdZJfwqMYhUk=w240-h480-rw" },
 
         ]
