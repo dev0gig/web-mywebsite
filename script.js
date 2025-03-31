@@ -70,6 +70,7 @@ const categories = [
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
             { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
             { label: "Tolino", url: "https://webreader.mytolino.com/library/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s48-rw" },
+            { label: "Quizlet", url: "https://quizlet.com/user/giga_39/sets", img: "https://play-lh.googleusercontent.com/hiQHKRhpuGu4pWAFhpto9H7qWKSdX-BjKbDAtZYgm_jfoD0cN7MCllGOn6L3XWo-6Q=s48-rw" },
 
         ]
     },
