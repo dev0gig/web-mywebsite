@@ -5,38 +5,17 @@ body {
     color: white;
 }
 
-/* HEADER */
-
-.header_container {
-    display: flex;
-    justify-content: space-between;
-
-    height: 80px;
-    line-height: 40px;
-
-    background-color: #111;
-    border-bottom: 2px solid #AAA;
-}
-
-.header_container-left {
-    padding-left: 100px;
-}
-
-.header_container-right {
-    padding-right: 100px;
-}
-
 /* MAIN */
 .main_container {
     margin: 50px 50px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 20px;
 }
 
 .main_container-box {
-    flex: 1 400px;
+    flex: 1 300px;
     background-color: #444;
     border: 2px solid #AAA;
     border-radius: 15px;
