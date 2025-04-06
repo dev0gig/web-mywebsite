@@ -36,7 +36,7 @@ body {
 }
 
 .main_container-box {
-    flex: 1 300px;
+    flex: 1 400px;
     background-color: #444;
     border: 2px solid #AAA;
     border-radius: 15px;
