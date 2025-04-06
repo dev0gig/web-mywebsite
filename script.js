@@ -54,12 +54,14 @@ const categories = [
         title: "Games",
         buttons: [
             { label: "HoyoLab", url: "https://www.hoyolab.com/home", img: "https://play-lh.googleusercontent.com/rkfVCuPdNJwhNj4-_jfueW56NM4fFohqVF-Y_ynFesGQVy-Jco84Opxp_UPxpeC5EeaH=s48-rw" },
+            { label: "Game8", url: "https://game8.co", img: "https://storage.googleapis.com/accesswire/logos/subaccounts/37677.png?v=1" },
             { label: "MTG Deckstats", url: "https://deckstats.net/", img: "https://pbs.twimg.com/profile_images/1170359141312974848/Dx2dTRcl_400x400.jpg" },
             { label: "Chess.com", url: "https://www.chess.com/daily-chess-puzzle", img: "https://play-lh.googleusercontent.com/a7R5nyeaX8lIEWdBOxjlvbyq9LcFwh3XMvNtBPEKR3LPGgdvgGrec4sJwn8tUaaSkw=s48-rw" },
             { label: "Epic Games", url: "https://store.epicgames.com/de/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYIn8lRMcFqpozaGneuqfI8-3cgRtKMUk9uw&s" },
             { label: "Prime Gaming", url: "https://gaming.amazon.com/home", img: "https://cdn-1.webcatalog.io/catalog/amazon-prime-gaming/amazon-prime-gaming-icon-filled-256.webp?v=1714773207214" },
             { label: "Steam", url: "https://store.steampowered.com/", img: "https://play-lh.googleusercontent.com/52_DMY5417awaEgJf3_9mWgEuO2t1JfkGab8kM-LD6l5u6cGm_1-GsoQ_IyWFHdbkA=w240-h480-rw" },
             { label: "itch.io", url: "https://itch.io/my-purchases", img: "https://static-00.iconduck.com/assets.00/itch-io-icon-2048x2048-i6hzclad.png" },
+            
         ]
     },
     {
