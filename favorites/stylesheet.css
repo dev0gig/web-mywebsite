@@ -5,7 +5,6 @@ body {
     color: white;
 }
 
-/* MAIN */
 .main_container {
     margin: 50px 50px;
     display: flex;
@@ -61,25 +60,4 @@ body {
 
 .button-label {
     text-align: center;
-}
-
-/* Floating Button */
-.floating-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px; /* Gleiche Breite wie .button-kreis */
-    height: 50px; /* Gleiche Höhe wie .button-kreis */
-    border-radius: 50%; /* Gleiche Rundung wie .button-kreis */
-    border: none; /* Kein Rahmen, wie bei .button-kreis */
-    background-image: url('https://cdn-icons-png.freepik.com/512/6288/6288891.png'); /* Bild als Hintergrund */
-    background-size: cover; /* Passt das Bild an die Größe des Buttons an */
-    background-position: center; /* Zentriert das Bild */
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.floating-button:hover {
-    transform: scale(1.1); /* Gleicher Hover-Effekt wie .button-kreis */
-    cursor: pointer;
 }

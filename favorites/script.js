@@ -13,28 +13,35 @@ const categories = [
     {
         title: "Office",
         buttons: [
-            { label: "Gmail", url: "https://mail.google.com/mail/u/0/#inbox", img: "https://play-lh.googleusercontent.com/KSuaRLiI_FlDP8cM4MzJ23ml3og5Hxb9AapaGTMZ2GgR103mvJ3AAnoOFz1yheeQBBI=w240-h480-rw" },
-            { label: "Outlook", url: "https://outlook.live.com/mail/0//", img: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=w240-h480-rw" },
             { label: "Office.com", url: "https://m365.cloud.microsoft/?auth=1", img: "https://play-lh.googleusercontent.com/Cf6rGlvAZJx2iG4c5f5H5N5XWGKFk5XZ_uz0A0YIIyuFPFybIfQaxSlDIQyU2W8btfv6=w240-h480-rw" },
             { label: "Github", url: "https://github.com/dev0gig", img: "https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU=s48-rw" },
-            { label: "AFFiNE", url: "https://app.affine.pro/", img: "https://app.affine.pro/api/workspaces/qf73AF6vzWphbTJdN7KiX/blobs/zaFAx1uVZi_n4TTnQtMo2zC1JgPOBZnYf2BxYVInhc0=" },
+            { label: "Notion", url: "https://notion.so/", img: "https://play-lh.googleusercontent.com/NEeqn_Ny6gZrzLDUqnbaUxbNn53U-S7GGYFiC22UGe84zxCq8GDEvyX5mPuLs4DSHw=w240-h480-rw" },
             { label: "Google Calendar", url: "https://calendar.google.com/", img: "https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480" },
+            { label: "🦄", url: "https://dev0gig.github.io/web.unicorn", img: "https://cdn-icons-png.freepik.com/512/6288/6288891.png" },
 
         ]
     },
     {
-        title: "crypto",
+        title: "Finanzen",
         buttons: [
             { label: "Bitpanda", url: "https://account.bitpanda.com/login", img: "https://play-lh.googleusercontent.com/0J5yWiMExRQ5wB92-KOpE42PoohTLw-IcPdq5GBLGAPmHMkuvD9EIUNt11bedYI_OcM=w240-h480-rw" },
             { label: "Coinmarketcap", url: "https://coinmarketcap.com/", img: "https://play-lh.googleusercontent.com/kCKeckQNFF9P2470x4lF9v3OW_ZZtvk1SIo9RmvJDa6WtBboqfzyefEZ2_rwWRYgM_M=s48-rw" },
+            { label: "Georg", url: "https://george.sparkasse.at/r/index.html?at=c#/overview", img: "https://play-lh.googleusercontent.com/iO3mw3CXFdTFhH_IMBirs-caiJO301aEeOXzPgr13J22W1U0z-PWr6GSnTgbZeu6vCA=w240-h480-rw" },
+            { label: "Revolut", url: "https://sso.revolut.com/signin?client_id=o3r08ao16zvdlf2y5fdc&code_challenge=7EVFQ49eb3I_mM8CF4VSd5ZXTG0xKJ18eWYZrycWhas&code_challenge_method=S256&response_type=code&redirect_uri=https%3A%2F%2Fapp.revolut.com%2Fhome&response_mode=query&ui_color_scheme=dark&ui_locales=en&state=KPbgwrh2iBUue1C4", img: "https://play-lh.googleusercontent.com/Zk8VcibrnwxdnlEydb5ytJOPGQuCVwceanusUprYjF06eLaPqO-pqYfkq7-LwMhMo7ZF=w240-h480-rw" },
+            { label: "N26", url: "https://app.n26.com/login", img: "https://play-lh.googleusercontent.com/pCFXCIyrT0zxLral7LuFhBj6K2Bwl4Xj_zH_BXNKOJ7IJ2Gl8fE6cQ4IbQzX4uDSSw=w240-h480-rw" },
+            { label: "FinanzOnline", url: "https://finanzonline.bmf.gv.at/fon/", img: "https://play-lh.googleusercontent.com/QQdz7x2gcVhe88tgzfT-2CNfh3nD6YNB8_ATmlvmItBZX4hcavVUUbVrODLyYDqQjmg=w240-h480-rw" },
+
         ]
     },
     {
-        title: "CloudStorage",
+        title: "CloudStorage & Mails",
         buttons: [
             { label: "pCloud", url: "https://my.pcloud.com/", img: "https://play-lh.googleusercontent.com/5C2U8bk9x9-SzmJqy4xb9urLqwY1JvX-kU4EEVL-bSSEjv1wyM7IT7o4svuAKbsHUoA=w240-h480-rw" },
             { label: "Google Drive", url: "https://drive.google.com/", img: "https://play-lh.googleusercontent.com/t-juVwXA8lDAk8uQ2L6d6K83jpgQoqmK1icB_l9yvhIAQ2QT_1XbRwg5IpY08906qEw=w240-h480-rw" },
             { label: "OneDrive", url: "https://onedrive.live.com/?id=root&cid=0C6CCA416C0AEF80", img: "https://play-lh.googleusercontent.com/6AWr-qrhGT0ohjw0koq3bM8GHEFg1gTurald4FjCDg2RulTp4y_VVsYWUtw7Fo6lsQo=s48-rw" },
+            { label: "Gmail", url: "https://mail.google.com/mail/u/0/#inbox", img: "https://play-lh.googleusercontent.com/KSuaRLiI_FlDP8cM4MzJ23ml3og5Hxb9AapaGTMZ2GgR103mvJ3AAnoOFz1yheeQBBI=w240-h480-rw" },
+            { label: "Outlook", url: "https://outlook.live.com/mail/0//", img: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=w240-h480-rw" },
+            { label: "ProtonMail", url: "https://account.proton.me/mail", img: "https://play-lh.googleusercontent.com/99IPL5W1HvN1TM7awcJ2gihUie-LQ5Ae7W9g0FgCBFJ8hNZnFIOJElyBPNcx4Wcx7A=w240-h480-rw" },
         ]
     },
     {
@@ -46,7 +53,6 @@ const categories = [
             { label: "DeepL", url: "https://www.deepl.com/en/translator", img: "https://play-lh.googleusercontent.com/0IH4L3pX-jqQXKYCDmxTM5t3Tvak2cb_zUuIs9nKCHPeOqkaRJ_bRTq1qKawsSvunw=w240-h480-rw" },
             { label: "deepseek", url: "https://chat.deepseek.com/", img: "https://play-lh.googleusercontent.com/d2zqBFBEymSZKaVg_dRo1gh3hBFn7_Kl9rO74xkDmnJeLgDW0MoJD3cUx0QzZN6jdsg=w240-h480-rw" },
             { label: "Copilot", url: "https://copilot.microsoft.com/", img: "https://play-lh.googleusercontent.com/p8R1lAZI5_WCOzmvBYnOQasCWcjc9d2vM7z4PaVku8b9AfxGhqQqM0ldJ8KULHblVj-g=w240-h480-rw" },
-            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://pbs.twimg.com/profile_images/1861084152054849547/uKBhfKBo_400x400.jpg" },
 
         ]
     },
@@ -70,19 +76,23 @@ const categories = [
             { label: "Udemy", url: "https://www.udemy.com/home/my-courses/learning/", img: "https://play-lh.googleusercontent.com/dsCkmJE2Fa8IjyXERAcwc5YeQ8_NvbZ4_OI8LgqyjILpXUfS5YhEcnAMajKPrZI-og=s48-rw" },
             { label: "Duolingo", url: "https://www.duolingo.com/learn", img: "https://play-lh.googleusercontent.com/xAps4eknm7glMBG8HkYnDaInFYadN-5l2wumOQB3tzdf_JYerNLYphUma4A8kjD07Zh0=w240-h480-rw" },
             { label: "Mimo", url: "https://mimo.org/web/library", img: "https://play-lh.googleusercontent.com/qPfmmEDFhGVmIXIKpmfbQeH6vXygXotzj6ied-j2el0YIB36fApN32XoVDrGoMQZ11Q=s48-rw" },
-            { label: "Free Japanese Lessons", url: "https://freejapaneselessons.com/", img: "https://cdn-icons-png.flaticon.com/512/6091/6091254.png" },
             { label: "Tolino", url: "https://webreader.mytolino.com/library/", img: "https://play-lh.googleusercontent.com/gj2xFcVsPRfjeAMMX0zG9_9TqcHeH30YbR3FdtPo2cHhcHbU6OGKsEqERriVuo8OCpg=s48-rw" },
             { label: "Quizlet", url: "https://quizlet.com/user/giga_39/sets", img: "https://play-lh.googleusercontent.com/hiQHKRhpuGu4pWAFhpto9H7qWKSdX-BjKbDAtZYgm_jfoD0cN7MCllGOn6L3XWo-6Q=s48-rw" },
+            { label: "NotebookLM", url: "https://notebooklm.google.com/", img: "https://pbs.twimg.com/profile_images/1861084152054849547/uKBhfKBo_400x400.jpg" },
 
         ]
     },
     {
-        title: "Media",
+        title: "Entertainment",
         buttons: [
             { label: "Youtube", url: "https://www.youtube.com/", img: "https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY=s48-rw" },
             { label: "Netflix", url: "https://www.netflix.com", img: "https://play-lh.googleusercontent.com/TBRwjS_qfJCSj1m7zZB93FnpJM5fSpMA_wUlFDLxWAb45T9RmwBvQd5cWR5viJJOhkI=w240-h480-rw" },
             { label: "Crunchyroll", url: "https://www.crunchyroll.com/de/", img: "https://play-lh.googleusercontent.com/Fnor8mzNEsiWTfSTI_RXUmsaZW0eYw0RkIgIhSCphG4Y0ZgwC-zK2qzik-9VIxQDWQ=s48-rw" },
-        
+            { label: "Pinterest", url: "https://at.pinterest.com/", img: "https://play-lh.googleusercontent.com/6CFQQ0b9r5fzF1v6f0gIirWsOGL7sGWkJifuUQxxhbCMcBx5aSG_cNXpjDKDn5c1jwjq=w240-h480-rw" },
+            { label: "Reddit", url: "https://www.reddit.com", img: "https://play-lh.googleusercontent.com/6Bexlvoh-v0z0YnxzXo_U5e5A6UdAETe8pIYyQ2E2KfhVf2BK5J83pFXKZbt125FHHQ=w240-h480-rw" },
+            { label: "Whatsapp", url: "https://web.whatsapp.com/", img: "https://play-lh.googleusercontent.com/bYtqbOcTYOlgc6gqZ2rwb8lptHuwlNE75zYJu6Bn076-hTmvd96HH-6v7S0YUAAJXoJN=w240-h480-rw" },
+            { label: "Google Messages", url: "https://messages.google.com/web/conversations", img: "https://play-lh.googleusercontent.com/9AZOTXU_CpreTFAXUPAmJNkm8VGCb1C90fjJ9pHGcVmpGMDSTq3cUbaQJdBT9Tdp9A=w240-h480-rw" },
+
         ]
     },
     {
@@ -95,16 +105,6 @@ const categories = [
             { label: "Amazon", url: "https://www.amazon.de", img: "https://play-lh.googleusercontent.com/1Ns1T_qN0pEXMvZeZ5lQNAR8z4blP7ce2J2Nn5doXvt2T1g_W7VMORdWHaApkOooupI=s48-rw" },
             { label: "Thalia", url: "https://www.thalia.at/", img: "https://play-lh.googleusercontent.com/Z2mljIDYihYbBWuyp-rcUAi-G-ThgexF1wekQboFfxkTBIoSEfj8M_6LdZJfwqMYhUk=w240-h480-rw" },
 
-        ]
-    },
-    {
-        title: "SocialMedia",
-        buttons: [
-            { label: "Pinterest", url: "https://at.pinterest.com/", img: "https://play-lh.googleusercontent.com/6CFQQ0b9r5fzF1v6f0gIirWsOGL7sGWkJifuUQxxhbCMcBx5aSG_cNXpjDKDn5c1jwjq=w240-h480-rw" },
-            { label: "Reddit", url: "https://www.reddit.com", img: "https://play-lh.googleusercontent.com/6Bexlvoh-v0z0YnxzXo_U5e5A6UdAETe8pIYyQ2E2KfhVf2BK5J83pFXKZbt125FHHQ=w240-h480-rw" },
-            { label: "Whatsapp", url: "https://web.whatsapp.com/", img: "https://play-lh.googleusercontent.com/bYtqbOcTYOlgc6gqZ2rwb8lptHuwlNE75zYJu6Bn076-hTmvd96HH-6v7S0YUAAJXoJN=w240-h480-rw" },
-            { label: "Google Messages", url: "https://messages.google.com/web/conversations", img: "https://play-lh.googleusercontent.com/9AZOTXU_CpreTFAXUPAmJNkm8VGCb1C90fjJ9pHGcVmpGMDSTq3cUbaQJdBT9Tdp9A=w240-h480-rw" },
-        
         ]
     },
 ];
