@@ -6,7 +6,7 @@ body {
 }
 
 .main_container {
-    margin: 50px 50px;
+    margin: 50px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

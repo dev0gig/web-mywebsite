@@ -9,12 +9,144 @@
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 
+<style>
+    body {
+        margin: 0px;
+        background-color: #111;
+        font-family: Arial, sans-serif;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+    }
+
+    nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        border-right: #444 2px solid;
+        background-color: #222;
+        color: #fff;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        height: 100vh;
+    }
+
+    .nav-box {
+        padding: 10px;
+        border: 2px solid #666;
+        border-radius: 10px;
+        background-color: #333;
+    }
+
+    #box-mails {
+        grid-area: mails;
+
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    #box-calendar {
+        grid-area: calendar;
+    }
+
+    #box-google {
+        grid-area: google;
+    }
+
+    #my-tools {
+        grid-area: tools;
+    }
+
+    main {
+        margin-left: 340px;
+        /* Adjusted to account for the fixed nav width */
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "mails mails mails mails"
+            "calendar calendar calendar tools"
+            "calendar calendar calendar tools"
+            "google google google tools";
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .box {
+        border: 2px solid #444;
+        border-radius: 10px;
+        background-color: #222;
+
+        iframe {
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+        }
+    }
+
+    #mail-button {
+        flex: 1;
+        height: 170px;
+        margin: 10px;
+        border: 2px solid #555;
+        border-radius: 8px;
+        color: #FFFFFF;
+        background-color: #4A4A4A;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+        &:hover {
+            background-color: lightblue;
+            border-color: blue;
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+    }
+</style>
+
 <body>
 
+    <nav>
+        <header>
+            <div class="nav-box">
+                <h1>Mein Dashboard</h1>
+                <p>Hier sind meine wichtigsten Tools und Informationen.</p>
+            </div>
+        </header>
+        <section>
+            das ist section
+        </section>
+    </nav>
     <main>
-        <a href="favorites/favorites.html">Meine Favoriten</a>
+        <div class="box" id="box-mails">
+            <button id="mail-button" onclick="window.open('https://mail.google.com/mail/u/0/#inbox')">Gmail</button>
+            <button id="mail-button" onclick="window.open('https://outlook.live.com/mail/inbox')">Outlook</button>
+            <button id="mail-button" onclick="window.open('https://www.proton.me/de/mail')">ProtonMail</button>
+            <button id="mail-button" onclick="window.open('https://www.icloud.com/mail/')">iCloud Mail</button>
+        </div>
+        <div class="box" id="box-calendar">
+            <iframe
+                src="https://calendar.google.com/calendar/embed?height=600&wkst=2&ctz=Europe%2FZurich&title=Mein%20Kalender&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73"
+                width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+        </div>
+        <div class="box" id="box-google">
+
+        </div>
+        <div class="box" id="my-tools">
+            <a href="favorites/favorites.html">Meine Favoriten</a>
+        </div>
     </main>
-    
+
 </body>
 
 </html>
