@@ -32,7 +32,11 @@
         display: flex;
         flex-direction: column;
         width: 300px;
-        height: 100vh;
+        height: 97vh;
+
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
     }
 
     .nav-box {
@@ -46,19 +50,25 @@
         grid-area: mails;
 
         display: flex;
-        justify-content: space-evenly;
     }
 
     #box-calendar {
         grid-area: calendar;
+        border: none;
     }
 
     #box-google {
         grid-area: google;
+
+        display: flex;
+        justify-content: space-evenly;
     }
 
     #my-tools {
         grid-area: tools;
+
+        display: flex;
+        flex-direction: column;
     }
 
     main {
@@ -90,7 +100,7 @@
 
     #mail-button {
         flex: 1;
-        height: 170px;
+        height: 140px;
         margin: 10px;
         border: 2px solid #555;
         border-radius: 8px;
@@ -104,8 +114,57 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
         &:hover {
-            background-color: lightblue;
-            border-color: blue;
+            background-color: lightgray;
+            border-color: gray;
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+    }
+
+    .circle-button {
+        margin: 10px;
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #222;
+        border: 2px solid #333;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    #tools-button {
+        flex: 1;
+        margin: 10px;
+        border: 2px solid #555;
+        border-radius: 8px;
+        color: #FFFFFF;
+        background-color: #4A4A4A;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+        &:hover {
+            background-color: lightgray;
+            border-color: gray;
             color: black;
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
@@ -124,8 +183,12 @@
             </div>
         </header>
         <section>
-            das ist section
+            <div class="nav-box">
+                <button id="tools-button" onclick="window.location.href = 'favorites/favorites.html'">Meine Favoriten</button>
+                <button id="tools-button" onclick="window.open('https://github.com/dev0gig?tab=repositories')">My Github Repositories</button>
         </section>
+        <div id="weather-widget">
+            <div id="ww_79b4d0608a813" v='1.3' loc='auto' a='{"t":"responsive","lang":"de","sl_lpl":1,"ids":[],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>Mehr Vorhersagen: <a href="https://oneweather.org/de/deutschland/30_tage/" id="ww_79b4d0608a813_u" target="_blank">Wetter 30 tage Deutschland</a></div><script async src="https://app3.weatherwidget.org/js/?id=ww_79b4d0608a813"></script>
     </nav>
     <main>
         <div class="box" id="box-mails">
@@ -137,13 +200,63 @@
         <div class="box" id="box-calendar">
             <iframe
                 src="https://calendar.google.com/calendar/embed?height=600&wkst=2&ctz=Europe%2FZurich&title=Mein%20Kalender&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73"
-                width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+                style="border: 2px solid #444;" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
         </div>
         <div class="box" id="box-google">
-
+            <a href="https://translate.google.com/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/ZrNeuKthBirZN7rrXPN1JmUbaG8ICy3kZSHt-WgSnREsJzo2txzCzjIoChlevMIQEA=w240-h480-rw">
+            </a>
+            <a href="https://contacts.google.com/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/fvhPW8dpGXM42Y-6aQU8Yl25L1l_mVgeoM-n08FxAkM7umAHkNs8wcs4MA49E67a7WVt=w240-h480-rw">
+            </a>
+            <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480-rw">
+            </a>
+            <a href="https://www.google.com/maps/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/Kf8WTct65hFJxBUDm5E-EpYsiDoLQiGGbnuyP6HBNax43YShXti9THPon1YKB6zPYpA=w240-h480-rw">
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY=s48-rw">
+            </a>
+            <a href="https://drive.google.com/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/t-juVwXA8lDAk8uQ2L6d6K83jpgQoqmK1icB_l9yvhIAQ2QT_1XbRwg5IpY08906qEw=w240-h480-rw">
+            </a>
+            <a href="https://keep.google.com/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/9bJoeaPbGTB8Tz_h4N-p-6ReRd8vSS-frZb2tmJulaGIoTKElKj3zpmcFJvnS96ANZP5=w240-h480-rw">
+            </a>
+            <a href="https://passwords.google.com/" target="_blank" class="circle-button">
+                <img src="https://img.icons8.com/fluent/600/google-password.png">
+            </a>
+            <a href="https://gemini.google.com/app" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/Pkwn0AbykyjSuCdSYCbq0dvOqHP-YXcbBLTZ8AOUZhvnRuhUnZ2aJrw_YCf6kVMcZ4PM=w240-h480-rw">
+            </a>
+            <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/keE2gN0Hqh8-Tsf_RYZ_-yS2uo6ToqYVyRBv_UZaLXsgeeHBd2YPcEUWEF4DEtfGyb1h=s48-rw">
+            </a>
+            <a href="https://docs.google.com/document/u/0/" target="_blank" class="circle-button">
+                <img
+                    src="https://play-lh.googleusercontent.com/emmbClh_hm0WpWZqJ0X59B8Pz1mKoB9HVLkYMktxhGE6_-30SdGoa-BmYW73RJ8MGZQ=s48-rw">
+            </a>
+            <a href="https://play.google.com/" target="_blank" class="circle-button">
+                <img src="https://cdn-icons-png.flaticon.com/512/732/732208.png">
+            </a>
         </div>
         <div class="box" id="my-tools">
-            <a href="favorites/favorites.html">Meine Favoriten</a>
+            <button id="tools-button" onclick="window.open('https://notion.so')">Notion</button>
+            <button id="tools-button"
+                onclick="window.open('https://https://trello.com/u/patrickgiger2/boards')">Trello</button>
+            <button id="tools-button"
+                onclick="window.open('https://https://whiteboard.office.com/')">Whiteboard</button>
+            <button id="tools-button" onclick="window.open('https://https://studio.firebase.google.com/')">IDX</button>
         </div>
     </main>
 
