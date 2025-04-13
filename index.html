@@ -37,6 +37,7 @@
         display: flex;
         flex-direction: column;
         gap: 30px;
+        padding-top: 29px;
     }
 
     .nav-box {
@@ -55,6 +56,7 @@
     #box-calendar {
         grid-area: calendar;
         border: none;
+        background-color: transparent;
     }
 
     #box-google {
@@ -93,8 +95,9 @@
 
         iframe {
             border-radius: 10px;
-            overflow: hidden;
             border: none;
+            width: 100%;
+            height: 600px;
         }
     }
 
@@ -198,9 +201,7 @@
             <button id="mail-button" onclick="window.open('https://www.icloud.com/mail/')">iCloud Mail</button>
         </div>
         <div class="box" id="box-calendar">
-            <iframe
-                src="https://calendar.google.com/calendar/embed?height=600&wkst=2&ctz=Europe%2FZurich&title=Mein%20Kalender&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73"
-                style="border: 2px solid #444;" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+            <iframe src="https://calendar.google.com/calendar/embed?height=NaN&wkst=2&ctz=Europe%2FZurich&mode=AGENDA&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73" style="border:solid 1px #777" width="NaN" height="NaN" frameborder="0" scrolling="no"></iframe>
         </div>
         <div class="box" id="box-google">
             <a href="https://translate.google.com/" target="_blank" class="circle-button">
