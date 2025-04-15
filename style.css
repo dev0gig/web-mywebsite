@@ -161,80 +161,65 @@ main {
 
 #studioFirebase {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://ph-files.imgix.net/e99a72af-a891-40c1-bcc7-5db2229bca36.png?auto=format&fit=crop');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #microsoftWhiteboard {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://blog.inknoe.com/wp-content/uploads/ms-whiteboard-1.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #trello {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://images.ctfassets.net/rz1oowkt5gyp/7lpUSxVqNRggpqzCNcnfo1/04cf35d0a0ef60e18c6575eb9a0374e4/inbox-slider.png?w=540');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #notion {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://ph-files.imgix.net/3be61787-5ba0-40e9-a0c2-b6dfa10abdea.png?auto=compress&codec=mozjpeg&cs=strip&auto=format&fit=max&frame=1');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #icloudMail {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://www.getmailbird.com/assets/components/phpthumbof/cache/setup-icloud-mail-on-mac.b3fca1d7ac68fb5753386b178522b571.webp');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #outlook {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #gmail {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-3.jpg?quality=82&strip=all&w=1600');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
     }
 }
 
 #protonMail {
     &:hover {
-        font-size: 0px !important;
         background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
+    }
+}
+
+#studioFirebase,
+#microsoftWhiteboard,
+#trello,
+#notion,
+#icloudMail,
+#outlook,
+#gmail,
+#protonMail {
+    &:hover {
+        font-size: 0px !important;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        transition: background-image 0.3s ease-in-out;
     }
 }
