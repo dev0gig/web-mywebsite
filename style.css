@@ -5,8 +5,6 @@ body {
 
     display: flex;
     flex-direction: column;
-
-    overflow: hidden;
 }
 
 nav {
@@ -20,7 +18,7 @@ nav {
     display: flex;
     flex-direction: column;
     width: 300px;
-    height: 97vh;
+    height: 100vh;
 
     display: flex;
     flex-direction: column;
@@ -49,9 +47,7 @@ nav {
 
 #box-google {
     grid-area: google;
-
-    display: flex;
-    justify-content: space-evenly;
+    text-align: center;
 }
 
 #my-tools {
@@ -196,7 +192,47 @@ main {
 #notion {
     &:hover {
         font-size: 0px !important;
-        background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8A0b5HSmukehTJtJIKhccjU4FJ_Ke5FUMRA&s');
+        background-image: url('https://ph-files.imgix.net/3be61787-5ba0-40e9-a0c2-b6dfa10abdea.png?auto=compress&codec=mozjpeg&cs=strip&auto=format&fit=max&frame=1');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#icloudMail {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://www.getmailbird.com/assets/components/phpthumbof/cache/setup-icloud-mail-on-mac.b3fca1d7ac68fb5753386b178522b571.webp');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#outlook {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#gmail {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-3.jpg?quality=82&strip=all&w=1600');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#protonMail {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
