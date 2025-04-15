@@ -6,178 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daschboard</title>
     <link rel="icon" href="https://www.svgrepo.com/show/432456/dashboard-customize.svg" />
-    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<style>
-    body {
-        margin: 0px;
-        background-color: #111;
-        font-family: Arial, sans-serif;
-
-        display: flex;
-        flex-direction: column;
-
-        overflow: hidden;
-    }
-
-    nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        border-right: #444 2px solid;
-        background-color: #222;
-        color: #fff;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        width: 300px;
-        height: 97vh;
-
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        padding-top: 29px;
-    }
-
-    .nav-box {
-        padding: 10px;
-        border: 2px solid #666;
-        border-radius: 10px;
-        background-color: #333;
-    }
-
-    #box-mails {
-        grid-area: mails;
-
-        display: flex;
-    }
-
-    #box-calendar {
-        grid-area: calendar;
-        border: none;
-        background-color: transparent;
-    }
-
-    #box-google {
-        grid-area: google;
-
-        display: flex;
-        justify-content: space-evenly;
-    }
-
-    #my-tools {
-        grid-area: tools;
-
-        display: flex;
-        flex-direction: column;
-    }
-
-    main {
-        margin-left: 340px;
-        /* Adjusted to account for the fixed nav width */
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: auto;
-        grid-template-areas:
-            "mails mails mails mails"
-            "calendar calendar calendar tools"
-            "calendar calendar calendar tools"
-            "google google google tools";
-        gap: 20px;
-        padding: 20px;
-    }
-
-    .box {
-        border: 2px solid #444;
-        border-radius: 10px;
-        background-color: #222;
-
-        iframe {
-            border-radius: 10px;
-            border: none;
-            width: 100%;
-            height: 600px;
-        }
-    }
-
-    #mail-button {
-        flex: 1;
-        height: 140px;
-        margin: 10px;
-        border: 2px solid #555;
-        border-radius: 8px;
-        color: #FFFFFF;
-        background-color: #4A4A4A;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        padding: 10px;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
-        &:hover {
-            background-color: lightgray;
-            border-color: gray;
-            color: black;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-    }
-
-    .circle-button {
-        margin: 10px;
-        display: inline-block;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        overflow: hidden;
-        background-color: #222;
-        border: 2px solid #333;
-        text-decoration: none;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        &:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-    }
-
-    #tools-button {
-        flex: 1;
-        margin: 10px;
-        border: 2px solid #555;
-        border-radius: 8px;
-        color: #FFFFFF;
-        background-color: #4A4A4A;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        padding: 10px;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
-        &:hover {
-            background-color: lightgray;
-            border-color: gray;
-            color: black;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-    }
-</style>
-
 <body>
-
     <nav>
         <header>
             <div class="nav-box">
@@ -187,21 +19,29 @@
         </header>
         <section>
             <div class="nav-box">
-                <button id="tools-button" onclick="window.location.href = 'favorites/favorites.html'">Meine Favoriten</button>
-                <button id="tools-button" onclick="window.open('https://github.com/dev0gig?tab=repositories')">My Github Repositories</button>
+                <button class="tools-button" onclick="window.location.href = 'favorites/favorites.html'">Meine
+                    Favoriten</button>
+                <button class="tools-button" onclick="window.open('https://github.com/dev0gig?tab=repositories')">My
+                    Github Repositories</button>
         </section>
         <div id="weather-widget">
-            <div id="ww_79b4d0608a813" v='1.3' loc='auto' a='{"t":"responsive","lang":"de","sl_lpl":1,"ids":[],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>Mehr Vorhersagen: <a href="https://oneweather.org/de/deutschland/30_tage/" id="ww_79b4d0608a813_u" target="_blank">Wetter 30 tage Deutschland</a></div><script async src="https://app3.weatherwidget.org/js/?id=ww_79b4d0608a813"></script>
+            <div id="ww_79b4d0608a813" v='1.3' loc='auto'
+                a='{"t":"responsive","lang":"de","sl_lpl":1,"ids":[],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>
+                Mehr Vorhersagen: <a href="https://oneweather.org/de/deutschland/30_tage/" id="ww_79b4d0608a813_u"
+                    target="_blank">Wetter 30 tage Deutschland</a></div>
+            <script async src="https://app3.weatherwidget.org/js/?id=ww_79b4d0608a813"></script>
     </nav>
     <main>
         <div class="box" id="box-mails">
-            <button id="mail-button" onclick="window.open('https://mail.google.com/mail/u/0/#inbox')">Gmail</button>
-            <button id="mail-button" onclick="window.open('https://outlook.live.com/mail/inbox')">Outlook</button>
-            <button id="mail-button" onclick="window.open('https://www.proton.me/de/mail')">ProtonMail</button>
-            <button id="mail-button" onclick="window.open('https://www.icloud.com/mail/')">iCloud Mail</button>
+            <button class="mail-button" onclick="window.open('https://mail.google.com/mail/u/0/#inbox')">Gmail</button>
+            <button class="mail-button" onclick="window.open('https://outlook.live.com/mail/inbox')">Outlook</button>
+            <button class="mail-button" onclick="window.open('https://www.proton.me/de/mail')">ProtonMail</button>
+            <button class="mail-button" onclick="window.open('https://www.icloud.com/mail/')">iCloud Mail</button>
         </div>
         <div class="box" id="box-calendar">
-            <iframe src="https://calendar.google.com/calendar/embed?height=NaN&wkst=2&ctz=Europe%2FZurich&mode=AGENDA&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73" style="border:solid 1px #777" width="NaN" height="NaN" frameborder="0" scrolling="no"></iframe>
+            <iframe
+                src="https://calendar.google.com/calendar/embed?height=NaN&wkst=2&ctz=Europe%2FZurich&mode=AGENDA&src=Ymlvc2dpZ2FAZ21haWwuY29t&src=Y2JiOWVhN2I1MzMxM2U3NGIyMjJhOTNmZTc2MjE1MWRkM2Y4Mjg3NDIwMzQwNWZjNTJhNjE2ODhkNDkyZGNmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZGUuYXVzdHJpYW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=NDZhcXBubGV1Y2RlZ2Nic2Q4anY1NzloZGVudjJ1MzhAaW1wb3J0LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%234285F4&color=%23D50000&color=%2333B679&color=%23E67C73"
+                style="border:solid 1px #777" width="NaN" height="NaN" frameborder="0" scrolling="no"></iframe>
         </div>
         <div class="box" id="box-google">
             <a href="https://translate.google.com/" target="_blank" class="circle-button">
@@ -251,16 +91,18 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/732/732208.png">
             </a>
             <a href="https://tasks.google.com/tasks/" target="_blank" class="circle-button">
-                <img src="https://play-lh.googleusercontent.com/pjUulZ-Vdo7qPKxk3IRhnk8SORPlgSydSyYEjm7fGcoXO8wDyYisWXwQqEjMryZ_sqK2=w240-h480-rw">
+                <img
+                    src="https://play-lh.googleusercontent.com/pjUulZ-Vdo7qPKxk3IRhnk8SORPlgSydSyYEjm7fGcoXO8wDyYisWXwQqEjMryZ_sqK2=w240-h480-rw">
             </a>
         </div>
         <div class="box" id="my-tools">
-            <button id="tools-button" onclick="window.open('https://notion.so')">Notion</button>
-            <button id="tools-button"
+            <button class="tools-button" id="notion" onclick="window.open('https://notion.so')">Notion</button>
+            <button class="tools-button" id="trello"
                 onclick="window.open('https://trello.com/u/patrickgiger2/boards')">Trello</button>
-            <button id="tools-button"
+            <button class="tools-button" id="microsoftWhiteboard"
                 onclick="window.open('https://whiteboard.office.com/')">Whiteboard</button>
-            <button id="tools-button" onclick="window.open('https://studio.firebase.google.com/')">IDX</button>
+            <button class="tools-button" id="studioFirebase"
+                onclick="window.open('https://studio.firebase.google.com/')">Studio Firebase</button>
         </div>
     </main>
 

@@ -1,0 +1,204 @@
+body {
+    margin: 0px;
+    background-color: #111;
+    font-family: Arial, sans-serif;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-right: #444 2px solid;
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 97vh;
+
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding-top: 29px;
+}
+
+.nav-box {
+    padding: 10px;
+    border: 2px solid #666;
+    border-radius: 10px;
+    background-color: #333;
+}
+
+#box-mails {
+    grid-area: mails;
+
+    display: flex;
+}
+
+#box-calendar {
+    grid-area: calendar;
+    border: none;
+    background-color: transparent;
+}
+
+#box-google {
+    grid-area: google;
+
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#my-tools {
+    grid-area: tools;
+
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    margin-left: 340px;
+    /* Adjusted to account for the fixed nav width */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "mails mails mails mails"
+        "calendar calendar calendar tools"
+        "calendar calendar calendar tools"
+        "google google google tools";
+    gap: 20px;
+    padding: 20px;
+}
+
+.box {
+    border: 2px solid #444;
+    border-radius: 10px;
+    background-color: #222;
+
+    iframe {
+        border-radius: 10px;
+        border: none;
+        width: 100%;
+        height: 600px;
+    }
+}
+
+.mail-button {
+    flex: 1;
+    height: 140px;
+    margin: 10px;
+    border: 2px solid #555;
+    border-radius: 8px;
+    color: #FFFFFF;
+    background-color: #4A4A4A;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+        background-color: lightgray;
+        border-color: gray;
+        color: black;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+    }
+}
+
+.circle-button {
+    margin: 10px;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #222;
+    border: 2px solid #333;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.tools-button {
+    flex: 1;
+    margin: 10px;
+    border: 2px solid #555;
+    border-radius: 8px;
+    color: #FFFFFF;
+    background-color: #4A4A4A;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+        background-color: lightgray;
+        border-color: gray;
+        color: black;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+    }
+}
+
+#studioFirebase {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://ph-files.imgix.net/e99a72af-a891-40c1-bcc7-5db2229bca36.png?auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#microsoftWhiteboard {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://blog.inknoe.com/wp-content/uploads/ms-whiteboard-1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#trello {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://images.ctfassets.net/rz1oowkt5gyp/7lpUSxVqNRggpqzCNcnfo1/04cf35d0a0ef60e18c6575eb9a0374e4/inbox-slider.png?w=540');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+#notion {
+    &:hover {
+        font-size: 0px !important;
+        background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8A0b5HSmukehTJtJIKhccjU4FJ_Ke5FUMRA&s');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
