@@ -106,6 +106,12 @@ main {
         transform: translateY(-3px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
+
+        font-size: 0px !important;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: background-image 0.3s ease-in-out;
     }
 }
 
@@ -154,6 +160,12 @@ main {
         transform: translateY(-3px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
+
+        font-size: 0px !important;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: background-image 0.3s ease-in-out;
     }
 }
 
@@ -165,25 +177,25 @@ main {
 
 #microsoftWhiteboard {
     &:hover {
-        background-image: url('https://blog.inknoe.com/wp-content/uploads/ms-whiteboard-1.jpg');
+        background-image: url('https://quisitive.com/wp-content/uploads/2023/01/Microsoft-Whiteboard-App-Feature-Image-1024x535.png');
     }
 }
 
 #trello {
     &:hover {
-        background-image: url('https://images.ctfassets.net/rz1oowkt5gyp/7lpUSxVqNRggpqzCNcnfo1/04cf35d0a0ef60e18c6575eb9a0374e4/inbox-slider.png?w=540');
+        background-image: url('https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/33/31/cf/3331cf39-0502-1d4a-97ad-48ebe51e8287/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1200x600wa.png');
     }
 }
 
 #notion {
     &:hover {
-        background-image: url('https://ph-files.imgix.net/3be61787-5ba0-40e9-a0c2-b6dfa10abdea.png?auto=compress&codec=mozjpeg&cs=strip&auto=format&fit=max&frame=1');
+        background-image: url('https://stadt-bremerhaven.de/wp-content/uploads/2024/01/notion.jpg');
     }
 }
 
 #icloudMail {
     &:hover {
-        background-image: url('https://www.getmailbird.com/assets/components/phpthumbof/cache/setup-icloud-mail-on-mac.b3fca1d7ac68fb5753386b178522b571.webp');
+        background-image: url('https://cdn.prod.website-files.com/667c19cea59556c83ff867fc/67a231b56fa298afc1d8e44b_iCloud%20Mail.jpg');
     }
 }
 
@@ -195,29 +207,12 @@ main {
 
 #gmail {
     &:hover {
-        background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-3.jpg?quality=82&strip=all&w=1600');
+        background-image: url('https://i.computer-bild.de/imgs/1/4/1/4/8/8/1/1/kommunikation-f76094bf4c955706.jpg?impolicy=full_content');
     }
 }
 
 #protonMail {
     &:hover {
         background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
-    }
-}
-
-#studioFirebase,
-#microsoftWhiteboard,
-#trello,
-#notion,
-#icloudMail,
-#outlook,
-#gmail,
-#protonMail {
-    &:hover {
-        font-size: 0px !important;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: background-image 0.3s ease-in-out;
     }
 }
