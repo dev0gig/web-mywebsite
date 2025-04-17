@@ -109,7 +109,6 @@ main {
     margin: 10px;
     border: 2px solid #555;
     border-radius: 8px;
-    color: #FFFFFF;
     background-color: #4A4A4A;
     font-size: 16px;
     font-weight: bold;
@@ -118,18 +117,14 @@ main {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
     &:hover {
         border-color: gray;
-        color: black;
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
-
-        font-size: 0px !important;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: background-image 0.3s ease-in-out;
     }
 }
 
@@ -144,7 +139,7 @@ main {
     border: 2px solid #333;
     text-decoration: none;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
 
     img {
         width: 100%;
@@ -163,7 +158,6 @@ main {
     margin: 10px;
     border: 2px solid #555;
     border-radius: 8px;
-    color: #FFFFFF;
     background-color: #4A4A4A;
     font-size: 16px;
     font-weight: bold;
@@ -172,65 +166,45 @@ main {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
     &:hover {
         border-color: gray;
-        color: black;
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
-
-        font-size: 0px !important;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: background-image 0.3s ease-in-out;
     }
 }
 
 #studioFirebase {
-    &:hover {
-        background-image: url('https://ph-files.imgix.net/e99a72af-a891-40c1-bcc7-5db2229bca36.png?auto=format&fit=crop');
-    }
+    background-image: url('https://ph-files.imgix.net/e99a72af-a891-40c1-bcc7-5db2229bca36.png?auto=format&fit=crop');
 }
 
 #microsoftWhiteboard {
-    &:hover {
-        background-image: url('https://quisitive.com/wp-content/uploads/2023/01/Microsoft-Whiteboard-App-Feature-Image-1024x535.png');
-    }
+    background-image: url('https://quisitive.com/wp-content/uploads/2023/01/Microsoft-Whiteboard-App-Feature-Image-1024x535.png');
 }
 
 #trello {
-    &:hover {
-        background-image: url('https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/33/31/cf/3331cf39-0502-1d4a-97ad-48ebe51e8287/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1200x600wa.png');
-    }
+    background-image: url('https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/33/31/cf/3331cf39-0502-1d4a-97ad-48ebe51e8287/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1200x600wa.png');
 }
 
 #notion {
-    &:hover {
-        background-image: url('https://stadt-bremerhaven.de/wp-content/uploads/2024/01/notion.jpg');
-    }
+    background-image: url('https://stadt-bremerhaven.de/wp-content/uploads/2024/01/notion.jpg');
 }
 
 #icloudMail {
-    &:hover {
-        background-image: url('https://cdn.prod.website-files.com/667c19cea59556c83ff867fc/67a231b56fa298afc1d8e44b_iCloud%20Mail.jpg');
-    }
+    background-image: url('https://cdn.prod.website-files.com/667c19cea59556c83ff867fc/67a231b56fa298afc1d8e44b_iCloud%20Mail.jpg');
 }
 
 #outlook {
-    &:hover {
-        background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');
-    }
+    background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');
 }
 
 #gmail {
-    &:hover {
-        background-image: url('https://i.computer-bild.de/imgs/1/4/1/4/8/8/1/1/kommunikation-f76094bf4c955706.jpg?impolicy=full_content');
-    }
+    background-image: url('https://i.computer-bild.de/imgs/1/4/1/4/8/8/1/1/kommunikation-f76094bf4c955706.jpg?impolicy=full_content');
 }
 
 #protonMail {
-    &:hover {
-        background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
-    }
+    background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
 }
