@@ -38,6 +38,7 @@ nav {
 
 .nav-button {
     width: 100%;
+    height: 70px;
     border: 2px solid #222;
     border-radius: 8px;
     color: #FFFFFF;
@@ -187,12 +188,8 @@ main {
     background-image: url('https://avidopenaccess.org/wp-content/uploads/2020/04/microsoftwhiteboard-1.jpg');
 }
 
-#trello {
-    background-image: url('https://sm.pcmag.com/pcmag_uk/review/t/trello/trello_dq28.jpg');
-}
-
 #notion {
-    background-image: url('https://stadt-bremerhaven.de/wp-content/uploads/2024/01/notion.jpg');
+    background-image: url('https://integrately.com/blog/wp-content/uploads/2022/07/notion-tips.jpg');
 }
 
 #icloudMail {
