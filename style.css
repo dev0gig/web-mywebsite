@@ -9,6 +9,8 @@ body {
 
 iframe{
     border: none;
+    width: fit-content;
+    height: fit-content;
 }
 
 nav {
@@ -61,7 +63,6 @@ nav {
 
 #box-mails {
     grid-area: mails;
-
     display: flex;
 }
 
@@ -72,8 +73,9 @@ nav {
 }
 
 #box-google {
-    grid-area: google;
     text-align: center;
+    margin: 20px;
+    border: 3px dashed #666;
 }
 
 #my-tools {
@@ -90,9 +92,7 @@ main {
     grid-template-rows: auto;
     grid-template-areas:
         "mails mails mails mails"
-        "calendar calendar calendar tools"
-        "calendar calendar calendar tools"
-        "google google google tools";
+        "calendar calendar calendar tools";
     gap: 20px;
     padding: 20px;
 }
@@ -106,7 +106,7 @@ main {
         border-radius: 10px;
         border: none;
         width: 100%;
-        height: 600px;
+        height: 700px;
     }
 }
 
