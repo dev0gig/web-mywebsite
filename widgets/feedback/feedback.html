@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback geben</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    #feedbackFormContainer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 2px 2px 5px #888888;
+      z-index: 1000;
+    }
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="feedbackButton">Feedback geben</button>
+
+  <div id="feedbackFormContainer">
+    <h2>Feedback & Vorschläge zur Website</h2>
+    <p>Teile uns deine Ideen und Verbesserungsvorschläge mit!</p>
+    <form>
+      <div>
+        <label for="vorschlag">Dein Vorschlag:</label><br>
+        <textarea id="vorschlag" name="vorschlag" rows="5" cols="50"></textarea>
+      </div>
+      <br>
+      <button type="submit" onclick="window.location.href='mailto:pk.giger@proton.me?subject=Neuer Website-Vorschlag: ' + encodeURIComponent(document.getElementById('vorschlag').value) + '&body=';">Vorschlag senden</button>
+      <button type="button" onclick="document.getElementById('feedbackFormContainer').style.display='none'; document.getElementById('overlay').style.display='none';">Schließen</button>
+    </form>
+  </div>
+
+  <div id="overlay"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var feedbackButton = document.getElementById('feedbackButton');
+      var feedbackFormContainer = document.getElementById('feedbackFormContainer');
+      var overlay = document.getElementById('overlay');
+
+      feedbackButton.addEventListener('click', function() {
+        feedbackFormContainer.style.display = 'block';
+        overlay.style.display = 'block';
+      });
+
+      // Die Schließen-Funktion ist jetzt direkt im HTML der Buttons
+    });
+  </script>
+
+</body>
+</html>
