@@ -3,7 +3,6 @@ const categories = [
         title: "ADMIN",
         buttons: [
             { label: "Post", url: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen", img: "https://play-lh.googleusercontent.com/LCn0zMVjJXauMDNclMVMv8Ht-TNHHLqbCA61Xa7OR3X489dtOgpdFpzXT7H8KM_yTppO=s48-rw" },
-            { label: "Simplr", url: "https://login.simplr.de/", img: "https://play-lh.googleusercontent.com/2lDYD2Gd75L9qSeGKQgHp2enMlLGOopURlA2cEqbS7zyQakEg0Z2eo-C_z9mTpt5Gg=w240-h480-rw" },
             { label: "Wiener Städtische", url: "https://losleben.wienerstaedtische.at/app/dashboard", img: "https://play-lh.googleusercontent.com/w_Q8D-sCwYn5eKykRC-0377S9V8a2a_syDJ64hfDsenJmtjHAdLTZ7FEEaJWRQrgHzs=s48-rw" },
             { label: "SmartMeter", url: "https://smartmeter-web.wienernetze.at/uebersicht", img: "https://www.wienernetze.at/documents/34846/0/raute_freigestellt.png/198df669-6c8c-b05a-df7c-ef0be7a027ee?version=1.0&t=1583916092746&imagePreview=1" },
             { label: "WienEnergie", url: "https://meine.wienenergie.at/privat/meine-produkte", img: "https://avatars.githubusercontent.com/u/55399799?s=200&v=4" },
