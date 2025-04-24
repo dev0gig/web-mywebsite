@@ -7,6 +7,10 @@ body {
     flex-direction: column;
 }
 
+iframe{
+    border: none;
+}
+
 nav {
     position: fixed;
     top: 0;
@@ -29,7 +33,7 @@ nav {
 .nav-box {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     padding: 10px;
     border: 3px dashed #666;
     border-radius: 10px;
@@ -178,10 +182,6 @@ main {
         transform: translateY(-3px);
         cursor: pointer;
     }
-}
-
-#studioFirebase {
-    background-image: url('https://ph-files.imgix.net/e99a72af-a891-40c1-bcc7-5db2229bca36.png?auto=format&fit=crop');
 }
 
 #microsoftWhiteboard {
