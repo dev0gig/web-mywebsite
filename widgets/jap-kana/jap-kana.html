@@ -1,67 +1,221 @@
-body {
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #1e1e1e; /* Dunkler Hintergrund */
-    color: #f8f8f2; /* Helle Textfarbe */
-    margin: 0;
-}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiragana & Katakana Übung</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1e1e1e; /* Dunkler Hintergrund */
+            color: #f8f8f2; /* Helle Textfarbe */
+            margin: 0;
+        }
 
-.container {
-    background-color: #282a36; /* Dunkler Container-Hintergrund */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Dunklerer Schatten */
-    padding: 30px;
-    text-align: center;
-}
+        .container {
+            background-color: #282a36; /* Dunkler Container-Hintergrund */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Dunklerer Schatten */
+            padding: 30px;
+            text-align: center;
+        }
 
-.progress-bar-container {
-    background-color: #44475a; /* Dunklerer Fortschrittsbalken-Hintergrund */
-    border-radius: 4px;
-    height: 10px;
-    margin-bottom: 20px;
-    overflow: hidden;
-}
+        .progress-bar-container {
+            background-color: #44475a; /* Dunklerer Fortschrittsbalken-Hintergrund */
+            border-radius: 4px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
 
-.progress-bar {
-    background-color: #50fa7b; /* Helle Akzentfarbe für den Fortschritt */
-    height: 100%;
-    width: 0%;
-    border-radius: 4px;
-}
+        .progress-bar {
+            background-color: #50fa7b; /* Helle Akzentfarbe für den Fortschritt */
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+        }
 
-.answer-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-}
+        .question-container {
+            margin-bottom: 30px;
+        }
 
-.answer-button {
-    background-color: #6272a4; /* Dunklerer Button-Hintergrund */
-    color: #f8f8f2;
-    border: none;
-    border-radius: 4px;
-    padding: 15px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .japanese-char {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
 
-.answer-button:hover {
-    background-color: #44475a; /* Noch dunklerer Button-Hintergrund beim Hover */
-}
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Zwei Buttons pro Reihe */
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-.feedback {
-    font-weight: bold;
-}
+        .answer-button {
+            background-color: #6272a4; /* Dunklerer Button-Hintergrund */
+            color: #f8f8f2;
+            border: none;
+            border-radius: 4px;
+            padding: 15px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.feedback.correct {
-    color: #50fa7b; /* Helle Farbe für korrekte Rückmeldung */
-}
+        .answer-button:hover {
+            background-color: #44475a; /* Noch dunklerer Button-Hintergrund beim Hover */
+        }
 
-.feedback.incorrect {
-    color: #ff5555; /* Helle Farbe für falsche Rückmeldung */
-}
+        .feedback {
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            color: #50fa7b; /* Helle Farbe für korrekte Rückmeldung */
+        }
+
+        .feedback.incorrect {
+            color: #ff5555; /* Helle Farbe für falsche Rückmeldung */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+        </div>
+        <div class="question-container">
+            <div class="japanese-char"></div>
+            <div class="answer-buttons">
+                <button class="answer-button" data-romanji=""></button>
+                <button class="answer-button" data-romanji=""></button>
+                <button class="answer-button" data-romanji=""></button>
+                <button class="answer-button" data-romanji=""></button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+    </div>
+    <script>
+        const japaneseCharElement = document.querySelector('.japanese-char');
+        const answerButtonsElement = document.querySelector('.answer-buttons');
+        const answerButtonElements = document.querySelectorAll('.answer-button');
+        const feedbackElement = document.querySelector('.feedback');
+        const progressBarElement = document.querySelector('.progress-bar');
+
+        const hiragana = [
+            { char: 'あ', romanji: 'a' }, { char: 'い', romanji: 'i' }, { char: 'う', romanji: 'u' }, { char: 'え', romanji: 'e' }, { char: 'お', romanji: 'o' },
+            { char: 'か', romanji: 'ka' }, { char: 'き', romanji: 'ki' }, { char: 'く', romanji: 'ku' }, { char: 'け', romanji: 'ke' }, { char: 'こ', romanji: 'ko' },
+            { char: 'さ', romanji: 'sa' }, { char: 'し', romanji: 'shi' }, { char: 'す', romanji: 'su' }, { char: 'せ', romanji: 'se' }, { char: 'そ', romanji: 'so' },
+            { char: 'た', romanji: 'ta' }, { char: 'ち', romanji: 'chi' }, { char: 'つ', romanji: 'tsu' }, { char: 'て', romanji: 'te' }, { char: 'と', romanji: 'to' },
+            { char: 'な', romanji: 'na' }, { char: 'に', romanji: 'ni' }, { char: 'ぬ', romanji: 'nu' }, { char: 'ね', romanji: 'ne' }, { char: 'の', romanji: 'no' },
+            { char: 'は', romanji: 'ha' }, { char: 'ひ', romanji: 'hi' }, { char: 'ふ', romanji: 'fu' }, { char: 'へ', romanji: 'he' }, { char: 'ほ', romanji: 'ho' },
+            { char: 'ま', romanji: 'ma' }, { char: 'み', romanji: 'mi' }, { char: 'む', romanji: 'mu' }, { char: 'め', romanji: 'me' }, { char: 'も', romanji: 'mo' },
+            { char: 'や', romanji: 'ya' }, { char: 'ゆ', romanji: 'yu' }, { char: 'よ', romanji: 'yo' },
+            { char: 'ら', romanji: 'ra' }, { char: 'り', romanji: 'ri' }, { char: 'る', romanji: 'ru' }, { char: 'れ', romanji: 're' }, { char: 'ろ', romanji: 'ro' },
+            { char: 'わ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ん', romanji: 'n' }
+        ];
+
+        const katakana = [
+            { char: 'ア', romanji: 'a' }, { char: 'イ', romanji: 'i' }, { char: 'ウ', romanji: 'u' }, { char: 'エ', romanji: 'e' }, { char: 'オ', romanji: 'o' },
+            { char: 'カ', romanji: 'ka' }, { char: 'キ', romanji: 'ki' }, { char: 'ク', romanji: 'ku' }, { char: 'ケ', romanji: 'ke' }, { char: 'コ', romanji: 'ko' },
+            { char: 'サ', romanji: 'sa' }, { char: 'シ', romanji: 'shi' }, { char: 'ス', romanji: 'su' }, { char: 'セ', romanji: 'se' }, { char: 'ソ', romanji: 'so' },
+            { char: 'タ', romanji: 'ta' }, { char: 'チ', romanji: 'chi' }, { char: 'ツ', romanji: 'tsu' }, { char: 'テ', romanji: 'te' }, { char: 'ト', romanji: 'to' },
+            { char: 'ナ', romanji: 'na' }, { char: 'ニ', romanji: 'ni' }, { char: 'ヌ', romanji: 'nu' }, { char: 'ネ', romanji: 'ne' }, { char: 'ノ', romanji: 'no' },
+            { char: 'ハ', romanji: 'ha' }, { char: 'ヒ', romanji: 'hi' }, { char: 'フ', romanji: 'fu' }, { char: 'ヘ', romanji: 'he' }, { char: 'ホ', romanji: 'ho' },
+            { char: 'マ', romanji: 'ma' }, { char: 'ミ', romanji: 'mi' }, { char: 'ム', romanji: 'mu' }, { char: 'メ', romanji: 'me' }, { char: 'モ', romanji: 'mo' },
+            { char: 'ヤ', romanji: 'ya' }, { char: 'ユ', romanji: 'yu' }, { char: 'ヨ', romanji: 'yo' },
+            { char: 'ラ', romanji: 'ra' }, { char: 'リ', romanji: 'ri' }, { char: 'ル', romanji: 'ru' }, { char: 'レ', romanji: 're' }, { char: 'ロ', romanji: 'ro' },
+            { char: 'ワ', romanji: 'wa' }, { char: 'ヲ', romanji: 'wo' }, { char: 'ン', romanji: 'n' }
+        ];
+
+        let currentQuestion = null;
+        let currentSet = []; // Hier speichern wir die Hiragana oder Katakana, die gerade abgefragt werden
+        let questionIndex = 0;
+        const totalQuestions = hiragana.length + katakana.length;
+        let correctAnswers = 0;
+
+        function selectCharacterSet() {
+            // Hier könntest du später eine Auswahlmöglichkeit für Hiragana/Katakana einbauen
+            // Im Moment nehmen wir einfach beide gemischt
+            currentSet = [...hiragana, ...katakana];
+            currentSet = shuffleArray(currentSet); // Mischen die Zeichen zufällig
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function nextQuestion() {
+            if (questionIndex < currentSet.length) {
+                currentQuestion = currentSet[questionIndex];
+                japaneseCharElement.textContent = currentQuestion.char;
+                const correctAnswer = currentQuestion.romanji;
+                const incorrectAnswers = getIncorrectAnswers(correctAnswer);
+                const allAnswers = shuffleArray([correctAnswer, ...incorrectAnswers]);
+
+                answerButtonElements.forEach((button, index) => {
+                    button.textContent = allAnswers[index];
+                    button.dataset.romanji = allAnswers[index];
+                    button.onclick = () => checkAnswer(button.dataset.romanji);
+                    button.disabled = false; // Buttons wieder aktivieren
+                });
+
+                feedbackElement.textContent = ''; // Feedback zurücksetzen
+                updateProgressBar();
+                questionIndex++;
+            } else {
+                // Alle Fragen beantwortet
+                feedbackElement.textContent = `Fertig! Du hast ${correctAnswers} von ${totalQuestions} richtig.`;
+                answerButtonElements.forEach(button => button.disabled = true); // Buttons deaktivieren
+            }
+        }
+
+        function getIncorrectAnswers(correctAnswer) {
+            const allRomanji = [...hiragana.map(h => h.romanji), ...katakana.map(k => k.romanji)];
+            const uniqueRomanji = [...new Set(allRomanji)]; // Entfernt Duplikate
+            const incorrect = [];
+            while (incorrect.length < 3) {
+                const randomIndex = Math.floor(Math.random() * uniqueRomanji.length);
+                const randomAnswer = uniqueRomanji[randomIndex];
+                if (randomAnswer !== correctAnswer && !incorrect.includes(randomAnswer)) {
+                    incorrect.push(randomAnswer);
+                }
+            }
+            return incorrect;
+        }
+
+        function checkAnswer(selectedAnswer) {
+            answerButtonElements.forEach(button => button.disabled = true); // Buttons nach der Antwort deaktivieren
+
+            if (selectedAnswer === currentQuestion.romanji) {
+                feedbackElement.textContent = 'Richtig!';
+                feedbackElement.className = 'feedback correct';
+                correctAnswers++;
+            } else {
+                feedbackElement.textContent = `Falsch. Die richtige Antwort ist: ${currentQuestion.romanji}`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+
+            // Nach kurzer Zeit zur nächsten Frage
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function updateProgressBar() {
+            const progress = (questionIndex / totalQuestions) * 100;
+            progressBarElement.style.width = `${progress}%`;
+        }
+
+        // Initialisierung
+        selectCharacterSet();
+        nextQuestion();
+    </script>
+</body>
+</html>
