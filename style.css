@@ -68,8 +68,6 @@ nav {
 
 #box-calendar {
     grid-area: calendar;
-    border: none;
-    background-color: transparent;
 }
 
 #box-google {
