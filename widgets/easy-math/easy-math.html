@@ -7,6 +7,11 @@
     <style>
         body {
             background-color: transparent; /* Hintergrund des Bodys transparent */
+            display: flex; /* Aktiviere Flexbox für das Body-Element */
+            justify-content: center; /* Horizontale Zentrierung */
+            align-items: center; /* Vertikale Zentrierung (optional, je nach Notion-Einbettung) */
+            min-height: 100vh; /* Stelle sicher, dass der body die volle Höhe des sichtbaren Bereichs hat (innerhalb des iFrames) */
+            margin: 0; /* Entferne Standard-Margins des Body */
         }
 
         .widget {
@@ -15,6 +20,8 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            width: 300px; /* Feste Breite des Widgets */
+            min-height: 200px; /* Minimale Höhe des Widgets */
         }
 
         .antworten {
