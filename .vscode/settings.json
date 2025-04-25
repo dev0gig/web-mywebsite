@@ -1,3 +1,37 @@
 {
-    "liveServer.settings.port": 5503
+    "liveServer.settings.port": 5503,
+    "folder-color.pathColors": [
+        {
+            "folderPath": "web.favorites/widgets/",
+            "color": "foldercolorizer.color_00cc00"
+        },
+        {
+            "folderPath": "web.favorites/widgets/clock/",
+            "color": "foldercolorizer.color_0066cc"
+        },
+        {
+            "folderPath": "web.favorites/widgets/feedback/",
+            "color": "foldercolorizer.color_9900cc"
+        },
+        {
+            "folderPath": "web.favorites/widgets/jap-kana/",
+            "color": "foldercolorizer.color_99cc66"
+        },
+        {
+            "folderPath": "web.favorites/widgets/RbPi-InfoBoard/",
+            "color": "foldercolorizer.color_ff3333"
+        },
+        {
+            "folderPath": "web.favorites/favorites/",
+            "color": "foldercolorizer.color_cc33ff"
+        },
+        {
+            "folderPath": "web.favorites/style.css/",
+            "color": "foldercolorizer.color_cc6600"
+        },
+        {
+            "folderPath": "web.favorites/index.html/",
+            "color": "foldercolorizer.color_cc6600"
+        }
+    ]
 }
