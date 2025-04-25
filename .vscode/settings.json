@@ -2,35 +2,54 @@
     "liveServer.settings.port": 5504,
     "folder-color.pathColors": [
         {
-            "folderPath": "web.favorites/widgets/",
-            "color": "foldercolorizer.color_00cc00"
+            "folderPath": "web.favorites/.vscode/"
         },
         {
-            "folderPath": "web.favorites/widgets/clock/",
-            "color": "foldercolorizer.color_0066cc"
+            "folderPath": "web.favorites/favorites/favorites.html/"
         },
         {
-            "folderPath": "web.favorites/widgets/feedback/",
-            "color": "foldercolorizer.color_9900cc"
+            "folderPath": "web.favorites/favorites/stylesheet.css/"
         },
         {
-            "folderPath": "web.favorites/widgets/jap-kana/",
-            "color": "foldercolorizer.color_99cc66"
+            "folderPath": "web.favorites/widgets/clock/clock.html/"
+        },
+        {
+            "folderPath": "web.favorites/widgets/feedback/feedback.html/"
+        },
+        {
+            "folderPath": "web.favorites/widgets/jap-kana/jap-kana.html/"
+        },
+        {
+            "folderPath": "web.favorites/widgets/calculator.html/"
+        },
+        {
+            "folderPath": "web.favorites/widgets/easy-math.html/"
+        },
+        {
+            "folderPath": "web.favorites/README.md/"
         },
         {
             "folderPath": "web.favorites/widgets/RbPi-InfoBoard/",
+            "color": "foldercolorizer.color_33cc33"
+        },
+        {
+            "folderPath": "web.favorites/widgets/jap-kana/",
             "color": "foldercolorizer.color_ff3333"
         },
         {
-            "folderPath": "web.favorites/favorites/",
-            "color": "foldercolorizer.color_cc33ff"
+            "folderPath": "web.favorites/widgets/feedback/",
+            "color": "foldercolorizer.color_0066ff"
         },
         {
-            "folderPath": "web.favorites/style.css/",
-            "color": "foldercolorizer.color_cc6600"
+            "folderPath": "web.favorites/widgets/easy-math/",
+            "color": "foldercolorizer.color_ffcc00"
         },
         {
-            "folderPath": "web.favorites/index.html/",
+            "folderPath": "web.favorites/widgets/clock/",
+            "color": "foldercolorizer.color_cc66ff"
+        },
+        {
+            "folderPath": "web.favorites/widgets/calculator/",
             "color": "foldercolorizer.color_cc6600"
         }
     ]
