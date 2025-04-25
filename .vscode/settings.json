@@ -51,6 +51,10 @@
         {
             "folderPath": "web.favorites/widgets/calculator/",
             "color": "foldercolorizer.color_cc6600"
+        },
+        {
+            "folderPath": "web.favorites/widgets/tariff/",
+            "color": "foldercolorizer.color_cc66ff"
         }
     ]
 }
