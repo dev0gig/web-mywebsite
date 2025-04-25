@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopfrechnen-Trainer</title>
+    <style>
+        body {
+            background-color: transparent; /* Hintergrund des Bodys transparent */
+        }
+
+        .widget {
+            background-color: #333; /* Dunkler Hintergrund für das Widget */
+            color: #f0f0f0; /* Helle Textfarbe */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .antworten {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Zwei Spalten für die Buttons */
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .antworten button {
+            background-color: #555;
+            color: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .antworten button:hover {
+            background-color: #777;
+        }
+
+        #feedback {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #feedback.richtig {
+            color: green;
+        }
+
+        #feedback.falsch {
+            color: red;
+        }
+
+        #neueAufgabe {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #neueAufgabe:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <p id="aufgabe"></p>
+        <div class="antworten">
+            <button id="antwort1"></button>
+            <button id="antwort2"></button>
+            <button id="antwort3"></button>
+            <button id="antwort4"></button>
+        </div>
+        <p id="feedback"></p>
+        <button id="neueAufgabe">Nächste Aufgabe</button>
+    </div>
+
+    <script>
+        const aufgabeElement = document.getElementById('aufgabe');
+        const antwortButtons = document.querySelectorAll('.antworten button');
+        const feedbackElement = document.getElementById('feedback');
+        const neueAufgabeButton = document.getElementById('neueAufgabe');
+
+        let aktuelleAufgabe;
+
+        function generiereAufgabe() {
+            const zahl1 = Math.floor(Math.random() * 20) + 1; // Zufällige Zahl zwischen 1 und 20
+            let zahl2 = Math.floor(Math.random() * 19) + 1; // Zufällige Zahl zwischen 1 und 19 (um Division durch 0 zu vermeiden)
+            const operationen = ['+', '-', '*', '/'];
+            const zufaelligeOperation = operationen[Math.floor(Math.random() * operationen.length)];
+
+            let richtigeAntwort;
+            switch (zufaelligeOperation) {
+                case '+':
+                    richtigeAntwort = zahl1 + zahl2;
+                    break;
+                case '-':
+                    richtigeAntwort = zahl1 - zahl2;
+                    break;
+                case '*':
+                    richtigeAntwort = zahl1 * zahl2;
+                    break;
+                case '/':
+                    // Stelle sicher, dass die Division aufgeht und vermeide Division durch 0
+                    if (zahl2 !== 0 && zahl1 % zahl2 === 0) {
+                        richtigeAntwort = zahl1 / zahl2;
+                    } else {
+                        // Wenn die Division nicht aufgeht, wähle eine andere Operation
+                        const andereOperationen = ['+', '-', '*'];
+                        const neueZufaelligeOperation = andereOperationen[Math.floor(Math.random() * andereOperationen.length)];
+                        if (neueZufaelligeOperation === '+') {
+                            richtigeAntwort = zahl1 + zahl2;
+                            zufaelligeOperation = '+';
+                        } else if (neueZufaelligeOperation === '-') {
+                            richtigeAntwort = zahl1 - zahl2;
+                            zufaelligeOperation = '-';
+                        } else {
+                            richtigeAntwort = zahl1 * zahl2;
+                            zufaelligeOperation = '*';
+                        }
+                    }
+                    break;
+            }
+
+            aktuelleAufgabe = {
+                frage: `${zahl1} ${zufaelligeOperation} ${zahl2} = ?`,
+                richtigeAntwort: richtigeAntwort
+            };
+        }
+
+        function generiereAntworten() {
+            const richtigeAntwort = aktuelleAufgabe.richtigeAntwort;
+            const falscheAntworten = [];
+            while (falscheAntworten.length < 3) {
+                const zufaelligeAntwort = Math.floor(Math.random() * 50) + 1; // Zufällige Zahl zwischen 1 und 50
+                if (zufaelligeAntwort !== richtigeAntwort && !falscheAntworten.includes(zufaelligeAntwort)) {
+                    falscheAntworten.push(zufaelligeAntwort);
+                }
+            }
+
+            const alleAntworten = [...falscheAntworten, richtigeAntwort];
+            // Zufällige Anordnung der Antworten
+            for (let i = alleAntworten.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [alleAntworten[i], alleAntworten[j]] = [alleAntworten[j], alleAntworten[i]];
+            }
+
+            antwortButtons.forEach((button, index) => {
+                button.textContent = alleAntworten[index];
+                button.onclick = () => ueberpruefeAntwort(alleAntworten[index]);
+            });
+        }
+
+        function zeigeAufgabe() {
+            aufgabeElement.textContent = aktuelleAufgabe.frage;
+            feedbackElement.textContent = ''; // Feedback zurücksetzen
+            feedbackElement.className = '';
+        }
+
+        function ueberpruefeAntwort(gewaehlteAntwort) {
+            if (gewaehlteAntwort === aktuelleAufgabe.richtigeAntwort) {
+                feedbackElement.textContent = 'Richtig!';
+                feedbackElement.className = 'richtig';
+            } else {
+                feedbackElement.textContent = `Falsch. Die richtige Antwort ist ${aktuelleAufgabe.richtigeAntwort}.`;
+                feedbackElement.className = 'falsch';
+            }
+        }
+
+        function starteSpiel() {
+            generiereAufgabe();
+            generiereAntworten();
+            zeigeAufgabe();
+        }
+
+        neueAufgabeButton.addEventListener('click', starteSpiel);
+
+        starteSpiel(); // Spiel beim Laden der Seite starten
+    </script>
+</body>
+</html>
