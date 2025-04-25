@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,11 @@
     <style>
         body {
             background-color: transparent;
+            display: flex; /* Aktiviert Flexbox für die Zentrierung */
+            justify-content: center; /* Zentriert horizontal */
+            align-items: center; /* Zentriert vertikal */
+            min-height: 100vh; /* Stellt sicher, dass der Body mindestens die Höhe des Viewports hat */
+            margin: 0; /* Entfernt Standard-Margins des Bodys */
         }
 
         .calculator {
@@ -51,7 +57,8 @@
 
         .clearDisplay {
             background-color: #e53935;
-            grid-column: span 2; /* Lässt den Clear-Button zwei Spalten breit sein */
+            grid-column: span 2;
+            /* Lässt den Clear-Button zwei Spalten breit sein */
         }
 
         .operator {
@@ -63,10 +70,12 @@
         }
 
         .equals {
-            grid-column: span 2; /* Lässt den Gleichheitsbutton zwei Spalten breit sein */
+            grid-column: span 2;
+            /* Lässt den Gleichheitsbutton zwei Spalten breit sein */
         }
     </style>
 </head>
+
 <body>
     <div class="calculator">
         <div class="display">0</div>
@@ -97,6 +106,7 @@
         let currentInput = '';
         let previousInput = null;
         let currentOperator = null;
+        let percentValue = null; // Speichert den Prozentwert
 
         function appendValue(value) {
             currentInput += value;
@@ -107,11 +117,20 @@
             currentInput = '';
             previousInput = null;
             currentOperator = null;
+            percentValue = null;
             display.textContent = '0';
         }
 
         function performOperation(operator) {
             if (currentInput === '' && previousInput === null) return;
+
+            if (operator === '%') {
+                percentValue = parseFloat(currentInput) / 100; // Speichert den Prozentwert
+                const interimResult = parseFloat(previousInput) * percentValue;
+                display.textContent = interimResult; // Zeigt das Zwischenresultat an
+                currentInput = String(interimResult); // Speichert das Zwischenresultat als aktuelle Eingabe für die Endberechnung
+                return;
+            }
 
             if (previousInput !== null) {
                 calculate();
@@ -123,15 +142,9 @@
 
         function calculateResult() {
             if (currentOperator === null) return;
-            if (currentInput === '') currentInput = '0';
-            calculate();
-            currentOperator = null;
-        }
-
-        function calculate() {
+            let current = parseFloat(currentInput);
             let result = 0;
             const prev = parseFloat(previousInput);
-            const current = parseFloat(currentInput);
 
             if (isNaN(prev) || isNaN(current)) return;
 
@@ -152,16 +165,14 @@
                     }
                     result = prev / current;
                     break;
-                case '%':
-                    result = prev / 100 * current; // Beispielhafte Prozentrechnung: "x Prozent von y"
-                    break;
-                default:
-                    return;
             }
             display.textContent = result;
             currentInput = String(result);
             previousInput = null;
+            currentOperator = null;
+            percentValue = null; // Setzt percentValue zurück
         }
     </script>
 </body>
+
 </html>
