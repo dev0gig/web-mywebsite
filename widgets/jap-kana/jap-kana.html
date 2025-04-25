@@ -11,9 +11,35 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: transparent; /* Dunkler Hintergrund */
+            background-color: transparent; /* Transparenter Hintergrund */
             color: #f8f8f2; /* Helle Textfarbe */
             margin: 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px; /* Abstand zum Widget */
+        }
+
+        .control-button {
+            background-color: #6272a4; /* Dunklerer Button-Hintergrund */
+            color: #f8f8f2;
+            border: none;
+            border-radius: 4px;
+            width: 50px; /* Feste Breite */
+            height: 50px; /* Feste Höhe */
+            font-size: 24px; /* Größere Schrift für die Zeichen */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px; /* Abstand zwischen den Buttons */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-button:hover {
+            background-color: #44475a; /* Noch dunklerer Button-Hintergrund beim Hover */
         }
 
         .container {
@@ -22,15 +48,18 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Dunklerer Schatten */
             padding: 30px;
             text-align: center;
-            height: 330px;
-            width: 200px;
+            height: 330px; /* Feste Höhe */
+            width: 200px; /* Feste Breite */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Verteilt den Inhalt vertikal */
         }
 
         .progress-bar-container {
             background-color: #44475a; /* Dunklerer Fortschrittsbalken-Hintergrund */
             border-radius: 5px;
-            height: 10px;
-            margin-bottom: 20px;
+            height: 10px; /* Feste Höhe */
+            margin-bottom: 10px; /* Weniger Abstand */
             overflow: hidden;
         }
 
@@ -42,19 +71,22 @@
         }
 
         .question-container {
-            margin-bottom: 30px;
+            margin-bottom: 10px; /* Weniger Abstand */
+            height: 100px; /* Feste Höhe für den Fragebereich */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .japanese-char {
             font-size: 80px;
-            margin-bottom: 20px;
         }
 
         .answer-buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Zwei Buttons pro Reihe */
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Weniger Abstand */
         }
 
         .answer-button {
@@ -62,8 +94,9 @@
             color: #f8f8f2;
             border: none;
             border-radius: 4px;
-            padding: 15px 20px;
-            font-size: 18px;
+            width: 80px; /* Feste Breite für Antwortbuttons */
+            height: 40px; /* Feste Höhe für Antwortbuttons */
+            font-size: 16px; /* Kleinere Schrift */
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -74,6 +107,11 @@
 
         .feedback {
             font-weight: bold;
+            font-size: 16px; /* Kleinere Schrift */
+            height: 20px; /* Feste Höhe für Feedback */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .feedback.correct {
@@ -86,29 +124,35 @@
     </style>
 </head>
 <body>
+    <div class="controls">
+        <button class="control-button" id="romanji-to-kana">a</button>
+        <button class="control-button" id="kana-to-romanji">あ</button>
+    </div>
     <div class="container">
         <div class="progress-bar-container">
             <div class="progress-bar"></div>
         </div>
         <div class="question-container">
             <div class="japanese-char"></div>
-            <div class="answer-buttons">
-                <button class="answer-button" data-romanji=""></button>
-                <button class="answer-button" data-romanji=""></button>
-                <button class="answer-button" data-romanji=""></button>
-                <button class="answer-button" data-romanji=""></button>
-            </div>
-            <div class="feedback"></div>
         </div>
+        <div class="answer-buttons">
+            <button class="answer-button" data-answer=""></button>
+            <button class="answer-button" data-answer=""></button>
+            <button class="answer-button" data-answer=""></button>
+            <button class="answer-button" data-answer=""></button>
+        </div>
+        <div class="feedback"></div>
     </div>
     <script>
+        const romanjiToKanaButton = document.getElementById('romanji-to-kana');
+        const kanaToRomanjiButton = document.getElementById('kana-to-romanji');
         const japaneseCharElement = document.querySelector('.japanese-char');
         const answerButtonsElement = document.querySelector('.answer-buttons');
         const answerButtonElements = document.querySelectorAll('.answer-button');
         const feedbackElement = document.querySelector('.feedback');
         const progressBarElement = document.querySelector('.progress-bar');
 
-        const hiragana = [
+        const allKana = [
             { char: 'あ', romanji: 'a' }, { char: 'い', romanji: 'i' }, { char: 'う', romanji: 'u' }, { char: 'え', romanji: 'e' }, { char: 'お', romanji: 'o' },
             { char: 'か', romanji: 'ka' }, { char: 'き', romanji: 'ki' }, { char: 'く', romanji: 'ku' }, { char: 'け', romanji: 'ke' }, { char: 'こ', romanji: 'ko' },
             { char: 'さ', romanji: 'sa' }, { char: 'し', romanji: 'shi' }, { char: 'す', romanji: 'su' }, { char: 'せ', romanji: 'se' }, { char: 'そ', romanji: 'so' },
@@ -118,10 +162,7 @@
             { char: 'ま', romanji: 'ma' }, { char: 'み', romanji: 'mi' }, { char: 'む', romanji: 'mu' }, { char: 'め', romanji: 'me' }, { char: 'も', romanji: 'mo' },
             { char: 'や', romanji: 'ya' }, { char: 'ゆ', romanji: 'yu' }, { char: 'よ', romanji: 'yo' },
             { char: 'ら', romanji: 'ra' }, { char: 'り', romanji: 'ri' }, { char: 'る', romanji: 'ru' }, { char: 'れ', romanji: 're' }, { char: 'ろ', romanji: 'ro' },
-            { char: 'わ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ん', romanji: 'n' }
-        ];
-
-        const katakana = [
+            { char: 'わ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ん', romanji: 'n' },
             { char: 'ア', romanji: 'a' }, { char: 'イ', romanji: 'i' }, { char: 'ウ', romanji: 'u' }, { char: 'エ', romanji: 'e' }, { char: 'オ', romanji: 'o' },
             { char: 'カ', romanji: 'ka' }, { char: 'キ', romanji: 'ki' }, { char: 'ク', romanji: 'ku' }, { char: 'ケ', romanji: 'ke' }, { char: 'コ', romanji: 'ko' },
             { char: 'サ', romanji: 'sa' }, { char: 'シ', romanji: 'shi' }, { char: 'ス', romanji: 'su' }, { char: 'セ', romanji: 'se' }, { char: 'ソ', romanji: 'so' },
@@ -131,20 +172,24 @@
             { char: 'マ', romanji: 'ma' }, { char: 'ミ', romanji: 'mi' }, { char: 'ム', romanji: 'mu' }, { char: 'メ', romanji: 'me' }, { char: 'モ', romanji: 'mo' },
             { char: 'ヤ', romanji: 'ya' }, { char: 'ユ', romanji: 'yu' }, { char: 'ヨ', romanji: 'yo' },
             { char: 'ラ', romanji: 'ra' }, { char: 'リ', romanji: 'ri' }, { char: 'ル', romanji: 'ru' }, { char: 'レ', romanji: 're' }, { char: 'ロ', romanji: 'ro' },
-            { char: 'ワ', romanji: 'wa' }, { char: 'ヲ', romanji: 'wo' }, { char: 'ン', romanji: 'n' }
+            { char: 'ワ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ン', romanji: 'n' }
         ];
 
         let currentQuestion = null;
-        let currentSet = []; // Hier speichern wir die Hiragana oder Katakana, die gerade abgefragt werden
+        let currentSet = [];
         let questionIndex = 0;
-        const totalQuestions = hiragana.length + katakana.length;
+        let totalQuestions = allKana.length;
         let correctAnswers = 0;
+        let practiceRomanjiToKana = true; // Startmodus: Romanji zu Kana
 
         function selectCharacterSet() {
-            // Hier könntest du später eine Auswahlmöglichkeit für Hiragana/Katakana einbauen
-            // Im Moment nehmen wir einfach beide gemischt
-            currentSet = [...hiragana, ...katakana];
-            currentSet = shuffleArray(currentSet); // Mischen die Zeichen zufällig
+            currentSet = [...allKana];
+            currentSet = shuffleArray(currentSet);
+            totalQuestions = currentSet.length;
+            questionIndex = 0;
+            correctAnswers = 0;
+            updateProgressBar();
+            nextQuestion();
         }
 
         function shuffleArray(array) {
@@ -158,35 +203,43 @@
         function nextQuestion() {
             if (questionIndex < currentSet.length) {
                 currentQuestion = currentSet[questionIndex];
-                japaneseCharElement.textContent = currentQuestion.char;
-                const correctAnswer = currentQuestion.romanji;
-                const incorrectAnswers = getIncorrectAnswers(correctAnswer);
-                const allAnswers = shuffleArray([correctAnswer, ...incorrectAnswers]);
-
-                answerButtonElements.forEach((button, index) => {
-                    button.textContent = allAnswers[index];
-                    button.dataset.romanji = allAnswers[index];
-                    button.onclick = () => checkAnswer(button.dataset.romanji);
-                    button.disabled = false; // Buttons wieder aktivieren
-                });
-
-                feedbackElement.textContent = ''; // Feedback zurücksetzen
+                if (practiceRomanjiToKana) {
+                    japaneseCharElement.textContent = currentQuestion.romanji;
+                    setupAnswerButtons(currentQuestion.char);
+                } else {
+                    japaneseCharElement.textContent = currentQuestion.char;
+                    setupAnswerButtons(currentQuestion.romanji);
+                }
+                feedbackElement.textContent = '';
                 updateProgressBar();
                 questionIndex++;
             } else {
-                // Alle Fragen beantwortet
                 feedbackElement.textContent = `Fertig! Du hast ${correctAnswers} von ${totalQuestions} richtig.`;
-                answerButtonElements.forEach(button => button.disabled = true); // Buttons deaktivieren
+                answerButtonElements.forEach(button => button.disabled = true);
             }
         }
 
+        function setupAnswerButtons(correctAnswer) {
+            const incorrectAnswers = getIncorrectAnswers(correctAnswer);
+            const allAnswers = shuffleArray([correctAnswer, ...incorrectAnswers]);
+
+            answerButtonElements.forEach((button, index) => {
+                button.textContent = allAnswers[index];
+                button.dataset.answer = allAnswers[index];
+                button.onclick = () => checkAnswer(button.dataset.answer, correctAnswer);
+                button.disabled = false;
+            });
+        }
+
         function getIncorrectAnswers(correctAnswer) {
-            const allRomanji = [...hiragana.map(h => h.romanji), ...katakana.map(k => k.romanji)];
-            const uniqueRomanji = [...new Set(allRomanji)]; // Entfernt Duplikate
+            const allPossibleAnswers = practiceRomanjiToKana
+                ? allKana.map(k => k.char)
+                : allKana.map(k => k.romanji);
+            const uniqueAnswers = [...new Set(allPossibleAnswers)];
             const incorrect = [];
             while (incorrect.length < 3) {
-                const randomIndex = Math.floor(Math.random() * uniqueRomanji.length);
-                const randomAnswer = uniqueRomanji[randomIndex];
+                const randomIndex = Math.floor(Math.random() * uniqueAnswers.length);
+                const randomAnswer = uniqueAnswers[randomIndex];
                 if (randomAnswer !== correctAnswer && !incorrect.includes(randomAnswer)) {
                     incorrect.push(randomAnswer);
                 }
@@ -194,19 +247,18 @@
             return incorrect;
         }
 
-        function checkAnswer(selectedAnswer) {
-            answerButtonElements.forEach(button => button.disabled = true); // Buttons nach der Antwort deaktivieren
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            answerButtonElements.forEach(button => button.disabled = true);
 
-            if (selectedAnswer === currentQuestion.romanji) {
+            if (selectedAnswer === correctAnswer) {
                 feedbackElement.textContent = 'Richtig!';
                 feedbackElement.className = 'feedback correct';
                 correctAnswers++;
             } else {
-                feedbackElement.textContent = `Falsch. Die richtige Antwort ist: ${currentQuestion.romanji}`;
+                feedbackElement.textContent = `Falsch. Die richtige Antwort ist: ${correctAnswer}`;
                 feedbackElement.className = 'feedback incorrect';
             }
 
-            // Nach kurzer Zeit zur nächsten Frage
             setTimeout(nextQuestion, 1500);
         }
 
@@ -215,9 +267,18 @@
             progressBarElement.style.width = `${progress}%`;
         }
 
+        romanjiToKanaButton.addEventListener('click', () => {
+            practiceRomanjiToKana = true;
+            selectCharacterSet();
+        });
+
+        kanaToRomanjiButton.addEventListener('click', () => {
+            practiceRomanjiToKana = false;
+            selectCharacterSet();
+        });
+
         // Initialisierung
         selectCharacterSet();
-        nextQuestion();
     </script>
 </body>
 </html>
