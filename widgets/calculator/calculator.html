@@ -57,8 +57,18 @@
 
         .clearDisplay {
             background-color: #e53935;
-            grid-column: span 2;
-            /* Lässt den Clear-Button zwei Spalten breit sein */
+        }
+
+        .clearEntry {
+            background-color: #ff6e6b;
+        }
+
+        .percent {
+            background-color: #d88500 !important;
+        }
+
+        .backspace {
+            background-color: #1180ff;
         }
 
         .operator {
@@ -68,11 +78,6 @@
         .operator:hover {
             background-color: #fbb03b;
         }
-
-        .equals {
-            grid-column: span 2;
-            /* Lässt den Gleichheitsbutton zwei Spalten breit sein */
-        }
     </style>
 </head>
 
@@ -81,23 +86,25 @@
         <div class="display">0</div>
         <div class="buttons">
             <button class="clearDisplay" onclick="clearDisplay()">C</button>
-            <button class="operator" onclick="performOperation('%')">%</button>
-            <button class="operator" onclick="performOperation('/')">÷</button>
+            <button class="clearEntry" onclick="clearEntry()">CE</button>
+            <button class="backspace" onclick="backspace()">&#8592;</button>
+            <button class="operator percent" onclick="performOperation('%')">%</button>
             <button onclick="appendValue('7')">7</button>
             <button onclick="appendValue('8')">8</button>
             <button onclick="appendValue('9')">9</button>
-            <button class="operator" onclick="performOperation('*')">×</button>
+            <button class="operator" onclick="performOperation('/')">÷</button>
             <button onclick="appendValue('4')">4</button>
             <button onclick="appendValue('5')">5</button>
             <button onclick="appendValue('6')">6</button>
-            <button class="operator" onclick="performOperation('-')">-</button>
+            <button class="operator" onclick="performOperation('*')">×</button>
             <button onclick="appendValue('1')">1</button>
             <button onclick="appendValue('2')">2</button>
             <button onclick="appendValue('3')">3</button>
-            <button class="operator" onclick="performOperation('+')">+</button>
-            <button onclick="appendValue('.')">.</button>
+            <button class="operator" onclick="performOperation('-')">-</button>
             <button onclick="appendValue('0')">0</button>
-            <button class="operator equals" onclick="calculateResult()">=</button>
+            <button onclick="appendValue('.')">.</button>
+            <button class="operator" onclick="calculateResult()">=</button>
+            <button class="operator" onclick="performOperation('+')">+</button>
         </div>
     </div>
 
@@ -119,6 +126,16 @@
             currentOperator = null;
             percentValue = null;
             display.textContent = '0';
+        }
+
+        function clearEntry() {
+            currentInput = '';
+            display.textContent = '0';
+        }
+
+        function backspace() {
+            currentInput = currentInput.slice(0, -1);
+            display.textContent = currentInput === '' ? '0' : currentInput;
         }
 
         function performOperation(operator) {
