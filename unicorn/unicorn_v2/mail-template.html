@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mailvorlagen</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/7285/7285521.png" />
+    <link rel="stylesheet" href="design/style-dark.css">
+    <link rel="stylesheet" href="float-button.css">
+
+</head>
+
+<body>
+
+    <main>
+        <section class="mail-main">
+
+            <div class="mail-main--left">
+            <!-- Strom & Gas -->
+            <details class="box-mail" open>
+                <summary>Strom & Gas</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="anmeldung">Anmeldung</button>
+                    <button class="button-single" id="abmeldung">Abmeldung</button>
+                    <button class="button-single" id="kdnr_benötigt">Kundennummer benötigt</button>
+                    <button class="button-single" id="rp">Ratenplan</button>
+                    <button class="button-single" id="rechnungskorrektur_zählerstände">Rechnungskorrektur &
+                        Zählerstände</button>
+                    <button class="button-single" id="sonnenstrom">Sonnenstrom</button>
+                    <button class="button-single" id="verlassenschaft">Verlassenschaft</button>
+                    <button class="button-single" id="tw">Tarifwechsel</button>
+                    <button class="button-single" id="trockenlegungsbrief">Trockenlegungbrief</button>
+                    <button class="button-single" id="ummeldung_erfolgreich">Ummeldung erfolgreich</button>
+                    <button class="button-single" id="anm_pv">ANM PV</button>
+                </div>
+            </details>
+
+            <!-- Guthaben -->
+            <details class="box-mail" open>
+                <summary>Guthaben</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="gh_auszahlung_ausweis_fehlt">ID fehlt</button>
+                    <button class="button-single" id="gh_auszahlung">GH Auszahlung</button>
+                    <button class="button-single" id="gh_allgemein">Allgemeines Wording</button>
+                </div>
+            </details>
+
+            <!-- Grundaufbau -->
+            <details class="box-mail" open>
+                <summary>Grundgerüst</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="grundgeruest">Grundgerüst</button>
+                    <button class="button-single" id="tois_vorlage">Tois-Vorlage</button>
+                </div>
+            </details>
+
+            <!-- Wärme -->
+            <details class="box-mail" open>
+                <summary>Wärme</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="waerme_anm">Anmeldung</button>
+                    <button class="button-single" id="waerme_an_abm">An-/Abmeldung</button>
+                    <button class="button-single" id="waerme_mieterwechsel">Mieterwechsel</button>
+                    <button class="button-single" id="heizkostenabrechnung">Heizkostenabrechnung</button>
+                    <button class="button-single" id="mw_untermieter">Mieterwechsel Untermieter</button>
+                </div>
+            </details>
+
+            <!-- WienerNetze -->
+            <details class="box-mail">
+                <summary>Wiener Netze</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="Einzelner_Zäst_gespeichert">Einzelner Zäst gespeichert</button>
+                    <button class="button-single" id="Mehrere_Zäst_gespeichert">Mehrere Zäst gespeichert</button>
+                    <button class="button-single" id="SmartMeter_Keine_ZÄST_benötigt">Smart Meter/ Keine ZÄST benötigt</button>
+                    <button class="button-single" id="Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung">Wenn der Kunde SMART Meter Zäst schickt bei Ummeldung</button>
+                    <button class="button-single" id="KD_ZÄST_von_Gas_und_SMART_Meter_schickt">Wenn KD ZÄST von Gas und SMART-Meter schickt</button>
+                    <button class="button-single" id="KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung">Wenn KD ZÄST von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist</button>
+                    
+                </div>
+            </details>
+
+            <!-- Kontaktdaten -->
+            <details class="box-mail">
+                <summary>Kontaktdaten</summary>
+                <div class="button-group-mail">
+                    <button class="button-single" id="data_spit">Spittelau</button>
+                    <button class="button-single" id="data_wn">WienerNetze</button>
+                    <button class="button-single" id="data_KS_allgemein">contact_data</button>
+                    <button class="button-single" id="data_inkasso">Inkassobüro</button>
+                </div>
+            </details>
+            </div>
+
+            <div class="mail-main--right">
+                <textarea id="outputArea" placeholder="Durch drücken in das Textfeld, wird der darin enthaltene Text automatisch kopiert..."></textarea>
+            </div>
+        </section>
+
+    <!-- ##################################################################################################################### -->
+    <style>
+        .floating-button {
+            position: fixed;
+            bottom: 0px;
+            right: 0px;
+            z-index: 10000;
+
+            a {
+                color: gray;
+                text-decoration: none;
+            }
+        }
+    </style>
+    <div class="floating-button">
+        <select id="theme-selector" onchange="changeTheme()">
+            <option value="design/style-dark.css">Dark Theme</option>
+            <option value="design/style-light.css">Light Theme</option>
+        </select>
+    </div>
+    <!-- /##################################################################################################################### -->
+    <!-- /##################################################################################################################### -->
+    <style>
+        .footer {
+            background-color: #111;
+            border-top: solid black 1px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            color: #888;
+        }
+    </style>
+    <footer class="footer">
+        <nav class="crumbs">
+            <li class="crumb"><a href="../index.html">unicorn-dashboard</a></li>
+            <li class="crumb"><a href="work-tools.html">we-tools</a></li>
+            <li class="crumb">mail-templates</li>
+        </nav>
+
+    </footer>
+    <!-- /##################################################################################################################### -->
+
+
+        <script src="script.js"></script>
+        <script src="changeTheme.js"></script>
+
+    </main>
+</body>
+
+</html>

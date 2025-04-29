@@ -55,6 +55,26 @@
         {
             "folderPath": "web.favorites/widgets/tariff/",
             "color": "foldercolorizer.color_cc66ff"
+        },
+        {
+            "folderPath": "web.MyWebsite/favorites/",
+            "color": "foldercolorizer.color_0000ff"
+        },
+        {
+            "folderPath": "web.MyWebsite/feedback/",
+            "color": "foldercolorizer.color_00cc33"
+        },
+        {
+            "folderPath": "web.MyWebsite/RbPi-InfoBoard/",
+            "color": "foldercolorizer.color_660033"
+        },
+        {
+            "folderPath": "web.MyWebsite/unicorn/",
+            "color": "foldercolorizer.color_cc0099"
+        },
+        {
+            "folderPath": "web.MyWebsite/widgets/",
+            "color": "foldercolorizer.color_ffcc33"
         }
     ]
 }
