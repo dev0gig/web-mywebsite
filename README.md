@@ -4,3 +4,6 @@ Da ich browserübergreifend meine Favoriten pflegen möchte, habe ich diese Seit
 
 used extensions: folder color, live server
 
+Dies ist mein neues Projekt, welches alle kleinen Projekte zusammenfasst.
+Link für die Website ist: https://dev0gig.github.io/web.MyWebsite/dashboard.html
+
