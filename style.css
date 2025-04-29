@@ -182,6 +182,10 @@ main {
     }
 }
 
+#codespace{
+    background-image: url('https://cdn-1.webcatalog.io/catalog/github-codespaces/github-codespaces-social-preview.png?v=1714774487205');
+}
+
 #microsoftWhiteboard {
     background-image: url('https://avidopenaccess.org/wp-content/uploads/2020/04/microsoftwhiteboard-1.jpg');
 }
