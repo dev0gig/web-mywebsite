@@ -5,5 +5,8 @@ Da ich browserübergreifend meine Favoriten pflegen möchte, habe ich diese Seit
 used extensions: folder color, live server
 
 Dies ist mein neues Projekt, welches alle kleinen Projekte zusammenfasst.
-Link für die Website ist: https://dev0gig.github.io/web.MyWebsite/dashboard.html
+Link für die Website ist: https://dev0gig.github.io/web-mywebsite/dashboard.html
 
+- was ich versuche ist ein feedback button mit email an mich
+- eine seite für darstellung der zeit und datum (vlt auch wetter) auf dem RaspberryPi
+- viele widgets für notion integration
