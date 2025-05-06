@@ -12,7 +12,7 @@
 		margin: 0px;
 		color: white;
 		background-color: #111;
-		width: 100vh;
+		width: 100vw; /* Ändere von vh zu vw */
 		height: 100vh;
 	}
 
@@ -20,10 +20,14 @@
 		text-align: center;
 	}
 
-	iframe{
+	.clock, .weather {
+		width: 100%; /* Nimmt die gesamte Breite des Browserfensters ein */
+	}
+
+	iframe {
 		border: none;
 		height: fit-content;
-		width: fit-content;
+		width: 100%; /* Passt sich der Breite des Containers an */
 	}
 </style>
 
