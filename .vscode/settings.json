@@ -75,6 +75,30 @@
         {
             "folderPath": "web.MyWebsite/widgets/",
             "color": "foldercolorizer.color_ffcc33"
+        },
+        {
+            "folderPath": "web-mywebsite/favorites/",
+            "color": "foldercolorizer.color_0000ff"
+        },
+        {
+            "folderPath": "web-mywebsite/feedback/",
+            "color": "foldercolorizer.color_00cc33"
+        },
+        {
+            "folderPath": "web-mywebsite/RbPi-InfoBoard/",
+            "color": "foldercolorizer.color_660099"
+        },
+        {
+            "folderPath": "web-mywebsite/unicorn/",
+            "color": "foldercolorizer.color_cc0000"
+        },
+        {
+            "folderPath": "web-mywebsite/widgets/",
+            "color": "foldercolorizer.color_cccc66"
+        },
+        {
+            "folderPath": "web-mywebsite/index.html/",
+            "badge": "🥰"
         }
     ]
 }
