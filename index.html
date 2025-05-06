@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
-    <link rel="icon" href="https://www.svgrepo.com/show/432456/dashboard-customize.svg" />
+    <link rel="icon"
+        href="https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/102-512.png" />
 </head>
 
 <style>
@@ -16,12 +17,6 @@
 
         display: flex;
         flex-direction: column;
-    }
-
-    iframe {
-        border: none;
-        width: fit-content;
-        height: fit-content;
     }
 
     nav {
@@ -35,40 +30,23 @@
         display: flex;
         flex-direction: column;
         width: 300px;
-        height: 100vh;
-
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        padding-top: 29px;
+        height: 100%;
     }
 
-    .nav-box {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        padding: 10px;
-        border: 3px dashed #666;
-        border-radius: 10px;
-        background-color: #333;
+    #clock {
+        border: none;
     }
 
-    .nav-button {
-        width: 100%;
-        height: 50px;
-        border: 2px solid #222;
-        border-radius: 8px;
-        color: #FFFFFF;
-        background-color: #555;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        padding: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    .nav-buttons {
+        padding-top: 50px;
+        display: flex;
+        flex-direction: column;
+        color: white;
 
-        &:hover {
-            border-color: gray;
-            cursor: pointer;
+        button {
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 20px;
         }
     }
 
@@ -79,12 +57,6 @@
 
     #box-favorites {
         grid-area: favorites;
-    }
-
-    #box-google {
-        text-align: center;
-        margin: 20px;
-        border: 3px dashed #666;
     }
 
     #my-tools {
@@ -119,19 +91,17 @@
         }
     }
 
-    .mail-button {
+    button {
         flex: 1;
-        height: 140px;
         margin: 10px;
         border: 2px solid #555;
         border-radius: 8px;
         background-color: #4A4A4A;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
         padding: 10px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+        height: 150px;
 
         background-size: cover;
         background-position: center;
@@ -142,91 +112,58 @@
             transform: translateY(-3px);
             cursor: pointer;
         }
-    }
-
-    .tools-button {
-        flex: 1;
-        margin: 10px;
-        border: 2px solid #555;
-        border-radius: 8px;
-        background-color: #4A4A4A;
-        padding: 10px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-
-        &:hover {
-            border-color: gray;
-            transform: translateY(-3px);
-            cursor: pointer;
-        }
-    }
-
-    #codespace {
-        background-image: url('https://www.zbw-mediatalk.eu/wp-content/uploads/2015/09/github-cover.jpg');
-    }
-
-    #microsoftWhiteboard {
-        background-image: url('https://avidopenaccess.org/wp-content/uploads/2020/04/microsoftwhiteboard-1.jpg');
-    }
-
-    #notion {
-        background-image: url('https://integrately.com/blog/wp-content/uploads/2022/07/notion-tips.jpg');
-    }
-
-    #icloudMail {
-        background-image: url('https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2022/10/apple_mail_logo_2.jpg');
-    }
-
-    #outlook {
-        background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');
-    }
-
-    #gmail {
-        background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-4.jpg?quality=82&strip=all&w=1600');
-    }
-
-    #protonMail {
-        background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');
     }
 </style>
 
 <body>
     <nav>
         <header>
-            <iframe src="widgets/clock/clock.html" title="description"></iframe>
-            <div class="nav-box">
-                <a style="text-decoration: none; color: white;" href="https://dev0gig.github.io/web-mywebsite/unicorn/index.html">⚠️unicorn⚠️</a>
-                <a style="text-decoration: none; color: white;" href="widgets/widgets-iframe.html">all my widgets</a>
+            <iframe src="widgets/clock/clock.html" title="description" id="clock"></iframe>
+            <div style="padding: 0px 30px;">
                 <h1>Mein Dashboard</h1>
-                Hier sind meine wichtigsten Tools und Informationen.
+                <h2>dev0gig's Home</h2>
+                Hier sind meine wichtigsten Tools auf einem Blick.
             </div>
         </header>
-        <div id="weather-widget">
-            
+        <div class="nav-buttons">
+            <button class="nav-button" onclick="window.location.href='widgets/widgets-iframe.html';">My Widgets</button>
+            <button class="nav-button" onclick="window.location.href='unicorn/index.html';">Unicorn</button>
+            <button class="nav-button" onclick="window.location.href='https://web.whatsapp.com';">Whatsapp</button>
+            <button class="nav-button" onclick="window.location.href='https://web.whatsapp.com';">Google
+                Messenger</button>
+            <button class="nav-button"
+                style="background-image: url('https://miro.medium.com/v2/resize:fit:529/1*Rg8Q5YrD4Yy1m-kpiM4bmg.png');"
+                onclick="window.location.href='https://humble-palm-tree-qjr47q5p4j429g.github.dev/';"><br><br><br><br><br></button>
         </div>
     </nav>
     <main>
+        <div class=" box" id="box-favorites">
+            <iframe src="favorites/favorites.html"></iframe>
+        </div>
         <div class="box" id="box-mails">
-            <button class="mail-button" id="gmail"
+            <button class="mail-button"
+                style="background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-4.jpg?quality=82&strip=all&w=1600');"
                 onclick="window.open('https://mail.google.com/mail/u/0/#inbox')"></button>
-            <button class="mail-button" id="outlook"
+            <button class="mail-button"
+                style="background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');"
                 onclick="window.open('https://outlook.live.com/mail/inbox')"></button>
-            <button class="mail-button" id="protonMail" onclick="window.open('https://www.proton.me/de/mail')"></button>
-            <button class="mail-button" id="icloudMail" onclick="window.open('https://www.icloud.com/mail/')"></button>
+            <button class="mail-button"
+                style="background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');"
+                onclick="window.open('https://www.proton.me/de/mail')"></button>
+            <button class="mail-button"
+                style="background-image: url('https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2022/10/apple_mail_logo_2.jpg');"
+                onclick="window.open('https://www.icloud.com/mail/')"></button>
         </div>
         <div class="box" id="my-tools">
-            <button class="tools-button" id="notion" onclick="window.open('https://notion.so')"></button>
-            <button class="tools-button" id="microsoftWhiteboard"
+            <button class="tools-button"
+                style="background-image: url('https://integrately.com/blog/wp-content/uploads/2022/07/notion-tips.jpg');"
+                onclick="window.open('https://notion.so')"></button>
+            <button class="tools-button"
+                style="background-image: url('https://avidopenaccess.org/wp-content/uploads/2020/04/microsoftwhiteboard-1.jpg');"
                 onclick="window.open('https://whiteboard.office.com/')"></button>
-            <button class="tools-button" id="codespace"
-                onclick="window.open('https://github.com/dev0gig/web.MyWebsite')"></button>
-        </div>
-        <div class="box" id="box-favorites">
-            <iframe src="favorites/favorites.html"></iframe>
+            <button class="tools-button"
+                style="background-image: url('https://meetergo.com/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fw9h6iqyj%2Fproduction%2F82da9d54c6b68acd450d20ae6124d4b47e1900ff-1009x485.png&w=3840&q=100');"
+                onclick="window.open('https://calendar.google.com/calendar/u/0/r')"></button>
         </div>
     </main>
 
