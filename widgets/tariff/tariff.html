@@ -6,79 +6,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stromkostenrechner</title>
     <style>
+        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+        :root {
+            --md-sys-color-background: #fffbfe;
+            --md-sys-color-on-background: #1c1b1f;
+            --md-sys-color-surface-container-high: #eee8f4;
+            /* Widget Hintergrund */
+            --md-sys-color-surface-container: #f3edfa;
+            /* Readonly Input Hintergrund */
+            --md-sys-color-surface-container-low: #f7f2fa;
+            /* Editable Input Hintergrund */
+            --md-sys-color-on-surface-container: #1c1b1f;
+            /* Haupt-Textfarbe (Input Text) */
+            --md-sys-color-on-surface-variant: #49454f;
+            /* Sekundär-Textfarbe (Label, Placeholder) */
+            --md-sys-color-outline: #79747e;
+            /* Input Umrandung */
+
+            /* Schattenfarbe */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Material You Farbpalette (Beispiel - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-background: #1c1b1f;
+                --md-sys-color-on-background: #e6e1e5;
+                --md-sys-color-surface-container-high: #36343b;
+                --md-sys-color-surface-container: #2a282d;
+                --md-sys-color-surface-container-low: #211f26;
+                /* Etwas dunkler für editable Inputs */
+                --md-sys-color-on-surface-container: #e6e1e5;
+                --md-sys-color-on-surface-variant: #cac4d0;
+                --md-sys-color-outline: #938f99;
+
+                /* Schattenfarbe für dunklen Modus */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+
         body {
-            font-family: sans-serif;
-            color: #f0f0f0;
-            /* Helle Textfarbe für Dark Mode */
+            font-family: 'Roboto', sans-serif;
+            /* Material You Schrift */
+            color: var(--md-sys-color-on-background);
+            /* Textfarbe aus Palette */
             background-color: transparent;
             /* Transparenter Hintergrund */
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            /* Etwas Padding um den Inhalt */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            /* Höhe des Viewports */
+            /* Oben ausrichten, nicht mittig für längere Inhalte */
+            min-height: 100vh;
+            /* Mindesthöhe des Viewports */
+            box-sizing: border-box;
         }
 
         .container {
-            background-color: #333;
-            /* Dunkler Hintergrund für das Widget */
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Hintergrund aus Palette */
+            border-radius: 24px;
+            /* Stärker abgerundete Ecken */
+            padding: 24px;
+            /* Mehr Padding */
+            box-shadow: 0 4px 8px var(--md-sys-shadow-color);
+            /* Subtiler Schatten */
             width: 100%;
             max-width: 600px;
-            /* Begrenzte Breite für bessere Darstellung */
+            /* Begrenzte Breite beibehalten */
+            box-sizing: border-box;
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 16px;
+            /* Mehr Abstand zwischen den Spalten */
+            margin-bottom: 16px;
+            /* Mehr Abstand zwischen den Reihen */
+            /* flex-wrap: wrap; */
+            /* Optional: Erlaubt Umbruch bei sehr schmaler Ansicht */
+            transition: gap 0.3s ease, margin-bottom 0.3s ease;
         }
 
-        .input-group {
-            flex: 1;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #ccc;
-        }
-
-        .input-group input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            background-color: #444;
-            color: #f0f0f0;
-            box-sizing: border-box;
-        }
-
+        .input-group,
         .result-group {
             flex: 1;
+            /* Nimmt den verfügbaren Platz gleichmäßig ein */
+            /* min-width: 120px; */
+            /* Optional: Mindestbreite für Spalten */
         }
 
+        .input-group label,
         .result-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            /* Mehr Abstand zum Input */
             font-size: 0.9em;
-            color: #ccc;
+            color: var(--md-sys-color-on-surface-variant);
+            /* Farbe aus Palette */
+            transition: color 0.3s ease;
+        }
+
+        .input-group input[type="number"],
+        .result-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            /* Mehr Padding */
+            border: 1px solid var(--md-sys-color-outline);
+            /* Farbe aus Palette */
+            border-radius: 8px;
+            /* Stärker abgerundete Ecken */
+            background-color: var(--md-sys-color-surface-container-low);
+            /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .result-group input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            background-color: #222;
-            color: #f0f0f0;
-            box-sizing: border-box;
-            font-weight: bold;
+            background-color: var(--md-sys-color-surface-container);
+            /* Leicht anderer Hintergrund für readonly */
+            font-weight: normal;
+            /* Standard Schriftstärke, da Wert berechnet ist */
+            cursor: default;
+            /* Kein Textcursor bei readonly */
+        }
+
+
+        /* Fokus Stil für Inputs */
+        .input-group input[type="number"]:focus {
+            outline: none;
+            /* Standard Outline entfernen */
+            border-color: var(--md-sys-color-primary);
+            /* Akzentfarbe beim Fokus */
+            box-shadow: 0 1px 4px var(--md-sys-shadow-color);
+            /* Leichter Schatten beim Fokus */
+        }
+
+        /* Placeholder Stil */
+        .input-group input::placeholder {
+            color: var(--md-sys-color-on-surface-variant);
+            /* Farbe aus Palette */
+            opacity: 0.7;
+            /* Leicht transparent */
+        }
+
+        /* Letzte Reihe ohne unteren Margin */
+        .row:last-child {
+            margin-bottom: 0;
         }
     </style>
 </head>

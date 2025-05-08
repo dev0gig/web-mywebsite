@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
+       
     <meta charset="UTF-8">
+       
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender & Uhr Widget (Kompakt)</title>
-    <style>
+        <title>Kalender & Uhr Widget (Kompakt)</title>
+        <style>
+        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+        :root {
+            --md-sys-color-primary: #6750a4;
+            /* Akzentfarbe (für aktuelles Datum) */
+            --md-sys-color-on-primary: #ffffff;
+            /* Text auf Akzentfarbe */
+            --md-sys-color-background: #fffbfe;
+            /* Hintergrund (nicht für Body, aber für Textfarbe) */
+            --md-sys-color-on-background: #1c1b1f;
+            /* Textfarbe auf Hintergrund */
+            --md-sys-color-surface-container-high: #eee8f4;
+            /* Oberfläche Container (Widget Hintergrund) */
+            --md-sys-color-on-surface-container: #1c1b1f;
+            /* Haupt-Textfarbe auf Widget */
+            --md-sys-color-on-surface-variant: #49454f;
+            /* Sekundäre Textfarbe (Wochentage, kleines Datum, etc.) */
+            --md-sys-color-outline: #79747e;
+            /* Umriss/Trennung Farbe */
+
+            /* Schattenfarbe */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Material You Farbpalette (Beispiel - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-primary: #d0bcff;
+                --md-sys-color-on-primary: #381e72;
+                --md-sys-color-background: #1c1b1f;
+                --md-sys-color-on-background: #e6e1e5;
+                --md-sys-color-surface-container-high: #36343b;
+                --md-sys-color-on-surface-container: #e6e1e5;
+                --md-sys-color-on-surface-variant: #cac4d0;
+                --md-sys-color-outline: #938f99;
+
+                /* Schattenfarbe für dunklen Modus */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+            }
+        }
+
         body {
             margin: 0;
             display: flex;
@@ -12,38 +55,63 @@
             align-items: center;
             min-height: 100vh;
             background-color: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Behält den transparenten Hintergrund bei */
+            font-family: 'Roboto', sans-serif;
+            /* Oder 'Arial' */
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .widget-container {
             display: flex;
-            background-color: #2d2d2d;
-            color: #e0e0e0;
-            border-radius: 10px; /* Etwas kleinere Rundung für kompaktes Design */
-            padding: 10px;       /* Reduziertes Padding */
-            width: 400px;        /* NEU: Feste Breite */
-            height: 200px;       /* NEU: Feste Höhe */
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-container);
+            /* Haupt-Textfarbe aus Palette */
+            border-radius: 24px;
+            /* Stärker abgerundete Ecken */
+            padding: 10px 16px 16px 10px;
+            /* Geändert: Oben 10px, Rechts 16px, Unten 16px, Links 10px */
+            width: 400px;
+            /* Begrenzung wieder auf 400px */
+            height: 200px;
+            /* Begrenzung wieder auf 200px */
             box-sizing: border-box;
+            box-shadow: 0 4px 8px var(--md-sys-shadow-color);
+            /* Subtiler Schatten */
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            /* Sicherstellen, dass nichts überläuft */
         }
 
         /* Kalender Teil */
         .calendar-container {
-            flex: 1.1; /* Gibt dem Kalender tendenziell etwas mehr Platz, da er dichter ist */
-            padding-right: 10px; /* Reduzierter Abstand */
-            border-right: 1px solid #444;
+            flex: 1.1 0 auto;
+            /* Flex-Basis auto, darf nicht schrumpfen, wächst 1.1 */
+            padding-right: 12px;
+            /* Abstand beibehalten */
+            border-right: 1px solid var(--md-sys-color-outline);
+            /* Farbe aus Palette */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Align items from the start */
+            justify-content: center;
+            /* Vertikal zentrieren der Elemente im Container */
+            transition: border-color 0.3s ease;
+            min-width: 0;
+            /* Wichtig für Flexbox */
+            min-height: 0;
+            /* Wichtig für Flexbox bei justify-content: center */
         }
 
         .calendar-header {
             text-align: left;
-            margin-bottom: 8px;  /* Reduziert */
-            font-size: 0.8em;    /* Reduziert */
-            color: #f0f0f0;
-            white-space: nowrap; /* Verhindert Umbruch bei sehr schmaler Breite */
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: var(--md-sys-color-on-surface-container);
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            transition: color 0.3s ease;
         }
 
         .calendar-header #month-name {
@@ -54,33 +122,40 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            margin-bottom: 5px; /* Reduziert */
-            font-size: 0.65em;   /* Reduziert */
-            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.7em;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: color 0.3s ease;
         }
 
         .calendar-weekdays div {
-            padding: 2px 0; /* Reduziert */
+            padding: 2px 0;
         }
 
         .calendar-days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px;           /* Reduzierter Abstand zwischen Tagen */
+            gap: 3px;
             text-align: center;
-            flex-grow: 1; /* Allow grid to take remaining space if any */
+            flex-grow: 1;
+            /* Darf wachsen, um Platz zu füllen */
+            color: var(--md-sys-color-on-surface-container);
+            transition: color 0.3s ease;
+            /* min-height: 0; */
+            /* Kann nötig sein bei justify-content: center */
         }
 
         .calendar-days-grid div {
-            font-size: 0.7em;    /* Reduziert */
-            border-radius: 50%; /* Stellt sicher, dass es ein Kreis ist */
+            font-size: 0.8em;
+            border-radius: 50%;
             cursor: default;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 20px;        /* NEU: Deutlich kleiner für kompaktes Layout */
-            height: 20px;       /* NEU: Deutlich kleiner für kompaktes Layout */
-            margin: auto;       /* Zentriert die Kreise in den Grid-Zellen */
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .calendar-days-grid .empty-day {
@@ -88,75 +163,95 @@
         }
 
         .calendar-days-grid .current-day {
-            background-color: #ff8c00;
-            color: #2d2d2d;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
             font-weight: bold;
         }
 
         /* Uhr Teil */
         .clock-display-container {
-            flex: 0.9; /* Gibt der Uhr etwas weniger Raum, da der Inhalt flexibler ist */
+            flex: 0.9 0 auto;
+            /* Flex-Basis auto, darf nicht schrumpfen, wächst 0.9 */
             display: flex;
             flex-direction: column;
             justify-content: center;
+            /* Vertikal zentrieren der Elemente im Container */
             align-items: center;
-            padding-left: 10px; /* Reduzierter Abstand */
+            padding-left: 12px;
+            /* Abstand beibehalten */
+            min-width: 0;
+            /* Wichtig für Flexbox */
+            min-height: 0;
+            /* Wichtig für Flexbox bei justify-content: center */
         }
 
         #weekday-display {
-            font-size: 1.1em;    /* Reduziert */
+            font-size: 1.2em;
             font-weight: 300;
-            margin-bottom: 3px; /* Reduziert */
-            color: #f0f0f0;
+            margin-bottom: 3px;
+            color: var(--md-sys-color-on-surface-container);
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #time-main {
-            font-size: 2.8em;    /* Reduziert */
+            font-size: 2.8em;
             font-weight: bold;
-            letter-spacing: 1px; /* Reduziert */
-            color: #ffffff;
-            line-height: 1.1;    /* Für kompaktere Darstellung der Zeilenhöhe */
+            letter-spacing: 0;
+            color: var(--md-sys-color-on-surface-container);
+            line-height: 1.1;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
+
         #time-main .seconds {
-            font-size: 0.4em;    /* Relativ zur neuen time-main Größe */
+            font-size: 0.35em;
             opacity: 0.7;
-            margin-left: 3px;  /* Reduziert */
+            margin-left: 2px;
         }
 
         #date-display-under-clock {
-            font-size: 0.75em;   /* Reduziert */
-            margin-top: 5px;   /* Reduziert */
-            color: #aaa;
+            font-size: 0.85em;
+            margin-top: 5px;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
     </style>
 </head>
-<body>
-    <div class="widget-container">
-        <div class="calendar-container">
-            <div class="calendar-header">
-                <span id="month-name"></span> <span id="year-display"></span>
-            </div>
-            <div class="calendar-weekdays">
-                </div>
-            <div class="calendar-days-grid" id="calendar-days-grid">
-                </div>
-        </div>
-        <div class="clock-display-container">
-            <div id="weekday-display"></div>
-            <div id="time-main">
-                </div>
-            <div id="date-display-under-clock"></div>
-        </div>
-    </div>
 
+<body>
+        <div class="widget-container">
+                <div class="calendar-container">
+                        <div class="calendar-header">
+                                <span id="month-name"></span> <span id="year-display"></span>
+                            </div>
+                        <div class="calendar-weekdays">
+                                </div>
+                        <div class="calendar-days-grid" id="calendar-days-grid">
+                                </div>
+                    </div>
+                <div class="clock-display-container">
+                        <div id="weekday-display"></div>
+                        <div id="time-main">
+                                </div>
+                        <div id="date-display-under-clock"></div>
+                    </div>
+            </div>
+
+       
     <script>
         const monthNamesEn = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
         const weekdayNamesEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const weekdayNamesJa = ["月", "火", "水", "木", "金", "土", "日"];
+        const weekdayNamesJa = ["月", "火", "水", "木", "金", "土", "日"]; // Jap. Tage für Kalender-Header
 
         const calendarDaysGrid = document.getElementById('calendar-days-grid');
         const monthNameDisplay = document.getElementById('month-name');
@@ -167,40 +262,51 @@
         const weekdayDisplayElem = document.getElementById('weekday-display');
         const dateDisplayUnderClockElem = document.getElementById('date-display-under-clock');
 
-        let today = new Date();
+        let today = new Date(); // Variable, um das Datum der Kalenderansicht zu speichern
 
         function generateCalendar(year, month) {
             calendarDaysGrid.innerHTML = '';
             calendarWeekdaysContainer.innerHTML = '';
+
+            // Wochentage (Japanisch) in den Header einfügen
             weekdayNamesJa.forEach(day => {
                 const dayDiv = document.createElement('div');
                 dayDiv.textContent = day;
                 calendarWeekdaysContainer.appendChild(dayDiv);
             });
-            
+
+            // Monats- und Jahresanzeige aktualisieren
             monthNameDisplay.textContent = monthNamesEn[month];
             yearDisplay.textContent = year;
 
             const firstDayOfMonth = new Date(year, month, 1);
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
+
+            // Berechnen, wie viele leere Felder vor dem ersten Tag des Monats benötigt werden
+            // Standard getDay() gibt 0 für Sonntag, 1 für Montag...
+            // Wir wollen Montag als ersten Tag (Index 0 in der Grid)
             let dayOfWeekOfFirst = firstDayOfMonth.getDay();
-            if (dayOfWeekOfFirst === 0) { // Sonntag (0) zu 6 für Wochenstart Montag
-                 dayOfWeekOfFirst = 6;
-            } else { // Montag (1) zu 0, Dienstag (2) zu 1 etc.
-                dayOfWeekOfFirst -=1;
+            if (dayOfWeekOfFirst === 0) { // Sonntag
+                dayOfWeekOfFirst = 6; // Soll als letzter Tag behandelt werden
+            } else {
+                dayOfWeekOfFirst -= 1; // Montag (1) wird 0, Dienstag (2) wird 1, etc.
             }
 
+
+            // Leere Felder für die Tage vor dem ersten des Monats hinzufügen
             for (let i = 0; i < dayOfWeekOfFirst; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.classList.add('empty-day');
                 calendarDaysGrid.appendChild(emptyCell);
             }
 
+            // Felder für jeden Tag des Monats hinzufügen
+            const now = new Date(); // Aktuelles Datum für Hervorhebung
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayCell = document.createElement('div');
                 dayCell.textContent = day;
-                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                // Aktuellen Tag hervorheben
+                if (day === now.getDate() && month === now.getMonth() && year === now.getFullYear()) {
                     dayCell.classList.add('current-day');
                 }
                 calendarDaysGrid.appendChild(dayCell);
@@ -209,25 +315,38 @@
 
         function updateClockAndDate() {
             const now = new Date();
+
+            // Wochentag unter der Uhr anzeigen
             weekdayDisplayElem.textContent = weekdayNamesEn[now.getDay()];
+
+            // Uhrzeit anzeigen
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             timeMainDisplay.innerHTML = `${hours}:${minutes}<span class="seconds">${seconds}</span>`;
+
+            // Datum unter der Uhr anzeigen
             const day = String(now.getDate()).padStart(2, '0');
-            const monthFormatted = String(now.getMonth() + 1).padStart(2, '0');
+            const monthFormatted = String(now.getMonth() + 1).padStart(2, '0'); // Monate sind 0-basiert
             const year = now.getFullYear();
             dateDisplayUnderClockElem.textContent = `${day}.${monthFormatted}.${year}`;
 
-            if (now.getDate() !== today.getDate() || now.getMonth() !== today.getMonth() || now.getFullYear() !== today.getFullYear()) {
-                today = new Date(now);
+            // Kalender neu generieren, wenn sich das Datum geändert hat
+            // Wir erstellen ein neues Date-Objekt von 'now' für den Vergleich, um Mitternachtsprobleme zu vermeiden
+            const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            if (nowMidnight.getTime() !== todayMidnight.getTime()) {
+                today = new Date(now); // today auf das neue Datum setzen
                 generateCalendar(today.getFullYear(), today.getMonth());
             }
         }
 
+        // Initialisierung
         generateCalendar(today.getFullYear(), today.getMonth());
-        updateClockAndDate();
-        setInterval(updateClockAndDate, 1000);
+        updateClockAndDate(); // Direkt beim Start aktualisieren
+        setInterval(updateClockAndDate, 1000); // Alle Sekunde aktualisieren
     </script>
 </body>
+
 </html>

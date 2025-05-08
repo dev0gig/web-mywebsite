@@ -6,124 +6,345 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wetter-Widget</title>
     <style>
+        /* Material You Farbpalette (Basis - helle Variante als Standard) */
+        :root {
+            --md-sys-color-background: #fffbfe;
+            --md-sys-color-on-background: #1c1b1f;
+            --md-sys-color-surface-container-high: #eee8f4;
+            /* Widget Hintergrund Fallback */
+            --md-sys-color-on-surface-container: #1c1b1f;
+            /* Haupt-Textfarbe Fallback */
+            --md-sys-color-outline: #79747e;
+            /* Umrandung Fallback */
+
+            /* Schattenfarbe */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+
+            /* Standard Wetterfarben (dunkel) - Werden durch JS-Klassen überschrieben */
+            --widget-background-color: #222;
+            --widget-on-background-color: #eee;
+            --forecast-background-color: rgba(0, 0, 0, 0.1);
+            --forecast-on-background-color: inherit;
+            /* Kann in Wetterklassen spezifischer werden */
+            --forecast-day-background-color: rgba(255, 255, 255, 0.08);
+            --forecast-day-on-background-color: inherit;
+            /* Kann in Wetterklassen spezifischer werden */
+        }
+
+        /* Material You Farbpalette (Basis - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-background: #1c1b1f;
+                --md-sys-color-on-background: #e6e1e5;
+                --md-sys-color-surface-container-high: #36343b;
+                --md-sys-color-on-surface-container: #e6e1e5;
+                --md-sys-color-outline: #938f99;
+
+                /* Schattenfarbe für dunklen Modus */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+
+                /* Standard Wetterfarben (dunkel) - Bleiben hier oft gleich, wenn Basis eh dunkel ist */
+                --widget-background-color: #222;
+                --widget-on-background-color: #eee;
+                --forecast-background-color: rgba(0, 0, 0, 0.1);
+                --forecast-on-background-color: inherit;
+                --forecast-day-background-color: rgba(255, 255, 255, 0.08);
+                --forecast-day-on-background-color: inherit;
+            }
+        }
+
+        /* === Wetter-spezifische Farben (überschreiben Basisvariablen) === */
+        /* Farben inspiriert von Material You Tonal Paletten */
+        .weather-widget.sunny {
+            --widget-background-color: #ffb25c;
+            /* Orange 40 */
+            --widget-on-background-color: #442b00;
+            /* Orange 900 */
+            --forecast-background-color: rgba(255, 255, 255, 0.2);
+            /* Helle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(255, 255, 255, 0.3);
+            /* Helle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.cloudy {
+            --widget-background-color: #9e9e9e;
+            /* Grey 500 */
+            --widget-on-background-color: #212121;
+            /* Grey 900 */
+            --forecast-background-color: rgba(0, 0, 0, 0.1);
+            /* Dunkle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(0, 0, 0, 0.15);
+            /* Dunkle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.rainy {
+            --widget-background-color: #42a5f5;
+            /* Blue 40 */
+            --widget-on-background-color: #0d47a1;
+            /* Blue 900 */
+            --forecast-background-color: rgba(0, 0, 0, 0.15);
+            /* Dunkle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(0, 0, 0, 0.25);
+            /* Dunkle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.snowy {
+            --widget-background-color: #b2ebf2;
+            /* Cyan 20 */
+            --widget-on-background-color: #006064;
+            /* Cyan 900 */
+            --forecast-background-color: rgba(0, 0, 0, 0.1);
+            /* Dunkle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(0, 0, 0, 0.15);
+            /* Dunkle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.stormy {
+            --widget-background-color: #757575;
+            /* Grey 600 */
+            --widget-on-background-color: #ffffff;
+            /* White */
+            --forecast-background-color: rgba(0, 0, 0, 0.2);
+            /* Dunkle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(0, 0, 0, 0.3);
+            /* Dunkle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.foggy {
+            --widget-background-color: #bdbdbd;
+            /* Grey 400 */
+            --widget-on-background-color: #212121;
+            /* Grey 900 */
+            --forecast-background-color: rgba(0, 0, 0, 0.1);
+            /* Dunkle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(0, 0, 0, 0.15);
+            /* Dunkle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        .weather-widget.night {
+            --widget-background-color: #303f9f;
+            /* Indigo 80 */
+            --widget-on-background-color: #e8eaf6;
+            /* Indigo 50 */
+            --forecast-background-color: rgba(255, 255, 255, 0.1);
+            /* Helle Überlagerung */
+            --forecast-on-background-color: inherit;
+            --forecast-day-background-color: rgba(255, 255, 255, 0.15);
+            /* Helle Überlagerung */
+            --forecast-day-on-background-color: inherit;
+        }
+
+        /* === Ende Wetter-spezifische Farben === */
+
+
         body {
-            font-family: sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             background-color: transparent;
-            /* Standard-Hintergrund für die Seite */
-            transition: background-color 0.5s ease;
+            /* Hintergrund für Testzwecke sichtbar machen: lightblue; */
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .weather-widget {
-            background-color: #ffffff;
-            /* Standard-Widget-Hintergrund */
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            text-align: center;
-            /* Zentriert Textinhalte horizontal */
-            width: 350px;
-            /* Festgelegte Breite */
+            background-color: var(--widget-background-color, var(--md-sys-color-surface-container-high));
+            /* Hintergrund aus variabler (Wetter > Basis) */
+            color: var(--widget-on-background-color, var(--md-sys-color-on-surface-container));
+            /* Textfarbe aus variabler (Wetter > Basis) */
+            border-radius: 28px;
+            /* Stärker abgerundet */
+            padding: 24px;
+            /* Mehr Padding */
+            width: auto;
+            /* Passt sich Inhalt an */
+            max-width: 90vw;
+            /* Maximale Breite */
             height: 200px;
-            /* Festgelegte Höhe */
+            /* Höhe angepasst, flexibel durch Inhalt */
             display: flex;
-            /* Für vertikale Zentrierung des Hauptinhalts */
+            flex-direction: row;
+            /* .current-weather und .forecast nebeneinander */
+            align-items: stretch;
+            /* Dehnt Flex-Items auf gleiche Höhe */
+            gap: 24px;
+            /* Größerer Abstand zwischen Sektionen */
+            overflow: hidden;
+            /* Verhindert Scrollen des Hauptwidgets */
+            box-shadow: 0 6px 12px var(--md-sys-shadow-color);
+            /* Subtilerer, größerer Schatten */
+            transition: background-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        /* Container für aktuelle Wetterdetails, wird per JS erstellt */
+        .current-weather {
+            display: flex;
             flex-direction: column;
-            /* Inhalt soll untereinander angeordnet sein */
-            justify-content: center;
-            /* Zentriert Inhalt vertikal */
-            align-items: center;
-            /* Zentriert Inhalt horizontal innerhalb des Flex-Containers */
-            transition: background-color 0.5s ease, color 0.5s ease;
-            /* Wichtig für den Farbwechsel */
-            color: #333;
-            /* Standard-Textfarbe */
-        }
-
-        .widget-header h2 {
-            margin: 0 0 10px 0;
-            /* Weniger Abstand nach unten */
-            font-size: 1.3em;
-            /* Etwas kleinere Schriftgröße, falls nötig */
-        }
-
-        .weather-main {
-            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            /* Etwas weniger Abstand zwischen Icon und Temperatur */
-            margin-bottom: 10px;
-            /* Weniger Abstand nach unten */
+            text-align: center;
+            flex-shrink: 0;
+            /* Verhindert, dass dieser Teil schrumpft */
+            /* padding-right: 10px; */
+            /* Nicht mehr benötigt dank gap */
+            min-width: 120px;
+            /* Mindestbreite für diesen Bereich */
+            color: inherit;
+            /* Erbt die Wetter-Textfarbe */
         }
 
-        #weather-icon {
-            width: 60px;
-            /* Größe des Icons an die neue Höhe anpassen */
-            height: 60px;
-        }
-
-        #temperature {
-            font-size: 2.2em;
-            /* Schriftgröße anpassen */
+        .location {
+            font-size: 1.2em;
+            /* Größer */
+            margin-bottom: 8px;
+            /* Mehr Abstand */
+            color: inherit;
             font-weight: bold;
-            margin: 0;
         }
 
-        #description {
+        .weather-icon {
+            width: 60px;
+            /* Größer */
+            height: 60px;
+            /* Größer */
+            /* filter: brightness(1.2); */
+            /* Filter entfernen oder anpassen, je nach Icon-Design */
+            margin-bottom: 8px;
+            /* Mehr Abstand */
+        }
+
+        .temperature {
+            font-size: 2.2em;
+            /* Deutlich größer */
+            font-weight: bold;
+            margin-bottom: 8px;
+            /* Mehr Abstand */
+            color: inherit;
+        }
+
+        .description {
             font-size: 1em;
-            /* Schriftgröße anpassen */
+            /* Größer */
             text-transform: capitalize;
+            color: inherit;
             margin-bottom: 0;
-            /* Kein zusätzlicher Abstand nach unten */
+            /* Letztes Element, kein Margin Bottom */
         }
 
-        /* Farbklassen basierend auf dem Wetter */
-        .weather-widget.sunny {
-            background-color: #ffd700;
-            /* Goldgelb für sonnig */
-            color: #4a4737;
+
+        /* Container für die täglichen Vorhersagen, wird per JS erstellt */
+        .forecast {
+            display: flex;
+            flex-direction: row;
+            /* Wettervorhersagen in einer Reihe */
+            overflow-x: auto;
+            /* Horizontales Scrollen für Vorhersagen ermöglichen */
+            flex-wrap: nowrap;
+            /* Sicherstellen, dass Vorhersagen in einer Zeile bleiben */
+            gap: 12px;
+            /* Mehr Abstand zwischen den einzelnen Vorhersagetagen */
+            align-items: stretch;
+            /* Dehnt Vorhersage-Items auf gleiche Höhe */
+            padding: 12px;
+            /* Innenabstand für den Vorhersagebereich */
+            flex: 1;
+            /* Nimmt verfügbaren Platz ein */
+            height: auto;
+            /* Höhe flexibel */
+            border-radius: 20px;
+            /* Stärker abgerundet */
+            background-color: var(--forecast-background-color, rgba(0, 0, 0, 0.1));
+            /* Hintergrund aus variabler (Wetter > Standard) */
+            color: var(--forecast-on-background-color, inherit);
+            /* Textfarbe */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        .weather-widget.cloudy {
-            background-color: #bdc3c7;
-            /* Hellgrau für bewölkt */
-            color: #3d3f40;
+        /* Einzelner Vorhersagetag */
+        .forecast-day {
+            flex: 0 0 100px;
+            /* Feste Breite für jeden Vorhersagetag */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            /* Mehr Padding */
+            border-radius: 16px;
+            /* Stärker abgerundet */
+            background-color: var(--forecast-day-background-color, rgba(255, 255, 255, 0.08));
+            /* Hintergrund aus variabler (Wetter > Standard) */
+            color: var(--forecast-day-on-background-color, inherit);
+            /* Textfarbe */
+            text-align: center;
+            /* min-height: 140px; */
+            /* Nicht mehr zwingend nötig bei align-items: stretch im Parent */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        .weather-widget.rainy {
-            background-color: #3498db;
-            /* Blau für regnerisch */
-            color: #ffffff;
+        .forecast-day-name {
+            font-size: 0.9em;
+            /* Größer */
+            margin-bottom: 10px;
+            /* Mehr Platz */
+            font-weight: 500;
         }
 
-        .weather-widget.snowy {
-            background-color: #e0f7fa;
-            /* Sehr helles Blau/Weiß für Schnee */
-            color: #3E606F;
+        .forecast-icon {
+            width: 45px;
+            /* Größer */
+            height: 45px;
+            /* Größer */
+            margin-bottom: 10px;
+            /* Mehr Platz */
         }
 
-        .weather-widget.stormy {
-            background-color: #7f8c8d;
-            /* Dunkelgrau für Sturm */
-            color: #ffffff;
+        .forecast-temp {
+            font-size: 1em;
+            /* Größer */
+            line-height: 1.3;
+            /* Mehr Zeilenhöhe */
+            font-weight: bold;
         }
 
-        .weather-widget.foggy {
-            background-color: #95a5a6;
-            /* Grau für Nebel */
-            color: #ffffff;
+        .forecast-temp span {
+            font-weight: normal;
+            /* Min-Temp normal statt bold */
+            opacity: 0.8;
+            /* Leicht blasser */
+            margin-left: 2px;
         }
 
-        .weather-widget.night {
-            background-color: #2c3e50;
-            /* Dunkelblau für Nacht */
-            color: #ecf0f1;
+        /* === NEU: Scrollbar Stil zum Ausblenden === */
+        .forecast {
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
         }
+
+        .forecast::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
+
+        /* === Ende Scrollbar Stil === */
     </style>
 </head>
 
@@ -143,23 +364,89 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Standardkoordinaten (z.B. Wien, Österreich)
-            // Du kannst diese Werte ändern oder die Geolocation API verwenden
-            const defaultLatitude = 48.2082;
-            const defaultLongitude = 16.3738;
-            const defaultLocationName = "Wien, Österreich";
+            const defaultLatitude = 48.2082; // Wien
+            const defaultLongitude = 16.3738; // Wien
+            const defaultLocationName = "Wien";
 
-            // HTML Elemente
-            const locationElement = document.getElementById('location');
-            const temperatureElement = document.getElementById('temperature');
-            const descriptionElement = document.getElementById('description');
-            const iconElement = document.getElementById('weather-icon');
+            // Elemente, die nach JS-Strukturierung existieren
             const widgetElement = document.querySelector('.weather-widget');
+            let locationElement, temperatureElement, descriptionElement, iconElement, forecastContainer;
 
-            // Funktion zum Abrufen von Wetterdaten
-            async function getWeatherData(lat, lon, locationName) {
-                // Open-Meteo URL für aktuelle Wetterdaten
-                const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&timezone=Europe/Berlin`;
+            // Funktion zum Erstellen der Widget-Struktur nach dem Laden
+            function buildWidgetStructure() {
+                // Initialen Inhalt sichern (falls nötig) oder einfach ignorieren, da er ersetzt wird
+                // console.log("Initialer Widget Inhalt:", widgetElement.innerHTML);
+
+                // Container für aktuelle Wetterdetails erstellen
+                const currentWeatherDiv = document.createElement('div');
+                currentWeatherDiv.classList.add('current-weather');
+
+                // Elemente für aktuelles Wetter neu erstellen oder aus DOM greifen, falls schon da
+                // Greifen ist sicherer, falls Initial-HTML Struktur sich ändert
+                locationElement = widgetElement.querySelector('#location') || document.createElement('h2');
+                if (!locationElement.id) locationElement.id = 'location';
+                locationElement.textContent = "Wetter wird geladen..."; // Initialtext
+
+                iconElement = widgetElement.querySelector('#weather-icon') || document.createElement('img');
+                if (!iconElement.id) iconElement.id = 'weather-icon';
+                iconElement.alt = "Wetter Icon";
+
+                temperatureElement = widgetElement.querySelector('#temperature') || document.createElement('p');
+                if (!temperatureElement.id) temperatureElement.id = 'temperature';
+                temperatureElement.textContent = "- °C";
+
+                descriptionElement = widgetElement.querySelector('#description') || document.createElement('p');
+                if (!descriptionElement.id) descriptionElement.id = 'description';
+                descriptionElement.textContent = "-";
+
+
+                // Elemente in den currentWeatherDiv einfügen
+                currentWeatherDiv.appendChild(locationElement);
+                currentWeatherDiv.appendChild(iconElement);
+                currentWeatherDiv.appendChild(temperatureElement);
+                currentWeatherDiv.appendChild(descriptionElement);
+
+                // Container für Vorhersage erstellen
+                forecastContainer = document.createElement('div');
+                forecastContainer.classList.add('forecast');
+
+                // Widget-Inhalt neu aufbauen
+                widgetElement.innerHTML = ''; // Leert den ursprünglichen Inhalt
+                widgetElement.appendChild(currentWeatherDiv);
+                widgetElement.appendChild(forecastContainer);
+            }
+
+            // Rufen Sie die Struktur-Funktion auf, bevor Sie Daten abrufen
+            buildWidgetStructure();
+
+
+            async function getCityName(latitude, longitude) {
+                // Nominatim API für Reverse Geocoding (kostenlos, aber Limits beachten)
+                const reverseGeocodingApiUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+                try {
+                    const response = await fetch(reverseGeocodingApiUrl);
+                    if (!response.ok) {
+                        // Log HTTP errors
+                        console.error(`HTTP error fetching city name: ${response.status}`);
+                        // Fallback to default
+                        return defaultLocationName;
+                    }
+                    const data = await response.json();
+                    if (data && data.address) {
+                        // Extract city, town, village, or suburb as fallback
+                        return data.address.city || data.address.town || data.address.village || data.address.suburb || defaultLocationName;
+                    }
+                    // If no address data, fallback
+                    return defaultLocationName;
+                } catch (error) {
+                    console.error("Fehler beim Abrufen des Stadtnamens:", error);
+                    // Fallback auf Standardort im Fehlerfall
+                    return defaultLocationName;
+                }
+            }
+
+            async function getWeatherData(lat, lon) {
+                const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Europe/Berlin&forecast_days=7`;
 
                 try {
                     const response = await fetch(apiUrl);
@@ -167,174 +454,230 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    console.log("Wetterdaten empfangen:", data); // Zum Debuggen
-                    updateWidget(data, locationName);
+                    console.log("Wetterdaten empfangen:", data);
+
+                    const cityName = await getCityName(lat, lon);
+                    updateWidget(data, cityName);
+
                 } catch (error) {
                     console.error("Fehler beim Abrufen der Wetterdaten:", error);
-                    locationElement.textContent = "Fehler";
+                    // Fehlerbehandlung UI aktualisieren
+                    locationElement.textContent = "Ort"; // Placeholder
                     temperatureElement.textContent = "- °C";
-                    descriptionElement.textContent = "Daten konnten nicht geladen werden.";
+                    descriptionElement.textContent = "Daten nicht geladen.";
                     iconElement.src = ""; // Kein Icon bei Fehler
-                    iconElement.alt = "Fehler beim Laden des Icons";
-                    // Standard-Styling bei Fehler
-                    widgetElement.className = 'weather-widget cloudy'; // Fallback zu einem neutralen Stil
+                    iconElement.alt = "Fehler";
+                    widgetElement.className = 'weather-widget cloudy'; // Standard-Fallback-Klasse
+                    forecastContainer.innerHTML = '<p style="padding:10px; text-align:center; width: 100%; box-sizing: border-box;">Vorhersage nicht verfügbar.</p>';
                 }
             }
 
-            // Funktion zum Aktualisieren des Widgets
             function updateWidget(data, locationName) {
-                if (data && data.current) {
+                if (data && data.current && data.daily) {
                     const temp = Math.round(data.current.temperature_2m);
                     const weatherCode = data.current.weather_code;
-                    const isDay = data.current.is_day === 1; // 1 für Tag, 0 für Nacht
+                    const isDay = data.current.is_day === 1;
 
                     locationElement.textContent = locationName;
                     temperatureElement.textContent = `${temp}°C`;
 
                     const { description, iconName, colorClass } = getWeatherDetails(weatherCode, isDay);
                     descriptionElement.textContent = description;
-
-                    // Stelle sicher, dass der Pfad und Dateityp stimmen
-                    // WICHTIG: Erstelle einen Ordner "icons" neben dieser HTML-Datei
-                    // und lege dort deine Icons ab (z.B. sunny.png, cloudy.png, etc.)
+                    // Annahme: Icons sind lokal unter /icons/ verfügbar
                     iconElement.src = `icons/${iconName}.png`;
                     iconElement.alt = description;
 
-                    // Entferne alle vorherigen Farbklassen
-                    widgetElement.className = 'weather-widget'; // Setzt auf die Basisklasse zurück
-                    // Füge die neue Farbklasse hinzu
+                    // Farbklasse auf das Widget anwenden
+                    widgetElement.className = 'weather-widget'; // Reset classes
                     if (colorClass) {
                         widgetElement.classList.add(colorClass);
                     }
 
+                    forecastContainer.innerHTML = ''; // Vorhersage-Container leeren
+
+                    const todayFormatted = new Date().toLocaleDateString('de-DE', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    }); // Präziseres Datum für Vergleich
+
+                    for (let i = 0; i < data.daily.time.length; i++) {
+                        const forecastDayDiv = document.createElement('div');
+                        forecastDayDiv.classList.add('forecast-day');
+
+                        const date = new Date(data.daily.time[i]);
+                        const dayNameStr = date.toLocaleDateString('de-DE', {
+                            weekday: 'short'
+                        });
+                        // const forecastDateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+                        const dayNameElement = document.createElement('p');
+                        dayNameElement.classList.add('forecast-day-name');
+                        dayNameElement.textContent = dayNameStr;
+                        forecastDayDiv.appendChild(dayNameElement);
+
+                        const forecastWeatherCode = data.daily.weather_code[i];
+                        const { iconName: forecastIconNameVal, description: forecastDesc
+                        } = getWeatherDetails(forecastWeatherCode, true); // Annahme: Tagesvorhersage-Icon
+
+                        const forecastIconElement = document.createElement('img');
+                        forecastIconElement.classList.add('forecast-icon');
+                        forecastIconElement.src = `icons/${forecastIconNameVal}.png`;
+                        forecastIconElement.alt = forecastDesc;
+                        forecastDayDiv.appendChild(forecastIconElement);
+
+                        const tempMax = Math.round(data.daily.temperature_2m_max[i]);
+                        const tempMin = Math.round(data.daily.temperature_2m_min[i]);
+                        const tempElement = document.createElement('p');
+                        tempElement.classList.add('forecast-temp');
+                        tempElement.innerHTML = `${tempMax}°<span style="opacity:0.8;">/${tempMin}°</span>`; // Min-Temp etwas blasser
+                        forecastDayDiv.appendChild(tempElement);
+
+                        // Heutigen Tag in der Vorhersage hervorheben
+                        const forecastDateStr = date.toLocaleDateString('de-DE', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        if (forecastDateStr === todayFormatted) {
+                            // Kann eine spezifische Klasse hinzufügen, um es per CSS zu stylen
+                            forecastDayDiv.classList.add('is-today-forecast');
+                        }
+
+                        forecastContainer.appendChild(forecastDayDiv);
+                    }
                 } else {
-                    descriptionElement.textContent = "Keine aktuellen Daten verfügbar.";
+                    // Fehlerbehandlung UI aktualisieren (falls updateWidget mit leeren Daten aufgerufen wird)
+                    descriptionElement.textContent = "Keine Daten verfügbar.";
                     iconElement.src = "";
                     iconElement.alt = "Keine Daten";
+                    forecastContainer.innerHTML = '';
                 }
             }
 
-            // Funktion zum Zuordnen von Wettercode zu Beschreibung, Icon und Farbe
+
             function getWeatherDetails(code, isDay) {
-                // WMO Wetter-Interpretationscodes: https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM
-                // Open-Meteo verwendet auch WMO Codes: https://open-meteo.com/en/docs#weathervariables
                 let description = "Unbekannt";
-                // WICHTIG: Passe diese iconName-Werte an deine tatsächlichen Dateinamen im "icons"-Ordner an (ohne .png)
-                let iconName = "unknown"; // Erstelle ein 'unknown.png' als Fallback oder verwende ein Standard-Icon
-                let colorClass = "cloudy"; // Standardfarbe
+                let iconName = "unknown";
+                let colorClass = "cloudy"; // Standard-Farbklasse
 
                 switch (code) {
-                    case 0: // Klarer Himmel
+                    case 0:
                         description = isDay ? "Sonnig" : "Klare Nacht";
                         iconName = isDay ? "sunny" : "clear-night";
                         colorClass = isDay ? "sunny" : "night";
                         break;
-                    case 1: // Hauptsächlich klar
+                    case 1:
                         description = isDay ? "Überwiegend sonnig" : "Überwiegend klar";
                         iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night";
-                        colorClass = isDay ? "sunny" : "night"; // Kann auch 'cloudy' für Dämmerung sein
+                        colorClass = isDay ? "sunny" : "night"; // Überwiegend klar/sonnig kann auch hellere Klasse haben
                         break;
-                    case 2: // Teils bewölkt
+                    case 2:
                         description = "Teils bewölkt";
                         iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night";
                         colorClass = "cloudy";
-                        if (!isDay) colorClass = "night"; // Wenn du ein dunkleres Nacht-Bewölkt hast
+                        if (!isDay) colorClass = "night"; // Nachts andere Klasse
                         break;
-                    case 3: // Bedeckt
+                    case 3:
                         description = "Bedeckt";
-                        iconName = "cloudy"; // Du benötigst 'cloudy.png'
+                        iconName = "cloudy";
                         colorClass = "cloudy";
                         break;
-                    case 45: // Nebel
-                    case 48: // Reifnebel
+                    case 45:
+                    case 48:
                         description = "Nebel";
-                        iconName = "fog"; // Du benötigst 'fog.png'
+                        iconName = "fog";
                         colorClass = "foggy";
                         break;
-                    case 51: case 53: case 55: // Nieselregen (leicht, mäßig, stark)
-                    case 56: case 57: // Gefrierender Nieselregen (leicht, stark)
+                    case 51:
+                    case 53:
+                    case 55:
+                    case 56:
+                    case 57:
                         description = "Nieselregen";
-                        iconName = "rain"; // oder spezifischeres Niesel-Icon z.B. 'drizzle.png'
+                        iconName = "rain";
                         colorClass = "rainy";
                         break;
-                    case 61: // Leichter Regen
-                    case 63: // Mäßiger Regen
-                    case 65: // Starker Regen
+                    case 61:
+                    case 63:
+                    case 65:
                         description = "Regen";
-                        iconName = "rain"; // Du benötigst 'rain.png'
+                        iconName = "rain";
                         colorClass = "rainy";
                         break;
-                    case 66: // Leichter gefrierender Regen
-                    case 67: // Mäßiger oder starker gefrierender Regen
+                    case 66:
+                    case 67:
                         description = "Gefrierender Regen";
-                        iconName = "rain"; // Evtl. 'freezing-rain.png'
+                        iconName = "rain";
                         colorClass = "rainy";
                         break;
-                    case 71: // Leichter Schneefall
-                    case 73: // Mäßiger Schneefall
-                    case 75: // Starker Schneefall
-                        description = "Schneefall";
-                        iconName = "snow"; // Du benötigst 'snow.png'
+                    case 71:
+                    case 73:
+                    case 75:
+                        description = "Schnee";
+                        iconName = "snow";
                         colorClass = "snowy";
                         break;
-                    case 77: // Schneekörner
+                    case 77:
                         description = "Schneekörner";
-                        iconName = "snow"; // oder spezifisches Icon
+                        iconName = "snow";
                         colorClass = "snowy";
                         break;
-                    case 80: // Leichte Regenschauer
-                    case 81: // Mäßige Regenschauer
-                    case 82: // Starke Regenschauer
+                    case 80:
+                    case 81:
+                    case 82:
                         description = "Regenschauer";
-                        iconName = "rain"; // Evtl. 'showers.png'
+                        iconName = "rain";
                         colorClass = "rainy";
                         break;
-                    case 85: // Leichte Schneeschauer
-                    case 86: // Starke Schneeschauer
+                    case 85:
+                    case 86:
                         description = "Schneeschauer";
-                        iconName = "snow"; // Evtl. 'snow-showers.png'
+                        iconName = "snow";
                         colorClass = "snowy";
                         break;
-                    case 95: // Gewitter: Leicht oder mäßig
+                    case 95:
                         description = "Gewitter";
-                        iconName = "thunderstorm"; // Du benötigst 'thunderstorm.png'
+                        iconName = "thunderstorm";
                         colorClass = "stormy";
                         break;
-                    case 96: // Gewitter mit leichtem Hagel
-                    case 99: // Gewitter mit starkem Hagel
+                    case 96:
+                    case 99:
                         description = "Gewitter mit Hagel";
-                        iconName = "thunderstorm"; // Evtl. 'thunderstorm-hail.png'
+                        iconName = "thunderstorm";
                         colorClass = "stormy";
                         break;
-                    default: // Fallback für unbekannte Codes
+                    default:
                         description = `Wettercode: ${code}`;
                         iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night"; // Fallback Icon
                         colorClass = "cloudy";
                 }
-                // Die Icons aus deinem Screenshot scheinen folgende zu sein (Beispielzuordnung, passe sie an deine Dateinamen an!)
-                // sunny.png, partly-cloudy-day.png (Sonne hinter Wolke), cloudy.png, rain.png,
-                // partly-cloudy-night.png (Mond hinter Wolke), snow.png, thunderstorm.png, fog.png (oder Nieselregen-Symbol),
-                // eventuell auch Icons für Wind etc.
-                // Du musst die `iconName` Logik oben genau an die Dateinamen deiner Icons anpassen.
-                // Z.B. wenn dein Icon für leichten Regen "light-rain.png" heißt, dann musst du das hier entsprechend setzen.
-                return { description, iconName, colorClass };
+                return {
+                    description,
+                    iconName,
+                    colorClass
+                };
             }
 
-            // Versuche, Geolocation zu verwenden, ansonsten Fallback
+            function handleLocation(position) {
+                getWeatherData(position.coords.latitude, position.coords.longitude);
+            }
+
+            function handleLocationError(error) {
+                console.warn("Geolocation nicht verfügbar/abgelehnt, verwende Standardort.", error.message);
+                getWeatherData(defaultLatitude, defaultLongitude);
+            }
+
+            // Starte den Prozess des Abrufens von Standort und Wetterdaten
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    // Optionale Reverse Geocoding API, um den Namen aus Koordinaten zu bekommen (hier nicht implementiert)
-                    // Fürs Erste verwenden wir "Dein Standort" oder lassen den defaultLocationName
-                    getWeatherData(lat, lon, "Dein Standort");
-                }, error => {
-                    console.warn("Geolocation nicht verfügbar oder abgelehnt, verwende Standardort.", error);
-                    getWeatherData(defaultLatitude, defaultLongitude, defaultLocationName);
+                // Versuche Geolocation, Timeout nach 10 Sekunden, erlaube zwischengespeicherte Position
+                navigator.geolocation.getCurrentPosition(handleLocation, handleLocationError, {
+                    timeout: 10000,
+                    enableHighAccuracy: false
                 });
             } else {
-                console.warn("Geolocation API nicht im Browser verfügbar, verwende Standardort.");
-                getWeatherData(defaultLatitude, defaultLongitude, defaultLocationName);
+                console.warn("Geolocation API nicht verfügbar, verwende Standardort.");
+                getWeatherData(defaultLatitude, defaultLongitude);
             }
         });
     </script>

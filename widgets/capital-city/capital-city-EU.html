@@ -1,85 +1,171 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
+       
     <meta charset="UTF-8">
+       
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Europäische Hauptstädte & Flaggen Lernen</title>
-    <style>
+        <title>Europäische Hauptstädte & Flaggen Lernen</title>
+        <style>
+        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+        :root {
+            --md-sys-color-background: #fffbfe;
+            /* Hintergrund (nicht für Body, aber für Textfarbe) */
+            --md-sys-color-on-background: #1c1b1f;
+            /* Textfarbe auf Hintergrund (für Info Text) */
+            --md-sys-color-surface-container-high: #eee8f4;
+            /* Oberfläche Container (Karten Hintergrund) */
+            --md-sys-color-on-surface-container: #1c1b1f;
+            /* Text auf Karten Hintergrund */
+            --md-sys-color-outline: #79747e;
+            /* Umriss Farbe (z.B. für Flaggen-Border) */
+
+            /* Schattenfarbe */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Material You Farbpalette (Beispiel - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-background: #1c1b1f;
+                --md-sys-color-on-background: #e6e1e5;
+                --md-sys-color-surface-container-high: #36343b;
+                --md-sys-color-on-surface-container: #e6e1e5;
+                --md-sys-color-outline: #938f99;
+
+                /* Schattenfarbe für dunklen Modus */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+            }
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
+            /* Oder 'Arial' */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: transparent; /* Für Notion-Einbettung */
+            background-color: transparent;
+            /* Behält den transparenten Hintergrund bei */
             overflow: hidden;
             padding: 20px;
             box-sizing: border-box;
+            /* Keine direkte Farbzuweisung hier, da Body transparent ist */
         }
 
         #card-container {
-            width: 280px;  /* Verkleinert von 320px */
-            height: 250px; /* Verkleinert von 280px, etwas mehr Puffer in Höhe */
+            width: 280px;
+            height: 250px;
             position: relative;
             margin-bottom: 20px;
+            /* Die Farbe für den "Alle Karten gesehen"-Text kommt aus der Karte selbst */
+            color: var(--md-sys-color-on-surface-container);
         }
+
+        #card-container p {
+            /* Stil für den "Alle Karten gesehen"-Text */
+            text-align: center;
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
+            font-size: 1.2em;
+        }
+
 
         .card {
             width: 100%;
             height: 100%;
             position: absolute;
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-            cursor: pointer;
-            border-radius: 12px; /* Leicht reduziert */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            background-color: #2c2c2c;
-            color: #f0f0f0;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            /* Übergänge für Farben und Schatten */
+            cursor: grab;
+            /* Greif-Cursor */
+            border-radius: 20px;
+            /* Stärker abgerundete Ecken */
+            box-shadow: 0 6px 12px var(--md-sys-shadow-color);
+            /* Subtilerer und größerer Schatten */
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
             text-align: center;
-            font-size: 1.0em; /* Verkleinert von 1.1em */
+            font-size: 1.0em;
             user-select: none;
             left: 0;
             opacity: 1;
-            border: 5px dashed #1e1e1e; 
+            /* border: 5px dashed #1e1e1e; */
+            /* Entfernen oder anpassen, passt nicht zu Material You */
             box-sizing: border-box;
-            padding: 8px; /* Verkleinert von 10px */
+            padding: 0;
+            /* Padding in card-content verschieben */
+        }
+
+        .card.dragging {
+            cursor: grabbing;
+            /* Greif-Cursor während des Ziehens */
         }
 
         .card-content {
             display: flex;
             flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
+            justify-content: center;
+            align-items: center;
             width: 100%;
             height: 100%;
+            padding: 20px;
+            /* Padding hier hinzufügen */
+            box-sizing: border-box;
         }
 
         .flag-image {
-            width: 70px;  /* Verkleinert von 80px */
-            height: auto; 
-            max-height: 45px; /* Verkleinert von 55px */
-            object-fit: contain; 
-            margin-bottom: 8px; /* Verkleinert von 10px */
-            border: 1px solid #444; 
+            width: 80px;
+            /* Leicht vergrößert */
+            height: auto;
+            max-height: 50px;
+            /* Leicht vergrößert */
+            object-fit: contain;
+            margin-bottom: 12px;
+            /* Mehr Abstand */
+            border: none;
+            /* Farbe aus Palette */
+            border-radius: 8px;
+            /* Leicht abgerundete Ecken */
+            background-color: transparent;
+            /* Hintergrund für Flaggen, falls transparent */
         }
 
         .question-line {
             font-weight: bold;
-            margin-bottom: 6px; /* Verkleinert von 8px */
-            min-height: 1.3em;  /* Angepasst an Schriftgröße */
+            margin-bottom: 8px;
+            /* Mehr Abstand */
+            min-height: 1.5em;
+            /* Etwas höher */
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            padding: 0 10px;
+            /* Etwas horizontaler Platz */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
         }
 
         .answer-line {
-            min-height: 1.3em;  /* Angepasst an Schriftgröße */
-            visibility: hidden; 
+            min-height: 1.5em;
+            /* Etwas höher */
+            visibility: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9em; /* Etwas kleiner relativ zur Basisschrift der Karte */
+            font-size: 1em;
+            /* Etwas größer */
+            text-align: center;
+            padding: 0 10px;
+            /* Etwas horizontaler Platz */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
         }
 
         .answer-line.visible {
@@ -88,20 +174,32 @@
 
         #info-text {
             text-align: center;
-            color: #555;
+            color: var(--md-sys-color-on-background);
+            /* Textfarbe aus Palette (passt zum transparenten Body) */
             font-size: 0.9em;
+            transition: color 0.3s ease;
+            /* Übergang */
         }
-        #card-container p { 
-            color: #ccc;
-            font-size: 1.2em;
+
+        /* Stapel-Effekt Anpassungen */
+        .card:nth-child(2) {
+            /* Transform wird im JS gesetzt, hier nur Fallback/Basis */
+            /* transition: transform 0.3s ease; */
+        }
+
+        .card:nth-child(3) {
+            /* Transform wird im JS gesetzt, hier nur Fallback/Basis */
+            /* transition: transform 0.3s ease; */
         }
     </style>
 </head>
-<body>
-    <div id="card-container">
-        </div>
-    <div id="info-text"></div>
 
+<body>
+        <div id="card-container">
+                        </div>
+        <div id="info-text">Zum Aufdecken klicken | wischen für weiter</div>
+
+       
     <script>
         // NEU: europaDaten mit Ländercodes (für Flaggen)
         const europaDaten = [
@@ -160,13 +258,14 @@
 
         let aktuellerKartenIndex = 0;
         let gemischteKarten = [];
-        
+
         let startX = 0;
         let aktuelleXPosition = 0;
         let isDragging = false;
         let aktiveKarteElement = null;
-        let dragStartThreshold = 15; 
-        let dragMoved = false; 
+        let dragStartThreshold = 15;
+        let dragMoved = false;
+        let isClicking = false; // Hilfsflag für Klick-Erkennung
 
         function mischen(array) {
             let newArray = [...array];
@@ -181,19 +280,19 @@
             const karte = document.createElement('div');
             karte.classList.add('card');
 
-            // Stapeloptik
-            if (indexPositionImStapel === 0) {
-                karte.style.transform = 'translate(0px, 0px) scale(1)'; 
-                karte.style.opacity = '1'; 
-                karte.style.zIndex = '3';
-            } else if (indexPositionImStapel === 1) {
-                karte.style.transform = 'translate(4px, 4px) scale(0.97)'; // Leicht angepasste Werte für kleineren Stapel
-                karte.style.opacity = '1'; 
-                karte.style.zIndex = '2';
-            } else if (indexPositionImStapel === 2) {
-                karte.style.transform = 'translate(8px, 8px) scale(0.94)'; // Leicht angepasste Werte für kleineren Stapel
-                karte.style.opacity = '1'; 
-                karte.style.zIndex = '1';
+            // Stapeloptik (angepasst an Material You)
+            const baseOffset = 6; // Basisabstand für Stapel
+            const baseScale = 0.96; // Basis Skalierung für Stapel
+            const zIndex = 3 - indexPositionImStapel; // Z-Index für die Reihenfolge
+
+            if (indexPositionImStapel < 3) {
+                const offsetX = baseOffset * indexPositionImStapel;
+                const offsetY = baseOffset * indexPositionImStapel * 0.8; // Y-Offset etwas geringer
+                const scale = baseScale - (indexPositionImStapel * 0.02); // Skalierung nimmt ab
+
+                karte.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+                karte.style.opacity = '1';
+                karte.style.zIndex = String(zIndex);
             } else {
                 karte.style.display = 'none';
             }
@@ -204,7 +303,8 @@
             if (kartenDaten.code) {
                 const flagImage = document.createElement('img');
                 flagImage.classList.add('flag-image');
-                flagImage.src = `https://flagcdn.com/w80/${kartenDaten.code.toLowerCase()}.png`; 
+                // Nutze eine zuverlässige Flaggen-API (flagcdn.com ist gut)
+                flagImage.src = `https://flagcdn.com/w80/${kartenDaten.code.toLowerCase()}.png`;
                 flagImage.alt = `Flagge von ${kartenDaten.land}`;
                 cardContent.appendChild(flagImage);
             }
@@ -224,17 +324,23 @@
                 aktiveKarteElement = karte;
 
                 karte.addEventListener('click', () => {
-                    if (!dragMoved) { 
+                    // Überprüfen, ob kein Ziehen stattgefunden hat
+                    if (!dragMoved) {
+                        // Antwort aufdecken
                         if (!answerLine.classList.contains('visible')) {
                             answerLine.textContent = kartenDaten.hauptstadt;
                             answerLine.classList.add('visible');
                         } else {
-                            // Optional: answerLine.textContent = ''; answerLine.classList.remove('visible');
+                            // Klick, wenn Antwort bereits sichtbar ist (kann für andere Aktionen genutzt werden)
+                            // Optional: Nächste Karte laden bei Klick, wenn Antwort sichtbar ist?
+                            // setTimeout(nextCard, 100); // Kleine Verzögerung
                         }
                     }
                 });
+
+                // Drag Events
                 karte.addEventListener('mousedown', startDrag);
-                karte.addEventListener('touchstart', startDrag, { passive: true });
+                karte.addEventListener('touchstart', startDrag, { passive: true }); // Passive for initial touch start
             }
             return karte;
         }
@@ -242,14 +348,26 @@
         function ladeKartenAnzeige() {
             cardContainer.innerHTML = '';
             aktiveKarteElement = null;
-            
-            if (aktuellerKartenIndex >= gemischteKarten.length) {
-                 cardContainer.innerHTML = '<p>Alle Karten gesehen! Lade die Seite neu oder starte eine neue Runde.</p>';
-                 if(infoTextElement) infoTextElement.style.display = 'none';
-                 return;
-            }
-            if(infoTextElement) infoTextElement.style.display = 'block';
 
+            if (aktuellerKartenIndex >= gemischteKarten.length) {
+                // Nachrichten-Karte erstellen statt nur Text
+                const nachrichtKarte = document.createElement('div');
+                nachrichtKarte.classList.add('card'); // Wiederverwenden der card Klasse für Styling
+                nachrichtKarte.style.position = 'static'; // Nicht absolut positionieren
+                nachrichtKarte.style.transform = 'none';
+                nachrichtKarte.style.opacity = '1';
+                nachrichtKarte.style.zIndex = 'auto';
+                nachrichtKarte.style.height = 'auto'; // Höhe automatisch anpassen
+                nachrichtKarte.style.padding = '20px'; // Padding hinzufügen
+                nachrichtKarte.innerHTML = '<p>Alle Karten gesehen! Gut gemacht! <br> Lade die Seite neu, um eine neue Runde zu starten.</p>';
+                cardContainer.appendChild(nachrichtKarte);
+
+                if (infoTextElement) infoTextElement.style.display = 'none'; // Info Text ausblenden
+                return;
+            }
+            if (infoTextElement) infoTextElement.style.display = 'block'; // Info Text einblenden
+
+            // Max 3 Karten anzeigen
             const anzahlSichtbarerKarten = Math.min(3, gemischteKarten.length - aktuellerKartenIndex);
             for (let i = 0; i < anzahlSichtbarerKarten; i++) {
                 const datenIndex = aktuellerKartenIndex + i;
@@ -259,14 +377,17 @@
                 }
             }
         }
-        
+
         function startDrag(e) {
-            if (aktiveKarteElement) { 
+            if (aktiveKarteElement) {
                 isDragging = true;
-                dragMoved = false; 
+                dragMoved = false;
+                isClicking = true; // Vorläufig als Klick behandeln
                 startX = e.pageX || e.touches[0].pageX;
-                aktiveKarteElement.style.transition = 'none'; 
-                
+                aktuelleXPosition = 0; // Reset position
+                aktiveKarteElement.style.transition = 'none'; // Übergang während des Ziehens deaktivieren
+                aktiveKarteElement.classList.add('dragging'); // Klasse für Cursor
+
                 document.addEventListener('mousemove', drag);
                 document.addEventListener('touchmove', drag, { passive: false });
                 document.addEventListener('mouseup', endDrag);
@@ -277,59 +398,89 @@
         function drag(e) {
             if (!isDragging || !aktiveKarteElement) return;
 
-            if (e.type === 'touchmove') { 
-                e.preventDefault();
+            if (e.type === 'touchmove') {
+                e.preventDefault(); // Verhindert Scrollen auf Touch-Geräten
             }
 
             const aktuelleX = e.pageX || e.touches[0].pageX;
             aktuelleXPosition = aktuelleX - startX;
 
+            // Überprüfen, ob der Drag-Threshold überschritten wurde
             if (Math.abs(aktuelleXPosition) > dragStartThreshold) {
-                dragMoved = true; 
+                dragMoved = true;
+                isClicking = false; // Es ist kein Klick, sondern ein Drag
             }
-            aktiveKarteElement.style.transform = `translateX(${aktuelleXPosition}px) rotate(${aktuelleXPosition / 20}deg)`;
+
+            // Wischeffekt mit leichter Rotation
+            const maxRotation = 15; // Maximal 15 Grad Rotation
+            const rotation = (aktuelleXPosition / aktiveKarteElement.offsetWidth) * maxRotation;
+
+            aktiveKarteElement.style.transform = `translateX(${aktuelleXPosition}px) rotate(${rotation}deg)`;
         }
 
         function endDrag() {
             if (!aktiveKarteElement) return;
 
+            // Listener entfernen
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('touchmove', drag);
             document.removeEventListener('mouseup', endDrag);
             document.removeEventListener('touchend', endDrag);
-            
-            if (isDragging) { 
-                 aktiveKarteElement.style.removeProperty('transition'); 
-            }
-            isDragging = false;
 
-            const swipeThreshold = aktiveKarteElement.offsetWidth * 0.35;
+            isDragging = false;
+            aktiveKarteElement.classList.remove('dragging'); // Klasse entfernen
+            aktiveKarteElement.style.removeProperty('transition'); // Reset transition for swipe animation
+
+
+            const swipeThreshold = aktiveKarteElement.offsetWidth * 0.4; // Schwelle für Wischen
             let swiped = false;
 
             if (dragMoved && Math.abs(aktuelleXPosition) > swipeThreshold) {
                 const direction = aktuelleXPosition > 0 ? 1 : -1;
-                aktiveKarteElement.style.transform = `translateX(${direction * 600}px) rotate(${direction * 45}deg)`;
+                // Karte vom Bildschirm wischen
+                aktiveKarteElement.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+                aktiveKarteElement.style.transform = `translateX(${direction * 800}px) rotate(${direction * 30}deg)`;
                 aktiveKarteElement.style.opacity = '0';
                 swiped = true;
             } else {
-                if (aktiveKarteElement) { 
+                // Karte zurückfedern lassen
+                if (aktiveKarteElement) {
+                    aktiveKarteElement.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; // Bounce-Effekt
                     aktiveKarteElement.style.transform = 'translateX(0) rotate(0)';
+                    // Die ursprüngliche Stapel-Transformation wiederherstellen, nachdem die Karte zurückgefedert ist
+                    setTimeout(() => {
+                        if (aktiveKarteElement) { // Stelle sicher, dass das Element noch existiert
+                            const indexPositionImStapel = 0; // Es ist immer die oberste Karte
+                            const baseOffset = 6;
+                            const baseScale = 0.96;
+                            const offsetX = baseOffset * indexPositionImStapel;
+                            const offsetY = baseOffset * indexPositionImStapel * 0.8;
+                            const scale = baseScale - (indexPositionImStapel * 0.02);
+                            aktiveKarteElement.style.transition = 'transform 0.3s ease-out'; // Nur Transform für den Stapel
+                            aktiveKarteElement.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+                        }
+                    }, 300); // Verzögerung passend zur Bounce-Animation
                 }
             }
-            
+
+            // Nur zur nächsten Karte wechseln, wenn gewischt wurde
             if (swiped) {
+                // Kleine Verzögerung vor dem Laden der nächsten Karte, damit man die Animation sieht
                 setTimeout(() => {
                     aktuellerKartenIndex++;
                     ladeKartenAnzeige();
-                }, 300); 
+                }, 300); // Passt zur Swipe-out Animation
             }
-            aktuelleXPosition = 0; 
+
+            aktuelleXPosition = 0;
+            dragMoved = false; // Reset
         }
+
 
         function initialisieren() {
             if (europaDaten.length === 0) {
-                 cardContainer.innerHTML = '<p>Keine Kartendaten vorhanden zum Laden.</p>';
-                 if(infoTextElement) infoTextElement.style.display = 'none';
+                cardContainer.innerHTML = '<p>Keine Kartendaten vorhanden zum Laden.</p>';
+                if (infoTextElement) infoTextElement.style.display = 'none';
                 return;
             }
             gemischteKarten = mischen(europaDaten);
@@ -340,4 +491,5 @@
         document.addEventListener('DOMContentLoaded', initialisieren);
     </script>
 </body>
+
 </html>

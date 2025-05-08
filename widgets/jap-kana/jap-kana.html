@@ -5,122 +5,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hiragana & Katakana Übung</title>
     <style>
+        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+        :root {
+            --md-sys-color-primary: #6750a4; /* Akzentfarbe */
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-background: transparent; /* Hintergrund */
+            --md-sys-color-on-background: #1c1b1f; /* Text auf Hintergrund */
+            --md-sys-color-surface: #f3edfa; /* Oberfläche (z.B. Container) */
+            --md-sys-color-on-surface: #1c1b1f; /* Text auf Oberfläche */
+            --md-sys-color-surface-variant: #eaddff; /* Oberfläche Variante (z.B. Control Buttons) */
+            --md-sys-color-on-surface-variant: #1c1b1f; /* Text auf Oberfläche Variante */
+            --md-sys-color-outline: #79747e; /* Umriss Farbe */
+            --md-sys-color-error: #b3261e; /* Fehlerfarbe */
+            --md-sys-color-on-error: #ffffff;
+            --md-sys-color-success: #4CAF50; /* Eigene Farbe für Erfolg */
+
+             /* Schattenfarbe für helle und dunkle Modi */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Material You Farbpalette (Beispiel - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-primary: #d0bcff; /* Hellere Akzentfarbe für Dark Mode */
+                --md-sys-color-on-primary: #381e72; /* Dunklerer Text auf Akzentfarbe */
+                --md-sys-color-background: transparent; /* Dunkler Hintergrund */
+                --md-sys-color-on-background: #e6e1e5; /* Heller Text auf Hintergrund */
+                --md-sys-color-surface: #2a282d; /* Dunklere Oberfläche (leicht vom Hintergrund abgesetzt) */
+                --md-sys-color-on-surface: #e6e1e5; /* Heller Text auf Oberfläche */
+                --md-sys-color-surface-variant: #49454f; /* Dunklere Oberfläche Variante */
+                --md-sys-color-on-surface-variant: #cac4d0; /* Hellerer Text auf Oberfläche Variante */
+                --md-sys-color-outline: #938f99;
+                --md-sys-color-error: #f2b8b5; /* Helleres Rot für Dark Mode */
+                --md-sys-color-on-error: #601410;
+                --md-sys-color-success: #81C784; /* Helleres Grün für Dark Mode */
+
+                /* Schattenfarbe für dunklen Modus (kann subtiler sein) */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.25); /* Schatten sind in Dark Mode weniger auffällig */
+            }
+        }
+
+
         body {
-            font-family: sans-serif;
+            font-family: 'Roboto', sans-serif; /* Optional: Roboto oder eine ähnliche Schrift */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: transparent; /* Transparenter Hintergrund */
-            color: #f8f8f2; /* Helle Textfarbe */
+            background-color: var(--md-sys-color-background); /* Hintergrundfarbe aus Palette */
+            color: var(--md-sys-color-on-background); /* Textfarbe aus Palette */
             margin: 0;
+            padding: 20px; /* Etwas Padding um den Inhalt */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Übergang für den Farbwechsel */
         }
 
         .controls {
             display: flex;
             flex-direction: column;
-            margin-right: 20px; /* Abstand zum Widget */
+            margin-right: 30px; /* Mehr Abstand zum Widget */
         }
 
         .control-button {
-            background-color: #6272a4; /* Dunklerer Button-Hintergrund */
-            color: #f8f8f2;
+            background-color: var(--md-sys-color-surface-variant); /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-variant); /* Textfarbe aus Palette */
             border: none;
-            border-radius: 4px;
-            width: 50px; /* Feste Breite */
-            height: 50px; /* Feste Höhe */
-            font-size: 24px; /* Größere Schrift für die Zeichen */
+            border-radius: 16px; /* Stärker abgerundete Ecken */
+            width: 60px; /* Etwas breiter */
+            height: 60px; /* Etwas höher */
+            font-size: 28px; /* Größere Schrift */
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 10px; /* Abstand zwischen den Buttons */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Übergänge für Hover/Schatten */
+            margin-bottom: 15px; /* Mehr Abstand zwischen den Buttons */
             display: flex;
             justify-content: center;
             align-items: center;
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
         }
 
         .control-button:hover {
-            background-color: #44475a; /* Noch dunklerer Button-Hintergrund beim Hover */
+            /* Passen sich automatisch an die Palette an, da die Variable verwendet wird */
+            background-color: var(--md-sys-color-surface); /* Beim Hover leicht andere Oberflächenfarbe */
+            box-shadow: 0 2px 4px var(--md-sys-shadow-color); /* Schatten beim Hover erhöhen */
         }
 
         .container {
-            background-color: #282a36; /* Dunkler Container-Hintergrund */
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Dunklerer Schatten */
-            padding: 30px;
+            background-color: var(--md-sys-color-surface); /* Hintergrund aus Palette */
+            border-radius: 24px; /* Sehr stark abgerundete Ecken */
+            box-shadow: 0 4px 8px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
+            padding: 40px; /* Mehr Padding */
             text-align: center;
-            height: 330px; /* Feste Höhe */
-            width: 200px; /* Feste Breite */
+            width: 250px; /* Etwas breiter */
+            height: 380px; /* Etwas höher */
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Verteilt den Inhalt vertikal */
+            justify-content: space-between;
+            color: var(--md-sys-color-on-surface); /* Textfarbe aus Palette */
+             transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Übergang für den Farbwechsel */
         }
 
         .progress-bar-container {
-            background-color: #44475a; /* Dunklerer Fortschrittsbalken-Hintergrund */
-            border-radius: 5px;
-            height: 10px; /* Feste Höhe */
-            margin-bottom: 10px; /* Weniger Abstand */
+            background-color: var(--md-sys-color-surface-variant); /* Hintergrund aus Palette */
+            border-radius: 8px; /* Abgerundete Ecken */
+            height: 12px; /* Etwas höher */
+            margin-bottom: 20px; /* Mehr Abstand */
             overflow: hidden;
         }
 
         .progress-bar {
-            background-color: #50fa7b; /* Helle Akzentfarbe für den Fortschritt */
+            background-color: green; /* Farbe aus Palette */
             height: 100%;
             width: 0%;
-            border-radius: 5px;
+            border-radius: 8px; /* Abgerundete Ecken */
+            transition: width 0.4s ease-in-out, background-color 0.3s ease; /* Sanfterer Übergang und Farbwechsel */
         }
 
         .question-container {
-            margin-bottom: 10px; /* Weniger Abstand */
-            height: 100px; /* Feste Höhe für den Fragebereich */
+            margin-bottom: 20px; /* Mehr Abstand */
+            height: 120px; /* Etwas höher für mehr Platz */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .japanese-char {
-            font-size: 80px;
+            font-size: 90px; /* Größere Schrift */
+            font-weight: 500; /* Mittlere Schriftstärke */
+            color: var(--md-sys-color-on-surface); /* Sicherstellen, dass die Textfarbe aus der Palette kommt */
+             transition: color 0.3s ease; /* Übergang für den Farbwechsel */
         }
 
         .answer-buttons {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Zwei Buttons pro Reihe */
-            gap: 10px;
-            margin-bottom: 10px; /* Weniger Abstand */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px; /* Mehr Abstand zwischen Buttons */
+            margin-bottom: 20px; /* Mehr Abstand */
         }
 
         .answer-button {
-            background-color: #6272a4; /* Dunklerer Button-Hintergrund */
-            color: #f8f8f2;
+            background-color: var(--md-sys-color-primary); /* Hintergrund aus Palette (Filled Button Style) */
+            color: var(--md-sys-color-on-primary); /* Textfarbe aus Palette */
             border: none;
-            border-radius: 4px;
-            width: 80px; /* Feste Breite für Antwortbuttons */
-            height: 40px; /* Feste Höhe für Antwortbuttons */
-            font-size: 16px; /* Kleinere Schrift */
+            border-radius: 16px; /* Stärker abgerundete Ecken */
+            width: auto; /* Breite automatisch an Grid anpassen */
+            height: 50px; /* Etwas höher */
+            font-size: 18px; /* Größere Schrift */
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease; /* Übergänge auch für Farbwechsel */
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
         }
 
         .answer-button:hover {
-            background-color: #44475a; /* Noch dunklerer Button-Hintergrund beim Hover */
+             background-color: var(--md-sys-color-primary); /* Beim Hover dieselbe Primary Farbe */
+             box-shadow: 0 2px 4px var(--md-sys-shadow-color); /* Schatten beim Hover erhöhen */
+             opacity: 0.9; /* Leichte Transparenz für Hover-Effekt */
         }
 
         .feedback {
             font-weight: bold;
-            font-size: 16px; /* Kleinere Schrift */
-            height: 20px; /* Feste Höhe für Feedback */
+            font-size: 18px; /* Größere Schrift */
+            height: 25px; /* Etwas höher */
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 1em; /* Mindesthöhe für den Text */
+             transition: color 0.3s ease; /* Übergang für den Farbwechsel */
         }
 
         .feedback.correct {
-            color: #50fa7b; /* Helle Farbe für korrekte Rückmeldung */
+            color: var(--md-sys-color-success); /* Farbe für korrekte Rückmeldung */
         }
 
         .feedback.incorrect {
-            color: #ff5555; /* Helle Farbe für falsche Rückmeldung */
+            color: var(--md-sys-color-error); /* Farbe für falsche Rückmeldung */
         }
+
+        /* Stil für deaktivierte Buttons */
+        .answer-button:disabled {
+            opacity: 0.4; /* Weniger Opazität im Dark Mode */
+            cursor: not-allowed;
+        }
+         .answer-button:disabled:hover {
+             background-color: var(--md-sys-color-primary); /* Hover-Effekt auf Disabled entfernen */
+             box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+         }
     </style>
 </head>
 <body>
@@ -171,6 +238,16 @@
             { char: 'ハ', romanji: 'ha' }, { char: 'ヒ', romanji: 'hi' }, { char: 'フ', romanji: 'fu' }, { char: 'ヘ', romanji: 'he' }, { char: 'ホ', romanji: 'ho' },
             { char: 'マ', romanji: 'ma' }, { char: 'ミ', romanji: 'mi' }, { char: 'ム', romanji: 'mu' }, { char: 'メ', romanji: 'me' }, { char: 'モ', romanji: 'mo' },
             { char: 'ヤ', romanji: 'ya' }, { char: 'ユ', romanji: 'yu' }, { char: 'ヨ', romanji: 'yo' },
+            { char: 'ラ', romanji: 'ra' }, { char: 'リ', romanji: 'ri' }, { char: 'ル', romanji: 'ru' }, { char: 'レ', romanji: 're' }, { char: 'ろ', romanji: 'ro' },
+            { char: 'ワ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ん', romanji: 'n' },
+            { char: 'ア', romanji: 'a' }, { char: 'イ', romanji: 'i' }, { char: 'ウ', romanji: 'u' }, { char: 'エ', romanji: 'e' }, { char: 'オ', romanji: 'o' },
+            { char: 'カ', romanji: 'ka' }, { char: 'キ', romanji: 'ki' }, { char: 'ク', romanji: 'ku' }, { char: 'ケ', romanji: 'ke' }, { char: 'コ', romanji: 'ko' },
+            { char: 'サ', romanji: 'sa' }, { char: 'シ', romanji: 'shi' }, { char: 'ス', romanji: 'su' }, { char: 'セ', romanji: 'se' }, { char: 'ソ', romanji: 'so' },
+            { char: 'タ', romanji: 'ta' }, { char: 'チ', romanji: 'chi' }, { char: 'ツ', romanji: 'tsu' }, { char: 'テ', romanji: 'te' }, { char: 'ト', romanji: 'to' },
+            { char: 'ナ', romanji: 'na' }, { char: 'ニ', romanji: 'ni' }, { char: 'ヌ', romanji: 'nu' }, { char: 'ネ', romanji: 'ne' }, { char: 'ノ', romanji: 'no' },
+            { char: 'ハ', romanji: 'ha' }, { char: 'ヒ', romanji: 'hi' }, { char: 'フ', romanji: 'fu' }, { char: 'ヘ', romanji: 'he' }, { char: 'ホ', romanji: 'ho' },
+            { char: 'マ', romanji: 'ma' }, { char: 'ミ', romanji: 'mi' }, { char: 'ム', romanji: 'mu' }, { char: 'メ', romanji: 'me' }, { char: 'モ', romanji: 'mo' },
+            { char: 'ヤ', romanji: 'ya' }, { char: 'ユ', romanji: 'yu' }, { char: 'ヨ', romanji: 'yo' },
             { char: 'ラ', romanji: 'ra' }, { char: 'リ', romanji: 'ri' }, { char: 'ル', romanji: 'ru' }, { char: 'レ', romanji: 're' }, { char: 'ロ', romanji: 'ro' },
             { char: 'ワ', romanji: 'wa' }, { char: 'を', romanji: 'wo' }, { char: 'ン', romanji: 'n' }
         ];
@@ -211,10 +288,12 @@
                     setupAnswerButtons(currentQuestion.romanji);
                 }
                 feedbackElement.textContent = '';
+                feedbackElement.className = 'feedback'; // Reset feedback class
                 updateProgressBar();
                 questionIndex++;
             } else {
                 feedbackElement.textContent = `Fertig! Du hast ${correctAnswers} von ${totalQuestions} richtig.`;
+                feedbackElement.className = 'feedback correct'; // Set class for final message color
                 answerButtonElements.forEach(button => button.disabled = true);
             }
         }

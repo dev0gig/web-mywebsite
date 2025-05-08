@@ -6,77 +6,257 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taschenrechner</title>
     <style>
+        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+        :root {
+            --md-sys-color-primary: #6750a4;
+            /* Akzentfarbe (z.B. Backspace) */
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-secondary: #625b71;
+            /* Sekundärfarbe (z.B. Operatoren) */
+            --md-sys-color-on-secondary: #ffffff;
+            --md-sys-color-tertiary: #7D5260;
+            /* Tertiärfarbe (z.B. Prozent) */
+            --md-sys-color-on-tertiary: #ffffff;
+            --md-sys-color-error: #b3261e;
+            /* Fehlerfarbe (z.B. C) */
+            --md-sys-color-error-container: #f2b8b5;
+            /* Fehler Container Farbe (z.B. CE) */
+            --md-sys-color-on-error-container: #601410;
+            --md-sys-color-surface: #fffbfe;
+            /* Oberfläche (nicht für Body, sondern für Container/Elemente) */
+            --md-sys-color-on-surface: #1c1b1f;
+            /* Text auf Oberfläche */
+            --md-sys-color-surface-container-high: #eee8f4;
+            /* Oberfläche Container (z.B. Taschenrechner-Background) */
+            --md-sys-color-surface-container-low: #f7f2fa;
+            /* Oberfläche Container (z.B. Display-Background) */
+            --md-sys-color-on-surface-container: #1c1b1f;
+            /* Text auf Oberfläche Container */
+            --md-sys-color-surface-variant: #e7e0ec;
+            /* Oberfläche Variante (z.B. Nummern-Buttons) */
+            --md-sys-color-on-surface-variant: #49454f;
+            /* Text auf Oberfläche Variante */
+
+            /* Schattenfarbe */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Material You Farbpalette (Beispiel - dunkle Variante) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --md-sys-color-primary: #d0bcff;
+                /* Hellere Akzentfarbe für Dark Mode */
+                --md-sys-color-on-primary: #381e72;
+                --md-sys-color-secondary: #ccc2dc;
+                /* Hellere Sekundärfarbe */
+                --md-sys-color-on-secondary: #332d41;
+                --md-sys-color-tertiary: #efb8c8;
+                /* Hellere Tertiärfarbe */
+                --md-sys-color-on-tertiary: #492532;
+                --md-sys-color-error: #f2b8b5;
+                /* Helleres Rot für Dark Mode */
+                --md-sys-color-error-container: #8c1d18;
+                /* Dunklerer Fehler Container */
+                --md-sys-color-on-error-container: #f2b8b5;
+                --md-sys-color-surface: #1c1b1f;
+                --md-sys-color-on-surface: #e6e1e5;
+                --md-sys-color-surface-container-high: #36343b;
+                /* Dunklerer Taschenrechner-Background */
+                --md-sys-color-surface-container-low: #2a282d;
+                /* Dunklerer Display-Background */
+                --md-sys-color-on-surface-container: #e6e1e5;
+                /* Heller Text auf Oberfläche Container */
+                --md-sys-color-surface-variant: #49454f;
+                /* Dunklere Nummern-Buttons */
+                --md-sys-color-on-surface-variant: #cac4d0;
+                /* Hellerer Text auf Nummern-Buttons */
+
+                /* Schattenfarbe für dunklen Modus */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+            }
+        }
+
         body {
             background-color: transparent;
-            display: flex; /* Aktiviert Flexbox für die Zentrierung */
-            justify-content: center; /* Zentriert horizontal */
-            align-items: center; /* Zentriert vertikal */
-            min-height: 100vh; /* Stellt sicher, dass der Body mindestens die Höhe des Viewports hat */
-            margin: 0; /* Entfernt Standard-Margins des Bodys */
+            /* Behält den transparenten Hintergrund bei */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* Textfarbe des Bodys ist hier weniger wichtig, da der Taschenrechner selbst den Inhalt hat */
+            /* Falls doch nötig, sicherstellen, dass sie mit allem dahinter kontrastiert */
         }
 
         .calculator {
-            background-color: #333;
-            border-radius: 8px;
-            padding: 16px;
-            width: 250px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Taschenrechner-Background aus Palette */
+            border-radius: 28px;
+            /* Sehr stark abgerundete Ecken */
+            padding: 24px;
+            /* Mehr Padding */
+            width: 300px;
+            /* Etwas breiter */
+            box-shadow: 0 6px 12px var(--md-sys-shadow-color);
+            /* Subtilerer und größerer Schatten */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            /* Übergang für Dark Mode Wechsel */
         }
 
         .display {
-            background-color: #444;
-            color: #fff;
-            font-size: 24px;
+            background-color: var(--md-sys-color-surface-container-low);
+            /* Display-Background aus Palette */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe aus Palette */
+            font-family: 'Roboto Mono', monospace;
+            /* Optional: Monospace Schrift für Ziffern */
+            font-size: 36px;
+            /* Größere Schrift */
             text-align: right;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+            padding: 16px 12px;
+            /* Mehr Padding, links/rechts weniger */
+            margin-bottom: 20px;
+            /* Mehr Abstand nach unten */
+            border-radius: 16px;
+            /* Stärker abgerundete Ecken */
             overflow: hidden;
+            min-height: 1.5em;
+            /* Mindesthöhe, falls nur "0" angezeigt wird */
+            display: flex;
+            /* Flexbox für bessere vertikale Zentrierung */
+            align-items: center;
+            /* Vertikal zentrieren */
+            justify-content: flex-end;
+            /* Rechts ausrichten */
+            word-break: break-all;
+            /* Lange Zahlen umbrechen */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Übergang */
         }
 
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-gap: 8px;
+            grid-gap: 12px;
+            /* Mehr Abstand zwischen Buttons */
         }
 
         button {
-            background-color: #555;
-            color: #fff;
+            /* Standard-Stil für Nummern- und Dezimalbutton */
+            background-color: var(--md-sys-color-surface-variant);
+            /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-variant);
+            /* Textfarbe aus Palette */
             border: none;
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 6px;
+            padding: 20px 15px;
+            /* Mehr Padding */
+            font-size: 20px;
+            /* Größere Schrift */
+            border-radius: 16px;
+            /* Stärker abgerundete Ecken */
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+            /* Übergänge */
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+            /* Subtiler Schatten */
         }
 
         button:hover {
-            background-color: #666;
+            background-color: var(--md-sys-color-surface);
+            /* Beim Hover leicht andere Oberflächenfarbe */
+            box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+            /* Schatten beim Hover erhöhen */
         }
 
+        /* Spezifische Button-Stile verwenden Farben aus der Palette */
         .clearDisplay {
-            background-color: #e53935;
+            background-color: var(--md-sys-color-error);
+            /* Fehlerfarbe */
+            color: var(--md-sys-color-on-error);
         }
+
+        .clearDisplay:hover {
+            background-color: #c02b27;
+            /* Leicht dunkler beim Hover (manuell oder aus Palette ableiten) */
+        }
+
 
         .clearEntry {
-            background-color: #ff6e6b;
+            background-color: var(--md-sys-color-error-container);
+            /* Fehler Container Farbe */
+            color: var(--md-sys-color-on-error-container);
         }
 
-        .percent {
-            background-color: #d88500 !important;
+        .clearEntry:hover {
+            background-color: #e0a8a5;
+            /* Leicht dunkler beim Hover */
         }
 
         .backspace {
-            background-color: #1180ff;
+            background-color: var(--md-sys-color-primary);
+            /* Primärfarbe */
+            color: var(--md-sys-color-on-primary);
+        }
+
+        .backspace:hover {
+            background-color: #553e91;
+            /* Leicht dunkler beim Hover */
         }
 
         .operator {
-            background-color: #f9a825;
+            background-color: var(--md-sys-color-secondary);
+            /* Sekundärfarbe */
+            color: var(--md-sys-color-on-secondary);
         }
 
         .operator:hover {
-            background-color: #fbb03b;
+            background-color: #50475a;
+            /* Leicht dunkler beim Hover */
+        }
+
+        .percent {
+            background-color: var(--md-sys-color-tertiary);
+            /* Tertiärfarbe */
+            color: var(--md-sys-color-on-tertiary);
+        }
+
+        .percent:hover {
+            background-color: #6a4654;
+            /* Leicht dunkler beim Hover */
+        }
+
+
+        /* Optional: Stil für deaktivierte Buttons */
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+            /* Schatten bleibt, wird nicht erhöht */
+        }
+
+        button:disabled:hover {
+            background-color: var(--md-sys-color-surface-variant);
+            /* Hover-Effekt auf Disabled Nummernbutton entfernen */
+        }
+
+        .clearDisplay:disabled:hover {
+            background-color: var(--md-sys-color-error);
+        }
+
+        .clearEntry:disabled:hover {
+            background-color: var(--md-sys-color-error-container);
+        }
+
+        .backspace:disabled:hover {
+            background-color: var(--md-sys-color-primary);
+        }
+
+        .operator:disabled:hover {
+            background-color: var(--md-sys-color-secondary);
+        }
+
+        .percent:disabled:hover {
+            background-color: var(--md-sys-color-tertiary);
         }
     </style>
 </head>
