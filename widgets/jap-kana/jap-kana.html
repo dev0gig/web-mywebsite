@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,190 +8,279 @@
     <style>
         /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
         :root {
-            --md-sys-color-primary: #6750a4; /* Akzentfarbe */
+            --md-sys-color-primary: #6750a4;
+            /* Akzentfarbe */
             --md-sys-color-on-primary: #ffffff;
-            --md-sys-color-background: transparent; /* Hintergrund */
-            --md-sys-color-on-background: #1c1b1f; /* Text auf Hintergrund */
-            --md-sys-color-surface: #f3edfa; /* Oberfläche (z.B. Container) */
-            --md-sys-color-on-surface: #1c1b1f; /* Text auf Oberfläche */
-            --md-sys-color-surface-variant: #eaddff; /* Oberfläche Variante (z.B. Control Buttons) */
-            --md-sys-color-on-surface-variant: #1c1b1f; /* Text auf Oberfläche Variante */
-            --md-sys-color-outline: #79747e; /* Umriss Farbe */
-            --md-sys-color-error: #b3261e; /* Fehlerfarbe */
+            --md-sys-color-background: transparent;
+            /* Hintergrund */
+            --md-sys-color-on-background: #1c1b1f;
+            /* Text auf Hintergrund */
+            --md-sys-color-surface: #f3edfa;
+            /* Oberfläche (z.B. Container) */
+            --md-sys-color-on-surface: #1c1b1f;
+            /* Text auf Oberfläche */
+            --md-sys-color-surface-variant: #eaddff;
+            /* Oberfläche Variante (z.B. Control Buttons) */
+            --md-sys-color-on-surface-variant: #1c1b1f;
+            /* Text auf Oberfläche Variante */
+            --md-sys-color-outline: #79747e;
+            /* Umriss Farbe */
+            --md-sys-color-error: #b3261e;
+            /* Fehlerfarbe */
             --md-sys-color-on-error: #ffffff;
-            --md-sys-color-success: #4CAF50; /* Eigene Farbe für Erfolg */
+            --md-sys-color-success: #4CAF50;
+            /* Eigene Farbe für Erfolg */
 
-             /* Schattenfarbe für helle und dunkle Modi */
+            /* Schattenfarbe für helle und dunkle Modi */
             --md-sys-shadow-color: rgba(0, 0, 0, 0.1);
         }
 
         /* Material You Farbpalette (Beispiel - dunkle Variante) */
         @media (prefers-color-scheme: dark) {
             :root {
-                --md-sys-color-primary: #d0bcff; /* Hellere Akzentfarbe für Dark Mode */
-                --md-sys-color-on-primary: #381e72; /* Dunklerer Text auf Akzentfarbe */
-                --md-sys-color-background: transparent; /* Dunkler Hintergrund */
-                --md-sys-color-on-background: #e6e1e5; /* Heller Text auf Hintergrund */
-                --md-sys-color-surface: #2a282d; /* Dunklere Oberfläche (leicht vom Hintergrund abgesetzt) */
-                --md-sys-color-on-surface: #e6e1e5; /* Heller Text auf Oberfläche */
-                --md-sys-color-surface-variant: #49454f; /* Dunklere Oberfläche Variante */
-                --md-sys-color-on-surface-variant: #cac4d0; /* Hellerer Text auf Oberfläche Variante */
+                --md-sys-color-primary: #d0bcff;
+                /* Hellere Akzentfarbe für Dark Mode */
+                --md-sys-color-on-primary: #381e72;
+                /* Dunklerer Text auf Akzentfarbe */
+                --md-sys-color-background: transparent;
+                /* Dunkler Hintergrund */
+                --md-sys-color-on-background: #e6e1e5;
+                /* Heller Text auf Hintergrund */
+                --md-sys-color-surface: #2a282d;
+                /* Dunklere Oberfläche (leicht vom Hintergrund abgesetzt) */
+                --md-sys-color-on-surface: #e6e1e5;
+                /* Heller Text auf Oberfläche */
+                --md-sys-color-surface-variant: #49454f;
+                /* Dunklere Oberfläche Variante */
+                --md-sys-color-on-surface-variant: #cac4d0;
+                /* Hellerer Text auf Oberfläche Variante */
                 --md-sys-color-outline: #938f99;
-                --md-sys-color-error: #f2b8b5; /* Helleres Rot für Dark Mode */
+                --md-sys-color-error: #f2b8b5;
+                /* Helleres Rot für Dark Mode */
                 --md-sys-color-on-error: #601410;
-                --md-sys-color-success: #81C784; /* Helleres Grün für Dark Mode */
+                --md-sys-color-success: #81C784;
+                /* Helleres Grün für Dark Mode */
 
                 /* Schattenfarbe für dunklen Modus (kann subtiler sein) */
-                --md-sys-shadow-color: rgba(0, 0, 0, 0.25); /* Schatten sind in Dark Mode weniger auffällig */
+                --md-sys-shadow-color: rgba(0, 0, 0, 0.25);
+                /* Schatten sind in Dark Mode weniger auffällig */
             }
         }
 
 
         body {
-            font-family: 'Roboto', sans-serif; /* Optional: Roboto oder eine ähnliche Schrift */
+            font-family: 'Roboto', sans-serif;
+            /* Optional: Roboto oder eine ähnliche Schrift */
             display: flex;
             justify-content: center;
+            /* Zentriert horizontal */
             align-items: center;
-            min-height: 100vh;
-            background-color: var(--md-sys-color-background); /* Hintergrundfarbe aus Palette */
-            color: var(--md-sys-color-on-background); /* Textfarbe aus Palette */
+            /* Zentriert vertikal */
+            background-color: var(--md-sys-color-background);
+            /* Hintergrundfarbe aus Palette */
+            color: var(--md-sys-color-on-background);
+            /* Textfarbe aus Palette */
             margin: 0;
-            padding: 20px; /* Etwas Padding um den Inhalt */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Übergang für den Farbwechsel */
-            overflow: hidden; /* Verhindert Scrollen */
+            padding: 20px;
+            /* Etwas Padding um den Inhalt */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Übergang für den Farbwechsel */
+            overflow: hidden;
+            /* Verhindert Scrollen */
+            height: 100vh;
+            /* Stellt sicher, dass der Body die volle Höhe des Viewports einnimmt */
+            width: 100vw;
+            /* Stellt sicher, dass der Body die volle Breite des Viewports einnimmt (optional, aber gute Praxis bei Vollbild-Layouts) */
+            overflow: hidden;
         }
 
         .controls {
             display: flex;
             flex-direction: column;
-            margin-right: 30px; /* Mehr Abstand zum Widget */
+            margin-right: 30px;
+            /* Mehr Abstand zum Widget */
         }
 
         .control-button {
-            background-color: var(--md-sys-color-surface-variant); /* Hintergrund aus Palette */
-            color: var(--md-sys-color-on-surface-variant); /* Textfarbe aus Palette */
+            background-color: var(--md-sys-color-surface-variant);
+            /* Hintergrund aus Palette */
+            color: var(--md-sys-color-on-surface-variant);
+            /* Textfarbe aus Palette */
             border: none;
-            border-radius: 16px; /* Stärker abgerundete Ecken */
-            width: 60px; /* Etwas breiter */
-            height: 60px; /* Etwas höher */
-            font-size: 28px; /* Größere Schrift */
+            border-radius: 16px;
+            /* Stärker abgerundete Ecken */
+            width: 60px;
+            /* Etwas breiter */
+            height: 60px;
+            /* Etwas höher */
+            font-size: 28px;
+            /* Größere Schrift */
             cursor: pointer;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Übergänge für Hover/Schatten */
-            margin-bottom: 15px; /* Mehr Abstand zwischen den Buttons */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            /* Übergänge für Hover/Schatten */
+            margin-bottom: 15px;
+            /* Mehr Abstand zwischen den Buttons */
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 1px 3px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+            /* Schattenfarbe aus Variable */
         }
 
         .control-button:hover {
             /* Passen sich automatisch an die Palette an, da die Variable verwendet wird */
-            background-color: var(--md-sys-color-surface); /* Beim Hover leicht andere Oberflächenfarbe */
-            box-shadow: 0 2px 4px var(--md-sys-shadow-color); /* Schatten beim Hover erhöhen */
+            background-color: var(--md-sys-color-surface);
+            /* Beim Hover leicht andere Oberflächenfarbe */
+            box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+            /* Schatten beim Hover erhöhen */
         }
 
         .container {
-            background-color: var(--md-sys-color-surface); /* Hintergrund aus Palette */
-            border-radius: 24px; /* Sehr stark abgerundete Ecken */
-            box-shadow: 0 4px 8px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
-            padding: 40px; /* Mehr Padding */
+            background-color: var(--md-sys-color-surface);
+            /* Hintergrund aus Palette */
+            border-radius: 24px;
+            /* Sehr stark abgerundete Ecken */
+            box-shadow: 0 4px 8px var(--md-sys-shadow-color);
+            /* Schattenfarbe aus Variable */
+            padding: 40px;
+            /* Mehr Padding */
             text-align: center;
-            width: 250px; /* Etwas breiter */
-            height: 380px; /* Etwas höher */
+            width: 250px;
+            /* Etwas breiter */
+            height: 380px;
+            /* Etwas höher */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            color: var(--md-sys-color-on-surface); /* Textfarbe aus Palette */
-             transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Übergang für den Farbwechsel */
+            color: var(--md-sys-color-on-surface);
+            /* Textfarbe aus Palette */
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            /* Übergang für den Farbwechsel */
         }
 
         .progress-bar-container {
-            background-color: var(--md-sys-color-surface-variant); /* Hintergrund aus Palette */
-            border-radius: 8px; /* Abgerundete Ecken */
-            height: 12px; /* Etwas höher */
-            margin-bottom: 20px; /* Mehr Abstand */
+            background-color: var(--md-sys-color-surface-variant);
+            /* Hintergrund aus Palette */
+            border-radius: 8px;
+            /* Abgerundete Ecken */
+            height: 12px;
+            /* Etwas höher */
+            margin-bottom: 20px;
+            /* Mehr Abstand */
             overflow: hidden;
         }
 
         .progress-bar {
-            background-color: green; /* Farbe aus Palette */
+            background-color: green;
+            /* Farbe aus Palette */
             height: 100%;
             width: 0%;
-            border-radius: 8px; /* Abgerundete Ecken */
-            transition: width 0.4s ease-in-out, background-color 0.3s ease; /* Sanfterer Übergang und Farbwechsel */
+            border-radius: 8px;
+            /* Abgerundete Ecken */
+            transition: width 0.4s ease-in-out, background-color 0.3s ease;
+            /* Sanfterer Übergang und Farbwechsel */
         }
 
         .question-container {
-            margin-bottom: 20px; /* Mehr Abstand */
-            height: 120px; /* Etwas höher für mehr Platz */
+            margin-bottom: 20px;
+            /* Mehr Abstand */
+            height: 120px;
+            /* Etwas höher für mehr Platz */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .japanese-char {
-            font-size: 90px; /* Größere Schrift */
-            font-weight: 500; /* Mittlere Schriftstärke */
-            color: var(--md-sys-color-on-surface); /* Sicherstellen, dass die Textfarbe aus der Palette kommt */
-             transition: color 0.3s ease; /* Übergang für den Farbwechsel */
+            font-size: 90px;
+            /* Größere Schrift */
+            font-weight: 500;
+            /* Mittlere Schriftstärke */
+            color: var(--md-sys-color-on-surface);
+            /* Sicherstellen, dass die Textfarbe aus der Palette kommt */
+            transition: color 0.3s ease;
+            /* Übergang für den Farbwechsel */
         }
 
         .answer-buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px; /* Mehr Abstand zwischen Buttons */
-            margin-bottom: 20px; /* Mehr Abstand */
+            gap: 15px;
+            /* Mehr Abstand zwischen Buttons */
+            margin-bottom: 20px;
+            /* Mehr Abstand */
         }
 
         .answer-button {
-            background-color: var(--md-sys-color-primary); /* Hintergrund aus Palette (Filled Button Style) */
-            color: var(--md-sys-color-on-primary); /* Textfarbe aus Palette */
+            background-color: var(--md-sys-color-primary);
+            /* Hintergrund aus Palette (Filled Button Style) */
+            color: var(--md-sys-color-on-primary);
+            /* Textfarbe aus Palette */
             border: none;
-            border-radius: 16px; /* Stärker abgerundete Ecken */
-            width: auto; /* Breite automatisch an Grid anpassen */
-            height: 50px; /* Etwas höher */
-            font-size: 18px; /* Größere Schrift */
+            border-radius: 16px;
+            /* Stärker abgerundete Ecken */
+            width: auto;
+            /* Breite automatisch an Grid anpassen */
+            height: 50px;
+            /* Etwas höher */
+            font-size: 18px;
+            /* Größere Schrift */
             cursor: pointer;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease; /* Übergänge auch für Farbwechsel */
-            box-shadow: 0 1px 3px var(--md-sys-shadow-color); /* Schattenfarbe aus Variable */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+            /* Übergänge auch für Farbwechsel */
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+            /* Schattenfarbe aus Variable */
         }
 
         .answer-button:hover {
-             background-color: var(--md-sys-color-primary); /* Beim Hover dieselbe Primary Farbe */
-             box-shadow: 0 2px 4px var(--md-sys-shadow-color); /* Schatten beim Hover erhöhen */
-             opacity: 0.9; /* Leichte Transparenz für Hover-Effekt */
+            background-color: var(--md-sys-color-primary);
+            /* Beim Hover dieselbe Primary Farbe */
+            box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+            /* Schatten beim Hover erhöhen */
+            opacity: 0.9;
+            /* Leichte Transparenz für Hover-Effekt */
         }
 
         .feedback {
             font-weight: bold;
-            font-size: 18px; /* Größere Schrift */
-            height: 25px; /* Etwas höher */
+            font-size: 18px;
+            /* Größere Schrift */
+            height: 25px;
+            /* Etwas höher */
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 1em; /* Mindesthöhe für den Text */
-             transition: color 0.3s ease; /* Übergang für den Farbwechsel */
+            min-height: 1em;
+            /* Mindesthöhe für den Text */
+            transition: color 0.3s ease;
+            /* Übergang für den Farbwechsel */
         }
 
         .feedback.correct {
-            color: var(--md-sys-color-success); /* Farbe für korrekte Rückmeldung */
+            color: var(--md-sys-color-success);
+            /* Farbe für korrekte Rückmeldung */
         }
 
         .feedback.incorrect {
-            color: var(--md-sys-color-error); /* Farbe für falsche Rückmeldung */
+            color: var(--md-sys-color-error);
+            /* Farbe für falsche Rückmeldung */
         }
 
         /* Stil für deaktivierte Buttons */
         .answer-button:disabled {
-            opacity: 0.4; /* Weniger Opazität im Dark Mode */
+            opacity: 0.4;
+            /* Weniger Opazität im Dark Mode */
             cursor: not-allowed;
         }
-         .answer-button:disabled:hover {
-             background-color: var(--md-sys-color-primary); /* Hover-Effekt auf Disabled entfernen */
-             box-shadow: 0 1px 3px var(--md-sys-shadow-color);
-         }
+
+        .answer-button:disabled:hover {
+            background-color: var(--md-sys-color-primary);
+            /* Hover-Effekt auf Disabled entfernen */
+            box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+        }
     </style>
 </head>
+
 <body>
     <div class="controls">
         <button class="control-button" id="romanji-to-kana">a</button>
@@ -361,4 +451,5 @@
         selectCharacterSet();
     </script>
 </body>
+
 </html>
