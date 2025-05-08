@@ -1,0 +1,29 @@
+{
+    "folder-color.pathColors": [
+        {
+            "folderPath": "web-mywebsite/RbPi-InfoBoard/",
+            "color": "foldercolorizer.color_0000ff"
+        },
+        {
+            "folderPath": "web-mywebsite/feedback/",
+            "color": "foldercolorizer.color_00cc66"
+        },
+        {
+            "folderPath": "web-mywebsite/unicorn/",
+            "color": "foldercolorizer.color_cc0033",
+            "badge": "🦄"
+        },
+        {
+            "folderPath": "web-mywebsite/widgets/",
+            "color": "foldercolorizer.color_cccc00"
+        },
+        {
+            "folderPath": "web-mywebsite/widgets/widgets-iframe.html/",
+            "color": "foldercolorizer.color_cc6600"
+        },
+        {
+            "folderPath": "web-mywebsite/index.html/",
+            "badge": "❤️"
+        }
+    ]
+}
