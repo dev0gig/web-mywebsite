@@ -235,6 +235,7 @@
         border: none;
         outline: none;
         cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 
         /* Farben aus den neuen Button-Variablen (Graustufen) */
         background-color: var(--color-button-background);
@@ -260,7 +261,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
         /* Leichter Hover-Effekt */
-        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
         /* Schatten beim Hover erhöhen */
         cursor: pointer;
     }
@@ -268,7 +269,7 @@
     .button-single:active {
         /* Active Farbe basierend auf Button Hintergrundfarbe */
         background-color: color-mix(in srgb, var(--color-button-background) 80%, black 20%);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
 
     /* Styles für den zusätzlichen Text innerhalb der Boxen */

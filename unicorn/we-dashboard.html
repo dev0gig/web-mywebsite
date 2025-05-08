@@ -44,8 +44,10 @@
             --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
 
             /* Spezifische Farben für Titel (Optional, angelehnt an Orange) */
-            --title-color: #ff8a65; /* Deep Orange 400 */
-            --title-color-dark: #ffccbc; /* Deep Orange 100 */
+            --title-color: #ff8a65;
+            /* Deep Orange 400 */
+            --title-color-dark: #ffccbc;
+            /* Deep Orange 100 */
         }
 
         /* Material You Farbpalette (Basis - dunkle Variante) */
@@ -135,6 +137,7 @@
             transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             z-index: 100;
             /* Sicherstellen, dass Nav über anderem Inhalt liegt */
+            justify-content: center;
         }
 
         .navbar a {
@@ -151,7 +154,8 @@
             color: var(--md-sys-color-on-surface);
             /* Textfarbe aus Palette */
             display: flex;
-            align-items: center; /* Bilder und Text (falls hinzugefügt) zentrieren */
+            align-items: center;
+            /* Bilder und Text (falls hinzugefügt) zentrieren */
         }
 
         .navbar a img {
@@ -166,7 +170,8 @@
             background-color: var(--md-sys-color-surface-variant);
             /* Hintergrund beim Hover */
             cursor: pointer;
-            color: var(--md-sys-color-on-surface-variant); /* Textfarbe beim Hover anpassen */
+            color: var(--md-sys-color-on-surface-variant);
+            /* Textfarbe beim Hover anpassen */
         }
 
         /* Titel für Sektionen im Main */
@@ -199,7 +204,9 @@
             /* Platz für Nav + Padding */
             /* Nav width (250) + Nav Padding Right (20) + Main Padding Left (20) = 290 */
             /* Oder Nav width (250) + etwas Gap (40) = 290? Let's use 290 for now. */
-             margin-bottom: 60px; /* Abstand vom Footer */
+            margin-bottom: 60px;
+            /* Abstand vom Footer */
+            justify-content: center;
         }
 
         .title {
@@ -211,14 +218,16 @@
             /* Größerer Abstand */
             font-weight: bold;
             text-align: center;
-            width: 100%; /* Sicherstellen, dass es die volle Breite einnimmt für text-align */
-             transition: color 0.3s ease;
+            width: 100%;
+            /* Sicherstellen, dass es die volle Breite einnimmt für text-align */
+            transition: color 0.3s ease;
         }
-         /* Titel Farbe im Dark Mode anpassen, falls spezifisch */
+
+        /* Titel Farbe im Dark Mode anpassen, falls spezifisch */
         @media (prefers-color-scheme: dark) {
-             .title {
-                 color: var(--title-color-dark, orange);
-             }
+            .title {
+                color: var(--title-color-dark, orange);
+            }
         }
 
 
@@ -231,7 +240,8 @@
             /* Buttons sind innen zentriert */
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Abstand zwischen h1 und button-group */
+            gap: 20px;
+            /* Abstand zwischen h1 und button-group */
         }
 
         .button-group {
@@ -242,7 +252,8 @@
             /* Abstand im Grid */
             justify-content: center;
             /* Grid Items horizontal zentrieren (falls Platz da ist) */
-             width: 100%; /* Sicherstellen, dass Grid die volle Breite einnimmt */
+            width: 100%;
+            /* Sicherstellen, dass Grid die volle Breite einnimmt */
         }
 
         .button-single {
@@ -265,9 +276,10 @@
             transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
             box-shadow: 0 1px 3px var(--md-sys-shadow-color);
             /* Subtiler Schatten */
-             display: flex; /* Inhalt zentrieren */
-             justify-content: center;
-             align-items: center;
+            display: flex;
+            /* Inhalt zentrieren */
+            justify-content: center;
+            align-items: center;
         }
 
         .button-single:hover {
@@ -275,7 +287,8 @@
             /* Hintergrund beim Hover */
             border-color: transparent;
             /* Hover Border entfernen */
-            color: var(--md-sys-color-on-surface-container); /* Textfarbe sollte gut auf Hover-Farbe passen */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe sollte gut auf Hover-Farbe passen */
             transform: translateY(-2px);
             /* Leichter Hover-Effekt */
             box-shadow: 0 3px 8px var(--md-sys-shadow-color);
@@ -301,52 +314,63 @@
             padding: 12px 20px;
             /* Padding */
             box-sizing: border-box;
-            z-index: 100; /* Über Hauptinhalt legen */
-             transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            z-index: 100;
+            /* Über Hauptinhalt legen */
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .footer .crumbs {
-             /* Navigation im Footer */
-             list-style: none; /* Standard Listenpunkte entfernen */
-             margin: 0;
-             padding: 0;
-             display: flex; /* Elemente nebeneinander */
-             gap: 8px; /* Abstand zwischen den Crumbs */
-             flex-wrap: wrap; /* Bei Bedarf umbrechen */
+            /* Navigation im Footer */
+            list-style: none;
+            /* Standard Listenpunkte entfernen */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            /* Elemente nebeneinander */
+            gap: 8px;
+            /* Abstand zwischen den Crumbs */
+            flex-wrap: wrap;
+            /* Bei Bedarf umbrechen */
         }
 
-         .footer .crumb {
-             display: flex; /* Für Pipe-Trenner */
-             align-items: center;
-             color: var(--md-sys-color-on-surface-variant); /* Farbe aus Palette */
-             font-size: 0.9em;
-         }
+        .footer .crumb {
+            display: flex;
+            /* Für Pipe-Trenner */
+            align-items: center;
+            color: var(--md-sys-color-on-surface-variant);
+            /* Farbe aus Palette */
+            font-size: 0.9em;
+        }
 
         .footer a {
             color: var(--md-sys-color-on-surface);
             /* Linkfarbe aus Palette */
             text-decoration: none;
             /* Unterstreichung entfernen */
-             transition: color 0.2s ease;
+            transition: color 0.2s ease;
         }
+
         .footer a:hover {
-             color: var(--md-sys-color-on-surface-variant); /* Farbe beim Hover */
+            color: var(--md-sys-color-on-surface-variant);
+            /* Farbe beim Hover */
         }
 
 
         .footer .crumb a::after {
             display: inline-block;
-            color: var(--md-sys-color-outline); /* Farbe aus Palette */
+            color: var(--md-sys-color-outline);
+            /* Farbe aus Palette */
             content: "|";
             font-weight: bold;
-            padding: 0 8px; /* Abstand um den Trenner */
+            padding: 0 8px;
+            /* Abstand um den Trenner */
         }
-         /* Letzter Crumb hat keinen Trenner */
-         .footer .crumb:last-child a::after {
-             content: none;
-             padding: 0;
-         }
 
+        /* Letzter Crumb hat keinen Trenner */
+        .footer .crumb:last-child a::after {
+            content: none;
+            padding: 0;
+        }
     </style>
 </head>
 
@@ -390,7 +414,8 @@
         <h1>Inofficial Tools</h1>
         <div class="inofficialTools">
             <div class="button-group">
-                <button class="button-single" onclick="window.location.href = 'mail-template.html'">Mailvorlagen</button>
+                <button class="button-single"
+                    onclick="window.location.href = 'mail-template.html'">Mailvorlagen</button>
                 <button class="button-single" onclick="window.location.href = 'work-tools.html'">Unicorn</button>
             </div>
         </div>
