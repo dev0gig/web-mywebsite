@@ -178,6 +178,7 @@
         .clearDisplay:hover {
             background-color: #c02b27;
             /* Leicht dunkler beim Hover (manuell oder aus Palette ableiten) */
+            color: #e0a8a5;
         }
 
 
@@ -190,6 +191,7 @@
         .clearEntry:hover {
             background-color: #e0a8a5;
             /* Leicht dunkler beim Hover */
+            color: #c02b27;
         }
 
         .backspace {
@@ -296,7 +298,16 @@
         let percentValue = null; // Speichert den Prozentwert
 
         function appendValue(value) {
-            currentInput += value;
+            // Verhindert mehr als einen Dezimalpunkt
+            if (value === '.' && currentInput.includes('.')) {
+                return;
+            }
+            // Ersetzt das initiale '0', wenn eine Zahl eingegeben wird und noch kein Dezimalpunkt da ist
+            if (currentInput === '0' && value !== '.') {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
             display.textContent = currentInput;
         }
 
@@ -319,31 +330,86 @@
         }
 
         function performOperation(operator) {
-            if (currentInput === '' && previousInput === null) return;
+            // Wenn die aktuelle Eingabe leer ist und kein vorheriger Wert existiert, tue nichts (außer vielleicht, wenn der vorherige Wert durch '%' berechnet wurde)
+            if (currentInput === '' && previousInput === null && percentValue === null) return;
+
 
             if (operator === '%') {
-                percentValue = parseFloat(currentInput) / 100; // Speichert den Prozentwert
-                const interimResult = parseFloat(previousInput) * percentValue;
-                display.textContent = interimResult; // Zeigt das Zwischenresultat an
-                currentInput = String(interimResult); // Speichert das Zwischenresultat als aktuelle Eingabe für die Endberechnung
-                return;
+                // Prozent-Logik: Berechnet den Prozentsatz des previousInput und zeigt ihn an.
+                // Der resultierende Wert wird zum neuen currentInput für die Endberechnung.
+                if (previousInput !== null) {
+                    const currentValue = parseFloat(currentInput);
+                    const prevValue = parseFloat(previousInput);
+                    if (!isNaN(currentValue) && !isNaN(prevValue)) {
+                        percentValue = currentValue / 100;
+                        const interimResult = prevValue * percentValue;
+                        display.textContent = interimResult;
+                        currentInput = String(interimResult); // Setzt das Zwischenergebnis als aktuelle Eingabe
+                        // currentOperator und previousInput bleiben bestehen für die Endberechnung
+                    }
+                } else {
+                    // Wenn kein previousInput vorhanden ist, behandle % als Division durch 100
+                    const currentValue = parseFloat(currentInput);
+                    if (!isNaN(currentValue)) {
+                        const result = currentValue / 100;
+                        display.textContent = result;
+                        currentInput = String(result); // Das Ergebnis wird zur neuen Eingabe
+                        previousInput = null; // Keine vorherige Operation
+                        currentOperator = null;
+                        percentValue = null;
+                    }
+                }
+                return; // Beende die Funktion nach der Prozent-Behandlung
             }
 
-            if (previousInput !== null) {
-                calculate();
+
+            // Wenn bereits ein Operator und previousInput vorhanden sind, berechne das Zwischenergebnis
+            if (currentOperator !== null && currentInput !== '') {
+                calculateResult();
+                // Nach calculateResult() ist das Ergebnis im currentInput
+                previousInput = currentInput; // Das Ergebnis wird zum neuen previousInput
+                currentInput = ''; // Neue Eingabe starten
+                currentOperator = operator; // Neuer Operator setzen
+            } else if (currentInput !== '') {
+                // Wenn aktuelle Eingabe vorhanden ist und kein Operator/previousInput,
+                // setze die aktuelle Eingabe als previousInput
+                previousInput = currentInput;
+                currentInput = '';
+                currentOperator = operator;
+            } else if (previousInput !== null) {
+                // Wenn nur previousInput da ist (z.B. nach '='), erlaube das Ändern des Operators
+                currentOperator = operator;
             }
-            previousInput = currentInput;
-            currentInput = '';
-            currentOperator = operator;
+
         }
 
+
         function calculateResult() {
-            if (currentOperator === null) return;
+            // Stelle sicher, dass sowohl previousInput als auch currentInput Werte haben,
+            // es sei denn, die letzte Operation war % auf previousInput.
+            if (previousInput === null || (currentInput === '' && percentValue === null)) {
+                // Sonderfall: Wenn previousInput da ist und currentInput leer, aber percentValue gesetzt,
+                // bedeutet das, dass '%' auf previousInput angewendet wurde und das Ergebnis
+                // bereits im currentInput steht. Wir können direkt die Berechnung mit dem operator durchführen.
+                if (previousInput !== null && percentValue !== null && currentInput !== '') {
+                    // Mach nichts, die Werte sind für die switch-Anweisung bereit
+                } else {
+                    return; // Keine ausreichenden Werte zum Berechnen
+                }
+            }
+
+
             let current = parseFloat(currentInput);
             let result = 0;
             const prev = parseFloat(previousInput);
 
-            if (isNaN(prev) || isNaN(current)) return;
+            // Prüfe auf NaN, aber erlaube NaN für current, wenn percentValue gesetzt ist,
+            // da currentInput dann bereits das Ergebnis der Prozentberechnung ist (string).
+            if (isNaN(prev) || (isNaN(current) && percentValue === null)) {
+                display.textContent = 'Error'; // Zeige Error bei ungültigen Zahlen
+                clearDisplay(); // Setze den Rechner zurück
+                return;
+            }
 
             switch (currentOperator) {
                 case '+':
@@ -362,13 +428,69 @@
                     }
                     result = prev / current;
                     break;
+                default:
+                    // Falls kein Operator gesetzt ist (sollte bei calculateResult nicht passieren, aber zur Sicherheit)
+                    result = current; // Zeige einfach den aktuellen Wert an
+                    break;
             }
-            display.textContent = result;
-            currentInput = String(result);
-            previousInput = null;
-            currentOperator = null;
-            percentValue = null; // Setzt percentValue zurück
+
+            // Behandle Division durch Null und andere Fehler
+            if (result === 'Error' || !isFinite(result)) {
+                display.textContent = 'Error';
+                clearDisplay(); // Setze den Rechner zurück
+            } else {
+                display.textContent = result;
+                currentInput = String(result); // Das Ergebnis wird zur neuen Eingabe
+                previousInput = null; // Setze previousInput zurück
+                currentOperator = null; // Setze Operator zurück
+                percentValue = null; // Setze Prozentwert zurück
+            }
         }
+
+        // --- Neue Funktion zur Verarbeitung von Tastatureingaben ---
+        window.addEventListener('keydown', function (event) {
+            const key = event.key;
+            const display = document.querySelector('.display'); // Das Display-Element
+
+            // Erlaube nur bestimmte Tasten und verarbeite sie
+            if ((key >= '0' && key <= '9') || key === '.') {
+                // Zahlen und Dezimalpunkt
+                appendValue(key);
+                event.preventDefault(); // Verhindert Standard-Aktionen des Browsers
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                // Operatoren
+                performOperation(key);
+                event.preventDefault(); // Verhindert Standard-Aktionen des Browsers (z.B. / für Suche)
+            } else if (key === '=' || key === 'Enter') {
+                // Gleichheitszeichen oder Enter
+                calculateResult();
+                event.preventDefault(); // Verhindert Standard-Aktionen des Browsers (z.B. Formular senden)
+            } else if (key === 'Backspace') {
+                // Backspace-Taste
+                backspace();
+                event.preventDefault(); // Verhindert Standard-Aktion (zurück im Browser)
+            } else if (key === 'c' || key === 'C' || key === 'Escape') {
+                // 'C' oder 'c' oder 'Escape' für Clear (C)
+                clearDisplay();
+                event.preventDefault();
+            } else if (key === 'e' || key === 'E') {
+                // 'E' oder 'e' für Clear Entry (CE)
+                clearEntry();
+                event.preventDefault();
+            } else if (key === '%') {
+                // Prozentzeichen
+                performOperation('%');
+                event.preventDefault();
+            }
+            // Optional: Weitere Tasten ignorieren, falls sie nicht behandelt werden sollen
+            else {
+                // Wenn du möchtest, dass nur die definierten Tasten eine Wirkung haben,
+                // kannst du hier weitere Tasten abfangen oder einfach nichts tun.
+                // event.preventDefault(); // Könnte hier auch unerwünschte Tasten blockieren
+            }
+        });
+        // --- Ende neue Funktion ---
+
     </script>
 </body>
 
