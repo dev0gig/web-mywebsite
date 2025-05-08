@@ -245,15 +245,13 @@
         }
 
         .button-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            /* Responsive Grid für Buttons */
+            display: flex;
+            /* Flexbox für Buttons */
+            flex-wrap: wrap;
             gap: 16px;
-            /* Abstand im Grid */
             justify-content: center;
             /* Grid Items horizontal zentrieren (falls Platz da ist) */
             width: 100%;
-            /* Sicherstellen, dass Grid die volle Breite einnimmt */
         }
 
         .button-single {
@@ -280,6 +278,8 @@
             /* Inhalt zentrieren */
             justify-content: center;
             align-items: center;
+            flex: 1 300px;
+            /* Flex-Element, damit es den Platz gleichmäßig einnimmt */
         }
 
         .button-single:hover {
