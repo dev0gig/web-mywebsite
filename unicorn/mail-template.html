@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mailvorlagen</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/7285/7285521.png" />
+
+</head>
+
+<style>
+    /* style.css */
+
+    /* --- Material You Color Palette (Light Mode) --- */
+    :root {
+        --primary-color: #6750A4;
+        /* Typisches Material You Lila */
+        --on-primary-color: #FFFFFF;
+        --surface-color: #FFFBFE;
+        /* Heller Hintergrund */
+        --on-surface-color: #1C1B1F;
+        /* Dunkler Text */
+        --surface-container-color: #EADDFF;
+        /* Leichter Akzent für Container/Buttons */
+        --outline-color: #7A757F;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        /* Leichter Schatten */
+        --gap-size: 10px;
+        /* Variable für den Abstand */
+    }
+
+    /* --- Material You Color Palette (Dark Mode) --- */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --primary-color: #2A282D;
+            --on-primary-color: #E6E1E5;
+            --surface-color: #1C1B1F;
+            /* Dunkler Hintergrund */
+            --on-surface-color: #E6E1E5;
+            /* Heller Text */
+            --surface-container-color: #36343B;
+            /* Dunkler Akzent für Container/Buttons */
+            --outline-color: #fca732;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            /* Dunklerer Schatten */
+        }
+    }
+
+    /* --- Allgemeine Stile --- */
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 20px;
+        /* Abstand vom Rand des Browserfensters */
+        background-color: var(--surface-color);
+        color: var(--on-surface-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        /* --- GEÄNDERT: Keine maximale Breite und kein auto-margin mehr --- */
+        max-width: none;
+        /* Volle Breite nutzen */
+        margin: 0;
+        /* Kein auto-margin */
+        width: 100%;
+    }
+
+
+    /* --- Layout für die zwei Spalten --- */
+    .mail-main {
+        display: flex;
+        flex-direction: row;
+        /* Standardmäßig nebeneinander */
+        gap: var(--gap-size);
+        /* Abstand zwischen den Spalten */
+        /* Höhe so berechnen, dass sie die verfügbare Viewport-Höhe ausfüllt (abzgl. body padding) */
+        height: calc(100vh - 2 * 20px);
+        /* 20px Body-Padding oben und unten */
+
+        /* Auf kleineren Bildschirmen übereinander */
+        @media (max-width: 768px) {
+            flex-direction: column;
+            height: auto;
+            /* Höhe automatisch auf kleineren Screens */
+        }
+    }
+
+    .mail-main--left,
+    .mail-main--right {
+        flex: 1;
+        /* Beide Spalten nehmen weiterhin gleich viel Platz ein */
+        overflow-y: auto;
+        /* Erlaubt Scrollen innerhalb der Spalten, falls Inhalt zu lang ist */
+        padding-right: var(--gap-size);
+        /* Platz für die Scrollbar und Abstand zum rechten Rand der Spalte */
+    }
+
+    /* Sicherstellen, dass die Spalten auf kleinen Bildschirmen 100% Breite nutzen und die Höhen angepasst sind */
+    @media (max-width: 768px) {
+        .mail-main--left {
+            flex: none;
+            /* Keine Flex-Basis auf kleinen Screens */
+            width: 100%;
+            max-height: 50vh;
+            /* Begrenzte Höhe, damit das Textfeld sichtbar bleibt */
+            padding-right: 0;
+            /* Kein zusätzliches Padding rechts, da es jetzt 100% Breite hat */
+            margin-bottom: var(--gap-size);
+            /* Abstand zum Textfeld unten */
+        }
+
+        .mail-main--right {
+            flex: none;
+            width: 100%;
+            height: 50vh;
+            /* Textfeld nimmt halbe Viewport-Höhe ein */
+            padding-right: 0;
+            /* Kein zusätzliches Padding rechts */
+        }
+    }
+
+
+    /* --- Styling für Details (Klappbare Bereiche) --- */
+    .box-mail {
+        background-color: var(--surface-container-color);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px var(--shadow-color);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .box-mail summary {
+        cursor: pointer;
+        font-weight: bold;
+        padding: 5px 0;
+        user-select: none;
+
+        &::marker,
+        &::-webkit-details-marker {
+            color: var(--on-surface-color);
+        }
+    }
+
+    .box-mail .button-group-mail {
+        /* --- GEÄNDERT: Buttons in Reihen anordnen und umbrechen erlauben --- */
+        display: flex;
+        flex-direction: row;
+        /* Horizontal */
+        flex-wrap: wrap;
+        /* Bei Bedarf in die nächste Zeile umbrechen */
+        gap: var(--gap-size);
+        /* Abstand zwischen den Buttons */
+        margin-top: 10px;
+    }
+
+    /* --- Styling für Buttons --- */
+    .button-single {
+        /* --- GEÄNDERT: Breite so berechnen, dass 5 Buttons in eine Reihe passen (inkl. Gap) --- */
+        /* Berechnung: (Gesamte Breite - (Anzahl Buttons - 1) * Gap) / Anzahl Buttons */
+        width: calc((100% - (5 - 1) * var(--gap-size)) / 5);
+        /* Breite für 5 Buttons pro Reihe */
+
+        /* Flex-Shrink erlauben, falls der Platz sehr eng wird */
+        flex-shrink: 1;
+        /* Minimalbreite, damit sie nicht zu klein werden, falls 5 nicht passen */
+        min-width: 120px;
+        /* Beispiel: Eine minimale Breite, ansonsten brechen sie um */
+
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+        font-size: 1rem;
+        cursor: pointer;
+        text-align: left;
+        /* Text linksbündig lassen, wie vorher */
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 1px 3px var(--shadow-color);
+    }
+
+    /* Anpassung für kleinere Bildschirme, wo vielleicht nur 1, 2 oder 3 Buttons pro Reihe passen */
+    @media (max-width: 1024px) {
+
+        /* Beispiel Breakpoint, anpassen falls nötig */
+        .mail-main--left .button-group-mail .button-single {
+            /* Versuch, 3 oder 4 pro Reihe zu bekommen, flex-wrap hilft dabei */
+            width: calc((100% - (3 - 1) * var(--gap-size)) / 3);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .mail-main--left .button-group-mail .button-single {
+            /* Wenn Spalten gestapelt sind und linke Spalte 100% Breite hat, 2 oder 3 pro Reihe versuchen */
+            width: calc((100% - (2 - 1) * var(--gap-size)) / 2);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .mail-main--left .button-group-mail .button-single {
+            /* Auf sehr kleinen Screens wieder untereinander */
+            width: 100%;
+        }
+    }
+
+
+    .button-single:hover {
+        background-color: color-mix(in srgb, var(--primary-color), var(--on-primary-color) 15%);
+        box-shadow: 0 2px 6px var(--shadow-color);
+    }
+
+    .button-single:active {
+        background-color: color-mix(in srgb, var(--primary-color), var(--on-primary-color) 30%);
+    }
+
+
+    /* --- Styling für das Textfeld --- */
+    #outputArea {
+        width: 100%;
+        height: 90%;
+        /* Nimmt die gesamte Höhe des rechten Containers ein */
+        padding: 15px;
+        border: 1px solid var(--outline-color);
+        border-radius: 12px;
+        font-size: 1.2rem;
+        background-color: var(--surface-color);
+        color: var(--on-surface-color);
+        resize: none;
+        box-sizing: border-box;
+        overflow-y: auto;
+        /* Erlaubt Scrollen innerhalb des Textfeldes */
+        transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        outline: none;
+    }
+
+    #outputArea:focus {
+        border-color: var(--primary-color);
+    }
+
+    /* --- Verbesserungen für Scrollbars (optional) --- */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--surface-container-color);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--outline-color);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: color-mix(in srgb, var(--outline-color), var(--primary-color) 20%);
+    }
+</style>
+
+
+<body>
+
+    <main>
+        <section class="mail-main">
+
+            <div class="mail-main--left">
+                <!-- Strom & Gas -->
+                <details class="box-mail" open>
+                    <summary>Strom & Gas</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="anmeldung">Anmeldung</button>
+                        <button class="button-single" id="abmeldung">Abmeldung</button>
+                        <button class="button-single" id="kdnr_benötigt">Kundennummer benötigt</button>
+                        <button class="button-single" id="rp">Ratenplan</button>
+                        <button class="button-single" id="rechnungskorrektur_zählerstände">Rechnungskorrektur &
+                            Zählerstände</button>
+                        <button class="button-single" id="sonnenstrom">Sonnenstrom</button>
+                        <button class="button-single" id="verlassenschaft">Verlassenschaft</button>
+                        <button class="button-single" id="tw">Tarifwechsel</button>
+                        <button class="button-single" id="trockenlegungsbrief">Trockenlegungbrief</button>
+                        <button class="button-single" id="ummeldung_erfolgreich">Ummeldung erfolgreich</button>
+                        <button class="button-single" id="anm_pv">ANM PV</button>
+                    </div>
+                </details>
+
+                <!-- Guthaben -->
+                <details class="box-mail" open>
+                    <summary>Guthaben</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="gh_auszahlung_ausweis_fehlt">ID fehlt</button>
+                        <button class="button-single" id="gh_auszahlung">GH Auszahlung</button>
+                        <button class="button-single" id="gh_allgemein">Allgemeines Wording</button>
+                    </div>
+                </details>
+
+                <!-- Grundaufbau -->
+                <details class="box-mail" open>
+                    <summary>Grundgerüst</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="grundgeruest">Grundgerüst</button>
+                        <button class="button-single" id="tois_vorlage">Tois-Vorlage</button>
+                    </div>
+                </details>
+
+                <!-- Wärme -->
+                <details class="box-mail" open>
+                    <summary>Wärme</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="waerme_anm">Anmeldung</button>
+                        <button class="button-single" id="waerme_an_abm">An-/Abmeldung</button>
+                        <button class="button-single" id="waerme_mieterwechsel">Mieterwechsel</button>
+                        <button class="button-single" id="heizkostenabrechnung">Heizkostenabrechnung</button>
+                        <button class="button-single" id="mw_untermieter">Mieterwechsel Untermieter</button>
+                    </div>
+                </details>
+
+                <!-- WienerNetze -->
+                <details class="box-mail">
+                    <summary>Wiener Netze</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="Einzelner_Zäst_gespeichert">Einzelner Zäst
+                            gespeichert</button>
+                        <button class="button-single" id="Mehrere_Zäst_gespeichert">Mehrere Zäst gespeichert</button>
+                        <button class="button-single" id="SmartMeter_Keine_ZÄST_benötigt">Smart Meter/ Keine ZÄST
+                            benötigt</button>
+                        <button class="button-single" id="Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung">Wenn der Kunde
+                            SMART Meter Zäst schickt bei Ummeldung</button>
+                        <button class="button-single" id="KD_ZÄST_von_Gas_und_SMART_Meter_schickt">Wenn KD ZÄST von Gas
+                            und SMART-Meter schickt</button>
+                        <button class="button-single"
+                            id="KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung">Wenn KD ZÄST
+                            von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist</button>
+
+                    </div>
+                </details>
+
+                <!-- Kontaktdaten -->
+                <details class="box-mail">
+                    <summary>Kontaktdaten</summary>
+                    <div class="button-group-mail">
+                        <button class="button-single" id="data_spit">Spittelau</button>
+                        <button class="button-single" id="data_wn">WienerNetze</button>
+                        <button class="button-single" id="data_KS_allgemein">contact_data</button>
+                        <button class="button-single" id="data_inkasso">Inkassobüro</button>
+                    </div>
+                </details>
+            </div>
+
+            <div class="mail-main--right">
+                <textarea id="outputArea"
+                    placeholder="Durch drücken in das Textfeld, wird der darin enthaltene Text automatisch kopiert..."></textarea>
+            </div>
+        </section>
+
+        <script src="script.js"></script>
+
+    </main>
+</body>
+
+</html>
