@@ -5,176 +5,483 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="icon"
         href="https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/102-512.png" />
 </head>
 
 <style>
-    body {
-        margin: 0px;
-        background-color: #111;
-        font-family: Arial, sans-serif;
+    /* Material You Farbpalette (Basis - helle Variante als Standard) */
+    :root {
+        --md-sys-color-primary: #6750a4;
+        --md-sys-color-on-primary: #ffffff;
+        --md-sys-color-secondary: #625b71;
+        --md-sys-color-on-secondary: #ffffff;
+        --md-sys-color-tertiary: #7d5260;
+        --md-sys-color-on-tertiary: #ffffff;
+        --md-sys-color-error: #b3261e;
+        --md-sys-color-on-error: #ffffff;
+        --md-sys-color-background: #fffbfe;
+        /* Hintergrund des Bodys */
+        --md-sys-color-on-background: #1c1b1f;
+        /* Text auf Hintergrund */
+        --md-sys-color-surface: #fffbfe;
+        /* Standard Oberfläche */
+        --md-sys-color-on-surface: #1c1b1f;
+        /* Text auf Oberfläche */
+        --md-sys-color-surface-variant: #e7e0ec;
+        --md-sys-color-on-surface-variant: #49454f;
+        --md-sys-color-outline: #79747e;
+        /* Umriss Farbe */
+        --md-sys-color-surface-container-lowest: #ffffff;
+        --md-sys-color-surface-container-low: #f7f2fa;
+        --md-sys-color-surface-container: #f3edfa;
+        /* Box Hintergrund */
+        --md-sys-color-surface-container-high: #eee8f4;
+        /* Nav Hintergrund */
+        --md-sys-color-surface-container-highest: #e6e0eb;
 
+        /* Schattenfarbe */
+        --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Material You Farbpalette (Basis - dunkle Variante) */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --md-sys-color-primary: #d0bcff;
+            --md-sys-color-on-primary: #381e72;
+            --md-sys-color-secondary: #ccc2dc;
+            --md-sys-color-on-secondary: #332d41;
+            --md-sys-color-tertiary: #efb8c8;
+            --md-sys-color-on-tertiary: #492532;
+            --md-sys-color-error: #f2b8b5;
+            --md-sys-color-on-error: #601410;
+            --md-sys-color-background: #1c1b1f;
+            /* Hintergrund des Bodys */
+            --md-sys-color-on-background: #e6e1e5;
+            /* Text auf Hintergrund */
+            --md-sys-color-surface: #1c1b1f;
+            /* Standard Oberfläche */
+            --md-sys-color-on-surface: #e6e1e5;
+            /* Text auf Oberfläche */
+            --md-sys-color-surface-variant: #49454f;
+            --md-sys-color-on-surface-variant: #cac4d0;
+            --md-sys-color-outline: #938f99;
+            /* Umriss Farbe */
+            --md-sys-color-surface-container-lowest: #0f1113;
+            --md-sys-color-surface-container-low: #1d192b;
+            --md-sys-color-surface-container: #2a282d;
+            /* Box Hintergrund */
+            --md-sys-color-surface-container-high: #36343b;
+            /* Nav Hintergrund */
+            --md-sys-color-surface-container-highest: #44414c;
+
+            /* Schattenfarbe für dunklen Modus */
+            --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    body {
+        margin: 0;
+        background-color: var(--md-sys-color-background);
+        /* Hintergrund aus Palette */
+        color: var(--md-sys-color-on-background);
+        /* Textfarbe aus Palette */
+        font-family: 'Roboto', sans-serif;
+        /* Material You Schrift */
         display: flex;
         flex-direction: column;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     nav {
         position: fixed;
         top: 0;
         left: 0;
-        border-right: #444 2px solid;
-        background-color: #222;
-        color: #fff;
-        padding: 20px;
+        /* border-right: #444 2px solid; */
+        /* Border entfernen oder anpassen */
+        background-color: var(--md-sys-color-surface-container-high);
+        /* Hintergrund aus Palette */
+        color: var(--md-sys-color-on-surface-container);
+        /* Textfarbe aus Palette */
+        padding: 24px;
+        /* Mehr Padding */
         display: flex;
         flex-direction: column;
-        width: 400px;
-        height: 100%;
+        width: 300px;
+        /* Angepasste Breite für Padding + Inhalt */
+        height: 100vh;
+        /* Volle Viewport Höhe */
+        box-sizing: border-box;
+        /* Padding in Breite/Höhe einbeziehen */
+        box-shadow: 2px 0 6px var(--md-sys-shadow-color);
+        /* Schatten statt Border */
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        z-index: 100;
+        /* Sicherstellen, dass Nav über anderem Inhalt liegt */
     }
 
+    nav header {
+        margin-bottom: 24px;
+        /* Abstand nach dem Header-Bereich */
+    }
+
+    nav header h1 {
+        font-size: 1.8em;
+        /* Etwas kleiner */
+        margin: 0 0 5px 0;
+        /* Abstand anpassen */
+        color: var(--md-sys-color-on-surface-container);
+    }
+
+    nav header h2 {
+        font-size: 1.2em;
+        /* Etwas kleiner */
+        margin: 0 0 10px 0;
+        /* Abstand anpassen */
+        color: var(--md-sys-color-on-surface-variant);
+        /* Sekundärfarbe */
+        font-weight: normal;
+    }
+
+    nav header p {
+        font-size: 0.9em;
+        /* Standardgröße */
+        color: var(--md-sys-color-on-surface);
+        /* Standard Textfarbe */
+    }
+
+
     #clock {
+        margin-top: -50px;
+        margin-left: -100px;
+        /* Positionierung anpassen */
+        /* iframe für Uhr Widget */
         border: none;
-        width: 400px;
-        height: 200px;
+        width: 500px;
+        /* Breite passt sich dem Nav-Padding an */
+        height: 300px;
+        /* Feste Höhe (basierend auf vorherigem Widget) */
+        /* border-radius: 20px; */
+        /* Radius wird besser auf dem Wrapper gesetzt */
+        margin-bottom: 16px;
+        /* Abstand unter der Uhr */
+        background-color: transparent;
+        /* Hintergrund für den iframe-Bereich */
+        overflow: hidden;
+        /* Inhalt schneiden, falls er über den Radius geht */
     }
 
     .nav-buttons {
-        padding-top: 50px;
+        padding-top: 24px;
+        /* Angepasster Abstand */
         display: flex;
         flex-direction: column;
-        color: white;
-
-        button {
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 20px;
-        }
+        gap: 12px;
+        /* Abstand zwischen Buttons */
+        color: var(--md-sys-color-on-surface-container);
+        /* Textfarbe aus Palette */
     }
 
-    #box-mails {
-        grid-area: mails;
+    /* Genereller Stil für Navigation Buttons */
+    .nav-buttons button {
         display: flex;
+        /* Icons und Text nebeneinander */
+        align-items: center;
+        /* Vertikal zentrieren */
+        gap: 10px;
+        /* Abstand zwischen Icon und Text */
+        width: 100%;
+        /* Volle Breite im Nav-Bereich */
+        box-sizing: border-box;
+        /* Padding in Breite/Höhe einbeziehen */
+
+        color: var(--md-sys-color-on-surface);
+        /* Standard Textfarbe */
+        font-family: 'Roboto', sans-serif;
+        /* Material You Schrift */
+        font-size: 1em;
+        /* Standardgröße */
+        font-weight: normal;
+        /* Standard Gewicht */
+        text-align: left;
+        /* Text linksbündig */
+
+
+        border: none;
+        /* Border entfernen */
+        /* border: 1px solid var(--md-sys-color-outline); */
+        /* Optional: Dezenter Umriss */
+        border-radius: 16px;
+        /* Stärker abgerundet */
+        background-color: transparent;
+        /* Standard Nav-Button ist oft transparent */
+        padding: 12px 16px;
+        /* Angemessenes Padding */
+
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: none;
+        /* Kein Schatten standardmäßig */
     }
 
-    #box-favorites {
-        grid-area: favorites;
+    .nav-buttons button img {
+        height: 20px;
+        /* Icon Größe */
+        vertical-align: middle;
     }
 
-    #my-tools {
-        grid-area: tools;
-
-        display: flex;
-        flex-direction: column;
+    .nav-buttons button:hover {
+        background-color: var(--md-sys-color-surface-variant);
+        /* Hintergrund beim Hover */
+        color: var(--md-sys-color-on-surface-variant);
+        /* Textfarbe beim Hover */
+        box-shadow: none;
+        /* Kein Schatten beim Hover standardmäßig */
+        cursor: pointer;
     }
+
 
     main {
-        margin-left: 440px;
+        margin-left: 380px;
+        /* Angepasster Abstand zur Nav */
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: repeat(4, 1fr);
         grid-template-rows: auto;
         grid-template-areas:
             "favorites favorites favorites tools"
             "mails mails mails mails";
-        gap: 20px;
-        padding: 20px;
+        gap: 24px;
+        /* Mehr Abstand im Grid */
+        padding: 24px;
+        /* Mehr Padding um den Grid-Bereich */
+        transition: margin-left 0.3s ease;
+        /* Sanfter Übergang, falls Nav-Breite sich ändert (z.B. Responsive) */
     }
 
     .box {
-        border: 2px solid #444;
-        border-radius: 10px;
-        background-color: #222;
+        /* border: 2px solid #444; */
+        /* Border entfernen */
+        border-radius: 20px;
+        /* Stärker abgerundet */
+        background-color: var(--md-sys-color-surface-container);
+        /* Hintergrund aus Palette */
+        box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+        /* Subtiler Schatten */
+        padding: 20px;
+        /* Padding innerhalb der Box */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        /* Damit Inhalt (z.B. iframe oder Buttons) Flexbox nutzen kann */
+        flex-direction: column;
+        /* Inhalt untereinander */
+        gap: 16px;
+        /* Abstand zwischen Elementen in der Box */
 
-        iframe {
-            border-radius: 10px;
-            border: none;
-            width: 100%;
-            height: 650px;
+        /* Grid Area Zuweisungen */
+        &#box-favorites {
+            grid-area: favorites;
         }
+
+        &#box-mails {
+            grid-area: mails;
+            flex-direction: row;
+        }
+
+        /* Mails in einer Reihe */
+        &#my-tools {
+            grid-area: tools;
+        }
+
     }
 
-    button {
+    /* Style für Iframes innerhalb von Boxen */
+    .box iframe {
+        border-radius: 16px;
+        /* Stärker abgerundet (etwas kleiner als Box) */
+        border: none;
+        width: 100%;
+        /* Volle Breite der Box */
+        height: 600px;
+        /* Beispielhöhe, anpassen falls nötig */
+        background-color: var(--md-sys-color-surface-container-low);
+        /* Hintergrund für den iframe-Bereich */
+        /* optional: box-shadow: inset 0 0 5px rgba(0,0,0,0.1); */
+        /* Leichter innerer Schatten */
+    }
+
+    /* Spezifische Höhe für Favorites Box */
+    #box-favorites iframe {
+        height: 630px;
+        /* Beispielhöhe für Favorites */
+    }
+
+
+    /* Base Button Style für Buttons in Boxen */
+    .box button {
         flex: 1;
-        margin: 10px;
-        border: 2px solid #555;
-        border-radius: 8px;
-        background-color: #4A4A4A;
-        padding: 10px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        /* Buttons nehmen gleichen Platz in Flex-Containern (#box-mails, #my-tools) */
+        margin: 0;
+        /* Margin entfernen, da gap im Parent verwendet wird */
+        border: none;
+        /* Border entfernen */
+        /* border: 1px solid var(--md-sys-color-outline); */
+        /* Optional: Umriss */
+        border-radius: 16px;
+        /* Stärker abgerundet */
+        background-color: var(--md-sys-color-surface-container-high);
+        /* Hintergrund aus Palette */
+        color: var(--md-sys-color-on-surface-container);
+        /* Textfarbe */
+        padding: 12px;
+        /* Padding */
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+        /* Subtiler Schatten */
 
         height: 150px;
+        /* Beispielhöhe beibehalten */
 
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
 
-        &:hover {
-            border-color: gray;
-            transform: translateY(-3px);
-            cursor: pointer;
-        }
+        display: flex;
+        /* Flexbox für Inhalt (Text/Icon) */
+        align-items: center;
+        /* Vertikal zentrieren */
+        justify-content: center;
+        /* Horizontal zentrieren */
+        overflow: hidden;
+        /* Inhalt schneiden, falls er über den Radius geht */
+    }
+
+    .box button:hover {
+        background-color: var(--md-sys-color-surface-container-highest);
+        /* Hintergrund beim Hover */
+        transform: translateY(-2px);
+        /* Leichter Hover-Effekt */
+        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+        /* Schatten beim Hover erhöhen */
+        cursor: pointer;
+    }
+
+    /* Spezifische Anpassungen für Mail Buttons (liegen in einer Flex-Reihe) */
+    #box-mails {
+        /* display: flex; flex-direction: row; */
+        /* Already set in .box definition */
+        gap: 16px;
+        /* Abstand zwischen Mail Buttons */
+    }
+
+    #box-mails button {
+        flex: 1;
+        /* Mail Buttons teilen sich den Platz */
+        /* height: 120px; */
+        /* Beispielhöhe anpassen, falls nötig */
+    }
+
+    /* Spezifische Anpassungen für Tools Buttons (liegen in einer Flex-Spalte) */
+    #my-tools {
+        /* display: flex; flex-direction: column; */
+        /* Already set in .box definition */
+        gap: 16px;
+        /* Abstand zwischen Tools Buttons */
+    }
+
+    #my-tools button {
+        flex: 0 0 auto;
+        /* Tools Buttons schrumpfen/wachsen nicht unnötig */
+        height: 200px;
+        /* Beispielhöhe anpassen */
+    }
+
+
+    /* Stil für Text/Icons innerhalb von Buttons (falls nicht nur Background Image) */
+    .box button img {
+        max-height: 100%;
+        /* Icon/Bild passt sich Höhe an */
+        max-width: 100%;
+        /* Icon/Bild passt sich Breite an */
+        object-fit: contain;
+        /* Bild proportional skalieren */
+    }
+
+    .box button span {
+        /* Für Button-Text über Background Image, falls vorhanden */
+        color: var(--md-sys-color-on-surface);
+        /* Kontrastierende Textfarbe */
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        /* Leichter Schatten für Lesbarkeit */
+        z-index: 1;
+        /* Über Background Image legen */
     }
 </style>
 
 <body>
     <nav>
         <header>
-            <iframe src="widgets/clock/clock.html" title="description" id="clock"></iframe>
-            <div style="padding: 0px 30px;">
+            <iframe src="widgets/clock/clock.html" title="Dashboard Clock" id="clock"></iframe>
+            <div style="padding: 0 12px;">
                 <h1>Mein Dashboard</h1>
                 <h2>dev0gig's Home</h2>
-                Hier sind meine wichtigsten Tools auf einem Blick.
+                <p>Hier sind meine wichtigsten Tools auf einem Blick.</p>
             </div>
         </header>
         <div class="nav-buttons">
-            <button class="nav-button" onclick="window.location.href='widgets/widgets-iframe.html';"><img
-                    style="height: 20px; vertical-align: middle;"
-                    src="https://cdn-icons-png.freepik.com/512/9995/9995840.png"> My Widgets</button>
-            <button class="nav-button" onclick="window.location.href='unicorn/index.html';"><img
-                style="height: 20px; vertical-align: middle;"
-                src="https://cdn-icons-png.freepik.com/512/6288/6288891.png"> Unicorn</button>
-            <button class="nav-button" onclick="window.location.href='https://web.whatsapp.com';"><img
-                style="height: 20px; vertical-align: middle;"
-                src="https://cdn-icons-png.freepik.com/512/3536/3536445.png"> Whatsapp</button>
-            <button class="nav-button"
-                onclick="window.location.href='https://messages.google.com/web/conversations';"><img
-                style="height: 20px; vertical-align: middle;"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Google_Messages_icon_%282022%29.svg/2048px-Google_Messages_icon_%282022%29.svg.png"> Google
-                Messenger</button>
-            <button class="nav-button"
+            <button onclick="window.location.href='widgets/widgets-iframe.html';">
+                <img src="https://cdn-icons-png.freepik.com/512/9995/9995840.png" alt="Widgets Icon"> My Widgets
+            </button>
+            <button onclick="window.location.href='unicorn/index.html';">
+                <img src="https://cdn-icons-png.freepik.com/512/6288/6288891.png" alt="Unicorn Icon"> Unicorn
+            </button>
+            <button onclick="window.location.href='https://web.whatsapp.com';">
+                <img src="https://cdn-icons-png.freepik.com/512/3536/3536445.png" alt="Whatsapp Icon"> Whatsapp
+            </button>
+            <button onclick="window.location.href='https://messages.google.com/web/conversations';">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Google_Messages_icon_%282022%29.svg/2048px-Google_Messages_icon_%282022%29.svg.png"
+                    alt="Google Messages Icon"> Google Messenger
+            </button>
+            <button
                 style="background-image: url('https://miro.medium.com/v2/resize:fit:529/1*Rg8Q5YrD4Yy1m-kpiM4bmg.png');"
-                onclick="window.location.href='https://humble-palm-tree-qjr47q5p4j429g.github.dev/';"><br><br><br><br><br></button>
+                onclick="window.location.href='https://humble-palm-tree-qjr47q5p4j429g.github.dev/';">
+                <span>Mein Projekt</span> </button>
         </div>
     </nav>
     <main>
-        <div class=" box" id="box-favorites">
-            <iframe src="favorites/favorites.html"></iframe>
+        <div class="box" id="box-favorites">
+            <iframe src="favorites/favorites.html" title="Favorites Widget"></iframe>
         </div>
         <div class="box" id="box-mails">
             <button class="mail-button"
                 style="background-image: url('https://9to5google.com/wp-content/uploads/sites/4/2023/03/gmail-logo-circle-4.jpg?quality=82&strip=all&w=1600');"
-                onclick="window.location.href='https://mail.google.com/mail/u/0/#inbox';"></button>
+                onclick="window.location.href='https://mail.google.com/mail/u/0/#inbox';">
+            </button>
             <button class="mail-button"
                 style="background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');"
-                onclick="window.location.href='https://outlook.live.com/mail/inbox';"></button>
+                onclick="window.location.href='https://outlook.live.com/mail/inbox';">
+            </button>
             <button class="mail-button"
                 style="background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=fbaa5831_c48a_4a57_8ab7_913e452e0531_proton_mail_og_fd3ac8c3c8.png');"
-                onclick="window.location.href='https://www.proton.me/de/mail';"></button>
+                onclick="window.location.href='https://www.proton.me/de/mail';">
+            </button>
             <button class="mail-button"
                 style="background-image: url('https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2022/10/apple_mail_logo_2.jpg');"
-                onclick="window.location.href='https://www.icloud.com/mail/';"></button>
+                onclick="window.location.href='https://www.icloud.com/mail/';">
+            </button>
         </div>
         <div class="box" id="my-tools">
-            <button class="tools-button"
+            <button
                 style="background-image: url('https://integrately.com/blog/wp-content/uploads/2022/07/notion-tips.jpg');"
-                onclick="window.location.href='https://notion.so';"></button>
-            <button class="tools-button"
+                onclick="window.location.href='https://notion.so';">
+            </button>
+            <button
                 style="background-image: url('https://avidopenaccess.org/wp-content/uploads/2020/04/microsoftwhiteboard-1.jpg');"
-                onclick="window.location.href='https://whiteboard.office.com/';"></button>
-            <button class="tools-button"
+                onclick="window.location.href='https://whiteboard.office.com/';">
+            </button>
+            <button
                 style="background-image: url('https://cdn.prod.website-files.com/634681057b887c6f4830fae2/6712a22812e6b71494f3a426_66e0c1b9d03cccf4b2404449_Untitled%2520design%2520(20).png');"
-                onclick="window.location.href='https://calendar.google.com/calendar/u/0/r';"></button>
+                onclick="window.location.href='https://calendar.google.com/calendar/u/0/r';">
+            </button>
         </div>
     </main>
 
