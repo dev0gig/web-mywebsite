@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Europäische Hauptstädte & Flaggen Lernen</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: transparent; /* Für Notion-Einbettung */
+            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #card-container {
+            width: 280px;  /* Verkleinert von 320px */
+            height: 250px; /* Verkleinert von 280px, etwas mehr Puffer in Höhe */
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            cursor: pointer;
+            border-radius: 12px; /* Leicht reduziert */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #2c2c2c;
+            color: #f0f0f0;
+            text-align: center;
+            font-size: 1.0em; /* Verkleinert von 1.1em */
+            user-select: none;
+            left: 0;
+            opacity: 1;
+            border: 5px dashed #1e1e1e; 
+            box-sizing: border-box;
+            padding: 8px; /* Verkleinert von 10px */
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            width: 100%;
+            height: 100%;
+        }
+
+        .flag-image {
+            width: 70px;  /* Verkleinert von 80px */
+            height: auto; 
+            max-height: 45px; /* Verkleinert von 55px */
+            object-fit: contain; 
+            margin-bottom: 8px; /* Verkleinert von 10px */
+            border: 1px solid #444; 
+        }
+
+        .question-line {
+            font-weight: bold;
+            margin-bottom: 6px; /* Verkleinert von 8px */
+            min-height: 1.3em;  /* Angepasst an Schriftgröße */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-line {
+            min-height: 1.3em;  /* Angepasst an Schriftgröße */
+            visibility: hidden; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em; /* Etwas kleiner relativ zur Basisschrift der Karte */
+        }
+
+        .answer-line.visible {
+            visibility: visible;
+        }
+
+        #info-text {
+            text-align: center;
+            color: #555;
+            font-size: 0.9em;
+        }
+        #card-container p { 
+            color: #ccc;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="card-container">
+        </div>
+    <div id="info-text"></div>
+
+    <script>
+        // NEU: europaDaten mit Ländercodes (für Flaggen)
+        const europaDaten = [
+            { land: "Albanien", hauptstadt: "Tirana", code: "al" },
+            { land: "Andorra", hauptstadt: "Andorra la Vella", code: "ad" },
+            { land: "Belarus", hauptstadt: "Minsk", code: "by" },
+            { land: "Belgien", hauptstadt: "Brüssel", code: "be" },
+            { land: "Bosnien und Herzegowina", hauptstadt: "Sarajevo", code: "ba" },
+            { land: "Bulgarien", hauptstadt: "Sofia", code: "bg" },
+            { land: "Dänemark", hauptstadt: "Kopenhagen", code: "dk" },
+            { land: "Deutschland", hauptstadt: "Berlin", code: "de" },
+            { land: "Estland", hauptstadt: "Tallinn", code: "ee" },
+            { land: "Finnland", hauptstadt: "Helsinki", code: "fi" },
+            { land: "Frankreich", hauptstadt: "Paris", code: "fr" },
+            { land: "Griechenland", hauptstadt: "Athen", code: "gr" },
+            { land: "Irland", hauptstadt: "Dublin", code: "ie" },
+            { land: "Island", hauptstadt: "Reykjavík", code: "is" },
+            { land: "Italien", hauptstadt: "Rom", code: "it" },
+            { land: "Kasachstan", hauptstadt: "Astana", code: "kz" },
+            { land: "Kosovo", hauptstadt: "Pristina", code: "xk" },
+            { land: "Kroatien", hauptstadt: "Zagreb", code: "hr" },
+            { land: "Lettland", hauptstadt: "Riga", code: "lv" },
+            { land: "Liechtenstein", hauptstadt: "Vaduz", code: "li" },
+            { land: "Litauen", hauptstadt: "Vilnius", code: "lt" },
+            { land: "Luxemburg", hauptstadt: "Luxemburg", code: "lu" },
+            { land: "Malta", hauptstadt: "Valletta", code: "mt" },
+            { land: "Moldau", hauptstadt: "Chișinău", code: "md" },
+            { land: "Monaco", hauptstadt: "Monaco", code: "mc" },
+            { land: "Montenegro", hauptstadt: "Podgorica", code: "me" },
+            { land: "Niederlande", hauptstadt: "Amsterdam", code: "nl" },
+            { land: "Nordmazedonien", hauptstadt: "Skopje", code: "mk" },
+            { land: "Norwegen", hauptstadt: "Oslo", code: "no" },
+            { land: "Österreich", hauptstadt: "Wien", code: "at" },
+            { land: "Polen", hauptstadt: "Warschau", code: "pl" },
+            { land: "Portugal", hauptstadt: "Lissabon", code: "pt" },
+            { land: "Rumänien", hauptstadt: "Bukarest", code: "ro" },
+            { land: "Russland", hauptstadt: "Moskau", code: "ru" },
+            { land: "San Marino", hauptstadt: "San Marino", code: "sm" },
+            { land: "Schweden", hauptstadt: "Stockholm", code: "se" },
+            { land: "Schweiz", hauptstadt: "Bern", code: "ch" },
+            { land: "Serbien", hauptstadt: "Belgrad", code: "rs" },
+            { land: "Slowakei", hauptstadt: "Bratislava", code: "sk" },
+            { land: "Slowenien", hauptstadt: "Ljubljana", code: "si" },
+            { land: "Spanien", hauptstadt: "Madrid", code: "es" },
+            { land: "Tschechien", hauptstadt: "Prag", code: "cz" },
+            { land: "Türkei", hauptstadt: "Ankara", code: "tr" },
+            { land: "Ukraine", hauptstadt: "Kiew", code: "ua" },
+            { land: "Ungarn", hauptstadt: "Budapest", code: "hu" },
+            { land: "Vatikanstadt", hauptstadt: "Vatikanstadt", code: "va" },
+            { land: "Vereinigtes Königreich", hauptstadt: "London", code: "gb" },
+            { land: "Zypern", hauptstadt: "Nikosia", code: "cy" }
+        ];
+
+        const cardContainer = document.getElementById('card-container');
+        const infoTextElement = document.getElementById('info-text');
+
+        let aktuellerKartenIndex = 0;
+        let gemischteKarten = [];
+        
+        let startX = 0;
+        let aktuelleXPosition = 0;
+        let isDragging = false;
+        let aktiveKarteElement = null;
+        let dragStartThreshold = 15; 
+        let dragMoved = false; 
+
+        function mischen(array) {
+            let newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function erstelleKarteDOM(kartenDaten, indexPositionImStapel) {
+            const karte = document.createElement('div');
+            karte.classList.add('card');
+
+            // Stapeloptik
+            if (indexPositionImStapel === 0) {
+                karte.style.transform = 'translate(0px, 0px) scale(1)'; 
+                karte.style.opacity = '1'; 
+                karte.style.zIndex = '3';
+            } else if (indexPositionImStapel === 1) {
+                karte.style.transform = 'translate(4px, 4px) scale(0.97)'; // Leicht angepasste Werte für kleineren Stapel
+                karte.style.opacity = '1'; 
+                karte.style.zIndex = '2';
+            } else if (indexPositionImStapel === 2) {
+                karte.style.transform = 'translate(8px, 8px) scale(0.94)'; // Leicht angepasste Werte für kleineren Stapel
+                karte.style.opacity = '1'; 
+                karte.style.zIndex = '1';
+            } else {
+                karte.style.display = 'none';
+            }
+
+            const cardContent = document.createElement('div');
+            cardContent.classList.add('card-content');
+
+            if (kartenDaten.code) {
+                const flagImage = document.createElement('img');
+                flagImage.classList.add('flag-image');
+                flagImage.src = `https://flagcdn.com/w80/${kartenDaten.code.toLowerCase()}.png`; 
+                flagImage.alt = `Flagge von ${kartenDaten.land}`;
+                cardContent.appendChild(flagImage);
+            }
+
+            const questionLine = document.createElement('div');
+            questionLine.classList.add('question-line');
+            questionLine.textContent = kartenDaten.land;
+
+            const answerLine = document.createElement('div');
+            answerLine.classList.add('answer-line');
+
+            cardContent.appendChild(questionLine);
+            cardContent.appendChild(answerLine);
+            karte.appendChild(cardContent);
+
+            if (indexPositionImStapel === 0) {
+                aktiveKarteElement = karte;
+
+                karte.addEventListener('click', () => {
+                    if (!dragMoved) { 
+                        if (!answerLine.classList.contains('visible')) {
+                            answerLine.textContent = kartenDaten.hauptstadt;
+                            answerLine.classList.add('visible');
+                        } else {
+                            // Optional: answerLine.textContent = ''; answerLine.classList.remove('visible');
+                        }
+                    }
+                });
+                karte.addEventListener('mousedown', startDrag);
+                karte.addEventListener('touchstart', startDrag, { passive: true });
+            }
+            return karte;
+        }
+
+        function ladeKartenAnzeige() {
+            cardContainer.innerHTML = '';
+            aktiveKarteElement = null;
+            
+            if (aktuellerKartenIndex >= gemischteKarten.length) {
+                 cardContainer.innerHTML = '<p>Alle Karten gesehen! Lade die Seite neu oder starte eine neue Runde.</p>';
+                 if(infoTextElement) infoTextElement.style.display = 'none';
+                 return;
+            }
+            if(infoTextElement) infoTextElement.style.display = 'block';
+
+            const anzahlSichtbarerKarten = Math.min(3, gemischteKarten.length - aktuellerKartenIndex);
+            for (let i = 0; i < anzahlSichtbarerKarten; i++) {
+                const datenIndex = aktuellerKartenIndex + i;
+                if (gemischteKarten[datenIndex]) {
+                    const kartenElement = erstelleKarteDOM(gemischteKarten[datenIndex], i);
+                    cardContainer.appendChild(kartenElement);
+                }
+            }
+        }
+        
+        function startDrag(e) {
+            if (aktiveKarteElement) { 
+                isDragging = true;
+                dragMoved = false; 
+                startX = e.pageX || e.touches[0].pageX;
+                aktiveKarteElement.style.transition = 'none'; 
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+        }
+
+        function drag(e) {
+            if (!isDragging || !aktiveKarteElement) return;
+
+            if (e.type === 'touchmove') { 
+                e.preventDefault();
+            }
+
+            const aktuelleX = e.pageX || e.touches[0].pageX;
+            aktuelleXPosition = aktuelleX - startX;
+
+            if (Math.abs(aktuelleXPosition) > dragStartThreshold) {
+                dragMoved = true; 
+            }
+            aktiveKarteElement.style.transform = `translateX(${aktuelleXPosition}px) rotate(${aktuelleXPosition / 20}deg)`;
+        }
+
+        function endDrag() {
+            if (!aktiveKarteElement) return;
+
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+            
+            if (isDragging) { 
+                 aktiveKarteElement.style.removeProperty('transition'); 
+            }
+            isDragging = false;
+
+            const swipeThreshold = aktiveKarteElement.offsetWidth * 0.35;
+            let swiped = false;
+
+            if (dragMoved && Math.abs(aktuelleXPosition) > swipeThreshold) {
+                const direction = aktuelleXPosition > 0 ? 1 : -1;
+                aktiveKarteElement.style.transform = `translateX(${direction * 600}px) rotate(${direction * 45}deg)`;
+                aktiveKarteElement.style.opacity = '0';
+                swiped = true;
+            } else {
+                if (aktiveKarteElement) { 
+                    aktiveKarteElement.style.transform = 'translateX(0) rotate(0)';
+                }
+            }
+            
+            if (swiped) {
+                setTimeout(() => {
+                    aktuellerKartenIndex++;
+                    ladeKartenAnzeige();
+                }, 300); 
+            }
+            aktuelleXPosition = 0; 
+        }
+
+        function initialisieren() {
+            if (europaDaten.length === 0) {
+                 cardContainer.innerHTML = '<p>Keine Kartendaten vorhanden zum Laden.</p>';
+                 if(infoTextElement) infoTextElement.style.display = 'none';
+                return;
+            }
+            gemischteKarten = mischen(europaDaten);
+            aktuellerKartenIndex = 0;
+            ladeKartenAnzeige();
+        }
+
+        document.addEventListener('DOMContentLoaded', initialisieren);
+    </script>
+</body>
+</html>

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uhr Widget</title>
+    <title>Kalender & Uhr Widget (Kompakt)</title>
     <style>
         body {
             margin: 0;
@@ -12,74 +11,224 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: transparent;
+            background-color: #1e1e1e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .clock-container {
-            color: #fff;
-            /* Weiße Schriftfarbe */
-            font-family: sans-serif;
-            font-size: 2em;
-            padding: 10px;
-            background-color: black;
-            border: solid 2px black;
-            border-radius: 5px;
-            text-align: center;
-            /* Zentriert sowohl Uhrzeit als auch Datum */
+        .widget-container {
             display: flex;
-            /* Für vertikale Anordnung von Uhrzeit und Datum */
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border-radius: 10px; /* Etwas kleinere Rundung für kompaktes Design */
+            padding: 10px;       /* Reduziertes Padding */
+            width: 400px;        /* NEU: Feste Breite */
+            height: 200px;       /* NEU: Feste Höhe */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Etwas kleinerer Schatten */
+            box-sizing: border-box;
+        }
+
+        /* Kalender Teil */
+        .calendar-container {
+            flex: 1.1; /* Gibt dem Kalender tendenziell etwas mehr Platz, da er dichter ist */
+            padding-right: 10px; /* Reduzierter Abstand */
+            border-right: 1px solid #444;
+            display: flex;
             flex-direction: column;
-            /* Elemente untereinander anordnen */
-            align-items: center;
-            /* Zentriert Elemente horizontal innerhalb des Containers */
+            justify-content: flex-start; /* Align items from the start */
         }
 
-        #time {
+        .calendar-header {
+            text-align: left;
+            margin-bottom: 8px;  /* Reduziert */
+            font-size: 0.8em;    /* Reduziert */
+            color: #f0f0f0;
+            white-space: nowrap; /* Verhindert Umbruch bei sehr schmaler Breite */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .calendar-header #month-name {
             font-weight: bold;
-            font-size: 1.2em;
-            /* Optional: Etwas größere Schrift für die Uhrzeit */
         }
 
-        #date {
-            font-size: 0.8em;
-            /* Kleinere Schrift für das Datum */
-            margin-top: 5px;
-            /* Etwas Abstand zwischen Uhrzeit und Datum */
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 5px; /* Reduziert */
+            font-size: 0.65em;   /* Reduziert */
+            color: #aaa;
         }
+
+        .calendar-weekdays div {
+            padding: 2px 0; /* Reduziert */
+        }
+
+        .calendar-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;           /* Reduzierter Abstand zwischen Tagen */
+            text-align: center;
+            flex-grow: 1; /* Allow grid to take remaining space if any */
+        }
+
+        .calendar-days-grid div {
+            font-size: 0.7em;    /* Reduziert */
+            border-radius: 50%; /* Stellt sicher, dass es ein Kreis ist */
+            cursor: default;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;        /* NEU: Deutlich kleiner für kompaktes Layout */
+            height: 20px;       /* NEU: Deutlich kleiner für kompaktes Layout */
+            margin: auto;       /* Zentriert die Kreise in den Grid-Zellen */
+        }
+
+        .calendar-days-grid .empty-day {
+            visibility: hidden;
+        }
+
+        .calendar-days-grid .current-day {
+            background-color: #ff8c00;
+            color: #2d2d2d;
+            font-weight: bold;
+        }
+
+        /* Uhr Teil */
+        .clock-display-container {
+            flex: 0.9; /* Gibt der Uhr etwas weniger Raum, da der Inhalt flexibler ist */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-left: 10px; /* Reduzierter Abstand */
+        }
+
+        #weekday-display {
+            font-size: 1.1em;    /* Reduziert */
+            font-weight: 300;
+            margin-bottom: 3px; /* Reduziert */
+            color: #f0f0f0;
+        }
+
+        #time-main {
+            font-size: 2.8em;    /* Reduziert */
+            font-weight: bold;
+            letter-spacing: 1px; /* Reduziert */
+            color: #ffffff;
+            line-height: 1.1;    /* Für kompaktere Darstellung der Zeilenhöhe */
+        }
+        
+        #time-main .seconds {
+            font-size: 0.4em;    /* Relativ zur neuen time-main Größe */
+            opacity: 0.7;
+            margin-left: 3px;  /* Reduziert */
+        }
+
+        #date-display-under-clock {
+            font-size: 0.75em;   /* Reduziert */
+            margin-top: 5px;   /* Reduziert */
+            color: #aaa;
+        }
+
     </style>
 </head>
-
 <body>
-    <div class="clock-container">
-        <span id="time"></span>
-        <div id="date"></div>
+    <div class="widget-container">
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <span id="month-name"></span> <span id="year-display"></span>
+            </div>
+            <div class="calendar-weekdays">
+                </div>
+            <div class="calendar-days-grid" id="calendar-days-grid">
+                </div>
+        </div>
+        <div class="clock-display-container">
+            <div id="weekday-display"></div>
+            <div id="time-main">
+                </div>
+            <div id="date-display-under-clock"></div>
+        </div>
     </div>
 
     <script>
-        function updateTime() {
-            const now = new Date();
+        const monthNamesEn = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const weekdayNamesEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const weekdayNamesJa = ["月", "火", "水", "木", "金", "土", "日"];
 
-            // Uhrzeit formatieren
+        const calendarDaysGrid = document.getElementById('calendar-days-grid');
+        const monthNameDisplay = document.getElementById('month-name');
+        const yearDisplay = document.getElementById('year-display');
+        const calendarWeekdaysContainer = document.querySelector('.calendar-weekdays');
+
+        const timeMainDisplay = document.getElementById('time-main');
+        const weekdayDisplayElem = document.getElementById('weekday-display');
+        const dateDisplayUnderClockElem = document.getElementById('date-display-under-clock');
+
+        let today = new Date();
+
+        function generateCalendar(year, month) {
+            calendarDaysGrid.innerHTML = '';
+            calendarWeekdaysContainer.innerHTML = '';
+            weekdayNamesJa.forEach(day => {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = day;
+                calendarWeekdaysContainer.appendChild(dayDiv);
+            });
+            
+            monthNameDisplay.textContent = monthNamesEn[month];
+            yearDisplay.textContent = year;
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let dayOfWeekOfFirst = firstDayOfMonth.getDay();
+            if (dayOfWeekOfFirst === 0) { // Sonntag (0) zu 6 für Wochenstart Montag
+                 dayOfWeekOfFirst = 6;
+            } else { // Montag (1) zu 0, Dienstag (2) zu 1 etc.
+                dayOfWeekOfFirst -=1;
+            }
+
+            for (let i = 0; i < dayOfWeekOfFirst; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('empty-day');
+                calendarDaysGrid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayCell.classList.add('current-day');
+                }
+                calendarDaysGrid.appendChild(dayCell);
+            }
+        }
+
+        function updateClockAndDate() {
+            const now = new Date();
+            weekdayDisplayElem.textContent = weekdayNamesEn[now.getDay()];
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            const timeString = `${hours}:${minutes}:${seconds}`;
-            document.getElementById('time').textContent = timeString;
-
-            // Datum formatieren
+            timeMainDisplay.innerHTML = `${hours}:${minutes}<span class="seconds">${seconds}</span>`;
             const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // Monate sind 0-basiert
+            const monthFormatted = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
-            const dateString = `${day}.${month}.${year}`;
-            document.getElementById('date').textContent = dateString;
+            dateDisplayUnderClockElem.textContent = `${day}.${monthFormatted}.${year}`;
+
+            if (now.getDate() !== today.getDate() || now.getMonth() !== today.getMonth() || now.getFullYear() !== today.getFullYear()) {
+                today = new Date(now);
+                generateCalendar(today.getFullYear(), today.getMonth());
+            }
         }
 
-        // Die Funktion jede Sekunde aufrufen, um die Uhrzeit und das Datum zu aktualisieren
-        setInterval(updateTime, 1000);
-
-        // Die Funktion beim ersten Laden der Seite einmal aufrufen
-        updateTime();
+        generateCalendar(today.getFullYear(), today.getMonth());
+        updateClockAndDate();
+        setInterval(updateClockAndDate, 1000);
     </script>
 </body>
-
 </html>
