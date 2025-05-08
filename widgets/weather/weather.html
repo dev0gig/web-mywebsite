@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wetter-Widget</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: transparent;
+            /* Standard-Hintergrund für die Seite */
+            transition: background-color 0.5s ease;
+        }
+
+        .weather-widget {
+            background-color: #ffffff;
+            /* Standard-Widget-Hintergrund */
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            /* Zentriert Textinhalte horizontal */
+            width: 350px;
+            /* Festgelegte Breite */
+            height: 200px;
+            /* Festgelegte Höhe */
+            display: flex;
+            /* Für vertikale Zentrierung des Hauptinhalts */
+            flex-direction: column;
+            /* Inhalt soll untereinander angeordnet sein */
+            justify-content: center;
+            /* Zentriert Inhalt vertikal */
+            align-items: center;
+            /* Zentriert Inhalt horizontal innerhalb des Flex-Containers */
+            transition: background-color 0.5s ease, color 0.5s ease;
+            /* Wichtig für den Farbwechsel */
+            color: #333;
+            /* Standard-Textfarbe */
+        }
+
+        .widget-header h2 {
+            margin: 0 0 10px 0;
+            /* Weniger Abstand nach unten */
+            font-size: 1.3em;
+            /* Etwas kleinere Schriftgröße, falls nötig */
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            /* Etwas weniger Abstand zwischen Icon und Temperatur */
+            margin-bottom: 10px;
+            /* Weniger Abstand nach unten */
+        }
+
+        #weather-icon {
+            width: 60px;
+            /* Größe des Icons an die neue Höhe anpassen */
+            height: 60px;
+        }
+
+        #temperature {
+            font-size: 2.2em;
+            /* Schriftgröße anpassen */
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #description {
+            font-size: 1em;
+            /* Schriftgröße anpassen */
+            text-transform: capitalize;
+            margin-bottom: 0;
+            /* Kein zusätzlicher Abstand nach unten */
+        }
+
+        /* Farbklassen basierend auf dem Wetter */
+        .weather-widget.sunny {
+            background-color: #ffd700;
+            /* Goldgelb für sonnig */
+            color: #4a4737;
+        }
+
+        .weather-widget.cloudy {
+            background-color: #bdc3c7;
+            /* Hellgrau für bewölkt */
+            color: #3d3f40;
+        }
+
+        .weather-widget.rainy {
+            background-color: #3498db;
+            /* Blau für regnerisch */
+            color: #ffffff;
+        }
+
+        .weather-widget.snowy {
+            background-color: #e0f7fa;
+            /* Sehr helles Blau/Weiß für Schnee */
+            color: #3E606F;
+        }
+
+        .weather-widget.stormy {
+            background-color: #7f8c8d;
+            /* Dunkelgrau für Sturm */
+            color: #ffffff;
+        }
+
+        .weather-widget.foggy {
+            background-color: #95a5a6;
+            /* Grau für Nebel */
+            color: #ffffff;
+        }
+
+        .weather-widget.night {
+            background-color: #2c3e50;
+            /* Dunkelblau für Nacht */
+            color: #ecf0f1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="weather-widget">
+        <div class="widget-header">
+            <h2 id="location">Wetter wird geladen...</h2>
+        </div>
+        <div class="weather-main">
+            <img id="weather-icon" src="" alt="Wetter Icon">
+            <p id="temperature">- °C</p>
+        </div>
+        <div class="weather-details">
+            <p id="description">-</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Standardkoordinaten (z.B. Wien, Österreich)
+            // Du kannst diese Werte ändern oder die Geolocation API verwenden
+            const defaultLatitude = 48.2082;
+            const defaultLongitude = 16.3738;
+            const defaultLocationName = "Wien, Österreich";
+
+            // HTML Elemente
+            const locationElement = document.getElementById('location');
+            const temperatureElement = document.getElementById('temperature');
+            const descriptionElement = document.getElementById('description');
+            const iconElement = document.getElementById('weather-icon');
+            const widgetElement = document.querySelector('.weather-widget');
+
+            // Funktion zum Abrufen von Wetterdaten
+            async function getWeatherData(lat, lon, locationName) {
+                // Open-Meteo URL für aktuelle Wetterdaten
+                const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&timezone=Europe/Berlin`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log("Wetterdaten empfangen:", data); // Zum Debuggen
+                    updateWidget(data, locationName);
+                } catch (error) {
+                    console.error("Fehler beim Abrufen der Wetterdaten:", error);
+                    locationElement.textContent = "Fehler";
+                    temperatureElement.textContent = "- °C";
+                    descriptionElement.textContent = "Daten konnten nicht geladen werden.";
+                    iconElement.src = ""; // Kein Icon bei Fehler
+                    iconElement.alt = "Fehler beim Laden des Icons";
+                    // Standard-Styling bei Fehler
+                    widgetElement.className = 'weather-widget cloudy'; // Fallback zu einem neutralen Stil
+                }
+            }
+
+            // Funktion zum Aktualisieren des Widgets
+            function updateWidget(data, locationName) {
+                if (data && data.current) {
+                    const temp = Math.round(data.current.temperature_2m);
+                    const weatherCode = data.current.weather_code;
+                    const isDay = data.current.is_day === 1; // 1 für Tag, 0 für Nacht
+
+                    locationElement.textContent = locationName;
+                    temperatureElement.textContent = `${temp}°C`;
+
+                    const { description, iconName, colorClass } = getWeatherDetails(weatherCode, isDay);
+                    descriptionElement.textContent = description;
+
+                    // Stelle sicher, dass der Pfad und Dateityp stimmen
+                    // WICHTIG: Erstelle einen Ordner "icons" neben dieser HTML-Datei
+                    // und lege dort deine Icons ab (z.B. sunny.png, cloudy.png, etc.)
+                    iconElement.src = `icons/${iconName}.png`;
+                    iconElement.alt = description;
+
+                    // Entferne alle vorherigen Farbklassen
+                    widgetElement.className = 'weather-widget'; // Setzt auf die Basisklasse zurück
+                    // Füge die neue Farbklasse hinzu
+                    if (colorClass) {
+                        widgetElement.classList.add(colorClass);
+                    }
+
+                } else {
+                    descriptionElement.textContent = "Keine aktuellen Daten verfügbar.";
+                    iconElement.src = "";
+                    iconElement.alt = "Keine Daten";
+                }
+            }
+
+            // Funktion zum Zuordnen von Wettercode zu Beschreibung, Icon und Farbe
+            function getWeatherDetails(code, isDay) {
+                // WMO Wetter-Interpretationscodes: https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM
+                // Open-Meteo verwendet auch WMO Codes: https://open-meteo.com/en/docs#weathervariables
+                let description = "Unbekannt";
+                // WICHTIG: Passe diese iconName-Werte an deine tatsächlichen Dateinamen im "icons"-Ordner an (ohne .png)
+                let iconName = "unknown"; // Erstelle ein 'unknown.png' als Fallback oder verwende ein Standard-Icon
+                let colorClass = "cloudy"; // Standardfarbe
+
+                switch (code) {
+                    case 0: // Klarer Himmel
+                        description = isDay ? "Sonnig" : "Klare Nacht";
+                        iconName = isDay ? "sunny" : "clear-night";
+                        colorClass = isDay ? "sunny" : "night";
+                        break;
+                    case 1: // Hauptsächlich klar
+                        description = isDay ? "Überwiegend sonnig" : "Überwiegend klar";
+                        iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night";
+                        colorClass = isDay ? "sunny" : "night"; // Kann auch 'cloudy' für Dämmerung sein
+                        break;
+                    case 2: // Teils bewölkt
+                        description = "Teils bewölkt";
+                        iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night";
+                        colorClass = "cloudy";
+                        if (!isDay) colorClass = "night"; // Wenn du ein dunkleres Nacht-Bewölkt hast
+                        break;
+                    case 3: // Bedeckt
+                        description = "Bedeckt";
+                        iconName = "cloudy"; // Du benötigst 'cloudy.png'
+                        colorClass = "cloudy";
+                        break;
+                    case 45: // Nebel
+                    case 48: // Reifnebel
+                        description = "Nebel";
+                        iconName = "fog"; // Du benötigst 'fog.png'
+                        colorClass = "foggy";
+                        break;
+                    case 51: case 53: case 55: // Nieselregen (leicht, mäßig, stark)
+                    case 56: case 57: // Gefrierender Nieselregen (leicht, stark)
+                        description = "Nieselregen";
+                        iconName = "rain"; // oder spezifischeres Niesel-Icon z.B. 'drizzle.png'
+                        colorClass = "rainy";
+                        break;
+                    case 61: // Leichter Regen
+                    case 63: // Mäßiger Regen
+                    case 65: // Starker Regen
+                        description = "Regen";
+                        iconName = "rain"; // Du benötigst 'rain.png'
+                        colorClass = "rainy";
+                        break;
+                    case 66: // Leichter gefrierender Regen
+                    case 67: // Mäßiger oder starker gefrierender Regen
+                        description = "Gefrierender Regen";
+                        iconName = "rain"; // Evtl. 'freezing-rain.png'
+                        colorClass = "rainy";
+                        break;
+                    case 71: // Leichter Schneefall
+                    case 73: // Mäßiger Schneefall
+                    case 75: // Starker Schneefall
+                        description = "Schneefall";
+                        iconName = "snow"; // Du benötigst 'snow.png'
+                        colorClass = "snowy";
+                        break;
+                    case 77: // Schneekörner
+                        description = "Schneekörner";
+                        iconName = "snow"; // oder spezifisches Icon
+                        colorClass = "snowy";
+                        break;
+                    case 80: // Leichte Regenschauer
+                    case 81: // Mäßige Regenschauer
+                    case 82: // Starke Regenschauer
+                        description = "Regenschauer";
+                        iconName = "rain"; // Evtl. 'showers.png'
+                        colorClass = "rainy";
+                        break;
+                    case 85: // Leichte Schneeschauer
+                    case 86: // Starke Schneeschauer
+                        description = "Schneeschauer";
+                        iconName = "snow"; // Evtl. 'snow-showers.png'
+                        colorClass = "snowy";
+                        break;
+                    case 95: // Gewitter: Leicht oder mäßig
+                        description = "Gewitter";
+                        iconName = "thunderstorm"; // Du benötigst 'thunderstorm.png'
+                        colorClass = "stormy";
+                        break;
+                    case 96: // Gewitter mit leichtem Hagel
+                    case 99: // Gewitter mit starkem Hagel
+                        description = "Gewitter mit Hagel";
+                        iconName = "thunderstorm"; // Evtl. 'thunderstorm-hail.png'
+                        colorClass = "stormy";
+                        break;
+                    default: // Fallback für unbekannte Codes
+                        description = `Wettercode: ${code}`;
+                        iconName = isDay ? "partly-cloudy-day" : "partly-cloudy-night"; // Fallback Icon
+                        colorClass = "cloudy";
+                }
+                // Die Icons aus deinem Screenshot scheinen folgende zu sein (Beispielzuordnung, passe sie an deine Dateinamen an!)
+                // sunny.png, partly-cloudy-day.png (Sonne hinter Wolke), cloudy.png, rain.png,
+                // partly-cloudy-night.png (Mond hinter Wolke), snow.png, thunderstorm.png, fog.png (oder Nieselregen-Symbol),
+                // eventuell auch Icons für Wind etc.
+                // Du musst die `iconName` Logik oben genau an die Dateinamen deiner Icons anpassen.
+                // Z.B. wenn dein Icon für leichten Regen "light-rain.png" heißt, dann musst du das hier entsprechend setzen.
+                return { description, iconName, colorClass };
+            }
+
+            // Versuche, Geolocation zu verwenden, ansonsten Fallback
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    // Optionale Reverse Geocoding API, um den Namen aus Koordinaten zu bekommen (hier nicht implementiert)
+                    // Fürs Erste verwenden wir "Dein Standort" oder lassen den defaultLocationName
+                    getWeatherData(lat, lon, "Dein Standort");
+                }, error => {
+                    console.warn("Geolocation nicht verfügbar oder abgelehnt, verwende Standardort.", error);
+                    getWeatherData(defaultLatitude, defaultLongitude, defaultLocationName);
+                });
+            } else {
+                console.warn("Geolocation API nicht im Browser verfügbar, verwende Standardort.");
+                getWeatherData(defaultLatitude, defaultLongitude, defaultLocationName);
+            }
+        });
+    </script>
+</body>
+
+</html>
