@@ -66,7 +66,6 @@
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        /* --- GEÄNDERT: Keine maximale Breite und kein auto-margin mehr --- */
         max-width: none;
         /* Volle Breite nutzen */
         margin: 0;
@@ -152,7 +151,6 @@
     }
 
     .box-mail .button-group-mail {
-        /* --- GEÄNDERT: Buttons in Reihen anordnen und umbrechen erlauben --- */
         display: flex;
         flex-direction: row;
         /* Horizontal */
@@ -187,7 +185,7 @@
         cursor: pointer;
         text-align: left;
         /* Text linksbündig lassen, wie vorher */
-        transition: background-color 0.2s ease, box-shadow 0.2s ease,  transform 0.2s ease;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         box-shadow: 0 1px 3px var(--shadow-color);
     }
 
@@ -279,84 +277,113 @@
         <section class="mail-main">
 
             <div class="mail-main--left">
-                <!-- Strom & Gas -->
                 <details class="box-mail" open>
                     <summary>Strom & Gas</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="anmeldung">Anmeldung</button>
-                        <button class="button-single" id="abmeldung">Abmeldung</button>
-                        <button class="button-single" id="kdnr_benötigt">Kundennummer benötigt</button>
-                        <button class="button-single" id="rp">Ratenplan</button>
-                        <button class="button-single" id="rechnungskorrektur_zählerstände">Rechnungskorrektur &
+                        <button class="button-single" id="anmeldung"
+                            data-template="mail-template-txt/anmeldung.txt">Anmeldung</button>
+                        <button class="button-single" id="abmeldung"
+                            data-template="mail-template-txt/abmeldung.txt">Abmeldung</button>
+                        <button class="button-single" id="kdnr_benötigt"
+                            data-template="mail-template-txt/kdnr_benötigt.txt">Kundennummer benötigt</button>
+                        <button class="button-single" id="rp"
+                            data-template="mail-template-txt/rp.txt">Ratenplan</button>
+                        <button class="button-single" id="rechnungskorrektur_zählerstände"
+                            data-template="mail-template-txt/rechnungskorrektur_zählerstände.txt">Rechnungskorrektur &
                             Zählerstände</button>
-                        <button class="button-single" id="sonnenstrom">Sonnenstrom</button>
-                        <button class="button-single" id="verlassenschaft">Verlassenschaft</button>
-                        <button class="button-single" id="tw">Tarifwechsel</button>
-                        <button class="button-single" id="trockenlegungsbrief">Trockenlegungbrief</button>
-                        <button class="button-single" id="ummeldung_erfolgreich">Ummeldung erfolgreich</button>
-                        <button class="button-single" id="anm_pv">ANM PV</button>
+                        <button class="button-single" id="sonnenstrom"
+                            data-template="mail-template-txt/sonnenstrom.txt">Sonnenstrom</button>
+                        <button class="button-single" id="verlassenschaft"
+                            data-template="mail-template-txt/verlassenschaft.txt">Verlassenschaft</button>
+                        <button class="button-single" id="tw"
+                            data-template="mail-template-txt/tw.txt">Tarifwechsel</button>
+                        <button class="button-single" id="trockenlegungsbrief"
+                            data-template="mail-template-txt/trockenlegungsbrief.txt">Trockenlegungbrief</button>
+                        <button class="button-single" id="ummeldung_erfolgreich"
+                            data-template="mail-template-txt/ummeldung_erfolgreich.txt">Ummeldung erfolgreich</button>
+                        <button class="button-single" id="anm_pv" data-template="mail-template-txt/anm_pv.txt">ANM
+                            PV</button>
                     </div>
                 </details>
 
-                <!-- Guthaben -->
                 <details class="box-mail" open>
                     <summary>Guthaben</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="gh_auszahlung_ausweis_fehlt">ID fehlt</button>
-                        <button class="button-single" id="gh_auszahlung">GH Auszahlung</button>
-                        <button class="button-single" id="gh_allgemein">Allgemeines Wording</button>
+                        <button class="button-single" id="gh_auszahlung_ausweis_fehlt"
+                            data-template="mail-template-txt/gh_auszahlung_ausweis_fehlt.txt">ID fehlt</button>
+                        <button class="button-single" id="gh_auszahlung"
+                            data-template="mail-template-txt/gh_auszahlung.txt">GH Auszahlung</button>
+                        <button class="button-single" id="gh_allgemein"
+                            data-template="mail-template-txt/gh_allgemein.txt">Allgemeines Wording</button>
                     </div>
                 </details>
 
-                <!-- Grundaufbau -->
                 <details class="box-mail" open>
                     <summary>Grundgerüst</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="grundgeruest">Grundgerüst</button>
-                        <button class="button-single" id="tois_vorlage">Tois-Vorlage</button>
+                        <button class="button-single" id="grundgeruest"
+                            data-template="mail-template-txt/grundgeruest.txt">Grundgerüst</button>
+                        <button class="button-single" id="tois_vorlage"
+                            data-template="mail-template-txt/tois_vorlage.txt">Tois-Vorlage</button>
                     </div>
                 </details>
 
-                <!-- Wärme -->
                 <details class="box-mail" open>
                     <summary>Wärme</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="waerme_anm">Anmeldung</button>
-                        <button class="button-single" id="waerme_an_abm">An-/Abmeldung</button>
-                        <button class="button-single" id="waerme_mieterwechsel">Mieterwechsel</button>
-                        <button class="button-single" id="heizkostenabrechnung">Heizkostenabrechnung</button>
-                        <button class="button-single" id="mw_untermieter">Mieterwechsel Untermieter</button>
+                        <button class="button-single" id="waerme_anm"
+                            data-template="mail-template-txt/waerme_anm.txt">Anmeldung</button>
+                        <button class="button-single" id="waerme_an_abm"
+                            data-template="mail-template-txt/waerme_an_abm.txt">An-/Abmeldung</button>
+                        <button class="button-single" id="waerme_mieterwechsel"
+                            data-template="mail-template-txt/waerme_mieterwechsel.txt">Mieterwechsel</button>
+                        <button class="button-single" id="heizkostenabrechnung"
+                            data-template="mail-template-txt/heizkostenabrechnung.txt">Heizkostenabrechnung</button>
+                        <button class="button-single" id="mw_untermieter"
+                            data-template="mail-template-txt/mw_untermieter.txt">Mieterwechsel Untermieter</button>
                     </div>
                 </details>
 
-                <!-- WienerNetze -->
                 <details class="box-mail">
                     <summary>Wiener Netze</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="Einzelner_Zäst_gespeichert">Einzelner Zäst
+                        <button class="button-single" id="Einzelner_Zäst_gespeichert"
+                            data-template="mail-template-txt/Einzelner_Zäst_gespeichert.txt">Einzelner Zäst
                             gespeichert</button>
-                        <button class="button-single" id="Mehrere_Zäst_gespeichert">Mehrere Zäst gespeichert</button>
-                        <button class="button-single" id="SmartMeter_Keine_ZÄST_benötigt">Smart Meter/ Keine ZÄST
+                        <button class="button-single" id="Mehrere_Zäst_gespeichert"
+                            data-template="mail-template-txt/Mehrere_Zäst_gespeichert.txt">Mehrere Zäst
+                            gespeichert</button>
+                        <button class="button-single" id="SmartMeter_Keine_ZÄST_benötigt"
+                            data-template="mail-template-txt/SmartMeter_Keine_ZÄST_benötigt.txt">Smart Meter/ Keine ZÄST
                             benötigt</button>
-                        <button class="button-single" id="Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung">Wenn der Kunde
+                        <button class="button-single" id="Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung"
+                            data-template="mail-template-txt/Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung.txt">Wenn der
+                            Kunde
                             SMART Meter Zäst schickt bei Ummeldung</button>
-                        <button class="button-single" id="KD_ZÄST_von_Gas_und_SMART_Meter_schickt">Wenn KD ZÄST von Gas
+                        <button class="button-single" id="KD_ZÄST_von_Gas_und_SMART_Meter_schickt"
+                            data-template="mail-template-txt/KD_ZÄST_von_Gas_und_SMART_Meter_schickt.txt">Wenn KD ZÄST
+                            von Gas
                             und SMART-Meter schickt</button>
                         <button class="button-single"
-                            id="KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung">Wenn KD ZÄST
+                            id="KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung"
+                            data-template="mail-template-txt/KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung.txt">Wenn
+                            KD ZÄST
                             von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist</button>
 
                     </div>
                 </details>
 
-                <!-- Kontaktdaten -->
                 <details class="box-mail">
                     <summary>Kontaktdaten</summary>
                     <div class="button-group-mail">
-                        <button class="button-single" id="data_spit">Spittelau</button>
-                        <button class="button-single" id="data_wn">WienerNetze</button>
-                        <button class="button-single" id="data_KS_allgemein">contact_data</button>
-                        <button class="button-single" id="data_inkasso">Inkassobüro</button>
+                        <button class="button-single" id="data_spit"
+                            data-template="mail-template-txt/data_spit.txt">Spittelau</button>
+                        <button class="button-single" id="data_wn"
+                            data-template="mail-template-txt/data_wn.txt">WienerNetze</button>
+                        <button class="button-single" id="data_KS_allgemein"
+                            data-template="mail-template-txt/data_KS_allgemein.txt">contact_data</button>
+                        <button class="button-single" id="data_inkasso"
+                            data-template="mail-template-txt/data_inkasso.txt">Inkassobüro</button>
                     </div>
                 </details>
             </div>
@@ -366,10 +393,125 @@
                     placeholder="Durch drücken in das Textfeld, wird der darin enthaltene Text automatisch kopiert..."></textarea>
             </div>
         </section>
-
-        <script src="script.js"></script>
-
     </main>
 </body>
+
+<script>
+    // Warten, bis das gesamte HTML-Dokument geladen ist
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Referenz zum Container, der alle Buttons enthält (basierend auf deiner HTML-Struktur)
+        const buttonContainer = document.querySelector('.mail-main--left');
+        // Referenz zum Textbereich, wo die Vorlage angezeigt werden soll (basierend auf deiner HTML-Struktur)
+        const templateTextArea = document.getElementById('outputArea');
+
+        // Überprüfen, ob die notwendigen HTML-Elemente gefunden wurden
+        if (!buttonContainer || !templateTextArea) {
+            console.error('Wichtige HTML-Elemente (Button-Container ".mail-main--left" oder Textarea mit ID "outputArea") wurden nicht gefunden.');
+            return; // Skript beenden, wenn Elemente fehlen
+        }
+
+        // Event-Listener zum Button-Container hinzufügen (Event Delegation)
+        // Wir lauschen auf Klicks im gesamten linken Bereich und prüfen dann, ob ein Button geklickt wurde.
+        buttonContainer.addEventListener('click', async (event) => {
+            // Überprüfen, ob das geklickte Element oder ein übergeordnetes Element ein Button ist
+            const button = event.target.closest('button');
+
+            // Prüfen, ob ein Button gefunden wurde UND dieser das data-template-Attribut hat
+            if (button && button.dataset.template) {
+
+                // Den kompletten Dateipfad aus dem data-template-Attribut holen
+                // Dieser Pfad enthält bereits den Unterordner 'mail-template-txt/' und den Dateinamen.
+                const templateFilePath = button.dataset.template;
+                console.log(`Button "${button.textContent.trim()}" geklickt. Versuche, Datei zu laden: ${templateFilePath}`);
+
+                try {
+                    // Die Textdatei asynchron mit fetch laden
+                    const response = await fetch(templateFilePath);
+
+                    // Überprüfen, ob das Laden erfolgreich war (HTTP Status 200-299)
+                    if (!response.ok) {
+                        // Detailliertere Fehlermeldung, falls die Datei nicht gefunden wird etc.
+                        let errorDetails = `HTTP-Fehler: ${response.status} ${response.statusText}`;
+                        // Optional: Versuche, den Antworttext zu lesen, falls er Fehlermeldungen enthält
+                        try {
+                            const errorBody = await response.text();
+                            if (errorBody) errorDetails += ` - Antwort-Text: ${errorBody.substring(0, 200)}...`;
+                        } catch (e) { /* Ignore error reading error body */ }
+
+                        throw new Error(`Fehler beim Laden der Vorlagendatei "${templateFilePath}". ${errorDetails}`);
+                    }
+
+                    // Den Inhalt der geladenen Datei als reinen Text lesen
+                    const templateContent = await response.text();
+
+                    // Den gelesenen Inhalt in das Textarea-Feld einfügen
+                    templateTextArea.value = templateContent;
+
+                    console.log(`Vorlage aus "${templateFilePath}" erfolgreich geladen und in Textfeld angezeigt.`);
+
+                } catch (error) {
+                    // Fehler beim Laden oder Verarbeiten der Datei abfangen und im Textbereich anzeigen
+                    console.error('Ein Fehler ist aufgetreten:', error);
+                    templateTextArea.value = `Fehler beim Laden der Vorlage:\n${error.message}\n\nStellen Sie sicher:\n1. Die Datei "${templateFilePath}" existiert genau in diesem Pfad relativ zur HTML-Datei.\n2. Sie verwenden einen lokalen Webserver (z.B. Live Server in VS Code oder Python http.server), da Browser das Laden lokaler Dateien (`file://`) einschränken können.`;
+        }
+            }
+            // Wenn das geklickte Element kein Button mit data-template war, machen wir nichts.
+        });
+
+        // Event-Listener für das Textfeld, um bei Klick den Inhalt zu selektieren und zu kopieren
+        templateTextArea.addEventListener("click", function () {
+            this.select(); // Selektiert den gesamten Text im Textfeld
+
+            // Versuche, den Text in die Zwischenablage zu kopieren
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                // Moderne Clipboard API
+                navigator.clipboard.writeText(this.value).then(() => {
+                    console.log("Text erfolgreich in Zwischenablage kopiert!");
+                    // Optional: Visuelles Feedback für das Kopieren
+                    const originalBackground = this.style.backgroundColor || 'initial'; // Hintergrundfarbe speichern
+                    this.style.backgroundColor = 'lightblue'; // oder eine andere Farbe
+                    setTimeout(() => {
+                        this.style.backgroundColor = originalBackground; // Farbe zurücksetzen
+                    }, 300); // Kurze Zeit warten
+                }).catch(err => {
+                    console.error('Fehler beim Kopieren des Textes mit Clipboard API:', err);
+                    // Fallback versuchen
+                    try {
+                        document.execCommand("copy");
+                        console.log("Text mit execCommand erfolgreich in Zwischenablage kopiert (Fallback).");
+                        const originalBackground = this.style.backgroundColor || 'initial';
+                        this.style.backgroundColor = 'lightblue';
+                        setTimeout(() => {
+                            this.style.backgroundColor = originalBackground;
+                        }, 300);
+                    } catch (fallbackErr) {
+                        console.error('Fallback-Kopieren ebenfalls fehlgeschlagen:', fallbackErr);
+                        alert('Der Text konnte nicht automatisch kopiert werden. Bitte manuell kopieren.');
+                    }
+                });
+            } else {
+                // Fallback für ältere Browser ohne Clipboard API
+                try {
+                    document.execCommand("copy");
+                    console.log("Text mit execCommand erfolgreich in Zwischenablage kopiert.");
+                    const originalBackground = this.style.backgroundColor || 'initial';
+                    this.style.backgroundColor = 'lightblue';
+                    setTimeout(() => {
+                        this.style.backgroundColor = originalBackground;
+                    }, 300);
+                } catch (err) {
+                    console.error('execCommand("copy") fehlgeschlagen:', err);
+                    alert('Ihr Browser unterstützt das automatische Kopieren nicht oder es ist fehlgeschlagen. Bitte manuell kopieren.');
+                }
+            }
+        });
+
+
+        // Optionale Startnachricht im Textbereich
+        templateTextArea.value = "Wählen Sie eine Vorlage aus, um den Text hier anzuzeigen.\n\nKlicken Sie in dieses Feld, um den angezeigten Text automatisch zu kopieren.";
+
+    });
+</script>
 
 </html>
