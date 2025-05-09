@@ -2,7 +2,7 @@
     "folder-color.pathColors": [
         {
             "folderPath": "web-mywebsite/RbPi-InfoBoard/",
-            "color": "foldercolorizer.color_0000ff"
+            "color": "foldercolorizer.color_00cc00"
         },
         {
             "folderPath": "web-mywebsite/feedback/",
@@ -15,15 +15,14 @@
         },
         {
             "folderPath": "web-mywebsite/widgets/",
-            "color": "foldercolorizer.color_cccc00"
-        },
-        {
-            "folderPath": "web-mywebsite/widgets/widgets-iframe.html/",
-            "color": "foldercolorizer.color_cc6600"
+            "color": "foldercolorizer.color_9999ff"
         },
         {
             "folderPath": "web-mywebsite/index.html/",
             "badge": "❤️"
+        },
+        {
+            "folderPath": "web-mywebsite/widgets/widgets-iframe.html/"
         }
     ],
     "liveServer.settings.port": 5501
