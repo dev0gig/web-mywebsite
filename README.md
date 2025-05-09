@@ -14,7 +14,8 @@ Link für die Website ist: https://dev0gig.github.io/web-mywebsite/
 # Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)
 <details>
 ## Einleitung
-Seit dem 01.09.2024 arbeite ich für WienEnergie. Mein dritter Arbeitgeber seit ich, Oktober 2017, in Wien wohnhaft bin. Die #WienEnergie schreibt über sich selbst folgendes:
+  
+Seit dem 01.09.2024 arbeite ich für WienEnergie. Mein dritter Arbeitgeber seit ich, Oktober 2017, in Wien wohnhaft bin. Die WienEnergie schreibt über sich selbst folgendes:
 
 > “Wien Energie ist der größte regionale Energieanbieter Österreichs und ein Tochterunternehmen der [Wiener Stadtwerke](https://www.wienerstadtwerke.at/). Wir versorgen zwei Millionen Kund*innen zuverlässig und umweltfreundlich mit Strom, Wärme, Kälte, Elektromobilität und Telekommunikation. Um den Klimaschutz voranzutreiben, investieren wir in den nächsten Jahren massiv in den Ausbau erneuerbarer Energien wie Sonnen-, Wind- und Wasserkraft sowie Elektromobilität. Mit Innovation und Forschung gestalten wir die Energiezukunft aktiv mit. “Mit unseren Maßnahmen für Klimaschutz und Versorgungssicherheit in der Stadt sind wir bestmöglich für die Zukunft gewappnet.”
 > 
