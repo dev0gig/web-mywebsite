@@ -25,5 +25,6 @@
             "folderPath": "web-mywebsite/index.html/",
             "badge": "❤️"
         }
-    ]
+    ],
+    "liveServer.settings.port": 5501
 }
