@@ -11,8 +11,8 @@ Link für die Website ist: https://dev0gig.github.io/web-mywebsite/
 - eine seite für darstellung der zeit und datum (vlt auch wetter) auf dem RaspberryPi
 - viele widgets für notion integration
 
+# Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)
 <details>
-<summary># Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)</summary>
 ## Einleitung
 Seit dem 01.09.2024 arbeite ich für WienEnergie. Mein dritter Arbeitgeber seit ich, Oktober 2017, in Wien wohnhaft bin. Die #WienEnergie schreibt über sich selbst folgendes:
 
