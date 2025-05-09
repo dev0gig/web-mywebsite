@@ -337,9 +337,8 @@ main {
 #box-favorites .app-container {
     display: flex;
     flex-flow: row wrap;
-    gap: 15px;
+    gap: 20px;
     padding: 0;
-    justify-content: space-between;
 }
 
 #box-favorites .app-item {
