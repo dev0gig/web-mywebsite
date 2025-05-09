@@ -34,7 +34,7 @@
 }
 
 .weather-widget.cloudy {
-    --widget-bg-color: #E0E0E0;
+    --widget-bg-color: #a1a1a1;
     --widget-text-primary-color: #1F1F1F;
     --widget-text-secondary-color: #4A4A4A;
 }
