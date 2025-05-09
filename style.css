@@ -1,0 +1,439 @@
+/* Material You Farbpalette & AppDrawer Variablen */
+:root {
+    /* Material You Basisfarben (Light Mode) */
+    --md-sys-color-primary: #6750a4;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-secondary: #625b71;
+    --md-sys-color-on-secondary: #ffffff;
+    --md-sys-color-tertiary: #7d5260;
+    --md-sys-color-on-tertiary: #ffffff;
+    --md-sys-color-error: #b3261e;
+    --md-sys-color-on-error: #ffffff;
+    --md-sys-color-background: #fffbfe;
+    --md-sys-color-on-background: #1c1b1f;
+    --md-sys-color-surface: #fffbfe;
+    --md-sys-color-on-surface: #1c1b1f;
+    --md-sys-color-surface-variant: #e7e0ec;
+    --md-sys-color-on-surface-variant: #49454f;
+    --md-sys-color-outline: #79747e;
+    --md-sys-color-surface-container-lowest: #ffffff;
+    --md-sys-color-surface-container-low: #f7f2fa;
+    --md-sys-color-surface-container: #f3edfa;
+    --md-sys-color-surface-container-high: #eee8f4;
+    --md-sys-color-surface-container-highest: #e6e0eb;
+    --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+
+    /* AppDrawer spezifische Variablen */
+    --appdrawer-icon-background: #ffffff;
+    /* NEU: Explizit weißer Hintergrund für App-Icons */
+
+    --appdrawer-search-icon-url-light: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    --appdrawer-search-icon-url-dark: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cac4d0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    --appdrawer-search-icon-size: 25px;
+    /* Angepasste Größe für die Lupe */
+    --appdrawer-search-icon-padding-left: 12px;
+    /* Horizontaler Abstand des Icons vom Rand */
+    --appdrawer-search-text-padding-left: calc(var(--appdrawer-search-icon-padding-left) + var(--appdrawer-search-icon-size) + 8px);
+    /* Padding für Text neben Icon */
+}
+
+/* Material You Farbpalette (Basis - dunkle Variante) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --md-sys-color-primary: #d0bcff;
+        --md-sys-color-on-primary: #381e72;
+        --md-sys-color-secondary: #ccc2dc;
+        --md-sys-color-on-secondary: #332d41;
+        --md-sys-color-tertiary: #efb8c8;
+        --md-sys-color-on-tertiary: #492532;
+        --md-sys-color-error: #f2b8b5;
+        --md-sys-color-on-error: #601410;
+        --md-sys-color-background: #1c1b1f;
+        --md-sys-color-on-background: #e6e1e5;
+        --md-sys-color-surface: #1c1b1f;
+        --md-sys-color-on-surface: #e6e1e5;
+        --md-sys-color-surface-variant: #49454f;
+        --md-sys-color-on-surface-variant: #cac4d0;
+        --md-sys-color-outline: #938f99;
+        --md-sys-color-surface-container-lowest: #0f1113;
+        --md-sys-color-surface-container-low: transparent;
+        --md-sys-color-surface-container: #2a282d;
+        --md-sys-color-surface-container-high: #36343b;
+        --md-sys-color-surface-container-highest: #44414c;
+        --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+        /* --appdrawer-icon-background bleibt #ffffff, es sei denn, du willst es hier ändern */
+        /* z.B. für dunkle Icons im Dark Mode: --appdrawer-icon-background: var(--md-sys-color-surface-container-low); */
+    }
+}
+
+body {
+    margin: 0;
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 100vh;
+    box-sizing: border-box;
+    box-shadow: 2px 0 6px var(--md-sys-shadow-color);
+    border-right: 1px solid var(--md-sys-color-outline);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    z-index: 100;
+}
+
+nav header {
+    margin-bottom: 24px;
+}
+
+nav header h1 {
+    font-size: 1.8em;
+    margin: 0 0 5px 0;
+    color: var(--md-sys-color-on-surface);
+}
+
+nav header h2 {
+    font-size: 1.2em;
+    margin: 0 0 10px 0;
+    color: var(--md-sys-color-on-surface-variant);
+    font-weight: normal;
+}
+
+nav header p {
+    font-size: 0.9em;
+    color: var(--md-sys-color-on-surface);
+}
+
+#clock {
+    margin: -50px 0 16px -100px;
+    border: none;
+    width: 500px;
+    height: 300px;
+    background-color: transparent;
+    overflow: hidden;
+}
+
+.nav-buttons {
+    padding-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--md-sys-color-on-surface);
+}
+
+.nav-buttons button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--md-sys-color-on-surface);
+    font: normal 1em 'Roboto', sans-serif;
+    text-align: left;
+    border: none;
+    border-radius: 16px;
+    background-color: transparent;
+    padding: 12px 16px;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: none;
+}
+
+.nav-buttons button img {
+    height: 20px;
+    vertical-align: middle;
+}
+
+.nav-buttons button:hover {
+    background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+}
+
+main {
+    margin-left: 380px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+        "favorites favorites favorites tools"
+        "mails mails mails mails";
+    gap: 24px;
+    padding: 24px;
+    transition: margin-left 0.3s ease;
+}
+
+.box {
+    border-radius: 20px;
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: var(--md-sys-color-surface-container);
+    box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+    padding: 20px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.box#box-favorites {
+    grid-area: favorites;
+}
+
+.box#box-mails {
+    grid-area: mails;
+    flex-direction: row;
+}
+
+.box#my-tools {
+    grid-area: tools;
+}
+
+.box iframe {
+    border-radius: 16px;
+    border: none;
+    width: 100%;
+    height: 600px;
+    background-color: var(--md-sys-color-surface-container-low);
+}
+
+.box>button,
+#box-mails>button,
+#my-tools>button {
+    flex: 1;
+    margin: 0;
+    border: none;
+    border-radius: 16px;
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    padding: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.box>button:hover,
+#box-mails>button:hover,
+#my-tools>button:hover {
+    background-color: var(--md-sys-color-surface-container-highest);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+    cursor: pointer;
+}
+
+#box-mails {
+    gap: 16px;
+}
+
+#box-mails>button {
+    flex: 1;
+}
+
+#my-tools {
+    gap: 16px;
+}
+
+#my-tools>button {
+    flex: 0 0 auto;
+    height: 200px;
+}
+
+.box>button img,
+#box-mails>button img,
+#my-tools>button img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.box>button span,
+#box-mails>button span,
+#my-tools>button span {
+    color: var(--md-sys-color-on-surface);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* =========== AppDrawer Styles (Innerhalb von #box-favorites) =========== */
+#box-favorites .app-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0 16px 0;
+    gap: 20px;
+    background-color: transparent;
+    border-bottom: 1px solid var(--md-sys-color-surface-variant);
+    margin-bottom: 16px;
+}
+
+#box-favorites .app-title {
+    margin: 0;
+    font-size: 1.75em;
+    color: var(--md-sys-color-on-surface);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#box-favorites #searchInput {
+    padding: 10px 15px 10px var(--appdrawer-search-text-padding-left);
+    border-radius: 20px;
+    border: 1px solid var(--md-sys-color-outline);
+    font-size: 0.9em;
+    width: auto;
+    max-width: 280px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    background-color: var(--md-sys-color-surface-container-low);
+    background-image: var(--appdrawer-search-icon-url-light);
+    /* Standardmäßig Light-Mode Icon */
+    background-repeat: no-repeat;
+    background-position: var(--appdrawer-search-icon-padding-left) center;
+    background-size: var(--appdrawer-search-icon-size) var(--appdrawer-search-icon-size);
+    /* Nur Icon-Größe, da nur ein BG-Image */
+    color: var(--md-sys-color-on-surface);
+    outline: none;
+}
+
+#box-favorites #searchInput::placeholder {
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 1;
+}
+
+#box-favorites #searchInput:hover {
+    box-shadow: 0 1px 4px var(--md-sys-shadow-color);
+    border-color: var(--md-sys-color-on-surface-variant);
+}
+
+#box-favorites #searchInput:focus {
+    border-color: var(--md-sys-color-primary);
+    background-color: var(--md-sys-color-surface);
+    /* Icon bleibt dasselbe wie im Normalzustand, außer es wird im Dark Mode überschrieben */
+    background-image: var(--appdrawer-search-icon-url-light);
+    box-shadow: 0 1px 6px rgba(var(--md-sys-color-primary-rgb, 103, 80, 164), 0.25);
+    color: var(--md-sys-color-on-surface);
+}
+
+#box-favorites #searchInput:focus::placeholder {
+    color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.7;
+}
+
+#box-favorites .app-container {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 15px;
+    padding: 0;
+    justify-content: space-between;
+}
+
+#box-favorites .app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 70px;
+}
+
+#box-favorites .app-item .button-circle {
+    box-sizing: border-box;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background-color: var(--appdrawer-icon-background) !important;
+    /* Weißer Hintergrund für Icons */
+    /* background-image wird per JS direkt auf das Element gesetzt! */
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    overflow: hidden !important;
+    flex: none !important;
+    display: block !important;
+    box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    color: initial;
+    text-align: initial;
+    justify-content: initial;
+    align-items: initial;
+}
+
+#box-favorites .app-item .button-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+}
+
+#box-favorites .app-item .app-id-label {
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    text-align: center;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    line-height: 1.2;
+    width: 100%;
+}
+
+/* === Dark Mode Anpassungen === */
+@media (prefers-color-scheme: dark) {
+    #box-favorites #searchInput {
+        background-color: var(--md-sys-color-surface-container-lowest);
+        background-image: var(--appdrawer-search-icon-url-dark);
+        /* Dark-Mode Icon */
+        color: var(--md-sys-color-on-surface);
+        border-color: var(--md-sys-color-outline);
+    }
+
+    #box-favorites #searchInput::placeholder {
+        color: var(--md-sys-color-on-surface-variant);
+    }
+
+    #box-favorites #searchInput:focus {
+        border-color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-surface);
+        background-image: var(--appdrawer-search-icon-url-dark);
+        /* Dark-Mode Icon bei Fokus */
+        color: var(--md-sys-color-on-surface);
+    }
+
+    #box-favorites #searchInput:focus::placeholder {
+        color: var(--md-sys-color-on-surface-variant);
+        opacity: 0.7;
+    }
+
+    /* App-Icon Hintergrund bleibt weiß, es sei denn --appdrawer-icon-background wird im Dark :root überschrieben */
+    /* Keine spezifische Änderung für .button-circle background-color hier, wenn es weiß bleiben soll */
+    #box-favorites .app-item .button-circle {
+        /* background-color: var(--appdrawer-icon-background) !important; Ist bereits oben gesetzt */
+        box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+        /* Nutzt Dark Mode Schattenvariable */
+    }
+
+    #box-favorites .app-item .button-circle:hover {
+        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+        /* Nutzt Dark Mode Schattenvariable */
+    }
+
+    #box-favorites .app-item .app-id-label {
+        color: var(--md-sys-color-on-surface-variant);
+    }
+}
