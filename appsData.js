@@ -240,18 +240,6 @@ const appsData = [
         ariaLabel: "Reddit"
     },
     {
-        id: "Whatsapp",
-        iconUrl: "https://play-lh.googleusercontent.com/bYtqbOcTYOlgc6gqZ2rwb8lptHuwlNE75zYJu6Bn076-hTmvd96HH-6v7S0YUAAJXoJN=w240-h480-rw",
-        targetUrl: "https://web.whatsapp.com/",
-        ariaLabel: "Whatsapp"
-    },
-    {
-        id: "GoogleMessages",
-        iconUrl: "https://play-lh.googleusercontent.com/9AZOTXU_CpreTFAXUPAmJNkm8VGCb1C90fjJ9pHGcVmpGMDSTq3cUbaQJdBT9Tdp9A=w240-h480-rw",
-        targetUrl: "https://messages.google.com/web/conversations",
-        ariaLabel: "GoogleMessages"
-    },
-    {
         id: "Temu",
         iconUrl: "https://play-lh.googleusercontent.com/Nz5sdWyh7jn4eTy_GSaRBDgaKhLC1pvYywC6fklDOlPGbopmeFN9NkqgKGjsvJMbKVEI=w240-h480-rw",
         targetUrl: "https://www.temu.com",
