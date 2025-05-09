@@ -328,5 +328,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/TOeUOcW7cqu-2RSLp9514ETSQctPv0CY5rhWVLKqrMD5cJbsGTwYRZjDhtWAB857Zw=w240-h480-rw",
         targetUrl: "https://www.myheritage.com/",
         ariaLabel: "My Heritage"
+    },
+    {
+        id: "PDF24",
+        iconUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c0/PDF24_Creator_application_logo_256x256.png",
+        targetUrl: "https://tools.pdf24.org/de/alle-tools",
+        ariaLabel: "PDF24"
     }
 ];
