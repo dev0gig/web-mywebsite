@@ -5,13 +5,14 @@ Da ich browserübergreifend meine Favoriten pflegen möchte, habe ich diese Seit
 used extensions: folder color, live server
 
 Dies ist mein neues Projekt, welches alle kleinen Projekte zusammenfasst.
-Link für die Website ist: https://dev0gig.github.io/web-mywebsite/dashboard.html
+Link für die Website ist: https://dev0gig.github.io/web-mywebsite/
 
 - was ich versuche ist ein feedback button mit email an mich
 - eine seite für darstellung der zeit und datum (vlt auch wetter) auf dem RaspberryPi
 - viele widgets für notion integration
 
-# Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)
+<details>
+<summary># Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)</summary>
 ## Einleitung
 Seit dem 01.09.2024 arbeite ich für WienEnergie. Mein dritter Arbeitgeber seit ich, Oktober 2017, in Wien wohnhaft bin. Die #WienEnergie schreibt über sich selbst folgendes:
 
@@ -87,3 +88,4 @@ Dieses Projekt ist noch lange nicht zu Ende. Genau so werde ich versuchen diesen
 
 ## Design V_02
 Es gab eine grosse Änderung bezüglich Design. Ich wollte ich der Version 2 das Design mehr an das WienEnergie Online Design anpassen. So machte ich mich dran die .css Datei entsprechend anzupassen.
+</details>
