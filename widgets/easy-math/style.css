@@ -1,0 +1,255 @@
+/* Material You Farbpalette (Beispiel - helle Variante als Standard) */
+:root {
+    --md-sys-color-primary: #6750a4;
+    /* Primärfarbe (z.B. Nächste Aufgabe Button) */
+    --md-sys-color-on-primary: #ffffff;
+    /* Text auf Primärfarbe */
+    --md-sys-color-background: #fffbfe;
+    /* Hintergrund (nicht für Body) */
+    --md-sys-color-on-background: #1c1b1f;
+    /* Text auf Hintergrund */
+    --md-sys-color-surface: #fffbfe;
+    /* Oberfläche (für Hover Textfarbe) */
+    --md-sys-color-on-surface: #1c1b1f;
+    /* Text auf Oberfläche (für Hover Textfarbe) */
+    --md-sys-color-surface-container-high: #eee8f4;
+    /* Oberfläche Container (Widget Hintergrund) */
+    --md-sys-color-surface-container: #f3edfa;
+    /* Oberfläche Container (z.B. Antwort Button Hintergrund) */
+    --md-sys-color-on-surface-container: #1c1b1f;
+    /* Textfarbe auf Oberfläche Container */
+    --md-sys-color-error: #b3261e;
+    /* Fehlerfarbe (z.B. falsches Feedback) */
+    --md-sys-color-success: #4CAF50;
+    /* Eigene Erfolgsfarbe */
+    --md-sys-color-on-success: #ffffff;
+    /* Text auf Erfolgsfarbe */
+    --md-sys-color-correct-highlight: #d9ead3;
+    /* Farbe für richtige Antwort Hervorhebung (leicht grünlich) */
+
+
+    /* Schattenfarbe */
+    --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Material You Farbpalette (Beispiel - dunkle Variante) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --md-sys-color-primary: #d0bcff;
+        --md-sys-color-on-primary: #381e72;
+        --md-sys-color-background: #1c1b1f;
+        --md-sys-color-on-background: #e6e1e5;
+        --md-sys-color-surface: #1c1b1f;
+        --md-sys-color-on-surface: #e6e1e5;
+        --md-sys-color-surface-container-high: #36343b;
+        --md-sys-color-surface-container: #2a282d;
+        --md-sys-color-on-surface-container: #e6e1e5;
+        --md-sys-color-error: #f2b8b5;
+        --md-sys-color-success: #81C784;
+        /* Helleres Grün für Dark Mode */
+        --md-sys-color-on-success: #1b5e20;
+        --md-sys-color-correct-highlight: #3a4f3c;
+        /* Farbe für richtige Antwort Hervorhebung (dunkler, grünlich) */
+
+
+        /* Schattenfarbe für dunklen Modus */
+        --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
+    }
+}
+
+body {
+    background-color: transparent;
+    /* Hintergrund des Bodys transparent */
+    display: flex;
+    /* Aktiviere Flexbox für das Body-Element */
+    justify-content: center;
+    /* Horizontale Zentrierung */
+    align-items: center;
+    /* Vertikale Zentrierung (optional, je nach Notion-Einbettung) */
+    min-height: 100vh;
+    /* Stelle sicher, dass der body die volle Höhe des sichtbaren Bereichs hat (innerhalb des iFrame) */
+    margin: 0;
+    /* Entferne Standard-Margins des Body */
+    font-family: 'Roboto', sans-serif;
+    /* Material You Schrift */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.widget {
+    display: flex;
+    /* Flexbox, um Inhalt zu verteilen */
+    flex-direction: column;
+    justify-content: space-between;
+    /* Inhalt vertikal verteilen */
+
+    background-color: var(--md-sys-color-surface-container-high);
+    /* Hintergrund aus Palette */
+    color: var(--md-sys-color-on-surface-container);
+    /* Textfarbe aus Palette */
+    padding: 24px;
+    /* Mehr Padding */
+    border-radius: 28px;
+    /* Stärker abgerundete Ecken */
+    text-align: center;
+    width: 340px;
+    /* Breite beibehalten */
+    min-height: 220px;
+    /* Mindesthöhe beibehalten */
+    box-shadow: 0 4px 8px var(--md-sys-shadow-color);
+    /* Subtiler Schatten */
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    /* Padding in Breite/Höhe einschließen */
+}
+
+#aufgabe {
+    font-size: 1.6em;
+    /* Größer */
+    font-weight: bold;
+    margin-bottom: 24px;
+    /* Mehr Abstand */
+    flex-grow: 1;
+    /* Aufgabe darf wachsen und Platz einnehmen */
+    display: flex;
+    /* Flexbox für Zentrierung */
+    justify-content: center;
+    align-items: center;
+    color: var(--md-sys-color-on-surface-container);
+    /* Textfarbe aus Palette */
+    transition: color 0.3s ease;
+    min-height: 1.8em;
+    /* Mindesthöhe, um Layout-Sprünge zu vermeiden */
+}
+
+/* === Anpassungen für 2x2 Antwort-Layout === */
+.antworten {
+    display: flex;
+    /* Flexbox aktivieren */
+    flex-wrap: wrap;
+    /* Umbruch in die nächste Zeile erlauben */
+    justify-content: space-between;
+    /* Verteilt den horizontalen Platz */
+    gap: 16px;
+    /* Abstand zwischen den Buttons (vertikal und horizontal) */
+    margin-bottom: 24px;
+    width: 100%;
+    /* Sicherstellen, dass der Container die volle Breite nutzt */
+}
+
+.antworten button {
+    background-color: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface-container);
+    border: none;
+    padding: 16px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+
+    /* Breite berechnen, damit 2 Buttons pro Reihe passen, unter Berücksichtigung des Gaps */
+    width: calc(50% - (16px / 2));
+    /* 50% der Breite minus halber Gap-Wert */
+    box-sizing: border-box;
+    /* Padding und Border in die Breite einrechnen */
+
+    flex-grow: 0;
+    /* Nicht wachsen lassen über die berechnete Breite */
+    flex-shrink: 0;
+    /* Nicht schrumpfen lassen unter die berechnete Breite */
+    text-align: center;
+    /* Text im Button zentrieren */
+}
+
+.antworten button:hover {
+    background-color: #d9cadd;
+    /* Leicht dunkler/andere Oberfläche beim Hover (Beispiel) */
+    box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+    /* Schatten beim Hover erhöhen */
+    color: black;
+    /* Textfarbe beim Hover für besseren Kontrast */
+}
+
+/* Stil für den richtig hervorgehobenen Button */
+.antworten button.correct-answer-highlight {
+    background-color: var(--md-sys-color-correct-highlight);
+    /* Farbe aus Palette */
+    box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+    /* Schatten leicht erhöhen */
+    /* Textfarbe bleibt on-surface-container, sollte darauf gut lesbar sein */
+}
+
+/* Optional: Stil für deaktivierte Buttons nach der Auswahl */
+.antworten button:disabled {
+    opacity: 0.7;
+    /* Leicht transparent, wenn deaktiviert */
+    cursor: default;
+}
+
+.antworten button:disabled:hover {
+    background-color: var(--md-sys-color-surface-container);
+    /* Hover auf Disabled entfernen */
+    box-shadow: 0 1px 3px var(--md-sys-shadow-color);
+    color: var(--md-sys-color-on-surface-container);
+    /* Textfarbe zurücksetzen */
+}
+
+.antworten button.correct-answer-highlight:disabled:hover {
+    background-color: var(--md-sys-color-correct-highlight);
+    /* Hover auf Disabled Highlight entfernen */
+    box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+    color: var(--md-sys-color-on-surface-container);
+    /* Textfarbe zurücksetzen */
+}
+
+
+#feedback {
+    margin-bottom: 20px;
+    /* Mehr Abstand */
+    font-weight: bold;
+    font-size: 1em;
+    /* NEU: Kleinere Schriftgröße für Feedback */
+    min-height: 1.5em;
+    /* NEU: Größere Mindesthöhe für stabiles Layout */
+    display: flex;
+    /* Flexbox für Zentrierung */
+    justify-content: center;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+#feedback.richtig {
+    color: var(--md-sys-color-success);
+    /* Farbe aus Palette */
+}
+
+#feedback.falsch {
+    color: var(--md-sys-color-error);
+    /* Farbe aus Palette */
+}
+
+#neueAufgabe {
+    background-color: var(--md-sys-color-primary);
+    /* Hintergrund aus Palette (Primary Filled Button) */
+    color: var(--md-sys-color-on-primary);
+    /* Textfarbe aus Palette */
+    border: none;
+    padding: 14px 28px;
+    /* Mehr Padding für eine prominentere Schaltfläche */
+    border-radius: 28px;
+    /* Stärker abgerundete Ecken (Pill-Form angestrebt) */
+    cursor: pointer;
+    font-size: 1.1em;
+    /* Größer */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+    /* Subtiler Schatten */
+}
+
+#neueAufgabe:hover {
+    background-color: #553e91;
+    /* Dunkler beim Hover (Beispiel) */
+    box-shadow: 0 3px 6px var(--md-sys-shadow-color);
+    /* Schatten beim Hover erhöhen */
+}
