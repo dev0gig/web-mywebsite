@@ -25,19 +25,13 @@
 
     /* AppDrawer spezifische Variablen */
     --appdrawer-icon-background: #ffffff;
-    /* NEU: Explizit weißer Hintergrund für App-Icons */
-
     --appdrawer-search-icon-url-light: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
     --appdrawer-search-icon-url-dark: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cac4d0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
     --appdrawer-search-icon-size: 25px;
-    /* Angepasste Größe für die Lupe */
     --appdrawer-search-icon-padding-left: 12px;
-    /* Horizontaler Abstand des Icons vom Rand */
     --appdrawer-search-text-padding-left: calc(var(--appdrawer-search-icon-padding-left) + var(--appdrawer-search-icon-size) + 8px);
-    /* Padding für Text neben Icon */
 }
 
-/* Material You Farbpalette (Basis - dunkle Variante) */
 @media (prefers-color-scheme: dark) {
     :root {
         --md-sys-color-primary: #d0bcff;
@@ -61,8 +55,6 @@
         --md-sys-color-surface-container-high: #36343b;
         --md-sys-color-surface-container-highest: #44414c;
         --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
-        /* --appdrawer-icon-background bleibt #ffffff, es sei denn, du willst es hier ändern */
-        /* z.B. für dunkle Icons im Dark Mode: --appdrawer-icon-background: var(--md-sys-color-surface-container-low); */
     }
 }
 
@@ -74,6 +66,7 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: url('cursor/normal.cur'), default; /* Normaler Cursor für die Seite */
 }
 
 nav {
@@ -148,6 +141,7 @@ nav header p {
     padding: 12px 16px;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     box-shadow: none;
+    /* cursor: pointer; wird von der allgemeineren Regel unten abgedeckt */
 }
 
 .nav-buttons button img {
@@ -158,7 +152,7 @@ nav header p {
 .nav-buttons button:hover {
     background-color: var(--md-sys-color-surface-variant);
     color: var(--md-sys-color-on-surface-variant);
-    cursor: pointer;
+    /* cursor: pointer; wird von der allgemeineren Regel unten abgedeckt */
 }
 
 main {
@@ -184,10 +178,12 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    box-sizing: border-box; /* Stellt sicher, dass Padding und Border in die deklarierte Höhe und Breite des Elements eingerechnet werden. */
 }
 
 .box#box-favorites {
     grid-area: favorites;
+    height: 672px; /* Setzt eine feste Außenhöhe, basierend auf der berechneten Inhaltshöhe von #my-tools. */
 }
 
 .box#box-mails {
@@ -197,6 +193,7 @@ main {
 
 .box#my-tools {
     grid-area: tools;
+    align-self: start; /* Verhindert, dass dieses Grid-Item sich vertikal streckt; es nimmt nur die Höhe seines Inhalts ein. */
 }
 
 .box iframe {
@@ -207,6 +204,7 @@ main {
     background-color: var(--md-sys-color-surface-container-low);
 }
 
+/* Allgemeine Button-Stile in .box, #box-mails, #my-tools */
 .box>button,
 #box-mails>button,
 #my-tools>button {
@@ -227,6 +225,7 @@ main {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    /* cursor: pointer; wird von der allgemeineren Regel unten abgedeckt */
 }
 
 .box>button:hover,
@@ -235,7 +234,7 @@ main {
     background-color: var(--md-sys-color-surface-container-highest);
     transform: translateY(-2px);
     box-shadow: 0 3px 8px var(--md-sys-shadow-color);
-    cursor: pointer;
+    /* cursor: pointer; wird von der allgemeineren Regel unten abgedeckt */
 }
 
 #box-mails {
@@ -279,7 +278,7 @@ main {
     padding: 0 0 16px 0;
     background-color: transparent;
     border-bottom: 1px solid var(--md-sys-color-surface-variant);
-    margin-bottom: 16px;
+    /* margin-bottom: 16px; wurde entfernt, da 'gap' in .box#box-favorites den Abstand regelt. */
 }
 
 #box-favorites .app-title {
@@ -300,13 +299,12 @@ main {
     transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
     background-color: var(--md-sys-color-surface-container-low);
     background-image: var(--appdrawer-search-icon-url-light);
-    /* Standardmäßig Light-Mode Icon */
     background-repeat: no-repeat;
     background-position: var(--appdrawer-search-icon-padding-left) center;
     background-size: var(--appdrawer-search-icon-size) var(--appdrawer-search-icon-size);
-    /* Nur Icon-Größe, da nur ein BG-Image */
     color: var(--md-sys-color-on-surface);
     outline: none;
+    /* cursor: text; wird von der allgemeineren Regel unten abgedeckt */
 }
 
 #box-favorites #searchInput::placeholder {
@@ -322,7 +320,6 @@ main {
 #box-favorites #searchInput:focus {
     border-color: var(--md-sys-color-primary);
     background-color: var(--md-sys-color-surface);
-    /* Icon bleibt dasselbe wie im Normalzustand, außer es wird im Dark Mode überschrieben */
     background-image: var(--appdrawer-search-icon-url-light);
     box-shadow: 0 1px 6px rgba(var(--md-sys-color-primary-rgb, 103, 80, 164), 0.25);
     color: var(--md-sys-color-on-surface);
@@ -334,10 +331,14 @@ main {
 }
 
 #box-favorites .app-container {
-    display: flex;
-    flex-flow: row wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 70px);
+    justify-content: space-between;
     gap: 17px;
     padding: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 #box-favorites .app-item {
@@ -359,8 +360,6 @@ main {
     border-radius: 50% !important;
     border: none !important;
     background-color: var(--appdrawer-icon-background) !important;
-    /* Weißer Hintergrund für Icons */
-    /* background-image wird per JS direkt auf das Element gesetzt! */
     background-repeat: no-repeat !important;
     background-position: center center !important;
     background-size: cover !important;
@@ -369,7 +368,7 @@ main {
     display: block !important;
     box-shadow: 0 1px 3px var(--md-sys-shadow-color);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
+    /* cursor: pointer; wird von der allgemeineren Regel unten abgedeckt */
     color: initial;
     text-align: initial;
     justify-content: initial;
@@ -396,7 +395,6 @@ main {
     #box-favorites #searchInput {
         background-color: var(--md-sys-color-surface-container-lowest);
         background-image: var(--appdrawer-search-icon-url-dark);
-        /* Dark-Mode Icon */
         color: var(--md-sys-color-on-surface);
         border-color: var(--md-sys-color-outline);
     }
@@ -409,7 +407,6 @@ main {
         border-color: var(--md-sys-color-primary);
         background-color: var(--md-sys-color-surface);
         background-image: var(--appdrawer-search-icon-url-dark);
-        /* Dark-Mode Icon bei Fokus */
         color: var(--md-sys-color-on-surface);
     }
 
@@ -418,20 +415,60 @@ main {
         opacity: 0.7;
     }
 
-    /* App-Icon Hintergrund bleibt weiß, es sei denn --appdrawer-icon-background wird im Dark :root überschrieben */
-    /* Keine spezifische Änderung für .button-circle background-color hier, wenn es weiß bleiben soll */
     #box-favorites .app-item .button-circle {
-        /* background-color: var(--appdrawer-icon-background) !important; Ist bereits oben gesetzt */
         box-shadow: 0 1px 3px var(--md-sys-shadow-color);
-        /* Nutzt Dark Mode Schattenvariable */
     }
 
     #box-favorites .app-item .button-circle:hover {
         box-shadow: 0 3px 8px var(--md-sys-shadow-color);
-        /* Nutzt Dark Mode Schattenvariable */
     }
 
     #box-favorites .app-item .app-id-label {
         color: var(--md-sys-color-on-surface-variant);
     }
+}
+
+/* =========== Dezenter Scrollbalken für App-Container (Nur WebKit) =========== */
+#box-favorites .app-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#box-favorites .app-container::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+#box-favorites .app-container::-webkit-scrollbar-thumb {
+    background-color: var(--md-sys-color-outline);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+#box-favorites .app-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--md-sys-color-on-surface-variant);
+}
+
+/* =========== Benutzerdefinierte Cursor-Stile =========== */
+/* Diese Regel ist globaler, um Redundanz zu vermeiden */
+button,
+.button-circle,
+.nav-buttons button,
+#box-mails > button,
+#my-tools > button,
+a[href] {
+    cursor: url('cursor/pointer.cur'), pointer; /* Klickbarer Cursor (Hand-Ersatz) */
+}
+
+/* Cursor für Texteingabefelder */
+#searchInput,
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+textarea {
+    cursor: url('cursor/text.cur'), text; /* Texteingabe-Cursor (I-Balken-Ersatz) */
 }
