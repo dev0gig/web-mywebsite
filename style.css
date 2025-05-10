@@ -335,7 +335,8 @@ main {
     grid-template-columns: repeat(auto-fill, 70px);
     justify-content: space-between;
     gap: 17px;
-    padding: 0;
+    padding: 15px;
+    margin-right: -5px;
     flex-grow: 1;
     overflow-y: auto;
     min-height: 0;
