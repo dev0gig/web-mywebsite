@@ -360,9 +360,9 @@ const appsData = [
         ariaLabel: "LEGO"
     },
     {
-        id: "SunContracting EURO BOND",
+        id: "SunContracting",
         iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0fg2blaCobbugLH35r6a_lkr94SU6ukqqjw&s",
         targetUrl: "https://xserv.kdportal.de/show/Kunde_Vertraege",
-        ariaLabel: "SunContracting EURO BOND"
+        ariaLabel: "SunContracting"
     }
 ];
