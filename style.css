@@ -277,7 +277,7 @@ main {
     justify-content: space-between;
     align-items: center;
     padding: 0 0 16px 0;
-    gap: 19px;
+    gap: 20px;
     background-color: transparent;
     border-bottom: 1px solid var(--md-sys-color-surface-variant);
     margin-bottom: 16px;
