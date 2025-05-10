@@ -352,5 +352,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/RSKcY3dSvYVqPgabkZ3xmAjzpOBKmgmMZNOxLvxeab3cHmrcFvW_DeIPY863FWA1sOA=s48-rw",
         targetUrl: "https://discord.com/channels/@me",
         ariaLabel: "Discord"
+    },
+    {
+        id: "LEGO",
+        iconUrl: "https://play-lh.googleusercontent.com/Yo7a2-xXFXSo8nl26mijVMxjfN6cPKUQTtbOQPYdY6ZPfA2ryA-xDosrpGCr01XwMQ=s48-rw",
+        targetUrl: "https://www.lego.com/de-at/member",
+        ariaLabel: "LEGO"
     }
 ];
