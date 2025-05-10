@@ -340,5 +340,17 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/DHBlQKvUNbopIS-VjQb3fUKQ_QH0Em-Q66AwG6LwD1Sach3lUvEWDb6hh8xNvKGmctU=w240-h480-rw",
         targetUrl: "https://wallet.google.com/",
         ariaLabel: "GoogleWallet"
+    },
+    {
+        id: "AppleTV+",
+        iconUrl: "https://play-lh.googleusercontent.com/zovfDsfyegE7SF3hCrN_hWPiQ2VLSh_Hreg20YsgQD5d9rfeq_HLA1fdq3q9zn-QNg=s48-rw",
+        targetUrl: "https://tv.apple.com/at",
+        ariaLabel: "AppleTV+"
+    },
+    {
+        id: "Discord",
+        iconUrl: "https://play-lh.googleusercontent.com/RSKcY3dSvYVqPgabkZ3xmAjzpOBKmgmMZNOxLvxeab3cHmrcFvW_DeIPY863FWA1sOA=s48-rw",
+        targetUrl: "https://discord.com/channels/@me",
+        ariaLabel: "Discord"
     }
 ];
