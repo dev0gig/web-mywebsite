@@ -54,10 +54,10 @@ const appsData = [
         ariaLabel: "Paypal"
     },
     {
-        id: "GoogleCalendar",
-        iconUrl: "https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480",
-        targetUrl: "https://calendar.google.com/",
-        ariaLabel: "GoogleCalendar"
+        id: "GooglePhotos",
+        iconUrl: "https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA=w240-h480-rw",
+        targetUrl: "https://photos.google.com/",
+        ariaLabel: "GooglePhotos"
     },
     {
         id: "Udemy",
@@ -334,5 +334,11 @@ const appsData = [
         iconUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c0/PDF24_Creator_application_logo_256x256.png",
         targetUrl: "https://tools.pdf24.org/de/alle-tools",
         ariaLabel: "PDF24"
+    },
+    {
+        id: "GoogleWallet",
+        iconUrl: "https://play-lh.googleusercontent.com/DHBlQKvUNbopIS-VjQb3fUKQ_QH0Em-Q66AwG6LwD1Sach3lUvEWDb6hh8xNvKGmctU=w240-h480-rw",
+        targetUrl: "https://wallet.google.com/",
+        ariaLabel: "GoogleWallet"
     }
 ];
