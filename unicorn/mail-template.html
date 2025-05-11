@@ -178,10 +178,17 @@
 
 
     .button-single:hover {
-        background-color: var(--md-sys-color-surface);
-        box-shadow: 0 2px 8px var(--md-sys-shadow-color);
+        background-color: var(--md-sys-color-surface-container-high);
+        /* Hintergrund beim Hover */
+        border-color: transparent;
+        /* Hover Border entfernen */
+        color: var(--md-sys-color-on-surface-container);
+        /* Textfarbe sollte gut auf Hover-Farbe passen */
         transform: translateY(-2px);
-        color: var(--md-sys-color-on-surface);
+        /* Leichter Hover-Effekt */
+        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+        /* Schatten beim Hover erhöhen */
+        cursor: pointer;
     }
 
     /* --- Styling für das Textfeld --- */
@@ -234,7 +241,8 @@
                         <button class="button-single" id="abmeldung"
                             data-template="mail-template-txt/abmeldung.txt">Abmeldung</button>
                         <button class="button-single" id="re-korr-falsche-zählerstände"
-                            data-template="mail-template-txt/re-korr-falsche-zählerstände.txt">RE Korrektur, falsche Zählerstände</button>
+                            data-template="mail-template-txt/re-korr-falsche-zählerstände.txt">RE Korrektur, falsche
+                            Zählerstände</button>
                         <button class="button-single" id="pv-kein-zählpunkt"
                             data-template="mail-template-txt/pv-kein-zp.txt">PV - kein Zählpunkt</button>
                         <button class="button-single" id="pv-angebot-geschickt"

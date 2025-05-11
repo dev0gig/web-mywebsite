@@ -174,12 +174,15 @@
     }
 
     .button-single:hover {
-        /* Hover Farbe basierend auf Button Hintergrundfarbe */
-        background-color: var(--md-sys-color-surface);
-        box-shadow: 0 2px 4px var();
+        background-color: var(--md-sys-color-surface-container-high);
+        /* Hintergrund beim Hover */
+        border-color: transparent;
+        /* Hover Border entfernen */
+        color: var(--md-sys-color-on-surface-container);
+        /* Textfarbe sollte gut auf Hover-Farbe passen */
         transform: translateY(-2px);
         /* Leichter Hover-Effekt */
-        box-shadow: 0 1px 8px var(--md-sys-shadow-color);
+        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
         /* Schatten beim Hover erhöhen */
         cursor: pointer;
     }
