@@ -1,62 +1,3 @@
-/* Material You Farbpalette (Beispiel - helle Variante als Standard) */
-:root {
-    --md-sys-color-primary: #6750a4;
-    /* Primärfarbe (z.B. Nächste Aufgabe Button) */
-    --md-sys-color-on-primary: #ffffff;
-    /* Text auf Primärfarbe */
-    --md-sys-color-background: #fffbfe;
-    /* Hintergrund (nicht für Body) */
-    --md-sys-color-on-background: #1c1b1f;
-    /* Text auf Hintergrund */
-    --md-sys-color-surface: #fffbfe;
-    /* Oberfläche (für Hover Textfarbe) */
-    --md-sys-color-on-surface: #1c1b1f;
-    /* Text auf Oberfläche (für Hover Textfarbe) */
-    --md-sys-color-surface-container-high: #eee8f4;
-    /* Oberfläche Container (Widget Hintergrund) */
-    --md-sys-color-surface-container: #f3edfa;
-    /* Oberfläche Container (z.B. Antwort Button Hintergrund) */
-    --md-sys-color-on-surface-container: #1c1b1f;
-    /* Textfarbe auf Oberfläche Container */
-    --md-sys-color-error: #b3261e;
-    /* Fehlerfarbe (z.B. falsches Feedback) */
-    --md-sys-color-success: #4CAF50;
-    /* Eigene Erfolgsfarbe */
-    --md-sys-color-on-success: #ffffff;
-    /* Text auf Erfolgsfarbe */
-    --md-sys-color-correct-highlight: #d9ead3;
-    /* Farbe für richtige Antwort Hervorhebung (leicht grünlich) */
-
-
-    /* Schattenfarbe */
-    --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
-}
-
-/* Material You Farbpalette (Beispiel - dunkle Variante) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --md-sys-color-primary: #d0bcff;
-        --md-sys-color-on-primary: #381e72;
-        --md-sys-color-background: #1c1b1f;
-        --md-sys-color-on-background: #e6e1e5;
-        --md-sys-color-surface: #1c1b1f;
-        --md-sys-color-on-surface: #e6e1e5;
-        --md-sys-color-surface-container-high: #36343b;
-        --md-sys-color-surface-container: #2a282d;
-        --md-sys-color-on-surface-container: #e6e1e5;
-        --md-sys-color-error: #f2b8b5;
-        --md-sys-color-success: #81C784;
-        /* Helleres Grün für Dark Mode */
-        --md-sys-color-on-success: #1b5e20;
-        --md-sys-color-correct-highlight: #3a4f3c;
-        /* Farbe für richtige Antwort Hervorhebung (dunkler, grünlich) */
-
-
-        /* Schattenfarbe für dunklen Modus */
-        --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
-    }
-}
-
 body {
     background-color: transparent;
     /* Hintergrund des Bodys transparent */
@@ -85,12 +26,14 @@ body {
 
     background-color: var(--md-sys-color-surface-container-high);
     /* Hintergrund aus Palette */
-    color: var(--md-sys-color-on-surface-container);
+    color: var(--md-sys-color-on-surface);
     /* Textfarbe aus Palette */
     padding: 24px;
     /* Mehr Padding */
     border-radius: 28px;
     /* Stärker abgerundete Ecken */
+    border: 1px solid var(--md-sys-color-outline);
+    /* Optional: Rahmen hinzufügen */
     text-align: center;
     width: 340px;
     /* Breite beibehalten */

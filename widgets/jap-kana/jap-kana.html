@@ -5,69 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hiragana & Katakana Übung</title>
+    <link rel="stylesheet" href="../../global/color-palette.css">
     <style>
-        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
-        :root {
-            --md-sys-color-primary: #6750a4;
-            /* Akzentfarbe */
-            --md-sys-color-on-primary: #ffffff;
-            --md-sys-color-background: transparent;
-            /* Hintergrund */
-            --md-sys-color-on-background: #1c1b1f;
-            /* Text auf Hintergrund */
-            --md-sys-color-surface: #f3edfa;
-            /* Oberfläche (z.B. Container) */
-            --md-sys-color-on-surface: #1c1b1f;
-            /* Text auf Oberfläche */
-            --md-sys-color-surface-variant: #eaddff;
-            /* Oberfläche Variante (z.B. Control Buttons) */
-            --md-sys-color-on-surface-variant: #1c1b1f;
-            /* Text auf Oberfläche Variante */
-            --md-sys-color-outline: #79747e;
-            /* Umriss Farbe */
-            --md-sys-color-error: #b3261e;
-            /* Fehlerfarbe */
-            --md-sys-color-on-error: #ffffff;
-            --md-sys-color-success: #4CAF50;
-            /* Eigene Farbe für Erfolg */
-
-            /* Schattenfarbe für helle und dunkle Modi */
-            --md-sys-shadow-color: rgba(0, 0, 0, 0.1);
-        }
-
-        /* Material You Farbpalette (Beispiel - dunkle Variante) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --md-sys-color-primary: #d0bcff;
-                /* Hellere Akzentfarbe für Dark Mode */
-                --md-sys-color-on-primary: #381e72;
-                /* Dunklerer Text auf Akzentfarbe */
-                --md-sys-color-background: transparent;
-                /* Dunkler Hintergrund */
-                --md-sys-color-on-background: #e6e1e5;
-                /* Heller Text auf Hintergrund */
-                --md-sys-color-surface: #2a282d;
-                /* Dunklere Oberfläche (leicht vom Hintergrund abgesetzt) */
-                --md-sys-color-on-surface: #e6e1e5;
-                /* Heller Text auf Oberfläche */
-                --md-sys-color-surface-variant: #49454f;
-                /* Dunklere Oberfläche Variante */
-                --md-sys-color-on-surface-variant: #cac4d0;
-                /* Hellerer Text auf Oberfläche Variante */
-                --md-sys-color-outline: #938f99;
-                --md-sys-color-error: #f2b8b5;
-                /* Helleres Rot für Dark Mode */
-                --md-sys-color-on-error: #601410;
-                --md-sys-color-success: #81C784;
-                /* Helleres Grün für Dark Mode */
-
-                /* Schattenfarbe für dunklen Modus (kann subtiler sein) */
-                --md-sys-shadow-color: rgba(0, 0, 0, 0.25);
-                /* Schatten sind in Dark Mode weniger auffällig */
-            }
-        }
-
-
         body {
             font-family: 'Roboto', sans-serif;
             /* Optional: Roboto oder eine ähnliche Schrift */
@@ -76,7 +15,7 @@
             /* Zentriert horizontal */
             align-items: center;
             /* Zentriert vertikal */
-            background-color: var(--md-sys-color-background);
+            background-color: var(--md-sys-color-surface-container-low);
             /* Hintergrundfarbe aus Palette */
             color: var(--md-sys-color-on-background);
             /* Textfarbe aus Palette */
@@ -136,10 +75,11 @@
         }
 
         .container {
-            background-color: var(--md-sys-color-surface);
+            background-color: var(--md-sys-color-surface-container);
             /* Hintergrund aus Palette */
             border-radius: 24px;
             /* Sehr stark abgerundete Ecken */
+            border: 1px solid var(--md-sys-color-outline);
             box-shadow: 0 4px 8px var(--md-sys-shadow-color);
             /* Schattenfarbe aus Variable */
             padding: 40px;

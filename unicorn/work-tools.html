@@ -6,91 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WE-Tools</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/6193/6193286.png" />
+    <link rel="stylesheet" href="../global/color-palette.css">
 </head>
 
 <style>
-    /*
-    CSS-Variablen für das Material You Design (Heller Modus)
-    Angepasst für Buttons in Graustufen und roten Floating Button.
-    */
-    :root {
-        --color-primary: #6750a4;
-        /* Kann unbenutzt bleiben */
-        --color-on-primary: #ffffff;
-        --color-primary-container: #eaddff;
-        /* Kann unbenutzt bleiben */
-        --color-on-primary-container: #21005d;
-
-        --color-surface: #fef7ff;
-        /* Hintergrundfarbe für Oberflächen/Container */
-        --color-on-surface: #1c1b1e;
-        /* Textfarbe auf Oberflächen */
-        --color-background: #fef7ff;
-        /* Haupt-Hintergrundfarbe */
-        --color-on-background: #1c1b1e;
-        /* Textfarbe auf Haupt-Hintergrund */
-
-        --color-outline: #79747e;
-        /* Farbe für Umrandungen/Trenner */
-        --color-link: #006688;
-        /* Standard-Linkfarbe (für Links im Header etc.) */
-        --color-link-hover: #004466;
-        /* Linkfarbe beim Hover */
-
-        --color-card-background: #fffbfe;
-        /* Hintergrundfarbe für die "Karten" (Boxen) */
-
-        /* Farben für die Buttons in Graustufen (Heller Modus) */
-        --color-button-background: #e0e0e0;
-        /* Helles Grau */
-        --color-button-on-background: #212121;
-        /* Sehr dunkles Grau/Fast Schwarz als Text */
-
-        /* Farben für den roten Floating Button (nach MD3 Error-Farben) */
-        --color-floating-button-background: #ba1a1a;
-        /* Kräftiges Rot */
-        --color-floating-button-on-background: #ffffff;
-        /* Weißer Text */
-    }
-
-    /*
-    CSS-Variablen für das Material You Design (Dunkler Modus)
-    Angepasst für Buttons in Graustufen und roten Floating Button im Dark Mode.
-    */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --color-primary: #d0bcff;
-            /* Kann unbenutzt bleiben */
-            --color-on-primary: #381e72;
-            --color-primary-container: #4f378a;
-            /* Kann unbenutzt bleiben */
-            --color-on-primary-container: #eaddff;
-
-            --color-surface: #1c1b1e;
-            --color-on-surface: #e6e1e6;
-            --color-background: #1c1b1e;
-            --color-on-background: #e49c3d;
-
-            --color-outline: #938f99;
-            --color-link: #4fcbd8;
-            --color-link-hover: #6ff9ff;
-
-            --color-card-background: #36343B;
-
-            /* Farben für die Buttons in Graustufen (Dark Mode) */
-            --color-button-background: #2C2A2F;
-            /* Dunkleres Grau */
-            --color-button-on-background: #eeeeee;
-            /* Sehr helles Grau als Text */
-
-            /* Farben für den roten Floating Button im Dark Mode */
-            --color-floating-button-background: #ffb4ab;
-            /* Helleres Rot */
-            --color-floating-button-on-background: #690005;
-            /* Dunklerer Text */
-        }
-    }
-
     /*
     Grundlegende Styles für Body und allgemeine Elemente
     */
@@ -101,8 +20,8 @@
         padding: 10px 50px;
         padding-bottom: 80px;
         /* Platz am unteren Rand für den Floating Button lassen */
-        background-color: var(--color-background);
-        color: var(--color-on-background);
+        background-color: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-surface);
         transition: background-color 0.3s ease, color 0.3s ease;
         position: relative;
         min-height: 100vh;
@@ -118,8 +37,7 @@
     Styles für den Header-Bereich
     */
     header {
-        background-color: var(--color-surface);
-        color: var(--color-on-surface);
+        color: var(--md-sys-color-on-surface);
     }
 
     .header-box {
@@ -142,7 +60,7 @@
     }
 
     .header-link {
-        color: var(--color-on-surface);
+        color: var(--md-sys-color-on-surface);
         text-decoration: none;
         padding: 5px 10px;
         border-radius: 4px;
@@ -150,9 +68,9 @@
     }
 
     .header-link:hover {
-        background-color: var(--color-button-background);
+        background-color: var(--md-sys-color-surface-variant);
         /* Hintergrund beim Hover */
-        color: var(--color-button-on-surface);
+        color: var(--md-sys-color-on-surface-variant);
         /* Textfarbe beim Hover */
         box-shadow: none;
         /* Kein Schatten beim Hover standardmäßig */
@@ -171,7 +89,7 @@
         font-size: 3em;
         font-weight: bold;
         margin-bottom: 20px;
-        color: var(--color-on-background);
+        color: var(--md-sys-color-error);
         text-align: center;
     }
 
@@ -189,11 +107,11 @@
     Passt sich dem Browserfenster an und versucht, 4 pro Reihe zu zeigen.
     */
     .box-tools {
-        background-color: var(--color-card-background);
-        color: var(--color-on-surface);
+        background-color: var(--md-sys-color-surface-container);
+        color: var(--md-sys-color-on-surface);
         padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 8px var(--md-sys-shadow-color);
         display: flex;
         flex-direction: column;
         flex: 1 400px;
@@ -204,9 +122,9 @@
         font-weight: bold;
         margin-top: 0;
         margin-bottom: 15px;
-        color: var(--color-on-surface);
+        color: var(--md-sys-color-on-surface);
         text-align: center;
-        border-bottom: 1px solid var(--color-outline);
+        border-bottom: 1px solid var(--md-sys-color-outline);
         padding-bottom: 10px;
     }
 
@@ -232,14 +150,14 @@
     */
     .button-single {
         appearance: none;
-        border: 1px black solid;
+        border: 1px solid var(--md-sys-color-outline);
         outline: none;
         cursor: pointer;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 
         /* Farben aus den neuen Button-Variablen (Graustufen) */
-        background-color: var(--color-button-background);
-        color: var(--color-button-on-background);
+        background-color: var(--md-sys-color-surface-variant);
+        color: var(--md-sys-color-surface-on-variant);
 
         padding: 12px 16px;
         border-radius: 10px;
@@ -257,19 +175,13 @@
 
     .button-single:hover {
         /* Hover Farbe basierend auf Button Hintergrundfarbe */
-        background-color: color-mix(in srgb, var(--color-button-background) 90%, black 10%);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: var(--md-sys-color-surface);
+        box-shadow: 0 2px 4px var();
         transform: translateY(-2px);
         /* Leichter Hover-Effekt */
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 8px var(--md-sys-shadow-color);
         /* Schatten beim Hover erhöhen */
         cursor: pointer;
-    }
-
-    .button-single:active {
-        /* Active Farbe basierend auf Button Hintergrundfarbe */
-        background-color: color-mix(in srgb, var(--color-button-background) 80%, black 20%);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
 
     /* Styles für den zusätzlichen Text innerhalb der Boxen */
@@ -277,7 +189,7 @@
         font-size: 0.9em;
         margin-top: 0;
         margin-bottom: 5px;
-        color: var(--color-on-surface);
+        color: var(--md-sys-color-on-surface);
         text-align: center;
     }
 
@@ -300,109 +212,10 @@
         font-weight: bold;
         box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
         transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-
-        background-color: var(--color-floating-button-background);
-        color: var(--color-floating-button-on-background);
     }
 
     .floating-mail-button:hover {
-        background-color: color-mix(in srgb, var(--color-floating-button-background) 90%, black 10%);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
         transform: translateY(-2px);
-    }
-
-    .floating-mail-button:active {
-        background-color: color-mix(in srgb, var(--color-floating-button-background) 80%, black 20%);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-        transform: translateY(0);
-    }
-
-
-    /*
-    Responsive Anpassungen für kleinere Bildschirme
-    */
-    @media (max-width: 1200px) {
-
-        /* Anpassung: Bei kleineren Breiten als 1200px (Beispielwert für 4 Boxen) */
-        .box-tools {
-            /* Versuch, 3 Boxen pro Reihe zu zeigen */
-            flex: 0 0 calc(33.33% - 13.33px);
-            /* 33.33% Breite minus 13.33px (Hälfte von 20px Gap verteilt auf 3 Boxen) */
-        }
-    }
-
-
-    @media (max-width: 800px) {
-
-        /* Anpassung: Bei kleineren Breiten als 800px (Beispielwert für 2 Boxen) */
-        .tools-main {
-            justify-content: center;
-            /* Boxen zentrieren, wenn nur 1 oder 2 pro Reihe passen */
-        }
-
-        .box-tools {
-            /* Versuch, 2 Boxen pro Reihe zu zeigen */
-            flex: 0 0 calc(50% - 10px);
-            /* 50% Breite minus 10px (Hälfte von 20px Gap) */
-            max-width: none;
-            /* Max-width entfernen, damit 50% erreicht wird */
-        }
-
-        /* Floating Button: Kleinere Abstände */
-        .floating-mail-button {
-            bottom: 15px;
-            right: 15px;
-            padding: 14px 20px;
-            font-size: 1em;
-        }
-
-        body {
-            padding-bottom: 70px;
-        }
-    }
-
-    @media (max-width: 500px) {
-
-        /* Anpassung: Bei sehr kleinen Breiten */
-        .header-box {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .header-right {
-            width: 100%;
-            gap: 10px 15px;
-        }
-
-        .header-link {
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        .tools-main {
-            flex-direction: column;
-            /* Boxen untereinander stapeln */
-            align-items: center;
-            /* Boxen zentrieren */
-        }
-
-        .box-tools {
-            width: 95%;
-            /* Boxen nehmen fast die ganze Breite ein */
-            max-width: none;
-        }
-
-        /* Buttons gehen hier automatisch in eine Spalte */
-        .button-group-tools {
-            flex-direction: column;
-            /* Tasten explizit untereinander auf kleinen Screens */
-            gap: 10px;
-        }
-
-        .button-single {
-            width: 100%;
-            /* Tasten nehmen volle Breite ein */
-        }
     }
 </style>
 

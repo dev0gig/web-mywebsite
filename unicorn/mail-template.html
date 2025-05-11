@@ -6,55 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mailvorlagen</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/7285/7285521.png" />
-
+    <link rel="stylesheet" href="../global/color-palette.css" />
 </head>
 
 <style>
-    /* style.css */
-
-    /* --- Material You Color Palette (Light Mode) --- */
-    :root {
-        --primary-color: #6750A4;
-        /* Typisches Material You Lila */
-        --on-primary-color: #FFFFFF;
-        --surface-color: #FFFBFE;
-        /* Heller Hintergrund */
-        --on-surface-color: #1C1B1F;
-        /* Dunkler Text */
-        --surface-container-color: #EADDFF;
-        /* Leichter Akzent für Container/Buttons */
-        --outline-color: #7A757F;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-        /* Leichter Schatten */
-        --gap-size: 10px;
-        /* Variable für den Abstand */
-    }
-
-    /* --- Material You Color Palette (Dark Mode) --- */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --primary-color: #2A282D;
-            --on-primary-color: #E6E1E5;
-            --surface-color: #1C1B1F;
-            /* Dunkler Hintergrund */
-            --on-surface-color: #E6E1E5;
-            /* Heller Text */
-            --surface-container-color: #36343B;
-            /* Dunkler Akzent für Container/Buttons */
-            --outline-color: #ffa72d;
-            --shadow-color: rgba(0, 0, 0, 0.5);
-            /* Dunklerer Schatten */
-        }
-    }
-
     /* --- Allgemeine Stile --- */
     body {
         font-family: 'Roboto', sans-serif;
         margin: 0;
         padding: 20px;
         /* Abstand vom Rand des Browserfensters */
-        background-color: var(--surface-color);
-        color: var(--on-surface-color);
+        background-color: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-background);
         transition: background-color 0.3s ease, color 0.3s ease;
         min-height: 100vh;
         display: flex;
@@ -79,7 +42,7 @@
         display: flex;
         flex-direction: row;
         /* Standardmäßig nebeneinander */
-        gap: var(--gap-size);
+        gap: 10px;
         /* Abstand zwischen den Spalten */
         /* Höhe so berechnen, dass sie die verfügbare Viewport-Höhe ausfüllt (abzgl. body padding) */
         height: calc(100vh - 2 * 20px);
@@ -99,7 +62,7 @@
         /* Beide Spalten nehmen weiterhin gleich viel Platz ein */
         overflow-y: auto;
         /* Erlaubt Scrollen innerhalb der Spalten, falls Inhalt zu lang ist */
-        padding-right: var(--gap-size);
+        padding-right: 10px;
         /* Platz für die Scrollbar und Abstand zum rechten Rand der Spalte */
     }
 
@@ -113,7 +76,7 @@
             /* Begrenzte Höhe, damit das Textfeld sichtbar bleibt */
             padding-right: 0;
             /* Kein zusätzliches Padding rechts, da es jetzt 100% Breite hat */
-            margin-bottom: var(--gap-size);
+            margin-bottom: 10px;
             /* Abstand zum Textfeld unten */
         }
 
@@ -130,11 +93,11 @@
 
     /* --- Styling für Details (Klappbare Bereiche) --- */
     .box-mail {
-        background-color: var(--surface-container-color);
+        background-color: var(--md-sys-color-surface-container);
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
-        box-shadow: 0 2px 4px var(--shadow-color);
+        box-shadow: 0 2px 4px var(--md-sys-shadow-color);
         transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -146,7 +109,7 @@
 
         &::marker,
         &::-webkit-details-marker {
-            color: var(--on-surface-color);
+            color: var(--md-sys-color-surface);
         }
     }
 
@@ -156,7 +119,7 @@
         /* Horizontal */
         flex-wrap: wrap;
         /* Bei Bedarf in die nächste Zeile umbrechen */
-        gap: var(--gap-size);
+        gap: 10px;
         /* Abstand zwischen den Buttons */
         margin-top: 10px;
     }
@@ -165,7 +128,7 @@
     .button-single {
         /* --- GEÄNDERT: Breite so berechnen, dass 5 Buttons in eine Reihe passen (inkl. Gap) --- */
         /* Berechnung: (Gesamte Breite - (Anzahl Buttons - 1) * Gap) / Anzahl Buttons */
-        width: calc((100% - (5 - 1) * var(--gap-size)) / 5);
+        width: calc((100% - (5 - 1) * 10px) / 5);
         /* Breite für 5 Buttons pro Reihe */
 
         /* Flex-Shrink erlauben, falls der Platz sehr eng wird */
@@ -177,16 +140,16 @@
         overflow: hidden;
 
         padding: 12px 20px;
-        border: 1px black solid;
+        border: 1px solid var(--md-sys-color-outline);
         border-radius: 10px;
-        background-color: var(--primary-color);
-        color: var(--on-primary-color);
+        background-color: var(--md-sys-color-surface-variant);
+        color: var(--md-sys-color-on-surface-variant);
         font-size: 1rem;
         cursor: pointer;
         text-align: left;
         /* Text linksbündig lassen, wie vorher */
         transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-        box-shadow: 0 1px 3px var(--shadow-color);
+        box-shadow: 0 1px 3px var(--md-sys-shadow-color);
     }
 
     /* Anpassung für kleinere Bildschirme, wo vielleicht nur 1, 2 oder 3 Buttons pro Reihe passen */
@@ -195,14 +158,14 @@
         /* Beispiel Breakpoint, anpassen falls nötig */
         .mail-main--left .button-group-mail .button-single {
             /* Versuch, 3 oder 4 pro Reihe zu bekommen, flex-wrap hilft dabei */
-            width: calc((100% - (3 - 1) * var(--gap-size)) / 3);
+            width: calc((100% - (3 - 1) * 10px) / 3);
         }
     }
 
     @media (max-width: 768px) {
         .mail-main--left .button-group-mail .button-single {
             /* Wenn Spalten gestapelt sind und linke Spalte 100% Breite hat, 2 oder 3 pro Reihe versuchen */
-            width: calc((100% - (2 - 1) * var(--gap-size)) / 2);
+            width: calc((100% - (2 - 1) * 10px) / 2);
         }
     }
 
@@ -215,16 +178,11 @@
 
 
     .button-single:hover {
-        background-color: var(--outline-color);
-        box-shadow: 0 2px 8px var(--shadow-color);
+        background-color: var(--md-sys-color-surface);
+        box-shadow: 0 2px 8px var(--md-sys-shadow-color);
         transform: translateY(-2px);
-        color: var(--primary-color);
+        color: var(--md-sys-color-on-surface);
     }
-
-    .button-single:active {
-        background-color: color-mix(in srgb, var(--primary-color), var(--on-primary-color) 30%);
-    }
-
 
     /* --- Styling für das Textfeld --- */
     #outputArea {
@@ -232,42 +190,18 @@
         height: 90%;
         /* Nimmt die gesamte Höhe des rechten Containers ein */
         padding: 15px;
-        border: 1px solid var(--outline-color);
+        border: 1px solid var(--md-sys-color-outline);
         border-radius: 12px;
         font-size: 1.2rem;
         font-family: 'Times New Roman', Times, serif;
-        background-color: var(--surface-color);
-        color: var(--on-surface-color);
+        background-color: var(--md-sys-color-on-secondary);
+        color: var(--md-sys-color-secondary);
         resize: none;
         box-sizing: border-box;
         overflow-y: auto;
         /* Erlaubt Scrollen innerhalb des Textfeldes */
         transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         outline: none;
-    }
-
-    #outputArea:focus {
-        border-color: var(--primary-color);
-    }
-
-    /* --- Verbesserungen für Scrollbars (optional) --- */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--surface-container-color);
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--outline-color);
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: color-mix(in srgb, var(--outline-color), var(--primary-color) 20%);
     }
 </style>
 

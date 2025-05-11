@@ -1,63 +1,3 @@
-/* Material You Farbpalette & AppDrawer Variablen */
-:root {
-    /* Material You Basisfarben (Light Mode) */
-    --md-sys-color-primary: #6750a4;
-    --md-sys-color-on-primary: #ffffff;
-    --md-sys-color-secondary: #625b71;
-    --md-sys-color-on-secondary: #ffffff;
-    --md-sys-color-tertiary: #7d5260;
-    --md-sys-color-on-tertiary: #ffffff;
-    --md-sys-color-error: #b3261e;
-    --md-sys-color-on-error: #ffffff;
-    --md-sys-color-background: #fffbfe;
-    --md-sys-color-on-background: #1c1b1f;
-    --md-sys-color-surface: #fffbfe;
-    --md-sys-color-on-surface: #1c1b1f;
-    --md-sys-color-surface-variant: #e7e0ec;
-    --md-sys-color-on-surface-variant: #49454f;
-    --md-sys-color-outline: #79747e;
-    --md-sys-color-surface-container-lowest: #ffffff;
-    --md-sys-color-surface-container-low: #f7f2fa;
-    --md-sys-color-surface-container: #f3edfa;
-    --md-sys-color-surface-container-high: #eee8f4;
-    --md-sys-color-surface-container-highest: #e6e0eb;
-    --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
-
-    /* AppDrawer spezifische Variablen */
-    --appdrawer-icon-background: #ffffff;
-    --appdrawer-search-icon-url-light: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
-    --appdrawer-search-icon-url-dark: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cac4d0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
-    --appdrawer-search-icon-size: 25px;
-    --appdrawer-search-icon-padding-left: 12px;
-    --appdrawer-search-text-padding-left: calc(var(--appdrawer-search-icon-padding-left) + var(--appdrawer-search-icon-size) + 8px);
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --md-sys-color-primary: #d0bcff;
-        --md-sys-color-on-primary: #381e72;
-        --md-sys-color-secondary: #ccc2dc;
-        --md-sys-color-on-secondary: #332d41;
-        --md-sys-color-tertiary: #efb8c8;
-        --md-sys-color-on-tertiary: #492532;
-        --md-sys-color-error: #f2b8b5;
-        --md-sys-color-on-error: #601410;
-        --md-sys-color-background: #1c1b1f;
-        --md-sys-color-on-background: #e6e1e5;
-        --md-sys-color-surface: #1c1b1f;
-        --md-sys-color-on-surface: #e6e1e5;
-        --md-sys-color-surface-variant: #49454f;
-        --md-sys-color-on-surface-variant: #cac4d0;
-        --md-sys-color-outline: #938f99;
-        --md-sys-color-surface-container-lowest: #0f1113;
-        --md-sys-color-surface-container-low: transparent;
-        --md-sys-color-surface-container: #2a282d;
-        --md-sys-color-surface-container-high: #36343b;
-        --md-sys-color-surface-container-highest: #44414c;
-        --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
-    }
-}
-
 body {
     margin: 0;
     background-color: var(--md-sys-color-background);
@@ -66,7 +6,6 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: url('cursor/normal.cur'), default; /* Normaler Cursor für die Seite */
 }
 
 nav {
@@ -110,7 +49,7 @@ nav header p {
 }
 
 #clock {
-    margin: -50px 0 16px -100px;
+    margin: -50px 0 16px -70px;
     border: none;
     width: 500px;
     height: 300px;
@@ -156,7 +95,7 @@ nav header p {
 }
 
 main {
-    margin-left: 380px;
+    margin-left: 415px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: auto;
@@ -178,12 +117,14 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    box-sizing: border-box; /* Stellt sicher, dass Padding und Border in die deklarierte Höhe und Breite des Elements eingerechnet werden. */
+    box-sizing: border-box;
+    /* Stellt sicher, dass Padding und Border in die deklarierte Höhe und Breite des Elements eingerechnet werden. */
 }
 
 .box#box-favorites {
     grid-area: favorites;
-    height: 672px; /* Setzt eine feste Außenhöhe, basierend auf der berechneten Inhaltshöhe von #my-tools. */
+    height: 672px;
+    /* Setzt eine feste Außenhöhe, basierend auf der berechneten Inhaltshöhe von #my-tools. */
 }
 
 .box#box-mails {
@@ -193,7 +134,8 @@ main {
 
 .box#my-tools {
     grid-area: tools;
-    align-self: start; /* Verhindert, dass dieses Grid-Item sich vertikal streckt; es nimmt nur die Höhe seines Inhalts ein. */
+    align-self: start;
+    /* Verhindert, dass dieses Grid-Item sich vertikal streckt; es nimmt nur die Höhe seines Inhalts ein. */
 }
 
 .box iframe {
@@ -271,6 +213,16 @@ main {
 }
 
 /* =========== AppDrawer Styles (Innerhalb von #box-favorites) =========== */
+:root {
+    --appdrawer-icon-background: #ffffff;
+    --appdrawer-search-icon-url-light: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    --appdrawer-search-icon-url-dark: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cac4d0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    --appdrawer-search-icon-size: 25px;
+    --appdrawer-search-icon-padding-left: 12px;
+    --appdrawer-search-text-padding-left: calc(var(--appdrawer-search-icon-padding-left) + var(--appdrawer-search-icon-size) + 8px);
+
+}
+
 #box-favorites .app-header-container {
     display: flex;
     justify-content: space-between;
@@ -449,27 +401,4 @@ main {
 
 #box-favorites .app-container::-webkit-scrollbar-thumb:hover {
     background-color: var(--md-sys-color-on-surface-variant);
-}
-
-/* =========== Benutzerdefinierte Cursor-Stile =========== */
-/* Diese Regel ist globaler, um Redundanz zu vermeiden */
-button,
-.button-circle,
-.nav-buttons button,
-#box-mails > button,
-#my-tools > button,
-a[href] {
-    cursor: url('cursor/pointer.cur'), pointer; /* Klickbarer Cursor (Hand-Ersatz) */
-}
-
-/* Cursor für Texteingabefelder */
-#searchInput,
-input[type="text"],
-input[type="search"],
-input[type="email"],
-input[type="password"],
-input[type="url"],
-input[type="tel"],
-textarea {
-    cursor: url('cursor/text.cur'), text; /* Texteingabe-Cursor (I-Balken-Ersatz) */
 }

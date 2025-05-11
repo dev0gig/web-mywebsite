@@ -6,48 +6,9 @@
     <meta charset="UTF-8">
        
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Kalender & Uhr Widget (Kompakt)</title>
-        <style>
-        /* Material You Farbpalette (Beispiel - helle Variante als Standard) */
-        :root {
-            --md-sys-color-primary: #6750a4;
-            /* Akzentfarbe (für aktuelles Datum) */
-            --md-sys-color-on-primary: #ffffff;
-            /* Text auf Akzentfarbe */
-            --md-sys-color-background: #fffbfe;
-            /* Hintergrund (nicht für Body, aber für Textfarbe) */
-            --md-sys-color-on-background: #1c1b1f;
-            /* Textfarbe auf Hintergrund */
-            --md-sys-color-surface-container-high: #eee8f4;
-            /* Oberfläche Container (Widget Hintergrund) */
-            --md-sys-color-on-surface-container: #1c1b1f;
-            /* Haupt-Textfarbe auf Widget */
-            --md-sys-color-on-surface-variant: #49454f;
-            /* Sekundäre Textfarbe (Wochentage, kleines Datum, etc.) */
-            --md-sys-color-outline: #79747e;
-            /* Umriss/Trennung Farbe */
-
-            /* Schattenfarbe */
-            --md-sys-shadow-color: rgba(0, 0, 0, 0.15);
-        }
-
-        /* Material You Farbpalette (Beispiel - dunkle Variante) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --md-sys-color-primary: #d0bcff;
-                --md-sys-color-on-primary: #381e72;
-                --md-sys-color-background: #1c1b1f;
-                --md-sys-color-on-background: #e6e1e5;
-                --md-sys-color-surface-container-high: #0f1113;
-                --md-sys-color-on-surface-container: #e6e1e5;
-                --md-sys-color-on-surface-variant: #cac4d0;
-                --md-sys-color-outline: #938f99;
-
-                /* Schattenfarbe für dunklen Modus */
-                --md-sys-shadow-color: rgba(0, 0, 0, 0.4);
-            }
-        }
-
+    <title>Kalender & Uhr Widget (Kompakt)</title>
+    <link rel="stylesheet" href="../../global/color-palette.css">
+    <style>
         body {
             margin: 0;
             display: flex;
@@ -66,9 +27,9 @@
 
         .widget-container {
             display: flex;
-            background-color: var(--md-sys-color-surface-container-high);
+            background-color: var(--md-sys-color-surface-container-lowest);
             /* Hintergrund aus Palette */
-            color: var(--md-sys-color-on-surface-container);
+            color: var(--md-sys-color-on-surface);
             /* Haupt-Textfarbe aus Palette */
             border: 1px solid var(--md-sys-color-outline);
             border-radius: 24px;
