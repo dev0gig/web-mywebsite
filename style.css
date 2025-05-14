@@ -1,5 +1,10 @@
 @media (max-width: 1200px) {
 
+    body{
+        margin: 0 !important;
+        overflow: hidden;
+    }
+
     /* Muss mit dem mobileBreakpoint im JS übereinstimmen */
     nav {
         display: none !important;
