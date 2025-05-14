@@ -1,3 +1,41 @@
+@media (max-width: 1200px) {
+
+    /* Muss mit dem mobileBreakpoint im JS übereinstimmen */
+    nav {
+        display: none !important;
+        /* Wichtig, um Inline-Styles vom JS zu überschreiben, falls nötig */
+    }
+
+    main {
+        margin-left: 0 !important;
+        /* Wichtig, um Inline-Styles vom JS zu überschreiben */
+        padding: 16px;
+        /* Etwas weniger Padding auf kleineren Bildschirmen */
+        grid-template-columns: 1fr !important;
+        /* Nur eine Spalte */
+        grid-template-areas: "favorites" !important;
+        /* Nur der Favoriten-Bereich */
+    }
+
+    #box-favorites {
+        padding: 0;
+        grid-area: favorites;
+        /* Sicherstellen, dass es im richtigen Bereich ist */
+        height: auto;
+        /* Höhe an den Inhalt anpassen lassen */
+        border: none;
+        background-color: transparent;
+    }
+
+    /* Blende andere Boxen standardmäßig auf Mobilgeräten aus (kann durch JS gesteuert werden) */
+    #box-mails,
+    #my-tools {
+        display: none !important;
+        /* Wichtig, um Inline-Styles vom JS zu überschreiben */
+    }
+}
+
+
 body {
     margin: 0;
     background-color: var(--md-sys-color-background);

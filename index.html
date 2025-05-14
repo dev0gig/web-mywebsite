@@ -86,6 +86,103 @@
         </div>
     </main>
 
+    <script>
+        function adjustLayoutForMobile() {
+            const mobileBreakpoint = 1200; // Maximale Breite für mobile Ansicht
+            const isMobile = window.innerWidth < mobileBreakpoint;
+
+            const navElement = document.querySelector('nav');
+            const mainElement = document.querySelector('main');
+            const allBoxes = document.querySelectorAll('main > .box');
+            const boxFavorites = document.getElementById('box-favorites'); // Direkter Zugriff auf box-favorites
+
+            if (isMobile) {
+                // --- Mobile Ansicht ---
+
+                // Navigationsleiste ausblenden
+                if (navElement) {
+                    navElement.style.display = 'none';
+                }
+
+                // Main-Element anpassen (nimmt volle Breite ein, Padding für Mobilgeräte)
+                if (mainElement) {
+                    mainElement.style.marginLeft = '0';
+                    mainElement.style.gridTemplateColumns = '1fr';
+                    mainElement.style.gridTemplateAreas = '"favorites"'; // Nur "favorites" anzeigen
+                    mainElement.style.padding = '16px'; // Beispiel-Padding für Mobilgeräte (anpassen bei Bedarf)
+                }
+
+                allBoxes.forEach(box => {
+                    if (box.id === 'box-favorites') {
+                        box.style.display = 'flex'; // Sicherstellen, dass es ein Flex-Container ist
+                        box.style.gridArea = 'favorites'; // Dem Grid-Bereich zuweisen
+
+                        // Höhe von box-favorites anpassen
+                        if (mainElement) {
+                            // Berechne die verfügbare Höhe innerhalb von main
+                            const mainComputedStyle = getComputedStyle(mainElement);
+                            const mainPaddingTop = parseFloat(mainComputedStyle.paddingTop) || 0;
+                            const mainPaddingBottom = parseFloat(mainComputedStyle.paddingBottom) || 0;
+
+                            // Da .box (und somit #box-favorites) box-sizing: border-box verwendet,
+                            // setzt diese Höhe die Außenkante der Box.
+                            box.style.height = (window.innerHeight - mainPaddingTop - mainPaddingBottom) + 'px';
+                        } else {
+                            // Fallback, falls mainElement nicht existiert (unwahrscheinlich)
+                            box.style.height = window.innerHeight + 'px';
+                        }
+                    } else {
+                        // Alle anderen Boxen ausblenden
+                        box.style.display = 'none';
+                    }
+                });
+
+            } else {
+                // --- Desktop Ansicht ---
+
+                // Navigationsleiste wieder einblenden
+                if (navElement) {
+                    navElement.style.display = 'flex'; // Oder 'block', je nach ursprünglichem display
+                }
+
+                // Main-Element zurücksetzen
+                if (mainElement) {
+                    mainElement.style.marginLeft = '415px'; // Ursprünglicher linker Rand
+                    mainElement.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    mainElement.style.gridTemplateAreas = `
+                    "favorites favorites favorites tools"
+                    "mails mails mails mails"
+                `;
+                    mainElement.style.padding = '24px'; // Ursprüngliches Padding
+                }
+
+                // Alle Boxen auf Desktop-Standard zurücksetzen
+                allBoxes.forEach(box => {
+                    box.style.display = 'flex'; // Oder der jeweilige Standard-Display-Typ der Box
+
+                    if (box.id === 'box-favorites') {
+                        box.style.gridArea = 'favorites';
+                        box.style.height = '672px'; // Feste Höhe aus deinem CSS für Desktop wiederherstellen
+                    } else if (box.id === 'box-mails') {
+                        box.style.gridArea = 'mails';
+                        box.style.flexDirection = 'row'; // Spezifisches Styling wiederherstellen
+                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
+                    } else if (box.id === 'my-tools') {
+                        box.style.gridArea = 'tools';
+                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
+                    } else {
+                        // Für alle anderen Boxen, die Höhe ebenfalls durch CSS bestimmen lassen
+                        box.style.height = '';
+                    }
+                });
+            }
+        }
+
+        // Führe die Funktion beim Laden der Seite aus
+        window.addEventListener('load', adjustLayoutForMobile);
+        // Führe die Funktion auch aus, wenn die Fenstergröße geändert wird (z.B. Drehen des Smartphones)
+        window.addEventListener('resize', adjustLayoutForMobile);
+    </script>
 </body>
 
 </html>
