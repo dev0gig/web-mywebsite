@@ -18,13 +18,14 @@
     }
 
     #box-favorites {
-        padding: 0;
+        padding: 0 !important;
         grid-area: favorites;
         /* Sicherstellen, dass es im richtigen Bereich ist */
         height: auto;
         /* Höhe an den Inhalt anpassen lassen */
         border: none;
         background-color: transparent;
+        box-shadow: none;
     }
 
     /* Blende andere Boxen standardmäßig auf Mobilgeräten aus (kann durch JS gesteuert werden) */
