@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Übersicht</title>
-    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgpjIHc8G5vk1SHDcGzlPNIVNiAgKJJZ28bw&s" />
+    <link rel="icon"
+        href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgpjIHc8G5vk1SHDcGzlPNIVNiAgKJJZ28bw&s" />
     <link rel="stylesheet" href="../global/color-palette.css">
     <style>
         body {
@@ -61,17 +62,27 @@
             text-align: center;
             box-sizing: border-box;
             font-size: 30px;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+
         }
 
-        /* Der unterste Button (Dashboard) soll keinen margin-top haben, da er der letzte ist */
-        /* In column-reverse ist der :last-child im DOM der unterste visuell */
         .tab-buttons-wrapper .tab-button:last-child {
             margin-top: 0;
         }
 
 
         .tab-button:hover {
-            background-color: #777;
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Hintergrund beim Hover */
+            border-color: transparent;
+            /* Hover Border entfernen */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe sollte gut auf Hover-Farbe passen */
+            transform: translateY(-2px);
+            /* Leichter Hover-Effekt */
+            box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+            /* Schatten beim Hover erhöhen */
+            cursor: pointer;
         }
 
         .tab-button.active {

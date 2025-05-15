@@ -8,288 +8,215 @@
     <link rel="stylesheet" href="../global/color-palette.css">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/11068/11068821.png" />
     <style>
-body {
+        body {
             margin: 0;
             background-color: var(--md-sys-color-background);
-            /* Hintergrund aus Palette */
             color: var(--md-sys-color-on-background);
-            /* Textfarbe aus Palette */
             font-family: 'Roboto', sans-serif;
-            /* Material You Schrift */
             display: flex;
-            /* Für Nav links und Main rechts */
+            flex-direction: column;
+            /* Stellt sicher, dass .main den Platz einnimmt */
+            align-items: center;
+            /* Zentriert .main horizontal */
             overflow-x: hidden;
-            /* Horizontales Scrollen verhindern */
             overflow-y: auto;
-            /* Vertikales Scrollen im Body zulassen */
             min-height: 100vh;
-            /* Mindesthöhe Viewport */
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: var(--md-sys-color-surface-container-high);
-            /* Hintergrund aus Palette */
-            color: var(--md-sys-color-on-surface-container);
-            /* Textfarbe aus Palette */
-            padding: 20px;
-            /* Original Padding beibehalten */
-            display: flex;
-            justify-content: flex-start;
-            /* Elemente am Anfang ausrichten */
-            flex-direction: column;
-            width: 250px;
-            /* Breite beibehalten */
-            height: 100vh;
-            /* Volle Viewport Höhe */
-            border-left: 1px solid var(--md-sys-color-outline);
-            box-sizing: border-box;
-            /* Padding in Breite/Höhe einbeziehen */
-            box-shadow: 2px 0 6px var(--md-sys-shadow-color);
-            /* Schatten statt Border */
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-            z-index: 100;
-            /* Sicherstellen, dass Nav über anderem Inhalt liegt */
-            justify-content: center;
-        }
-
-        .navbar a {
-            display: block;
-            height: 50px;
-            padding: 8px 12px;
-            /* Etwas weniger Padding */
-            margin-bottom: 8px;
-            /* Weniger Abstand */
-            border-radius: 8px;
-            /* Weniger abgerundet */
-            transition: background-color 0.2s ease;
-            text-decoration: none;
-            /* Unterstreichung entfernen */
-            color: var(--md-sys-color-on-surface);
-            /* Textfarbe aus Palette */
-            display: flex;
-            align-items: center;
-            /* Bilder und Text (falls hinzugefügt) zentrieren */
-        }
-
-        .navbar a img {
-            max-height: 40px;
-            /* Logo Größe */
-            margin-right: 10px;
-            /* Abstand zum Text (falls Text im Link ist) */
-        }
-
-
-        .navbar a:hover {
-            background-color: var(--md-sys-color-surface-variant);
-            /* Hintergrund beim Hover */
-            cursor: pointer;
-            color: var(--md-sys-color-on-surface-variant);
-            /* Textfarbe beim Hover anpassen */
-        }
-
-        /* Titel für Sektionen im Main */
         .main h1 {
             font-size: 2em;
-            /* Angepasste Größe */
             color: var(--md-sys-color-on-background);
-            /* Textfarbe aus Palette */
             margin-top: 0;
-            /* Kein Margin oben, wenn es das erste Element ist */
             margin-bottom: 20px;
-            /* Abstand nach unten */
             font-weight: normal;
-            /* Standard Gewicht, Material You oft leichter */
         }
 
         .main {
-            padding: 50px;
-            /* Padding beibehalten */
-            flex: 1;
-            /* Nimmt verfügbaren Platz ein */
+            padding: 50px 20px;
+            /* Mehr Padding seitlich für kleinere Bildschirme */
+            width: 100%;
+            max-width: 1200px;
+            /* Maximale Breite des Hauptinhalts */
+            box-sizing: border-box;
+            /* Padding wird in die Breite eingerechnet */
             display: flex;
             flex-direction: column;
-            /* Inhalt untereinander */
-            /* justify-content: center; align-items: center; */
-            /* Entfernt - lässt Inhalt normal scrollen */
             gap: 40px;
-            /* Großer Abstand zwischen Sektionen */
-            margin-right: 250px;
-            /* Platz für Nav + Padding */
-            /* Nav width (250) + Nav Padding Right (20) + Main Padding Left (20) = 290 */
-            /* Oder Nav width (250) + etwas Gap (40) = 290? Let's use 290 for now. */
             margin-bottom: 60px;
-            /* Abstand vom Footer */
-            justify-content: center;
+            align-items: center;
+            /* Zentriert die .tools-section Kinder */
         }
 
         .title {
             font-size: 3rem;
-            /* Angepasste Größe */
             color: var(--md-sys-color-error);
-            /* Farbe aus variabler (angelehnt an Orange) */
             margin-bottom: 30px;
-            /* Größerer Abstand */
             font-weight: bold;
             text-align: center;
             width: 100%;
-            /* Sicherstellen, dass es die volle Breite einnimmt für text-align */
             transition: color 0.3s ease;
         }
 
-        /* Titel Farbe im Dark Mode anpassen, falls spezifisch */
         @media (prefers-color-scheme: dark) {
             .title {
                 color: var(--md-sys-color-error);
             }
         }
 
-
-        .inofficialTools {
+        .tools-section {
             width: 100%;
-            /* Nimmt verfügbaren Platz ein */
-            height: auto;
-            /* Höhe automatisch */
             text-align: center;
-            /* Buttons sind innen zentriert */
             display: flex;
             flex-direction: column;
             gap: 20px;
-            /* Abstand zwischen h1 und button-group */
         }
 
         .button-group {
             display: flex;
-            /* Flexbox für Buttons */
             flex-wrap: wrap;
             gap: 16px;
             justify-content: center;
-            /* Grid Items horizontal zentrieren (falls Platz da ist) */
             width: 100%;
         }
 
         .button-single {
             min-height: 100px;
-            /* Mindesthöhe beibehalten */
             border: 1px solid var(--md-sys-color-outline);
-            /* Border entfernen */
             border-radius: 12px;
-            /* Stärker abgerundet */
             color: var(--md-sys-color-on-surface-container);
-            /* Textfarbe aus Palette */
             background-color: var(--md-sys-color-surface-container);
-            /* Hintergrund aus Palette */
             font-size: 1em;
-            /* Angepasste Größe */
             font-weight: bold;
             text-align: center;
             padding: 16px;
-            /* Mehr Padding */
             transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
             box-shadow: 0 1px 3px var(--md-sys-shadow-color);
-            /* Subtiler Schatten */
             display: flex;
-            /* Inhalt zentrieren */
             justify-content: center;
             align-items: center;
             flex: 1 300px;
-            /* Flex-Element, damit es den Platz gleichmäßig einnimmt */
+            /* Verhindert, dass Buttons zu breit werden, besonders wenn nur wenige da sind */
+            word-break: break-word;
+            box-sizing: border-box;
+            /* Padding und Border werden in die Breite/Höhe eingerechnet */
+        }
+
+        .button-single img {
+            max-height: 50px;
+            /* Etwas mehr Höhe für die Logos */
+            max-width: 90%;
+            /* Nutzt fast die gesamte Button-Breite, wenn nötig */
+            object-fit: contain;
+            /* Behält Seitenverhältnis bei und skaliert passend */
+            display: block;
+            /* Stellt sicher, dass es korrekt im Flex-Container behandelt wird */
         }
 
         .button-single:hover {
             background-color: var(--md-sys-color-surface-container-high);
-            /* Hintergrund beim Hover */
             border-color: transparent;
-            /* Hover Border entfernen */
             color: var(--md-sys-color-on-surface-container);
-            /* Textfarbe sollte gut auf Hover-Farbe passen */
             transform: translateY(-2px);
-            /* Leichter Hover-Effekt */
             box-shadow: 0 3px 8px var(--md-sys-shadow-color);
-            /* Schatten beim Hover erhöhen */
             cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-    <div class="navbar">
-        <a href="https://www.wienerstadtwerke.at/" target="_blank"> <img
-                src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230&t=1744196967447"
-                alt="Wiener Stadtwerke Logo" /></a>
-        <a href="https://www.wienerlinien.at/" target="_blank"> <img
-                src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139&t=1713959345651"
-                alt="Wiener Linien Logo" /></a>
-        <a href="https://www.wienenergie.at/" target="_blank"> <img
-                src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"
-                alt="Wien Energie Logo" /></a>
-        <a href="https://www.wienernetze.at/" target="_blank"> <img
-                src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159&t=1713959374622"
-                alt="Wiener Netze Logo" /></a>
-        <a href="https://www.wlb.at/" target="_blank"> <img
-                src="https://www.wlb.at/image/layout_set_logo?img_id=18160554&t=1713959345658"
-                alt="Wiener Lokalbahnen Logo" /></a>
-        <a href="https://www.wipark.at/" target="_blank"> <img
-                src="https://www.wipark.at/image/layout_set_logo?img_id=6753665&t=1713959345375"
-                alt="Wipark Logo" /></a>
-        <a href="https://www.wienit.at/" target="_blank"> <img
-                src="https://www.wienit.at/image/layout_set_logo?img_id=18163000&t=1713959411884"
-                alt="WienIT Logo" /></a>
-        <a href="https://www.bestattungwien.at/" target="_blank"> <img
-                src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249&t=1713959355571"
-                alt="Bestattung Wien Logo" /></a>
-        <a href="https://www.friedhoefewien.at/" target="_blank"> <img
-                src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382&t=1713959380757"
-                alt="Friedhöfe Wien Logo" /></a>
-        <a href="https://www.immoh.at/" target="_blank"> <img
-                src="https://www.immoh.at/image/layout_set_logo?img_id=18094283&t=1713959405431" height="40px"
-                alt="ImmoH Logo" /></a>
-    </div>
-
     <div class="main">
         <span class="title">Willkommen bei Unicorn</span>
 
-        <h1>Inofficial Tools</h1>
-        <div class="inofficialTools">
+        <div class="tools-section">
+            <h1>Official Tools</h1>
             <div class="button-group">
-                <button class="button-single" onclick="window.location.href = 'work-tools.html'">Wichtige & Tägliche Arbeitsressourcen 🛠️</button>
+                <button class="button-single" onclick="window.location.href = 'https://intranet.wienenergie.at'">
+                    Intranet
+                </button>
+                <button class="button-single"
+                    onclick="window.location.href = 'https://wien-energie.secova.de/module/dashboardpreview/?preview'">
+                    SAM
+                </button>
+                <button class="button-single" onclick="window.location.href = 'https://cu300078.opcyc.net/setup/'">
+                    Opcyc
+                </button>
+                <button class="button-single" onclick="window.location.href = 'https://xenapp/Citrix/WSTWWeb/'">
+                    Citrix
+                </button>
+                <button class="button-single"
+                    onclick="window.open('https://wienenergie.4me.com/self-service', '_blank')">
+                    4me-Ticket
+                </button>
+                <button class="button-single"
+                    onclick="window.location.href = 'https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome?_adf.ctrl-state=mkxxtq08c_1&_adf.no-new-window-redirect=true&_adf.no-new-window-redirect=true&_afrLoop=5994991574977428&_afrWindowMode=2&_afrWindowId=null&_afrFS=16&_afrMT=screen&_afrMFW=1912&_afrMFH=964&_afrMFDW=1920&_afrMFDH=1080&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0'">
+                    Lernplattform
+                </button>
+                <button class="button-single"
+                    onclick="window.location.href = 'https://wstw365.sharepoint.com/sites/WE_Personal'">
+                    Informationsplattform Personal
+                </button>
+                <button class="button-single"
+                    onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04?ctid=2df2bcec-2017-4339-b493-e3d7b3a460c8&openReportSource=ReportInvitation&experience=power-bi', '_blank')">
+                    Persönlicher Kundenkanal
+                </button>
             </div>
         </div>
 
-        <h1>Official Tools</h1>
-        <div class="button-group">
-            <button class="button-single" onclick="window.location.href = 'https://intranet.wienenergie.at'">
-                Intranet
-            </button>
-            <button class="button-single"
-                onclick="window.location.href = 'https://wien-energie.secova.de/module/dashboardpreview/?preview'">
-                SAM
-            </button>
-            <button class="button-single" onclick="window.location.href = 'https://cu300078.opcyc.net/setup/'">
-                Opcyc
-            </button>
-            <button class="button-single" onclick="window.location.href = 'https://xenapp/Citrix/WSTWWeb/'">
-                Citrix
-            </button>
-            <button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">
-                4me-Ticket
-            </button>
-            <button class="button-single"
-                onclick="window.location.href = 'https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome?_adf.ctrl-state=mkxxtq08c_1&_adf.no-new-window-redirect=true&_adf.no-new-window-redirect=true&_afrLoop=5994991574977428&_afrWindowMode=2&_afrWindowId=null&_afrFS=16&_afrMT=screen&_afrMFW=1912&_afrMFH=964&_afrMFDW=1920&_afrMFDH=1080&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0'">
-                Lernplattform
-            </button>
-            <button class="button-single"
-                onclick="window.location.href = 'https://wstw365.sharepoint.com/sites/WE_Personal'">
-                Informationsplattform Personal
-            </button>
-            <button class="button-single"
-                onclick="window.location.href = 'https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04?ctid=2df2bcec-2017-4339-b493-e3d7b3a460c8&openReportSource=ReportInvitation&experience=power-bi'">
-                Persönlicher Kundenkanal
-            </button>
+        <div class="tools-section">
+            <h1>Wiener Stadtwerke</h1>
+            <div class="button-group">
+                <button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/', '_blank')">
+                    <img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230&t=1744196967447"
+                        alt="Wiener Stadtwerke Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wienerlinien.at/', '_blank')">
+                    <img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139&t=1713959345651"
+                        alt="Wiener Linien Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wienenergie.at/', '_blank')">
+                    <img src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"
+                        alt="Wien Energie Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wienernetze.at/', '_blank')">
+                    <img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159&t=1713959374622"
+                        alt="Wiener Netze Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wlb.at/', '_blank')">
+                    <img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554&t=1713959345658"
+                        alt="Wiener Lokalbahnen Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wipark.at/', '_blank')">
+                    <img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665&t=1713959345375"
+                        alt="Wipark Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.wienit.at/', '_blank')">
+                    <img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000&t=1713959411884"
+                        alt="WienIT Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.bestattungwien.at/', '_blank')">
+                    <img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249&t=1713959355571"
+                        alt="Bestattung Wien Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.friedhoefewien.at/', '_blank')">
+                    <img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382&t=1713959380757"
+                        alt="Friedhöfe Wien Logo" />
+                </button>
+                <button class="button-single" onclick="window.open('https://www.immoh.at/', '_blank')">
+                    <img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283&t=1713959405431"
+                        alt="ImmoH Logo" />
+                </button>
+            </div>
         </div>
+
+        <div class="tools-section">
+            <h1>Inofficial Tools</h1>
+            <div class="button-group">
+                <button class="button-single" onclick="window.location.href = 'work-tools.html'">Wichtige & Tägliche
+                    Arbeitsressourcen 🛠️</button>
+            </div>
+        </div>
+
     </div>
 </body>
 
