@@ -1,80 +1,118 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Übersicht</title>
-    <link rel="stylesheet" href="../global/color-palette.css">
     <style>
         body {
             font-family: sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            /* Volle Höhe des Viewports */
-            background-color: #f4f4f4;
-            /* Heller Hintergrund für die Hauptseite */
-            overflow: hidden;
+            display: flex; /* Hauptlayout: Horizontale Anordnung von Sidebar und Inhalt */
+            flex-direction: row;
+            height: 100vh; /* Volle Höhe des Viewports */
+            background-color: #f4f4f4; /* Heller Hintergrund für die Hauptseite */
+            overflow: hidden; /* Verhindert Scrollbalken am Body */
         }
 
         .tab-navigation {
-            position: fixed;
-            bottom: 0;
-            left: 0;
             display: flex;
-            background-color: var(--md-sys-color-background);
-            border-top: var(--md-sys-color-outline);
+            flex-direction: column; /* Logo oben, Button-Wrapper unten */
+            justify-content: space-between; /* Logo oben, Button-Wrapper nach unten drücken */
+            background-color: #333; /* Dunkler Hintergrund für die Tabs */
+            padding: 20px 10px; /* Mehr vertikales, weniger horizontales Padding */
+            width: 120px; /* Breite der vertikalen Tableiste */
+            height: 100vh; /* Volle Höhe */
+            box-sizing: border-box; /* Padding und Border in die Breite/Höhe einrechnen */
+        }
+
+        .logo-placeholder {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0; /* Etwas Platz um das Logo */
+            /* Hier könnten Sie ein <img> Tag oder ein SVG platzieren */
+            /* Beispiel: background-image: url('pfad/zum/logo.png'); height: 50px; background-size: contain; background-repeat: no-repeat; background-position: center; */
+        }
+
+        .tab-buttons-wrapper {
+            display: flex;
+            flex-direction: column-reverse; /* Ordnet Buttons von unten nach oben an */
+            align-items: center; /* Zentriert die Buttons im Wrapper, falls sie schmaler sind */
         }
 
         .tab-button {
-            width: 200px;
-            height: 30px;
+            width: 80px;  /* Breite für quadratische Buttons */
+            height: 80px; /* Höhe für quadratische Buttons */
             cursor: pointer;
             border: none;
-            background-color: transparent;
+            background-color: #555; /* Standard-Hintergrund für Tabs */
             color: white;
-            outline: none;
-            /* Kein Fokus-Rahmen */
+            margin-top: 10px; /* Abstand zwischen den vertikalen Tabs */
+            border-radius: 8px; /* Abgerundete Ecken für die Buttons */
+            outline: none; /* Kein Fokus-Rahmen */
+            display: flex; /* Für Textzentrierung */
+            align-items: center; /* Text vertikal zentrieren */
+            justify-content: center; /* Text horizontal zentrieren */
+            text-align: center; /* Für mehrzeiligen Text */
+            box-sizing: border-box;
+            font-size: 12px; /* Kleinere Schriftgröße für bessere Passform */
         }
 
+        .tab-button:first-child {
+             /* Der erste Button in der column-reverse Anordnung ist der oberste visuell,
+                also der letzte im HTML. Der letzte (visuell unterste) bekommt keinen margin-top,
+                da space-between im .tab-navigation ihn nach unten drückt.
+                Alternativ: margin-bottom für alle außer dem letzten (visuell untersten)
+                Da wir column-reverse nutzen, ist der .tab-button:last-child (im DOM) der visuell unterste. */
+        }
+         .tab-buttons-wrapper .tab-button:not(:first-child) {
+            /* Da column-reverse, ist der :first-child der Button "Arbeitsmittel" (visuell oben).
+               Alle Buttons außer dem ersten (visuell obersten) bekommen einen margin-top.
+               Nein, das ist falsch bei column-reverse.
+               Der letzte Button in der HTML-Reihenfolge (Arbeitsmittel) wird oben angezeigt.
+               Der erste Button in der HTML-Reihenfolge (Dashboard) wird unten angezeigt.
+               margin-top: 10px; sorgt für Abstand *über* dem Element im normalen Fluss.
+               In column-reverse wird margin-top zu einem Abstand *unter* dem Element im visuellen Fluss.
+               Deshalb ist margin-top: 10px; korrekt für den Abstand *zwischen* den Buttons,
+               wobei der unterste Button (Dashboard) diesen Abstand nach oben hat.
+            */
+        }
+
+
         .tab-button:hover {
-            background-color: #777;
-            /* Hellerer Hintergrund beim Hover */
+            background-color: #777; /* Hellerer Hintergrund beim Hover */
         }
 
         .tab-button.active {
-            background-color: #ddd;
-            /* Hintergrund für aktiven Tab */
-            color: #333;
-            /* Dunklere Schrift für aktiven Tab */
+            background-color: #ddd; /* Hintergrund für aktiven Tab */
+            color: #333; /* Dunklere Schrift für aktiven Tab */
         }
 
         .iframe-container {
-            flex-grow: 1;
-            /* Nimmt den verbleibenden Platz ein */
+            flex-grow: 1; /* Nimmt den verbleibenden Platz ein */
+            height: 100vh; /* Volle Höhe des Viewports */
             padding: 0;
-            /* Kein Padding, da der iframe den ganzen Platz ausfüllen soll */
             border: none;
-            /* Kein Rand um den iframe-Bereich */
         }
 
         iframe {
             width: 100%;
             height: 100%;
-            border: none;
-            /* Kein Rand um den iframe selbst */
+            border: none; /* Kein Rand um den iframe selbst */
         }
     </style>
 </head>
-
 <body>
 
     <nav class="tab-navigation">
-        <button class="tab-button active" onclick="openPage('we-dashboard.html', this)">Dashboard</button>
-        <button class="tab-button" onclick="openPage('mail-template.html', this)">Mailvorlagen</button>
-        <button class="tab-button" onclick="openPage('work-tools.html', this)">Arbeitsmittel</button>
+        <div class="logo-placeholder">LOGO</div>
+        <div class="tab-buttons-wrapper">
+            <button class="tab-button" onclick="openPage('work-tools.html', this)">Arbeits-mittel</button>
+            <button class="tab-button" onclick="openPage('mail-template.html', this)">Mail-vorlagen</button>
+            <button class="tab-button active" onclick="openPage('we-dashboard.html', this)">Dashboard</button>
+        </div>
     </nav>
 
     <div class="iframe-container">
@@ -96,29 +134,55 @@
             elmnt.classList.add("active");
         }
 
-        // Optional: Sicherstellen, dass der erste Tab beim Laden als aktiv markiert ist
-        // Dies geschieht bereits durch die "active" Klasse im HTML, aber zur Sicherheit:
-        document.addEventListener('DOMContentLoaded', function () {
-            const firstTab = document.querySelector('.tab-navigation .tab-button');
-            if (firstTab && !firstTab.classList.contains('active')) {
-                // Wenn aus irgendeinem Grund kein Tab als aktiv markiert ist, den ersten nehmen.
-                // Normalerweise sollte dies durch die HTML Klasse "active" abgedeckt sein.
-                const initialPage = document.getElementById('contentFrame').src;
-                const buttons = document.querySelectorAll('.tab-navigation .tab-button');
-                buttons.forEach(button => {
-                    if (button.getAttribute('onclick').includes(initialPage)) {
+        // Stellt sicher, dass der korrekte Tab beim Laden als aktiv markiert ist,
+        // basierend auf der initiale src des iframes.
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentFrame = document.getElementById('contentFrame');
+            // Der initiale aktive Button wird bereits durch die Klasse "active" im HTML gesetzt.
+            // Dieser Code stellt sicher, dass dies konsistent ist, falls die src des iframes
+            // dynamisch anders gesetzt würde und nicht zum "active" Button passt.
+            // In diesem Fall (src="we-dashboard.html" und "Dashboard"-Button hat "active") ist es bereits korrekt.
+
+            const initialPageSrc = contentFrame.getAttribute('src');
+            const tabButtons = document.querySelectorAll('.tab-navigation .tab-button');
+            let foundActive = false;
+
+            tabButtons.forEach(button => {
+                if (button.getAttribute('onclick').includes(initialPageSrc)) {
+                    if (!button.classList.contains('active')) {
+                        // Entferne 'active' von anderen falls nötig und setze es hier
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
                     }
-                });
-            } else if (firstTab) {
-                // Wenn der erste Tab bereits "active" ist, stellen wir sicher, dass auch der iframe passt.
-                // Dies ist meist der Fall, da wir src direkt im iframe-Tag setzen.
+                    foundActive = true;
+                } else if (button.classList.contains('active') && !button.getAttribute('onclick').includes(initialPageSrc)) {
+                    // Wenn ein Button 'active' ist, aber nicht zur iframe src passt, deaktiviere ihn.
+                    // Dies sollte nur passieren, wenn HTML inkonsistent ist.
+                    button.classList.remove('active');
+                }
+            });
+
+            // Fallback: Wenn kein Button als aktiv markiert ist, aber ein iframe src existiert,
+            // versuche den ersten passenden Button zu aktivieren.
+            if (!foundActive && initialPageSrc) {
+                 for (let i = 0; i < tabButtons.length; i++) {
+                    if (tabButtons[i].getAttribute('onclick').includes(initialPageSrc)) {
+                        tabButtons[i].classList.add('active');
+                        break;
+                    }
+                 }
+            } else if (!document.querySelector('.tab-button.active') && tabButtons.length > 0) {
+                // Wenn immer noch kein Tab aktiv ist (z.B. iframe src ist leer oder kein Match)
+                // und es Buttons gibt, aktiviere den letzten Button in der DOM-Reihenfolge im Wrapper
+                // (der visuell unterste, da `column-reverse`). Hier wäre es "Dashboard".
+                // Oder den Button, der initial 'active' im HTML hat.
+                // Da der Dashboard-Button die Klasse 'active' im HTML hat, wird dieser Block i.d.R. nicht benötigt.
+                 const initialActiveButton = document.querySelector('.tab-buttons-wrapper .tab-button[onclick*="we-dashboard.html"]');
+                 if(initialActiveButton) initialActiveButton.classList.add('active');
+
             }
         });
     </script>
 
 </body>
-
 </html>
