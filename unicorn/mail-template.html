@@ -211,6 +211,54 @@
         transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         outline: none;
     }
+
+    /* =========== Moderner Scrollbalken =========== */
+
+    /* Für WebKit-basierte Browser (Chrome, Safari, Edge, Opera) */
+    /* Betrifft die Scrollbalken in .mail-main--left, .mail-main--right und #outputArea */
+    .mail-main--left::-webkit-scrollbar,
+    .mail-main--right::-webkit-scrollbar,
+    #outputArea::-webkit-scrollbar {
+        width: 8px;
+        /* Breite des Scrollbalkens */
+        height: 8px;
+        /* Höhe für horizontale Scrollbalken (falls vorhanden) */
+    }
+
+    .mail-main--left::-webkit-scrollbar-track,
+    .mail-main--right::-webkit-scrollbar-track,
+    #outputArea::-webkit-scrollbar-track {
+        background: var(--md-sys-color-surface-container);
+        /* Hintergrund der Scrollleiste */
+        border-radius: 10px;
+    }
+
+    .mail-main--left::-webkit-scrollbar-thumb,
+    .mail-main--right::-webkit-scrollbar-thumb,
+    #outputArea::-webkit-scrollbar-thumb {
+        background-color: var(--md-sys-color-primary);
+        /* Farbe des Scrollbalken-Griffs */
+        border-radius: 10px;
+        border: 2px solid var(--md-sys-color-surface-container);
+        /* Erzeugt einen kleinen Rand um den Griff */
+    }
+
+    .mail-main--left::-webkit-scrollbar-thumb:hover,
+    .mail-main--right::-webkit-scrollbar-thumb:hover,
+    #outputArea::-webkit-scrollbar-thumb:hover {
+        background-color: var(--md-sys-color-on-primary-container);
+        /* Farbe des Griffs beim Hover */
+    }
+
+    /* Für Firefox */
+    .mail-main--left,
+    .mail-main--right,
+    #outputArea {
+        scrollbar-width: thin;
+        /* Optionen: 'auto', 'thin', 'none' */
+        scrollbar-color: var(--md-sys-color-primary) var(--md-sys-color-surface-container);
+        /* Daumenfarbe Trackfarbe */
+    }
 </style>
 
 
