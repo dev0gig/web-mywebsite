@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Übersicht</title>
+    <link rel="stylesheet" href="../global/color-palette.css">
     <style>
         body {
             font-family: sans-serif;
@@ -15,28 +16,25 @@
             /* Volle Höhe des Viewports */
             background-color: #f4f4f4;
             /* Heller Hintergrund für die Hauptseite */
+            overflow: hidden;
         }
 
         .tab-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             display: flex;
-            background-color: #333;
-            /* Dunkler Hintergrund für die Tabs */
-            padding: 10px;
-            padding-left: 20px;
-            /* Etwas mehr Platz links */
+            background-color: var(--md-sys-color-background);
+            border-top: var(--md-sys-color-outline);
         }
 
         .tab-button {
-            padding: 10px 20px;
+            width: 200px;
+            height: 30px;
             cursor: pointer;
             border: none;
-            background-color: #555;
-            /* Standard-Hintergrund für Tabs */
+            background-color: transparent;
             color: white;
-            margin-right: 5px;
-            /* Abstand zwischen den Tabs */
-            border-radius: 5px 5px 0 0;
-            /* Abgerundete Ecken oben */
             outline: none;
             /* Kein Fokus-Rahmen */
         }
