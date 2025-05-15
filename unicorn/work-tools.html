@@ -2,486 +2,165 @@
 <html lang="de">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Übersicht</title>
+    <link rel="icon"
+        href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgpjIHc8G5vk1SHDcGzlPNIVNiAgKJJZ28bw&s" />
     <link rel="stylesheet" href="../global/color-palette.css">
-</head>
-
-<style>
-    /*
-    Grundlegende Styles für Body und allgemeine Elemente
-    */
-    body {
-        font-family: 'Roboto', sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 10px 50px;
-        padding-bottom: 80px;
-        /* Platz am unteren Rand für den Floating Button lassen */
-        background-color: var(--md-sys-color-background);
-        color: var(--md-sys-color-on-surface);
-        transition: background-color 0.3s ease, color 0.3s ease;
-        position: relative;
-        min-height: 100vh;
-    }
-
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
-
-    /*
-    Styles für den Header-Bereich
-    */
-    header {
-        color: var(--md-sys-color-on-surface);
-    }
-
-    .header-box {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .header-left {
-        font-size: 1.5em;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    .header-right {
-        display: flex;
-        gap: 15px;
-        justify-content: flex-end;
-    }
-
-    .header-link {
-        color: var(--md-sys-color-on-surface);
-        text-decoration: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
-    }
-
-    .header-link:hover {
-        background-color: var(--md-sys-color-surface-variant);
-        /* Hintergrund beim Hover */
-        color: var(--md-sys-color-on-surface-variant);
-        /* Textfarbe beim Hover */
-        box-shadow: none;
-        /* Kein Schatten beim Hover standardmäßig */
-        cursor: pointer;
-    }
-
-
-    /*
-    Styles für den Haupt-Content-Bereich
-    */
-    section {
-        padding: 0 20px 20px;
-    }
-
-    .unicorn-main--title {
-        font-size: 3em;
-        font-weight: bold;
-        margin-bottom: 20px;
-        color: var(--md-sys-color-error);
-        text-align: center;
-    }
-
-    .tools-main {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        /* Abstand zwischen den Boxen */
-        justify-content: flex-start;
-        /* Boxen linksbündig ausrichten */
-    }
-
-    /*
-    Styles für die einzelnen Tool-Boxen (Karten)
-    Passt sich dem Browserfenster an und versucht, 4 pro Reihe zu zeigen.
-    */
-    .box-tools {
-        background-color: var(--md-sys-color-surface-container);
-        color: var(--md-sys-color-on-surface);
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px var(--md-sys-shadow-color);
-        display: flex;
-        flex-direction: column;
-        flex: 1 400px;
-    }
-
-    .box-title {
-        font-size: 1.2em;
-        font-weight: bold;
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: var(--md-sys-color-on-surface);
-        text-align: center;
-        border-bottom: 1px solid var(--md-sys-color-outline);
-        padding-bottom: 10px;
-    }
-
-    /*
-    Styles für die Button-Gruppen innerhalb der Boxen
-    Bleibt bei der zweireihigen Anordnung der Buttons.
-    */
-    .button-group-tools {
-        padding-top: 15px;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 10px;
-        /* Abstand zwischen den Buttons */
-        margin-bottom: 15px;
-        justify-content: center;
-        /* Buttons innerhalb der Gruppe zentrieren */
-    }
-
-    /*
-    Styles für die einzelnen Buttons (jetzt Graustufen)
-    Bleibt bei der Breitenanpassung für zwei Buttons pro Reihe.
-    */
-    .button-single {
-        appearance: none;
-        border: 1px solid var(--md-sys-color-outline);
-        outline: none;
-        cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-
-        /* Farben aus den neuen Button-Variablen (Graustufen) */
-        background-color: var(--md-sys-color-surface-variant);
-        color: var(--md-sys-color-surface-on-variant);
-
-        padding: 12px 16px;
-        border-radius: 10px;
-        font-size: 1em;
-        text-align: center;
-        text-decoration: none;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        font-weight: 500;
-
-        /* Breite anpassen, damit zwei Buttons in eine Reihe passen, unter Berücksichtigung des Gaps */
-        width: calc(50% - 5px);
-        height: 50px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    }
-
-    .button-single:hover {
-        background-color: var(--md-sys-color-surface-container-high);
-        /* Hintergrund beim Hover */
-        border-color: transparent;
-        /* Hover Border entfernen */
-        color: var(--md-sys-color-on-surface-container);
-        /* Textfarbe sollte gut auf Hover-Farbe passen */
-        transform: translateY(-2px);
-        /* Leichter Hover-Effekt */
-        box-shadow: 0 3px 8px var(--md-sys-shadow-color);
-        /* Schatten beim Hover erhöhen */
-        cursor: pointer;
-    }
-
-    /* Styles für den zusätzlichen Text innerhalb der Boxen */
-    .box-tools p {
-        font-size: 0.9em;
-        margin-top: 0;
-        margin-bottom: 5px;
-        color: var(--md-sys-color-on-surface);
-        text-align: center;
-    }
-
-    /*
-    Styles für den roten Floating Button unten rechts
-    */
-    .floating-mail-button {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 100;
-
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px 24px;
-        border-radius: 16px;
-        text-decoration: none;
-        font-size: 1.1em;
-        font-weight: bold;
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-    }
-
-    .floating-mail-button:hover {
-        transform: translateY(-2px);
-    }
-</style>
-
-<body>
-    <header>
-        <div class="header-box">
-            <div class="header-left"></div>
-            <div class="header-right">
-                <a class="header-link" target="_blank"
-                    href="https://www.wienernetze.at/o/document/210215-sm_anleitung_landis_gyr_uk_v5_bf">LGZ</a>
-                <a class="header-link" target="_blank"
-                    href="https://www.wienernetze.at/o/document/210213-sm_anleitung_siemens_uk_v4_bf">SMS</a>
-                <a class="header-link" target="_blank"
-                    href="https://www.wienernetze.at/o/document/210213-sm_anleitung_iskrameco_uk_v06_bf">ISK</a>
-                <a class="header-link" target="_blank"
-                    href="https://www.wienernetze.at/documents/34846/261085/Der_Ableseprozess.pdf/b2f018a6-fc82-578f-5bd4-d6d880c3f946?t=1586340649529">WN-Ableseprozess</a>
-            </div>
-        </div>
-    </header>
-    <section>
-        <p class="unicorn-main--title">Wichtige & Tägliche Arbeitsressourcen 🛠️</p>
-        <div class="tools-main">
-            <div class="box-tools">
-                <p class="box-title">Zeitpläne</p>
-                <div class="button-group-tools">
-                    <button class="button-single"
-                        onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc2.aspx?action=edit&sourcedoc=%7B79c7fd17-3b8b-4f6b-9e7e-b6f96c0d6cd8%7D&wdOrigin=TEAMS-MAGLEV.teamsSdk_ns.rwc&wdExp=TEAMS-TREATMENT&wdhostclicktime=1709636253264&web=1')">
-                        Mittagsplan
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wstw365-my.sharepoint.com/:x:/r/personal/nmuama_wstw_energy-it_net/_layouts/15/doc2.aspx?sourcedoc=%7BA77101AB-64A6-450B-9620-6FDE51765F08%7D&file=Pausenzeiten.xlsx&action=default&mobileredirect=true')">
-                        HO/Flexi - Mittagsplan
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7B4A5869C9-A49F-41A1-8BB8-AC2A80484B92%7D&file=Sitzplatzbuchung_Erdberg%201.xlsx&action=default&mobileredirect=true')">
-                        Sitzplan-CB08
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://apps.powerapps.com/play/e/0089faf5-df22-4012-a29b-93b3d081d5da/a/c9242c89-c412-4a5c-94fe-29e2a847c0d2?tenantId=2df2bcec-2017-4339-b493-e3d7b3a460c8&hint=77f70e51-131f-4968-9872-f617488b1244&skipmetadata=true')">
-                        DeskFinder
-                    </button>
-                </div>
-            </div>
-            <div class="box-tools">
-                <p class="box-title">System</p>
-                <div class="button-group-tools">
-                    <button class="button-single" style="border: dashed 3px red;"
-                        onclick="window.open('http://wienenergie.sabio.de/')">
-                        iTWIIN
-                    </button>
-                    <button class="button-single" style="border: dashed 3px red;"
-                        onclick="window.open('https://meine.wienenergie.at/mac/#/')">
-                        MAC
-                    </button>
-                    <button class="button-single" onclick="window.open('https://aufrufsystem/nova/Tickets')">
-                        Aufrufsystem
-                    </button>
-                    <button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">
-                        tois
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">
-                        Datenschutz
-                    </button>
-                    <button class="button-single" style="border: dashed 3px red;"
-                        onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">
-                        Copilot
-                    </button>
-                </div>
-            </div>
-            <div class="box-tools">
-                <p class="box-title">Strom & Gas</p>
-                <div class="button-group-tools">
-                    <button class="button-single"
-                        onclick="window.open('https://sapc2p.wstw.energy-it.net:8144/sap(bD1kZSZjPTIwMCZkPW1pbg==)/bc/bsp/sap/crm_ui_start/default.htm')">
-                        CRM
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_412d4c/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F412d4c%2FFreigegebene%20Dokumente%2FiTWIIN%2FPreisbl%C3%A4tter&viewid=9c0c91a1%2D0648%2D42b2%2D9cfa%2D70120c38f15b&csf=1&web=1&e=wr65mw&CID=68984949%2Db70e%2D44fa%2Dad4a%2D2ab6591166c0&FolderCTID=0x012000435180418F97054EB5AF9D055F9739B7')">
-                        Preisblätter
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://outlook.office.com/mail/rueckstand@wienenergie.at/')">
-                        Backlog
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://sarchpam30/pam4ws/frame/workplaceframe.aspx')">
-                        PAM
-                    </button>
-                </div>
-                <br>Dummy GP-Nr. 1250001023
-                <br>PV-VK-Vorlage 228000183897
-            </div>
-            <div class="box-tools">
-                <p class="box-title">Fernwärme</p>
-                <div class="button-group-tools">
-                    <button class="button-single" style="border: dashed 3px red;"
-                        onclick="window.open('http://spam01/PAM4/frame/workplaceframe.aspx')">
-                        PAM
-                    </button>
-                    <button class="button-single" style="background-color: #f58484; border: red solid 2px; color: black"
-                        onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_8cb9ed/Freigegebene%20Dokumente/Forms/AllItems.aspx?csf=1&web=1&e=t8tRjk&CID=c0d14d62%2D3ce8%2D4e7e%2Dab17%2Dc23098e08476&FolderCTID=0x01200004A2272D9E5EA54C998F1D00C04B2E9E&id=%2Fsites%2Fmsteams%5F8cb9ed%2FFreigegebene%20Dokumente%2FGeneral%2FWiener%20Wohnen%20Vertr%C3%A4ge')">
-                        WiWo Verträge
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://outlook.office.com/mail/rueckstand.waerme@wienenergie.at/')">
-                        Backlog
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('http://wstw365.sharepoint.com/:x:/r/sites/msteams_412d4c/Freigegebene%20Dokumente/iTWIIN/Dokumente/Fernw%C3%A4rme/Kalkulation%20der%20Ersteinstufung%20W%C3%A4rme%20-TBs.xlsx?d=we2ce3c55934841b087b5e56b36d98a55&csf=1&web=1&e=WzdOyi')">
-                        Wärme Kalkulator
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://webgis.wienit.at/WEB_P/synserver?project=fww&client=core')">
-                        WebGIS
-                    </button>
-                </div>
-            </div>
-            <div class="box-tools">
-                <p class="box-title">Tanke</p>
-                <div class="button-group-tools">
-                    <button class="button-single" onclick="window.open('https://app.chargecloud.de/quicknavigation')">
-                        EMEX
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://sp.wienenergie.at/CTY/emob/SitePages/Homepage.aspx')">
-                        Sharepoint
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://app.powerbi.com/groups/me/apps/c7a71521-6fe0-47c0-a548-2d8e05c7a57b/reports/6738a907-c364-4785-a8f8-094a0e38bcfa/ReportSection1d4125bf56b4c39f32a4?ctid=2df2bcec-2017-4339-b493-e3d7b3a460c8&experience=power-bi')">
-                        Stellplatz 🔎
-                    </button>
-                    <button class="button-single" onclick="window.open('https://itap.wstw.energy-it.net/#/orderMenue')">
-                        Störungsticket
-                    </button>
-                </div>
-            </div>
-            <div class="box-tools">
-                <p class="box-title">SuperSchnell</p>
-                <div class="button-group-tools">
-                    <button class="button-single"
-                        onclick="window.open('https://sp.wienenergie.at/APP/IntTvTel/_layouts/15/WopiFrame2.aspx?sourcedoc=%7BDF4E3B1B-5FC7-400F-98FA-A1336C0A3942%7D&action=edit&source=https%3A%2F%2Fsp%2Ewienenergie%2Eat%2FAPP%2FIntTvTel%2FSitePages%2FHomepage%2Easpx')">
-                        Sharepointliste
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/bd41fccab9604cf896920b2660d932b9')">
-                        Kodierung
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/fe72647b59ca4f68a750f8a593e4d829')">
-                        Rabatte
-                    </button>
-                </div>
-            </div>
-            <div class="box-tools">
-                <p class="box-title">Wiener Netze</p>
-                <div class="button-group-tools">
-                    <button class="button-single" onclick="window.open('https://www.wienernetze.at/stromversorgung')">
-                        Stromausfälle
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('https://outlook.office.com/mail/rueckstand@wienernetze.at/')">
-                        Backlog
-                    </button>
-                    <button class="button-single"
-                        onclick="window.open('http://sarchpam20/pam4weg/frame/workplaceframe.aspx')">
-                        PAM
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <style>
-        /*
-        Farben für den roten Floating Button (nach MD3 Error-Farben)
-        Definiert im root-Scope für den hellen Modus
-        */
-        :root {
-            --color-floating-button-background: #ba1a1a;
-            /* Kräftiges Rot im hellen Modus */
-            --color-floating-button-on-background: #ffffff;
-            /* Textfarbe (wird nicht angezeigt, aber gute Praxis) */
-        }
-
-        /*
-        Farben für den roten Floating Button im Dark Mode
-        */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --color-floating-button-background: #ffb4ab;
-                /* Helleres Rot im Dark Mode */
-                --color-floating-button-on-background: #690005;
-                /* Dunklerer Text (wird nicht angezeigt) */
-            }
-        }
-
-        /*
-        Styles für den roten Floating Button unten rechts ohne Inhalt (wie ein FAB)
-        */
-        .floating-mail-button {
-            position: fixed;
-            /* Fixiert die Position im Viewport */
-            bottom: 50px;
-            /* Abstand vom unteren Rand */
-            right: 70px;
-            /* Abstand vom rechten Rand */
-            z-index: 100;
-            /* Stellt sicher, dass der Button über anderen Elementen liegt */
-
-            /* Größe und Form eines Standard FABs */
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            /* Runde Form */
-            padding: 0;
-            /* Kein Innenabstand, da kein Inhalt */
-
-
+        body {
+            font-family: sans-serif;
+            margin: 0;
             display: flex;
-            /* Flexbox für Zentrierung (nützlich, falls doch mal ein Icon rein soll) */
+            flex-direction: row;
+            height: 100vh;
+            background-color: #f4f4f4;
+            overflow: hidden;
+        }
+
+        .tab-navigation {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: var(--md-sys-color-surface-container-high);
+            width: 70px;
+            height: 100vh;
+            box-sizing: border-box;
+            border-right: 1px solid var(--md-sys-color-outline);
+        }
+
+        .logo-placeholder {
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .tab-buttons-wrapper {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            padding-bottom: 10px;
+            gap: 10px;
+        }
+
+        .tab-button {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            border: none;
+            background-color: var(--md-sys-color-surface-container);
+            color: white;
+            border-radius: 10px;
+            border: 1px solid var(--md-sys-color-outline);
+            outline: none;
+            display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            box-sizing: border-box;
+            font-size: 30px;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 
-            text-decoration: none;
-            /* Falls es ein Link-Element ist */
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-            /* Prominenter Schatten */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-            /* Übergänge für Effekte */
         }
 
-        .floating-mail-button:hover {
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        .tab-buttons-wrapper .tab-button:last-child {
+            margin-top: 0;
+        }
+
+
+        .tab-button:hover {
+            background-color: var(--md-sys-color-surface-container-high);
+            /* Hintergrund beim Hover */
+            border-color: transparent;
+            /* Hover Border entfernen */
+            color: var(--md-sys-color-on-surface-container);
+            /* Textfarbe sollte gut auf Hover-Farbe passen */
             transform: translateY(-2px);
-            /* Leichter "Heben" Effekt */
+            /* Leichter Hover-Effekt */
+            box-shadow: 0 3px 8px var(--md-sys-shadow-color);
+            /* Schatten beim Hover erhöhen */
+            cursor: pointer;
         }
 
-        .floating-mail-button:active {
-            /* Farbe beim Active (Klick): Etwas dunkler und kleinerer Schatten */
-            background-color: color-mix(in srgb, var(--color-floating-button-background) 80%, black 20%);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-            transform: translateY(0);
+        .tab-button.active {
+            background-color: var(--md-sys-color-on-primary);
         }
 
+        .iframe-container {
+            flex-grow: 1;
+            height: 100vh;
+            padding: 0;
+            border: none;
+            position: relative;
+            /* Wichtig für die Positionierung der iframes übereinander */
+        }
 
-        /*
-        Responsive Anpassung für den Floating Button auf kleineren Bildschirmen
-        */
-        @media (max-width: 768px) {
+        /* Änderungen für die iframes */
+        .content-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            /* Standardmäßig alle iframes ausblenden */
+            position: absolute;
+            /* Damit sie sich nicht den Platz teilen, sondern übereinander liegen */
+            top: 0;
+            left: 0;
+        }
 
-            /* Beispiel-Breakpoint */
-            .floating-mail-button {
-                bottom: 15px;
-                /* Kleinerer Abstand */
-                right: 15px;
-                /* Kleinerer Abstand */
-                width: 40px;
-                /* Kleinere Größe */
-                height: 40px;
-            }
+        .content-iframe.active-iframe {
+            display: block;
+            /* Nur den aktiven iframe anzeigen */
         }
     </style>
+</head>
 
-    <a href="mail-template.html" class="floating-mail-button" target="_blank" style="font-size: 120px;">📧</a>
+<body>
+
+    <nav class="tab-navigation">
+        <div class="logo-placeholder">🦄</div>
+        <div class="tab-buttons-wrapper">
+            <button class="tab-button" onclick="openPage('mail-template.html', this)">📧</button>
+            <button class="tab-button active" onclick="openPage('we-quicklinks.html', this)">🛠️</button>
+            <button class="tab-button" onclick="openPage('we-dashboard.html', this)">📲</button>
+            <button class="tab-button" onclick="openPage('we-widgets.html', this)">🧩</button>
+        </div>
+    </nav>
+
+    <div class="iframe-container">
+        <iframe data-page-url="we-dashboard.html" src="we-iframe/we-dashboard.html" class="content-iframe"></iframe>
+        <iframe data-page-url="mail-template.html" src="we-iframe/mail-template.html" class="content-iframe "></iframe>
+        <iframe data-page-url="we-quicklinks.html" src="we-iframe/we-quicklinks.html" class="content-iframe active-iframe"></iframe>
+        <iframe data-page-url="we-widgets.html" src="we-iframe/we-widgets.html" class="content-iframe"></iframe>
+    </div>
+
+    <script>
+        function openPage(pageUrl, elmnt) {
+            // Alle iframes auswählen
+            var iframes = document.querySelectorAll('.content-iframe');
+            iframes.forEach(function (iframe) {
+                // Den gewünschten iframe sichtbar machen, andere ausblenden
+                if (iframe.getAttribute('data-page-url') === pageUrl) {
+                    iframe.classList.add('active-iframe');
+                } else {
+                    iframe.classList.remove('active-iframe');
+                }
+            });
+
+            // Aktiven Status von allen Buttons entfernen
+            var tabButtons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+
+            // Aktiven Status zum geklickten Button hinzufügen
+            elmnt.classList.add("active");
+        }
+
+    </script>
 
 </body>
 
