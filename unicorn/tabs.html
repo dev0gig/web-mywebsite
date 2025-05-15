@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Übersicht</title>
+    <link rel="stylesheet" href="../global/color-palette.css">
     <style>
         body {
             font-family: sans-serif;
@@ -19,16 +21,16 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background-color: #333;
-            padding: 20px 10px;
-            width: 120px;
+            background-color: var(--md-sys-color-surface-container-high);
+            width: 70px;
             height: 100vh;
             box-sizing: border-box;
+            border-right: 1px solid var(--md-sys-color-outline);
         }
 
         .logo-placeholder {
             color: white;
-            font-size: 20px;
+            font-size: 40px;
             font-weight: bold;
             text-align: center;
             padding: 10px 0;
@@ -38,34 +40,32 @@
             display: flex;
             flex-direction: column-reverse;
             align-items: center;
+            padding-bottom: 10px;
+            gap: 10px;
         }
 
         .tab-button {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
             border: none;
             background-color: #555;
             color: white;
-            margin-top: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--md-sys-color-outline);
             outline: none;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             box-sizing: border-box;
-            font-size: 12px;
+            font-size: 30px;
         }
 
         /* Der unterste Button (Dashboard) soll keinen margin-top haben, da er der letzte ist */
         /* In column-reverse ist der :last-child im DOM der unterste visuell */
         .tab-buttons-wrapper .tab-button:last-child {
             margin-top: 0;
-        }
-         /* Alle anderen Buttons (also die oberen) bekommen den margin-top */
-        .tab-buttons-wrapper .tab-button:not(:last-child) {
-            margin-top: 10px;
         }
 
 
@@ -83,7 +83,8 @@
             height: 100vh;
             padding: 0;
             border: none;
-            position: relative; /* Wichtig für die Positionierung der iframes übereinander */
+            position: relative;
+            /* Wichtig für die Positionierung der iframes übereinander */
         }
 
         /* Änderungen für die iframes */
@@ -91,25 +92,29 @@
             width: 100%;
             height: 100%;
             border: none;
-            display: none; /* Standardmäßig alle iframes ausblenden */
-            position: absolute; /* Damit sie sich nicht den Platz teilen, sondern übereinander liegen */
+            display: none;
+            /* Standardmäßig alle iframes ausblenden */
+            position: absolute;
+            /* Damit sie sich nicht den Platz teilen, sondern übereinander liegen */
             top: 0;
             left: 0;
         }
 
         .content-iframe.active-iframe {
-            display: block; /* Nur den aktiven iframe anzeigen */
+            display: block;
+            /* Nur den aktiven iframe anzeigen */
         }
     </style>
 </head>
+
 <body>
 
     <nav class="tab-navigation">
-        <div class="logo-placeholder">LOGO</div>
+        <div class="logo-placeholder">🦄</div>
         <div class="tab-buttons-wrapper">
-            <button class="tab-button" onclick="openPage('work-tools.html', this)">Arbeits-mittel</button>
-            <button class="tab-button" onclick="openPage('mail-template.html', this)">Mail-vorlagen</button>
-            <button class="tab-button active" onclick="openPage('we-dashboard.html', this)">Dashboard</button>
+            <button class="tab-button" onclick="openPage('mail-template.html', this)">📧</button>
+            <button class="tab-button" onclick="openPage('work-tools.html', this)">🛠️</button>
+            <button class="tab-button active" onclick="openPage('we-dashboard.html', this)">📲</button>
         </div>
     </nav>
 
@@ -123,7 +128,7 @@
         function openPage(pageUrl, elmnt) {
             // Alle iframes auswählen
             var iframes = document.querySelectorAll('.content-iframe');
-            iframes.forEach(function(iframe) {
+            iframes.forEach(function (iframe) {
                 // Den gewünschten iframe sichtbar machen, andere ausblenden
                 if (iframe.getAttribute('data-page-url') === pageUrl) {
                     iframe.classList.add('active-iframe');
@@ -151,4 +156,5 @@
     </script>
 
 </body>
+
 </html>

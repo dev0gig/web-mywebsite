@@ -30,7 +30,7 @@ body {
         .navbar {
             position: fixed;
             top: 0;
-            left: 0;
+            right: 0;
             background-color: var(--md-sys-color-surface-container-high);
             /* Hintergrund aus Palette */
             color: var(--md-sys-color-on-surface-container);
@@ -45,6 +45,7 @@ body {
             /* Breite beibehalten */
             height: 100vh;
             /* Volle Viewport Höhe */
+            border-left: 1px solid var(--md-sys-color-outline);
             box-sizing: border-box;
             /* Padding in Breite/Höhe einbeziehen */
             box-shadow: 2px 0 6px var(--md-sys-shadow-color);
@@ -104,7 +105,7 @@ body {
         }
 
         .main {
-            padding: 20px;
+            padding: 50px;
             /* Padding beibehalten */
             flex: 1;
             /* Nimmt verfügbaren Platz ein */
@@ -115,7 +116,7 @@ body {
             /* Entfernt - lässt Inhalt normal scrollen */
             gap: 40px;
             /* Großer Abstand zwischen Sektionen */
-            margin-left: 290px;
+            margin-right: 250px;
             /* Platz für Nav + Padding */
             /* Nav width (250) + Nav Padding Right (20) + Main Padding Left (20) = 290 */
             /* Oder Nav width (250) + etwas Gap (40) = 290? Let's use 290 for now. */
@@ -253,11 +254,7 @@ body {
         <h1>Inofficial Tools</h1>
         <div class="inofficialTools">
             <div class="button-group">
-                <button class="button-single"
-                    onclick="window.location.href = 'mail-template.html'">📧 Mailvorlagen</button>
-                <button class="button-single" onclick="window.location.href = 'work-tools.html'">🛠️ wichtige Tools</button>
-                <button class="button-single"
-                    onclick="window.location.href = 'tabs.html'">TEST</button>
+                <button class="button-single" onclick="window.location.href = 'work-tools.html'">Wichtige & Tägliche Arbeitsressourcen 🛠️</button>
             </div>
         </div>
 
