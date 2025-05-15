@@ -125,8 +125,8 @@
         <div class="logo-placeholder">🦄</div>
         <div class="tab-buttons-wrapper">
             <button class="tab-button" onclick="openPage('mail-template.html', this)">📧</button>
-            <button class="tab-button" onclick="openPage('work-tools.html', this)">🛠️</button>
-            <button class="tab-button active" onclick="openPage('we-dashboard.html', this)">📲</button>
+            <button class="tab-button active" onclick="openPage('work-tools.html', this)">🛠️</button>
+            <button class="tab-button" onclick="openPage('we-dashboard.html', this)">📲</button>
         </div>
     </nav>
 
@@ -159,12 +159,6 @@
             elmnt.classList.add("active");
         }
 
-        // Die Initialisierung des richtigen aktiven Tabs und iframes
-        // wird jetzt durch die HTML-Klassen 'active' (für den Button)
-        // und 'active-iframe' (für den iframe) direkt im Markup gesteuert.
-        // Ein DOMContentLoaded-Skript ist für diese Logik nicht mehr zwingend erforderlich,
-        // da die CSS-Regeln die initiale Sichtbarkeit basierend auf diesen Klassen handhaben.
-        // Alle iframes laden ihren 'src' beim Seitenaufruf.
     </script>
 
 </body>
