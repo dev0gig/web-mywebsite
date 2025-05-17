@@ -364,5 +364,11 @@ const appsData = [
         iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0fg2blaCobbugLH35r6a_lkr94SU6ukqqjw&s",
         targetUrl: "https://xserv.kdportal.de/show/Kunde_Vertraege",
         ariaLabel: "SunContracting"
+    },
+    {
+        id: "WienMobil",
+        iconUrl: "https://play-lh.googleusercontent.com/r342hitqOFjStwAhRFP8-KosAVepIDU3xAc-9NadGUlP80-3TkCBDsty8N3SqKUsIQ=w240-h480-rw",
+        targetUrl: "https://www.wienmobil.at/",
+        ariaLabel: "WienMobil"
     }
 ];
