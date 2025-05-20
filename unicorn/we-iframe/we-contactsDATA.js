@@ -41,4 +41,44 @@ const kontakte = [
         mail: "technischerkundendienst@wienenergie.at",
         notizen: "01 4004 84830 - direkte nummer"
     },
+    {
+        id: 6,
+        name: "ServiceTreff Spittelau",
+        nummer: "0800 500 800",
+        adresse: "Spittelauer Lände 45\n1090 Wien",
+        mail: "-",
+        notizen: "Öffnungszeiten:\nMontag - Donnerstag: 8:00 - 19:00 Uhr (bis 20:00 Uhr mit Termin)\nFreitag: 8:00 - 15:00 Uhr (bis 16:00 Uhr mit Termin)\nTerminvereinbarung unter: https://www.servicetreff.at/"
+    },
+    {
+        id: 7,
+        name: "WienerNetze",
+        nummer: "050 128 10100",
+        adresse: "Spittelauer Lände 45\n1090 Wien",
+        mail: "-",
+        notizen: "Öffnungszeiten:\nMontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr\nTerminvereinbarung unter: https://www.servicetreff.at/"
+    },
+    {
+        id: 8,
+        name: "ServicePoint Erdberg",
+        nummer: "0800 500 800",
+        adresse: "Thomas-Klestil-Platz 4\n1030 Wien",
+        mail: "-",
+        notizen: "Öffnungszeiten:\nMo-Do: 8:00-19:00 Uhr (mit Termin bis 20:00 Uhr)\nFr: 8:00-15:00 Uhr (mit Termin bis 16:00 Uhr)\nTerminvereinbarung unter: https://www.servicetreff.at/"
+    },
+    {
+        id: 9,
+        name: "ServicePoint Guntramsdorf",
+        nummer: "0800 500 800",
+        adresse: "Rathaus Viertel 1, 1. OG\n2353 Guntramsdorf",
+        mail: "-",
+        notizen: "Öffnungszeiten:\nontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr"
+    },
+    {
+        id: 10,
+        name: "Inkassobüro Riverty",
+        nummer: "+43 (0)386 80 90 38",
+        adresse: "Getrude-Fröhlich-Sandner-Straße 1/2\n1100 Wien",
+        mail: "-",
+        notizen: "Homepage: www.riverty.com"
+    },
 ];
