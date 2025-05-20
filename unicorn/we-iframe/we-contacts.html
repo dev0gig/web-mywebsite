@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Kontakte</title>
+    <link rel="stylesheet" href="../../global/color-palette.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+            line-height: 1.5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .linke-spalte {
+            width: 350px;
+            background-color: var(--md-sys-color-surface-container-low);
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid var(--md-sys-color-outline);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #suchfeld {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 16px;
+            box-sizing: border-box;
+            background-color: var(--md-sys-color-surface-container-highest);
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 1rem;
+        }
+
+        #suchfeld::placeholder {
+            color: var(--md-sys-color-on-surface-variant);
+            opacity: 0.7;
+        }
+
+        #suchfeld:focus {
+            outline: 2px solid var(--md-sys-color-primary);
+            border-color: transparent;
+        }
+
+        .kontaktliste-ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+            border-radius: 8px;
+        }
+
+        .kontaktliste-ul li {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+
+        .kontaktliste-ul li:hover {
+            background-color: var(--md-sys-color-surface-container-high);
+        }
+
+        .kontaktliste-ul li.aktiv {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            font-weight: 500;
+        }
+
+        .kontaktliste-ul li.aktiv:hover {
+            background-color: var(--md-sys-color-primary-container);
+        }
+
+        .rechte-spalte {
+            flex-grow: 1;
+            padding: 24px 32px;
+            box-sizing: border-box;
+            background-color: var(--md-sys-color-surface);
+        }
+
+        .rechte-spalte h2 {
+            color: var(--md-sys-color-primary);
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        #details-ansicht {
+            background-color: var(--md-sys-color-surface-container);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px var(--md-sys-shadow-color);
+        }
+
+        #details-ansicht h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: var(--md-sys-color-on-surface);
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        #details-ansicht>p {
+            margin: 10px 0;
+            line-height: 1.7;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 0.95rem;
+        }
+
+        #details-ansicht table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        #details-ansicht table td {
+            padding: 10px 0px;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        #details-ansicht table td:first-child {
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            width: 110px;
+            padding-right: 16px;
+        }
+
+        #details-ansicht table td:last-child {
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* NEU: Styling für die Notizen-Zelle, um Zeilenumbrüche zu erhalten */
+        #details-ansicht table td.notizen-zelle {
+            white-space: pre-line;
+            /* Erhält Zeilenumbrüche und Leerzeichen am Zeilenanfang/-ende, bricht aber normal um */
+        }
+
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--md-sys-color-surface-container-low);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--md-sys-color-outline);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--md-sys-color-on-surface-variant);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <aside class="linke-spalte">
+            <div class="suche-container">
+                <input type="text" id="suchfeld" placeholder="Kontakt suchen...">
+            </div>
+            <ul id="kontaktliste" class="kontaktliste-ul">
+            </ul>
+        </aside>
+
+        <main class="rechte-spalte" id="kontaktdetails-container">
+            <h2>Kontaktdetails</h2>
+            <div id="details-ansicht">
+                <p>Wähle einen Kontakt aus der Liste aus, um die Details anzuzeigen.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="we-contactsDATA.js"></script>
+
+    <script>
+        const kontaktlisteUl = document.getElementById('kontaktliste');
+        const suchfeldInput = document.getElementById('suchfeld');
+        const detailsAnsichtDiv = document.getElementById('details-ansicht');
+
+        function zeigeKontaktdetails(kontakt) {
+            if (kontakt) {
+                // Sicherstellen, dass Notizen vorhanden sind, ansonsten leerer String
+                const notizenText = kontakt.notizen || "";
+
+                detailsAnsichtDiv.innerHTML = `
+                    <h3>${kontakt.name}</h3>
+                    <table>
+                        <tr>
+                            <td>Nummer:</td>
+                            <td>${kontakt.nummer}</td>
+                        </tr>
+                        <tr>
+                            <td>Adresse:</td>
+                            <td>${kontakt.adresse}</td>
+                        </tr>
+                        <tr>
+                            <td>E-Mail:</td>
+                            <td>${kontakt.mail}</td>
+                        </tr>
+                        <tr>
+                            <td>Notizen:</td>
+                            <td class="notizen-zelle">${notizenText}</td>
+                        </tr>
+                    </table>
+                `;
+            } else {
+                detailsAnsichtDiv.innerHTML = '<p>Wähle einen Kontakt aus der Liste aus, um die Details anzuzeigen.</p>';
+            }
+        }
+
+        function rendereKontaktliste(anzuzeigendeKontakte) {
+            kontaktlisteUl.innerHTML = '';
+
+            if (!Array.isArray(anzuzeigendeKontakte)) {
+                console.error("Fehler: Es wurde kein gültiges Kontaktarray an rendereKontaktliste übergeben.");
+                const li = document.createElement('li');
+                li.textContent = 'Fehler beim Laden der Kontakte.';
+                li.style.cursor = 'default';
+                kontaktlisteUl.appendChild(li);
+                return;
+            }
+
+            const sortierteKontakte = [...anzuzeigendeKontakte].sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            });
+
+            if (sortierteKontakte.length === 0 && suchfeldInput.value !== "") {
+                const li = document.createElement('li');
+                li.textContent = 'Keine Kontakte für deine Suche gefunden.';
+                li.style.cursor = 'default';
+                kontaktlisteUl.appendChild(li);
+                zeigeKontaktdetails(null);
+                return;
+            } else if (sortierteKontakte.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Keine Kontakte vorhanden.';
+                li.style.cursor = 'default';
+                kontaktlisteUl.appendChild(li);
+                zeigeKontaktdetails(null);
+                return;
+            }
+
+            sortierteKontakte.forEach(kontakt => {
+                const li = document.createElement('li');
+                li.textContent = kontakt.name;
+                li.dataset.kontaktId = kontakt.id;
+
+                li.addEventListener('click', () => {
+                    document.querySelectorAll('#kontaktliste li').forEach(item => item.classList.remove('aktiv'));
+                    li.classList.add('aktiv');
+                    zeigeKontaktdetails(kontakt);
+                });
+                kontaktlisteUl.appendChild(li);
+            });
+        }
+
+        function filtereKontakte() {
+            const suchbegriff = suchfeldInput.value.toLowerCase();
+            if (typeof kontakte === 'undefined' || !Array.isArray(kontakte)) {
+                console.error("Kontaktdaten sind nicht verfügbar.");
+                rendereKontaktliste([]);
+                return;
+            }
+            const gefilterteKontakte = kontakte.filter(kontakt => {
+                // Suche auch im Notizfeld
+                const notizenMatch = kontakt.notizen ? kontakt.notizen.toLowerCase().includes(suchbegriff) : false;
+                return kontakt.name.toLowerCase().includes(suchbegriff) ||
+                    kontakt.nummer.toLowerCase().includes(suchbegriff) ||
+                    (kontakt.adresse && kontakt.adresse.toLowerCase().includes(suchbegriff)) ||
+                    (kontakt.mail && kontakt.mail.toLowerCase().includes(suchbegriff)) ||
+                    notizenMatch; // NEU: Notizen in die Suche einbeziehen
+            });
+            rendereKontaktliste(gefilterteKontakte);
+
+            const aktivesElement = kontaktlisteUl.querySelector('li.aktiv');
+            if (gefilterteKontakte.length > 0) {
+                if (!aktivesElement || !gefilterteKontakte.find(k => k.id == aktivesElement.dataset.kontaktId)) {
+                    // Optional
+                }
+            }
+        }
+
+        suchfeldInput.addEventListener('input', filtereKontakte);
+
+        if (typeof kontakte !== 'undefined' && Array.isArray(kontakte)) {
+            rendereKontaktliste(kontakte);
+            if (kontakte.length > 0) {
+                zeigeKontaktdetails(null);
+            } else {
+                zeigeKontaktdetails(null);
+            }
+        } else {
+            console.error("Kontaktdaten konnten nicht geladen werden. 'kontakte-data.js' überprüfen.");
+            const li = document.createElement('li');
+            li.textContent = 'Kontaktdaten konnten nicht geladen werden.';
+            kontaktlisteUl.appendChild(li);
+            zeigeKontaktdetails(null);
+        }
+    </script>
+</body>
+
+</html>
