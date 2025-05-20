@@ -370,5 +370,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/r342hitqOFjStwAhRFP8-KosAVepIDU3xAc-9NadGUlP80-3TkCBDsty8N3SqKUsIQ=w240-h480-rw",
         targetUrl: "https://www.wienmobil.at/",
         ariaLabel: "WienMobil"
+    },
+    {
+        id: "Figma",
+        iconUrl: "https://play-lh.googleusercontent.com/hoVBnPBRehmXsCqESLXRH2E3OTxklkwKZlb1psn7imm0VUSobn2nevS9RRFWb9GM4-o=s48-rw",
+        targetUrl: "https://www.figma.com/",
+        ariaLabel: "Figma"
     }
 ];
