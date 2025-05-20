@@ -63,11 +63,16 @@
         }
 
         .kontaktliste-ul li {
-            padding: 12px 16px;
+            padding: 10px 16px;
+            /* Etwas weniger Padding oben/unten für Bild */
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
             border-radius: 8px;
             margin-bottom: 4px;
+            display: flex;
+            /* NEU: Für Logo und Name nebeneinander */
+            align-items: center;
+            /* NEU: Vertikal zentrieren */
         }
 
         .kontaktliste-ul li:hover {
@@ -75,13 +80,28 @@
         }
 
         .kontaktliste-ul li.aktiv {
-            background-color: var(--md-sys-color-primary-container);
+            background-color: var(--md-sys-color-surface-container-high);
             color: var(--md-sys-color-on-primary-container);
             font-weight: 500;
+            border: 1px solid var(--md-sys-color-outline);
         }
 
-        .kontaktliste-ul li.aktiv:hover {
-            background-color: var(--md-sys-color-primary-container);
+        /* NEU: Styling für das Kontaktlogo */
+        .kontakt-logo {
+            width: 32px;
+            /* Breite des Logos anpassen */
+            height: 32px;
+            /* Höhe des Logos anpassen */
+            border-radius: 50%;
+            /* Rundes Logo */
+            margin-right: 12px;
+            /* Abstand zum Namen */
+            object-fit: cover;
+            /* Stellt sicher, dass das Bild den Bereich gut ausfüllt */
+            flex-shrink: 0;
+            /* Verhindert, dass das Logo schrumpft */
+            background-color: var(--md-sys-color-surface-container-highest);
+            /* Hintergrund für den Fall, dass das Bild transparente Bereiche hat */
         }
 
         .rechte-spalte {
@@ -143,10 +163,8 @@
             color: var(--md-sys-color-on-surface-variant);
         }
 
-        /* NEU: Styling für die Notizen-Zelle, um Zeilenumbrüche zu erhalten */
         #details-ansicht table td.notizen-zelle {
             white-space: pre-line;
-            /* Erhält Zeilenumbrüche und Leerzeichen am Zeilenanfang/-ende, bricht aber normal um */
         }
 
 
@@ -198,9 +216,11 @@
         const suchfeldInput = document.getElementById('suchfeld');
         const detailsAnsichtDiv = document.getElementById('details-ansicht');
 
+        // NEU: Pfad zum Platzhalterbild. Passe diesen Pfad ggf. an.
+        const PLACEHOLDER_LOGO_URL = 'https://images.icon-icons.com/1042/PNG/512/Contact_Icon_icon-icons.com_76434.png'; // z.B. 'img/platzhalter-avatar.svg'
+
         function zeigeKontaktdetails(kontakt) {
             if (kontakt) {
-                // Sicherstellen, dass Notizen vorhanden sind, ansonsten leerer String
                 const notizenText = kontakt.notizen || "";
 
                 detailsAnsichtDiv.innerHTML = `
@@ -212,11 +232,11 @@
                         </tr>
                         <tr>
                             <td>Adresse:</td>
-                            <td>${kontakt.adresse}</td>
+                            <td>${kontakt.adresse || '-'}</td>
                         </tr>
                         <tr>
                             <td>E-Mail:</td>
-                            <td>${kontakt.mail}</td>
+                            <td>${kontakt.mail || '-'}</td>
                         </tr>
                         <tr>
                             <td>Notizen:</td>
@@ -263,8 +283,27 @@
 
             sortierteKontakte.forEach(kontakt => {
                 const li = document.createElement('li');
-                li.textContent = kontakt.name;
                 li.dataset.kontaktId = kontakt.id;
+
+                // NEU: Logo-Element erstellen
+                const logoImg = document.createElement('img');
+                logoImg.classList.add('kontakt-logo');
+                // Verwende kontakt.logoUrl, wenn vorhanden, sonst den Platzhalter
+                logoImg.src = kontakt.logoUrl || PLACEHOLDER_LOGO_URL;
+                logoImg.alt = kontakt.name; // Alternativtext für Barrierefreiheit
+                // Fehlerbehandlung für nicht ladbare Bilder (optional, aber gut)
+                logoImg.onerror = function () {
+                    this.src = PLACEHOLDER_LOGO_URL; // Fallback auf Platzhalter, falls spezifisches Logo nicht lädt
+                    this.alt = 'Platzhalterbild';
+                };
+
+
+                // NEU: Span für den Namen erstellen
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = kontakt.name;
+
+                li.appendChild(logoImg);  // Logo zum li hinzufügen
+                li.appendChild(nameSpan); // Namen zum li hinzufügen
 
                 li.addEventListener('click', () => {
                     document.querySelectorAll('#kontaktliste li').forEach(item => item.classList.remove('aktiv'));
@@ -283,22 +322,22 @@
                 return;
             }
             const gefilterteKontakte = kontakte.filter(kontakt => {
-                // Suche auch im Notizfeld
                 const notizenMatch = kontakt.notizen ? kontakt.notizen.toLowerCase().includes(suchbegriff) : false;
                 return kontakt.name.toLowerCase().includes(suchbegriff) ||
                     kontakt.nummer.toLowerCase().includes(suchbegriff) ||
                     (kontakt.adresse && kontakt.adresse.toLowerCase().includes(suchbegriff)) ||
                     (kontakt.mail && kontakt.mail.toLowerCase().includes(suchbegriff)) ||
-                    notizenMatch; // NEU: Notizen in die Suche einbeziehen
+                    notizenMatch;
             });
             rendereKontaktliste(gefilterteKontakte);
 
-            const aktivesElement = kontaktlisteUl.querySelector('li.aktiv');
-            if (gefilterteKontakte.length > 0) {
-                if (!aktivesElement || !gefilterteKontakte.find(k => k.id == aktivesElement.dataset.kontaktId)) {
-                    // Optional
-                }
-            }
+            // Logik für aktives Element beibehalten oder anpassen, falls nötig
+            // const aktivesElement = kontaktlisteUl.querySelector('li.aktiv');
+            // if (gefilterteKontakte.length > 0) {
+            //     if (!aktivesElement || !gefilterteKontakte.find(k => k.id == aktivesElement.dataset.kontaktId)) {
+            //         // Optional
+            //     }
+            // }
         }
 
         suchfeldInput.addEventListener('input', filtereKontakte);
@@ -306,14 +345,21 @@
         if (typeof kontakte !== 'undefined' && Array.isArray(kontakte)) {
             rendereKontaktliste(kontakte);
             if (kontakte.length > 0) {
+                // Zeige initial keine Details oder den ersten Kontakt, je nach Präferenz
                 zeigeKontaktdetails(null);
+                // Optional: Um den ersten Kontakt der Liste initial anzuzeigen und als aktiv zu markieren:
+                // if (kontaktlisteUl.firstChild) {
+                //     kontaktlisteUl.firstChild.classList.add('aktiv');
+                //     zeigeKontaktdetails(kontakte.sort((a,b) => a.name.localeCompare(b.name))[0]);
+                // }
             } else {
                 zeigeKontaktdetails(null);
             }
         } else {
-            console.error("Kontaktdaten konnten nicht geladen werden. 'kontakte-data.js' überprüfen.");
+            console.error("Kontaktdaten konnten nicht geladen werden. 'we-contactsDATA.js' überprüfen.");
             const li = document.createElement('li');
             li.textContent = 'Kontaktdaten konnten nicht geladen werden.';
+            li.style.cursor = 'default';
             kontaktlisteUl.appendChild(li);
             zeigeKontaktdetails(null);
         }

@@ -7,7 +7,8 @@ const kontakte = [
         nummer: "050 230 230 300",
         adresse: "-",
         mail: "info@ista.at",
-        notizen: ""
+        notizen: "",
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT683fy7ftfs8q18hrQVO3LoFp8lpnSckinzw&s"
     },
     {
         id: 2,
@@ -15,7 +16,8 @@ const kontakte = [
         nummer: "01 712 63 35",
         adresse: "-",
         mail: "we@thermomatic.at",
-        notizen: ""
+        notizen: "",
+        logoUrl: "https://www.thermomatic.at/wp-content/uploads/2021/03/logo.png"
     },
     {
         id: 3,
@@ -55,7 +57,8 @@ const kontakte = [
         nummer: "050 128 10100",
         adresse: "Spittelauer Lände 45\n1090 Wien",
         mail: "-",
-        notizen: "Öffnungszeiten:\nMontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr\nTerminvereinbarung unter: https://www.servicetreff.at/"
+        notizen: "Öffnungszeiten:\nMontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr\nTerminvereinbarung unter: https://www.servicetreff.at/",
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5WqXRlwouRsGNkI5Nvt5YxPpR-2xJgxeYdw&s"
     },
     {
         id: 8,
@@ -79,6 +82,7 @@ const kontakte = [
         nummer: "+43 (0)386 80 90 38",
         adresse: "Getrude-Fröhlich-Sandner-Straße 1/2\n1100 Wien",
         mail: "-",
-        notizen: "Homepage: www.riverty.com"
+        notizen: "Homepage: www.riverty.com",
+        logoUrl: "https://riverty.design/favicons/green/apple-touch-icon.png"
     },
 ];
