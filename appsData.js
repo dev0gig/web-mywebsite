@@ -388,5 +388,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/-jz18EgBYlmeHlnsq_iltq6uLnYFtXAVR_gi_d0qEj0pANQ1MtrJIstJoCQtImlWKwc=s48-rw",
         targetUrl: "https://www.bitwarden.com/",
         ariaLabel: "Bitwarden"
+    },
+    {
+        id: "Logseq",
+        iconUrl: "https://docs.logseq.com/static/img/logo.png",
+        targetUrl: "https://demo.logseq.com/",
+        ariaLabel: "Logseq"
     }
 ];
