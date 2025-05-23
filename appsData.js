@@ -394,5 +394,11 @@ const appsData = [
         iconUrl: "https://docs.logseq.com/static/img/logo.png",
         targetUrl: "https://demo.logseq.com/",
         ariaLabel: "Logseq"
+    },
+    {
+        id: "Google Calendar",
+        iconUrl: "https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480-rw",
+        targetUrl: "https://calendar.google.com/calendar/u/0/r",
+        ariaLabel: "Google Calendar"
     }
 ];
