@@ -400,5 +400,29 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/_bh6XK3B7TAk7kBXC1GHC0j9eS9cw9wQo2K7fiP7FDGAQlcOqgUPT2lx3WgZ0JlOJh8=w240-h480-rw",
         targetUrl: "https://calendar.google.com/calendar/u/0/r",
         ariaLabel: "Google Calendar"
+    },
+    {
+        id: "Gmail",
+        iconUrl: "https://play-lh.googleusercontent.com/KSuaRLiI_FlDP8cM4MzJ23ml3og5Hxb9AapaGTMZ2GgR103mvJ3AAnoOFz1yheeQBBI=w240-h480-rw",
+        targetUrl: "https://mail.google.com/mail/u/0/#inbox",
+        ariaLabel: "Gmail"
+    },
+    {
+        id: "Outlook",
+        iconUrl: "https://play-lh.googleusercontent.com/Zk9elS0eGXDr0L4W6-Ey7YwHbRNjkyezHC8iCc8rWp64lNIjlByS8TDF9qDSZbiEWY4=s48-rw",
+        targetUrl: "https://outlook.live.com/mail/inbox",
+        ariaLabel: "Outlook"
+    },
+    {
+        id: "Proton Mail",
+        iconUrl: "https://play-lh.googleusercontent.com/99IPL5W1HvN1TM7awcJ2gihUie-LQ5Ae7W9g0FgCBFJ8hNZnFIOJElyBPNcx4Wcx7A=w240-h480-rw",
+        targetUrl: "https://www.proton.me/de/mail",
+        ariaLabel: "Proton Mail"
+    },
+    {
+        id: "Apple Mail",
+        iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mail_%28iOS%29.svg/1024px-Mail_%28iOS%29.svg.png",
+        targetUrl: "https://www.icloud.com/mail/",
+        ariaLabel: "Apple Mail"
     }
 ];
