@@ -424,5 +424,11 @@ const appsData = [
         iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mail_%28iOS%29.svg/1024px-Mail_%28iOS%29.svg.png",
         targetUrl: "https://www.icloud.com/mail/",
         ariaLabel: "Apple Mail"
+    },
+    {
+        id: "Booking.com",
+        iconUrl: "https://play-lh.googleusercontent.com/OSr8skhGVmspz4WJQgjGcaFy1OkIJrd_Afr_X6a9Z4tAAtq4bDdOmxlCbSznf0UFxnai=w240-h480-rw",
+        targetUrl: "https://www.booking.com/",
+        ariaLabel: "Booking.com"
     }
 ];
