@@ -430,5 +430,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/OSr8skhGVmspz4WJQgjGcaFy1OkIJrd_Afr_X6a9Z4tAAtq4bDdOmxlCbSznf0UFxnai=w240-h480-rw",
         targetUrl: "https://www.booking.com/",
         ariaLabel: "Booking.com"
+    },
+    {
+        id: "Trello",
+        iconUrl: "https://play-lh.googleusercontent.com/Tt-6ZaQDUAjfSNSeLz4XyYkPsEQfVVp0lBtwrnuyqubhCna0LKu5OZxKgegBJIrEhz8=s48-rw",
+        targetUrl: "https://trello.com/u/dev0gig/boards",
+        ariaLabel: "Trello"
     }
 ];
