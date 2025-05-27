@@ -12,8 +12,6 @@ Link für die Website ist: https://dev0gig.github.io/web-mywebsite/
 - viele widgets für notion integration
 
 # Mein 🦄UNICORN Seite (wichtige Links für die Arbeit)
-<details>
-  
 ## Einleitung
 Seit dem 01.09.2024 arbeite ich für WienEnergie. Mein dritter Arbeitgeber seit ich, Oktober 2017, in Wien wohnhaft bin. Die WienEnergie schreibt über sich selbst folgendes:
 
@@ -89,43 +87,3 @@ Dieses Projekt ist noch lange nicht zu Ende. Genau so werde ich versuchen diesen
 
 ## Design V_02
 Es gab eine grosse Änderung bezüglich Design. Ich wollte ich der Version 2 das Design mehr an das WienEnergie Online Design anpassen. So machte ich mich dran die .css Datei entsprechend anzupassen.
-</details>
-
-# RaspberryPi Info Board
-<details>
-
-Ich hab noch einen alten RaspberryPi zuhause, denn ich früher mal für Projekte einkaufte. Ich weiss leider nicht mehr genau wann ich den Einplatinen Rechner gekauft haben, aber ist sicher schon Jahre her.
-
-Nun möchte ich den RaspberryPi als kleines Info Panel verwenden, auf dem ich Uhrzeit, Wetter und Termine auf einen Blick sehe.
-
-Als OS nehm ich das schlanke Raspbien OS selbst. Und als InfoBoard verwende ich den Browser, wobei das InfoBoard eine selbstprogrammierte Website ist.
-
-Das schwierige wird sein, es auf dem RaspberryPi als Standard einzustellen.
-
-Der Browser sollte direkt nach Systemstart geöffnet werden. Als erste Website sollte dann das selbstgemachte InfoBoard geöffnet werden. Ein kleiner Bonus wäre, wenn sich das alles im Vollbild auf macht, damit man die Taskleiste nicht sieht.
-
-Es gibt zwei Möglichkeiten, die mir in den Sinn kommen:
-
-1. Vollbild, genau so wenn man F11 drückt im Browser
-2. Die Taskleiste automatisch verschwinden lassen
-
-Mal schauen welche Lösung es wird. Im Moment ist Raspbien OS am installieren.
-
-Es wurde die Lösung 1. Bei Raspbien hab ich die Möglichkeit, die Taskleiste ausblenden zu lassen nicht gefunden.
-
-Mithilfe von Gemini hab ich den code fürs Terminal, damit der vorinstallierte Chromium Browser im Vollbildmodus als Autostart geöffnet wird.
-
-```bash
-nano ~/.config/autostart/chromiumstart.desktop
-
-[Desktop Entry]
-Type=Application
-Hidden=false
-X-GNOME-Autostart-enabled=true
-Comment=Start des Cromium Browsers
-Name=chromiumstart
-Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk https://dev0gig.github.io/web-mywebsite/RbPi-InfoBoard/rbpi-infoboard.html
-```
-
-kiosk ist damit der Browser direkt im Vollbildmodus startet.
-</details>

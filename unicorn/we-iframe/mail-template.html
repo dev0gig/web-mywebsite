@@ -42,7 +42,6 @@
         /* Standardmäßig nebeneinander */
         gap: 10px;
         /* Abstand zwischen den Spalten */
-        /* Höhe so berechnen, dass sie die verfügbare Viewport-Höhe ausfüllt (abzgl. body padding) */
         height: calc(100vh - 2 * 20px);
         /* 20px Body-Padding oben und unten */
 
@@ -62,6 +61,10 @@
         /* Erlaubt Scrollen innerhalb der Spalten, falls Inhalt zu lang ist */
         padding-right: 10px;
         /* Platz für die Scrollbar und Abstand zum rechten Rand der Spalte */
+        display: flex;
+        /* Flexbox für innere Ausrichtung */
+        flex-direction: column;
+        /* Elemente untereinander anordnen */
     }
 
     /* Sicherstellen, dass die Spalten auf kleinen Bildschirmen 100% Breite nutzen und die Höhen angepasst sind */
@@ -81,8 +84,10 @@
         .mail-main--right {
             flex: none;
             width: 100%;
-            height: 50vh;
-            /* Textfeld nimmt halbe Viewport-Höhe ein */
+            height: auto;
+            /* Höhe an Inhalt anpassen */
+            min-height: 50vh;
+            /* Mindesthöhe beibehalten */
             padding-right: 0;
             /* Kein zusätzliches Padding rechts */
         }
@@ -124,19 +129,10 @@
 
     /* --- Styling für Buttons --- */
     .button-single {
-        /* --- GEÄNDERT: Breite so berechnen, dass 5 Buttons in eine Reihe passen (inkl. Gap) --- */
-        /* Berechnung: (Gesamte Breite - (Anzahl Buttons - 1) * Gap) / Anzahl Buttons */
         width: calc((100% - (5 - 1) * 10px) / 5);
-        /* Breite für 5 Buttons pro Reihe */
-
-        /* Flex-Shrink erlauben, falls der Platz sehr eng wird */
         flex-shrink: 1;
-        /* Minimalbreite, damit sie nicht zu klein werden, falls 5 nicht passen */
         min-width: 120px;
-        /* Beispiel: Eine minimale Breite, ansonsten brechen sie um */
-
         overflow: hidden;
-
         padding: 7px;
         border: 1px solid var(--md-sys-color-outline);
         border-radius: 10px;
@@ -145,32 +141,25 @@
         font-size: 1rem;
         cursor: pointer;
         text-align: center;
-        /* Text linksbündig lassen, wie vorher */
         transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         box-shadow: 0 1px 3px var(--md-sys-shadow-color);
         word-break: break-word;
     }
 
-    /* Anpassung für kleinere Bildschirme, wo vielleicht nur 1, 2 oder 3 Buttons pro Reihe passen */
     @media (max-width: 1024px) {
-
-        /* Beispiel Breakpoint, anpassen falls nötig */
         .mail-main--left .button-group-mail .button-single {
-            /* Versuch, 3 oder 4 pro Reihe zu bekommen, flex-wrap hilft dabei */
             width: calc((100% - (3 - 1) * 10px) / 3);
         }
     }
 
     @media (max-width: 768px) {
         .mail-main--left .button-group-mail .button-single {
-            /* Wenn Spalten gestapelt sind und linke Spalte 100% Breite hat, 2 oder 3 pro Reihe versuchen */
             width: calc((100% - (2 - 1) * 10px) / 2);
         }
     }
 
     @media (max-width: 480px) {
         .mail-main--left .button-group-mail .button-single {
-            /* Auf sehr kleinen Screens wieder untereinander */
             width: 100%;
         }
     }
@@ -178,23 +167,37 @@
 
     .button-single:hover {
         background-color: var(--md-sys-color-surface-container-high);
-        /* Hintergrund beim Hover */
         border-color: transparent;
-        /* Hover Border entfernen */
         color: var(--md-sys-color-on-surface-container);
-        /* Textfarbe sollte gut auf Hover-Farbe passen */
         transform: translateY(-2px);
-        /* Leichter Hover-Effekt */
         box-shadow: 0 3px 8px var(--md-sys-shadow-color);
-        /* Schatten beim Hover erhöhen */
         cursor: pointer;
     }
+
+    /* --- Stile für das Namens-Eingabefeld --- */
+    .name-input-container {
+        margin-bottom: 10px;
+        /* Abstand zum Textfeld */
+    }
+
+    #nameInput {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--md-sys-color-surface-container-high);
+        color: var(--md-sys-color-on-surface-variant);
+        box-sizing: border-box;
+        outline: none;
+    }
+
 
     /* --- Styling für das Textfeld --- */
     #outputArea {
         width: 100%;
-        height: 90%;
-        /* Nimmt die gesamte Höhe des rechten Containers ein */
+        flex-grow: 1;
         padding: 15px;
         border: 1px solid var(--md-sys-color-outline);
         border-radius: 12px;
@@ -205,29 +208,22 @@
         resize: none;
         box-sizing: border-box;
         overflow-y: auto;
-        /* Erlaubt Scrollen innerhalb des Textfeldes */
         transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         outline: none;
     }
 
     /* =========== Moderner Scrollbalken =========== */
-
-    /* Für WebKit-basierte Browser (Chrome, Safari, Edge, Opera) */
-    /* Betrifft die Scrollbalken in .mail-main--left, .mail-main--right und #outputArea */
     .mail-main--left::-webkit-scrollbar,
     .mail-main--right::-webkit-scrollbar,
     #outputArea::-webkit-scrollbar {
         width: 8px;
-        /* Breite des Scrollbalkens */
         height: 8px;
-        /* Höhe für horizontale Scrollbalken (falls vorhanden) */
     }
 
     .mail-main--left::-webkit-scrollbar-track,
     .mail-main--right::-webkit-scrollbar-track,
     #outputArea::-webkit-scrollbar-track {
         background: var(--md-sys-color-surface-container);
-        /* Hintergrund der Scrollleiste */
         border-radius: 10px;
     }
 
@@ -235,27 +231,21 @@
     .mail-main--right::-webkit-scrollbar-thumb,
     #outputArea::-webkit-scrollbar-thumb {
         background-color: var(--md-sys-color-primary);
-        /* Farbe des Scrollbalken-Griffs */
         border-radius: 10px;
         border: 2px solid var(--md-sys-color-surface-container);
-        /* Erzeugt einen kleinen Rand um den Griff */
     }
 
     .mail-main--left::-webkit-scrollbar-thumb:hover,
     .mail-main--right::-webkit-scrollbar-thumb:hover,
     #outputArea::-webkit-scrollbar-thumb:hover {
         background-color: var(--md-sys-color-on-primary-container);
-        /* Farbe des Griffs beim Hover */
     }
 
-    /* Für Firefox */
     .mail-main--left,
     .mail-main--right,
     #outputArea {
         scrollbar-width: thin;
-        /* Optionen: 'auto', 'thin', 'none' */
         scrollbar-color: var(--md-sys-color-primary) var(--md-sys-color-surface-container);
-        /* Daumenfarbe Trackfarbe */
     }
 </style>
 
@@ -325,6 +315,9 @@
                             data-template="mail-template-txt/gh_allgemein.txt">Allgemeines Wording</button>
                         <button class="button-single" id="gh-verlassenschaft"
                             data-template="mail-template-txt/gh-verlassenschaft.txt">GH Verlassenschaft</button>
+                        <button class="button-single" id="GH-ID-nicht-nötig.txt"
+                            data-template="mail-template-txt/GH-ID-nicht-nötig.txt">Auszahlung - ID NICHT
+                            notwendig</button>
                     </div>
                 </details>
 
@@ -347,7 +340,7 @@
                     </div>
                 </details>
 
-                <details class="box-mail">
+                <details class="box-mail" open>
                     <summary>Wiener Netze</summary>
                     <div class="button-group-mail">
                         <button class="button-single" id="Einzelner_Zäst_gespeichert"
@@ -376,6 +369,11 @@
             </div>
 
             <div class="mail-main--right">
+                <div class="name-input-container">
+                    <p>Dein Kürzel für die Signatur:</p>
+                    <input type="text" id="nameInput" placeholder="Dein Name für die Signatur...">
+                </div>
+                <p>Mail-Vorlage:</p>
                 <textarea id="outputArea"
                     placeholder="Durch drücken in das Textfeld, wird der darin enthaltene Text automatisch kopiert..."></textarea>
             </div>
@@ -387,103 +385,80 @@
     // Warten, bis das gesamte HTML-Dokument geladen ist
     document.addEventListener('DOMContentLoaded', () => {
 
-        // Referenz zum Container, der alle Buttons enthält (basierend auf deiner HTML-Struktur)
         const buttonContainer = document.querySelector('.mail-main--left');
-        // Referenz zum Textbereich, wo die Vorlage angezeigt werden soll (basierend auf deiner HTML-Struktur)
         const templateTextArea = document.getElementById('outputArea');
+        const nameInput = document.getElementById('nameInput');
 
-        // Überprüfen, ob die notwendigen HTML-Elemente gefunden wurden
-        if (!buttonContainer || !templateTextArea) {
-            console.error('Wichtige HTML-Elemente (Button-Container ".mail-main--left" oder Textarea mit ID "outputArea") wurden nicht gefunden.');
-            return; // Skript beenden, wenn Elemente fehlen
+        if (!buttonContainer || !templateTextArea || !nameInput) {
+            console.error('Wichtige HTML-Elemente (Container, Textarea oder Namens-Input) wurden nicht gefunden.');
+            return;
         }
 
-        // Event-Listener zum Button-Container hinzufügen (Event Delegation)
-        // Wir lauschen auf Klicks im gesamten linken Bereich und prüfen dann, ob ein Button geklickt wurde.
+        // Event-Listener für Buttons
         buttonContainer.addEventListener('click', async (event) => {
-            // Überprüfen, ob das geklickte Element oder ein übergeordnetes Element ein Button ist
             const button = event.target.closest('button');
 
-            // Prüfen, ob ein Button gefunden wurde UND dieser das data-template-Attribut hat
             if (button && button.dataset.template) {
-
-                // Den kompletten Dateipfad aus dem data-template-Attribut holen
-                // Dieser Pfad enthält bereits den Unterordner 'mail-template-txt/' und den Dateinamen.
                 const templateFilePath = button.dataset.template;
-                console.log(`Button "${button.textContent.trim()}" geklickt. Versuche, Datei zu laden: ${templateFilePath}`);
+                console.log(`Button "${button.textContent.trim()}" geklickt. Lade: ${templateFilePath}`);
 
                 try {
-                    // Die Textdatei asynchron mit fetch laden
                     const response = await fetch(templateFilePath);
-
-                    // Überprüfen, ob das Laden erfolgreich war (HTTP Status 200-299)
                     if (!response.ok) {
-                        // Detailliertere Fehlermeldung, falls die Datei nicht gefunden wird etc.
-                        let errorDetails = `HTTP-Fehler: ${response.status} ${response.statusText}`;
-                        // Optional: Versuche, den Antworttext zu lesen, falls er Fehlermeldungen enthält
-                        try {
-                            const errorBody = await response.text();
-                            if (errorBody) errorDetails += ` - Antwort-Text: ${errorBody.substring(0, 200)}...`;
-                        } catch (e) { /* Ignore error reading error body */ }
-
-                        throw new Error(`Fehler beim Laden der Vorlagendatei "${templateFilePath}". ${errorDetails}`);
+                        throw new Error(`Fehler beim Laden der Datei: ${response.status} ${response.statusText}`);
                     }
 
-                    // Den Inhalt der geladenen Datei als reinen Text lesen
+                    // Da die Signatur nicht mehr in der .txt-Datei ist, laden wir den Inhalt
+                    // und fügen ihn direkt und unverändert in das Textfeld ein.
                     const templateContent = await response.text();
+                    templateTextArea.value = templateContent.trim(); // .trim() entfernt überflüssige Leerzeilen
 
-                    // Den gelesenen Inhalt in das Textarea-Feld einfügen
-                    templateTextArea.value = templateContent;
-
-                    console.log(`Vorlage aus "${templateFilePath}" erfolgreich geladen und in Textfeld angezeigt.`);
+                    console.log(`Vorlage aus "${templateFilePath}" erfolgreich geladen.`);
 
                 } catch (error) {
-                    // Fehler beim Laden oder Verarbeiten der Datei abfangen und im Textbereich anzeigen
                     console.error('Ein Fehler ist aufgetreten:', error);
-                    templateTextArea.value = `Fehler beim Laden der Vorlage:\n${error.message}\n\nStellen Sie sicher:\n1. Die Datei "${templateFilePath}" existiert genau in diesem Pfad relativ zur HTML-Datei.\n2. Sie verwenden einen lokalen Webserver (z.B. Live Server in VS Code oder Python http.server), da Browser das Laden lokaler Dateien (file://) einschränken können.`;
-                    //                                                                                                                                                                                                                                                                                                                                                   ^ Hier prüfen! Kein Backtick hier! ^ und hier!        
+                    templateTextArea.value = `Fehler beim Laden der Vorlage:\n${error.message}`;
                 }
-                // Wenn das geklickte Element kein Button mit data-template war, machen wir nichts.
             }
         });
 
-        // Event-Listener für das Textfeld, um bei Klick den Inhalt zu selektieren und zu kopieren
+        // Event-Listener für das Textfeld: Baut den Text zusammen und kopiert ihn dann.
         templateTextArea.addEventListener("click", function () {
-            this.select(); // Selektiert den gesamten Text im Textfeld
+            // Hole den Namen aus dem Input-Feld.
+            const signatureName = nameInput.value.trim();
 
-            // Versuche, den Text in die Zwischenablage zu kopieren
+            // Definiere die Standard-Signatur, die immer angehängt wird.
+            // Der Name wird dynamisch eingefügt.
+            const finalSignature = `Freundliche Grüße und danke für Ihr Vertrauen,
+
+${signatureName}
+
+Ihre Wien Energie Kundenberatung
+
+www.wienenergie.at/kontakt
+www.wienenergie.at/impressum`;
+
+            // Baue den finalen Text für die Zwischenablage zusammen.
+            const textToCopy = `${this.value}\n\n${finalSignature}`;
+
+            // Kopiere den zusammengebauten Text.
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                // Moderne Clipboard API
-                navigator.clipboard.writeText(this.value).then(() => {
-                    console.log("Text erfolgreich in Zwischenablage kopiert!");
-                    // Optional: Visuelles Feedback für das Kopieren
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    console.log("Zusammengebauter Text erfolgreich kopiert!");
+                    // Visuelles Feedback für den User
+                    nameInput.style.backgroundColor = 'var(--md-sys-color-tertiary-container)';
+                    setTimeout(() => { nameInput.style.backgroundColor = '' }, 300);
                 }).catch(err => {
-                    console.error('Fehler beim Kopieren des Textes mit Clipboard API:', err);
-                    // Fallback versuchen
-                    try {
-                        document.execCommand("copy");
-                        console.log("Text mit execCommand erfolgreich in Zwischenablage kopiert (Fallback).");
-                    } catch (fallbackErr) {
-                        console.error('Fallback-Kopieren ebenfalls fehlgeschlagen:', fallbackErr);
-                        alert('Der Text konnte nicht automatisch kopiert werden. Bitte manuell kopieren.');
-                    }
+                    console.error('Fehler beim Kopieren des Textes:', err);
+                    alert('Der Text konnte nicht automatisch kopiert werden.');
                 });
             } else {
-                // Fallback für ältere Browser ohne Clipboard API
-                try {
-                    document.execCommand("copy");
-                    console.log("Text mit execCommand erfolgreich in Zwischenablage kopiert.");
-                } catch (err) {
-                    console.error('execCommand("copy") fehlgeschlagen:', err);
-                    alert('Ihr Browser unterstützt das automatische Kopieren nicht oder es ist fehlgeschlagen. Bitte manuell kopieren.');
-                }
+                alert('Ihr Browser unterstützt das automatische Kopieren nicht. Bitte manuell kopieren.');
             }
         });
 
-
-        // Optionale Startnachricht im Textbereich
-        templateTextArea.value = "Wählen Sie eine Vorlage aus, um den Text hier anzuzeigen.\n\nKlicken Sie in dieses Feld, um den angezeigten Text automatisch zu kopieren.";
-
+        // Startnachricht
+        templateTextArea.value = "Vorlage wählen. Dein Name wird beim Kopieren automatisch in die Signatur eingefügt.";
     });
 </script>
 
