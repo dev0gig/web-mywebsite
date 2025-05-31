@@ -85,4 +85,31 @@ const kontakte = [
         notizen: "Homepage: www.riverty.com",
         logoUrl: "https://riverty.design/favicons/green/apple-touch-icon.png"
     },
+    {
+        id: 11,
+        name: "MA40",
+        nummer: "+43 1 4000-8040",
+        adresse: "Thomas-Klestil-Platz 8\n1030 Wien",
+        mail: "servicestelle@ma40.wien.gv.at",
+        notizen: "Homepage: www.riverty.com",
+        logoUrl: "https://www.wien.gv.at/gesundheit/leistungen/mindestsicherung/energieunterstuetzung.html#beratung"
+    },
+    {
+        id: 12,
+        name: "Wohnschirm",
+        nummer: "+43 1 2185690",
+        adresse: "Erdbergstraße 228\n1110 Wien",
+        mail: "fawos@volkshilfe-wien.at",
+        notizen: " - ",
+        logoUrl: "https://wohnschirm.at/"
+    },
+    {
+        id: 13,
+        name: "Caritas Erzdiözese Wien",
+        nummer: "05 1780 0",
+        adresse: "Albrechtskreithgasse 19-20\n1160 Wien",
+        mail: "office@caritas-wien.at",
+        notizen: " - ",
+        logoUrl: "https://www.caritas.at/"
+    }
 ];
