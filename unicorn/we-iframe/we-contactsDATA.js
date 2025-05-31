@@ -92,7 +92,7 @@ const kontakte = [
         adresse: "Thomas-Klestil-Platz 8\n1030 Wien",
         mail: "servicestelle@ma40.wien.gv.at",
         notizen: "Homepage: www.riverty.com",
-        logoUrl: "https://www.wien.gv.at/gesundheit/leistungen/mindestsicherung/energieunterstuetzung.html#beratung"
+        logoUrl: "https://toptransfer.at/wp-content/uploads/2017/02/MA40.jpg"
     },
     {
         id: 12,
@@ -101,7 +101,7 @@ const kontakte = [
         adresse: "Erdbergstraße 228\n1110 Wien",
         mail: "fawos@volkshilfe-wien.at",
         notizen: " - ",
-        logoUrl: "https://wohnschirm.at/"
+        logoUrl: "https://konsumentenfragen.at/GenticsImageStore/600/auto/prop/konsumentenfragen/Aktuelles/Konsumentenfragen/logo-wohnschirm.png"
     },
     {
         id: 13,
@@ -110,6 +110,6 @@ const kontakte = [
         adresse: "Albrechtskreithgasse 19-20\n1160 Wien",
         mail: "office@caritas-wien.at",
         notizen: " - ",
-        logoUrl: "https://www.caritas.at/"
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7FBEW2g64RIbxdBshtoLdgku2LM3NkCjLPg&s"
     }
 ];
