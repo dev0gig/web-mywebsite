@@ -436,5 +436,11 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/Tt-6ZaQDUAjfSNSeLz4XyYkPsEQfVVp0lBtwrnuyqubhCna0LKu5OZxKgegBJIrEhz8=s48-rw",
         targetUrl: "https://trello.com/u/dev0gig/boards",
         ariaLabel: "Trello"
+    },
+    {
+        id: "Nebo",
+        iconUrl: "https://play-lh.googleusercontent.com/21fmPN1_9LMAvuA_NWeX3cMs6U-vka9TkXWSXxZznNUwozJoNdyzxP7qtRi7KNhfmNQ=w240-h480-rw",
+        targetUrl: "https://www.nebo.app/app/pages",
+        ariaLabel: "Nebo"
     }
 ];
