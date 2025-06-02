@@ -17,7 +17,7 @@ const kontakte = [
         adresse: "-",
         mail: "we@thermomatic.at",
         notizen: "",
-        logoUrl: "https://www.thermomatic.at/wp-content/uploads/2021/03/logo.png"
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9J6u93AhfwlDMfBiQfE6IyBvb6NUu1PlHwQ&s"
     },
     {
         id: 3,
@@ -49,7 +49,8 @@ const kontakte = [
         nummer: "0800 500 800",
         adresse: "Spittelauer Lände 45\n1090 Wien",
         mail: "-",
-        notizen: "Öffnungszeiten:\nMontag - Donnerstag: 8:00 - 19:00 Uhr (bis 20:00 Uhr mit Termin)\nFreitag: 8:00 - 15:00 Uhr (bis 16:00 Uhr mit Termin)\nTerminvereinbarung unter: https://www.servicetreff.at/"
+        notizen: "Öffnungszeiten:\nMontag - Donnerstag: 8:00 - 19:00 Uhr (bis 20:00 Uhr mit Termin)\nFreitag: 8:00 - 15:00 Uhr (bis 16:00 Uhr mit Termin)\nTerminvereinbarung unter: https://www.servicetreff.at/",
+        logoUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple118/v4/31/16/1c/31161cc4-fded-44dd-74e6-1c4c2deb4ac0/source/256x256bb.jpg"
     },
     {
         id: 7,
@@ -66,7 +67,8 @@ const kontakte = [
         nummer: "0800 500 800",
         adresse: "Thomas-Klestil-Platz 4\n1030 Wien",
         mail: "-",
-        notizen: "Öffnungszeiten:\nMo-Do: 8:00-19:00 Uhr (mit Termin bis 20:00 Uhr)\nFr: 8:00-15:00 Uhr (mit Termin bis 16:00 Uhr)\nTerminvereinbarung unter: https://www.servicetreff.at/"
+        notizen: "Öffnungszeiten:\nMo-Do: 8:00-19:00 Uhr (mit Termin bis 20:00 Uhr)\nFr: 8:00-15:00 Uhr (mit Termin bis 16:00 Uhr)\nTerminvereinbarung unter: https://www.servicetreff.at/",
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTv03ei5n3ez9GhH72LHGR2K5usLgz5QUC1cw&s"
     },
     {
         id: 9,
@@ -74,7 +76,8 @@ const kontakte = [
         nummer: "0800 500 800",
         adresse: "Rathaus Viertel 1, 1. OG\n2353 Guntramsdorf",
         mail: "-",
-        notizen: "Öffnungszeiten:\nontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr"
+        notizen: "Öffnungszeiten:\nontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr",
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdXijbpW-SOBlF4c8ktTS_vsyJiFrDs8FuJw&s"
     },
     {
         id: 10,
@@ -85,4 +88,31 @@ const kontakte = [
         notizen: "Homepage: www.riverty.com",
         logoUrl: "https://riverty.design/favicons/green/apple-touch-icon.png"
     },
+    {
+        id: 11,
+        name: "MA40",
+        nummer: "+43 1 4000-8040",
+        adresse: "Thomas-Klestil-Platz 8\n1030 Wien",
+        mail: "servicestelle@ma40.wien.gv.at",
+        notizen: "Homepage: www.riverty.com",
+        logoUrl: "https://toptransfer.at/wp-content/uploads/2017/02/MA40.jpg"
+    },
+    {
+        id: 12,
+        name: "Wohnschirm",
+        nummer: "+43 1 2185690",
+        adresse: "Erdbergstraße 228\n1110 Wien",
+        mail: "fawos@volkshilfe-wien.at",
+        notizen: " - ",
+        logoUrl: "https://konsumentenfragen.at/GenticsImageStore/600/auto/prop/konsumentenfragen/Aktuelles/Konsumentenfragen/logo-wohnschirm.png"
+    },
+    {
+        id: 13,
+        name: "Caritas Erzdiözese Wien",
+        nummer: "05 1780 0",
+        adresse: "Albrechtskreithgasse 19-20\n1160 Wien",
+        mail: "office@caritas-wien.at",
+        notizen: " - ",
+        logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7FBEW2g64RIbxdBshtoLdgku2LM3NkCjLPg&s"
+    }
 ];
