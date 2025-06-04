@@ -450,9 +450,9 @@ const appsData = [
         ariaLabel: "Manscaped"
     },
     {
-        id: "TheOdinProject",
+        id: "The Odin Project",
         iconUrl: "https://pbs.twimg.com/profile_images/853541927781904384/LKvUgs4u_400x400.jpg",
         targetUrl: "https://www.theodinproject.com/dashboard",
-        ariaLabel: "The Odin Project"
+        ariaLabel: "TheOdinProject"
     }
 ];
