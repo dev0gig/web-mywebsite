@@ -114,5 +114,14 @@ const kontakte = [
         mail: "office@caritas-wien.at",
         notizen: " - ",
         logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7FBEW2g64RIbxdBshtoLdgku2LM3NkCjLPg&s"
+    },
+    {
+        id: 14,
+        name: "Warmwasser Zählertausch | ImmOH!",
+        nummer: "0800 510 880",
+        adresse: " - ",
+        mail: "office-plt@facilitycomfort.at",
+        notizen: " - ",
+        logoUrl: " - "
     }
 ];
