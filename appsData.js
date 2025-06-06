@@ -442,5 +442,17 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/21fmPN1_9LMAvuA_NWeX3cMs6U-vka9TkXWSXxZznNUwozJoNdyzxP7qtRi7KNhfmNQ=w240-h480-rw",
         targetUrl: "https://www.nebo.app/app/pages",
         ariaLabel: "Nebo"
+    },
+    {
+        id: "Manscaped",
+        iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlG8vBVUmXcc4CGcLY4SxTg_WV5njUMKpzuBSTsIrINKgy0aam6gekQF27i5soToa8isc&usqp=CAU",
+        targetUrl: "https://eu.manscaped.com/de",
+        ariaLabel: "Manscaped"
+    },
+    {
+        id: "The Odin Project",
+        iconUrl: "https://pbs.twimg.com/profile_images/853541927781904384/LKvUgs4u_400x400.jpg",
+        targetUrl: "https://www.theodinproject.com/dashboard",
+        ariaLabel: "TheOdinProject"
     }
 ];
