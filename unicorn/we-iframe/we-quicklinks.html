@@ -121,6 +121,10 @@
         width: calc(50% - 5px);
         height: 50px;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .button-single:hover {
@@ -202,14 +206,13 @@
         }
 
         .button-single img {
-            max-height: 50px;
-            /* Etwas mehr Höhe für die Logos */
-            max-width: 90%;
-            /* Nutzt fast die gesamte Button-Breite, wenn nötig */
+            max-height: 70%;
+            max-width: 70%;
             object-fit: contain;
-            /* Behält Seitenverhältnis bei und skaliert passend */
             display: block;
-            /* Stellt sicher, dass es korrekt im Flex-Container behandelt wird */
+            margin: 0 auto;
+            /* Optional: Animation für sanftes Einpassen */
+            transition: max-width 0.2s, max-height 0.2s;
         }
 
         .button-single:hover {
@@ -425,8 +428,7 @@
                     <button class="button-single" onclick="window.open('https://xenapp/Citrix/WSTWWeb/')">
                         Citrix
                     </button>
-                    <button class="button-single"
-                        onclick="window.open('https://wienenergie.4me.com/self-service', '_blank')">
+                    <button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">
                         4me-Ticket
                     </button>
                     <button class="button-single"
@@ -438,13 +440,13 @@
                         Informationsplattform Personal
                     </button>
                     <button class="button-single"
-                        onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04?ctid=2df2bcec-2017-4339-b493-e3d7b3a460c8&openReportSource=ReportInvitation&experience=power-bi', '_blank')">
+                        onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04?ctid=2df2bcec-2017-4339-b493-e3d7b3a460c8&openReportSource=ReportInvitation&experience=power-bi')">
                         Persönlicher Kundenkanal
                     </button>
                 </div>
             </div>
             <div class="box-tools">
-                <p class="box-title">Official Tools</p>
+                <p class="box-title">Wiener Stadtwerke</p>
                 <div class="button-group-tools">
                     <style>
                         .button-single img {
@@ -459,45 +461,35 @@
                             text-align: center;
                         }
                     </style>
-                    <button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/', '_blank')">
-                        <img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230&t=1744196967447"
-                            alt="Wiener Stadtwerke Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/')">
+                        <img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230&t=1744196967447" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wienerlinien.at/', '_blank')">
-                        <img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139&t=1713959345651"
-                            alt="Wiener Linien Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wienerlinien.at/')">
+                        <img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139&t=1713959345651" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wienenergie.at/', '_blank')">
-                        <img src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"
-                            alt="Wien Energie Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wienenergie.at/')">
+                        <img src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wienernetze.at/', '_blank')">
-                        <img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159&t=1713959374622"
-                            alt="Wiener Netze Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wienernetze.at/')">
+                        <img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159&t=1713959374622" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wlb.at/', '_blank')">
-                        <img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554&t=1713959345658"
-                            alt="Wiener Lokalbahnen Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wlb.at/')">
+                        <img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554&t=1713959345658" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wipark.at/', '_blank')">
-                        <img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665&t=1713959345375"
-                            alt="Wipark Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wipark.at/')">
+                        <img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665&t=1713959345375" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.wienit.at/', '_blank')">
-                        <img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000&t=1713959411884"
-                            alt="WienIT Logo" />
+                    <button class="button-single" onclick="window.open('https://www.wienit.at/')">
+                        <img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000&t=1713959411884" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.bestattungwien.at/', '_blank')">
-                        <img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249&t=1713959355571"
-                            alt="Bestattung Wien Logo" />
+                    <button class="button-single" onclick="window.open('https://www.bestattungwien.at/')">
+                        <img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249&t=1713959355571" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.friedhoefewien.at/', '_blank')">
-                        <img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382&t=1713959380757"
-                            alt="Friedhöfe Wien Logo" />
+                    <button class="button-single" onclick="window.open('https://www.friedhoefewien.at/')">
+                        <img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382&t=1713959380757" />
                     </button>
-                    <button class="button-single" onclick="window.open('https://www.immoh.at/', '_blank')">
-                        <img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283&t=1713959405431"
-                            alt="ImmoH Logo" />
+                    <button class="button-single" onclick="window.open('https://www.immoh.at/')">
+                        <img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283&t=1713959405431" style="max-height: 40px !important;"/>
                     </button>
                 </div>
             </div>
