@@ -439,7 +439,7 @@ const appsData = [
     },
     {
         id: "Nebo",
-        iconUrl: "https://play-lh.googleusercontent.com/21fmPN1_9LMAvuA_NWeX3cMs6U-vka9TkXWSXxZznNUwozJoNdyzxP7qtRi7KNhfmNQ=w240-h480-rw",
+        iconUrl: "https://styles.redditmedia.com/t5_3pvt1m/styles/communityIcon_sh4dc7xrc3b61.png",
         targetUrl: "https://www.nebo.app/app/pages",
         ariaLabel: "Nebo"
     },
