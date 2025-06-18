@@ -390,10 +390,10 @@ const appsData = [
         ariaLabel: "Bitwarden"
     },
     {
-        id: "Logseq",
-        iconUrl: "https://docs.logseq.com/static/img/logo.png",
-        targetUrl: "https://demo.logseq.com/",
-        ariaLabel: "Logseq"
+        id: "Pixabay",
+        iconUrl: "https://cdn-icons-png.flaticon.com/256/3291/3291666.png",
+        targetUrl: "https://pixabay.com/de/",
+        ariaLabel: "Pixabay"
     },
     {
         id: "Google Calendar",
