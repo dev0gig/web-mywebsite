@@ -3,120 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Inhalt</title>
+    <title>Ihr Persönliches Werkzeug-Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.2.1/dist/gridstack.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/gridstack@10.2.1/dist/gridstack-all.js"></script>
     <style>
         :root {
-            --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
-            --widget-bg: #ffffff; --widget-header-bg: rgba(0,0,0,0.02);
-            --widget-border: #e5e7eb; --button-bg: #f3f4f6; --button-border: #d1d5db; --button-hover-bg: #f97316;
+            --bg-color: #f9fafb; --text-color-light: #6b7280; --header-text-color: #111827;
+            --sidebar-bg: #f3f4f6cc; --sidebar-border: #e5e7eb; --modal-bg: #ffffff;
+            --accent-color: #f97316;
         }
         /* UPDATE: Theme is now applied to the <html> tag */
         html[data-theme='dark'] {
-            --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
-            --widget-bg: #262626; --widget-header-bg: rgba(0,0,0,0.25);
-            --widget-border: #404040; --button-bg: #404040; --button-border: #525252; --button-hover-bg: #f97316;
+            --bg-color: #171717; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
+            --sidebar-bg: #262626cc; --sidebar-border: #404040; --modal-bg: #262626;
+            --accent-color: #f97316;
         }
-        /* UPDATE: Apply background color to html tag to fix scrolling issue */
-        html {
-             background-color: var(--bg-color);
-        }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
-        body { background-color: var(--bg-color); }
-        .main-header { color: var(--header-text-color); }
-        .main-subheader { color: var(--text-color-light); }
-        .grid-stack-item-content {
-            background-color: var(--widget-bg); border: 1px solid var(--widget-border);
-            color: var(--text-color); border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            overflow: hidden; display: flex; flex-direction: column;
-        }
-        .widget-header { padding: 0.75rem 1.25rem; background-color: var(--widget-header-bg); font-weight: 700; font-size: 1.125rem; color: var(--header-text-color); cursor: move; border-bottom: 1px solid var(--widget-border); flex-shrink: 0; }
-        .widget-content { padding: 1rem; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .grid-stack-item .ui-resizable-handle { background: none; border: 0; }
-        .button-group-tools { flex-grow: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); grid-auto-rows: 1fr; gap: 0.75rem; }
-        .button-single {
-            background-color: var(--button-bg); color: var(--text-color);
-            border: 1px solid var(--button-border);
-            border-radius: 0.375rem; padding: 0.25rem 0.5rem; text-align: center; transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-            font-weight: 500; font-size: 0.875rem; line-height: 1.2; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100%; min-height: 48px; word-break: break-word; overflow: hidden;
-        }
-        .button-single:hover { transform: translateY(-2px); background-color: var(--button-hover-bg); color: #ffffff; border-color: var(--button-hover-bg); }
-        .button-single img { max-height: 32px; max-width: 90%; object-fit: contain; }
-        html[data-theme='light'] .logo-invert-on-light { filter: invert(1); }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color-light); overflow: hidden; }
+        #sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 50; width: 5rem; transition: width 0.3s; background-color: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); backdrop-filter: blur(8px); }
+        #sidebar:hover { width: 16rem; }
+        #main-content { margin-left: 5rem; height: 100%; overflow-y: auto; }
+        .sidebar-text { opacity: 0; max-width: 0; transition: opacity 0.2s ease, max-width 0.3s ease; white-space: nowrap; overflow: hidden; margin-left: 0.75rem; }
+        #sidebar:hover .sidebar-text { opacity: 1; max-width: 150px; }
+        .sidebar-link { color: var(--text-color-light); }
+        .sidebar-link:hover { background-color: var(--accent-color); color: #ffffff; }
+        #settings-modal { background-color: var(--modal-bg); z-index: 100; }
+        .theme-radio-label { border: 2px solid var(--sidebar-border); color: var(--text-color-light); }
+        .theme-radio-peer:checked ~ .theme-radio-label { border-color: var(--accent-color); color: var(--header-text-color); }
+        .modal-button { background-color: var(--accent-color); transition: background-color 0.2s ease; }
+        .modal-button:hover { background-color: #fb923c; }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="p-4 md:p-8 pb-20">
-    <div class="text-center mb-8">
-        <h1 class="main-header text-4xl font-bold">Wichtige & Tägliche Arbeitsressourcen 🛠️</h1>
-        <p class="main-subheader mt-2">Verschieben und Grösse ändern nach Belieben</p>
+<body data-theme="system">
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="p-2">
+        <ul class="space-y-2 mt-2">
+            <li><a href="#" class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg><span class="sidebar-text font-medium">Startseite</span></a></li>
+            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827c.48.398.668 1.05.26 1.431l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.075-.124a6.57 6.57 0 0 1-.22.127c-.332.183-.582.495-.645.87l-.213 1.281c-.09.543-.56.94-1.11.94h-2.593c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 0 1-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 0 1-1.37-.49l-1.296-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 0 1-.26-1.431l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.217.456c.355.133.75.072 1.075-.124.072-.044.146-.087.22-.127.332-.183.582.495-.645-.87l.213-1.281Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg><span class="sidebar-text font-medium">Einstellungen</span></button></li>
+        </ul>
+    </nav>
+
+    <!-- Iframe Content Area -->
+    <main id="main-content">
+        <iframe id="content-frame" src="./dashboard.html" class="w-full h-full border-0"></iframe>
+    </main>
+    
+    <!-- Settings Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70"></div>
+    <div id="settings-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Einstellungen</h2>
+            <button id="close-modal-btn" class="hover:text-white text-2xl" style="color: var(--text-color-light);">&times;</button>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-2" style="color: var(--header-text-color);">Layout</h3>
+            <p class="text-sm mb-4">Setzt die Position und Grösse aller Widgets auf den Standard zurück.</p>
+            <button id="reset-layout-btn" class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg">Layout zurücksetzen</button>
+        </div>
+        <hr class="my-6" style="border-color: var(--sidebar-border);">
+        <div>
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
+            <fieldset class="space-y-3">
+                <legend class="sr-only">Theme selection</legend>
+                <div><input type="radio" name="theme" id="theme-light" value="light" class="theme-radio-peer hidden"><label for="theme-light" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label></div>
+                <div><input type="radio" name="theme" id="theme-dark" value="dark" class="theme-radio-peer hidden"><label for="theme-dark" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label></div>
+                <div><input type="radio" name="theme" id="theme-system" value="system" class="theme-radio-peer hidden"><label for="theme-system" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label></div>
+            </fieldset>
+        </div>
     </div>
-    <div class="grid-stack"></div>
 
     <script type="text/javascript">
-        const initialLayoutData = [
-            { id: 'official', title: 'Official Tools', x: 0, y: 0, w: 5, h: 3, minW: 4, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://intranet.wienenergie.at')">Intranet</button><button class="button-single" onclick="window.open('https://wien-energie.secova.de/module/dashboardpreview/?preview')">SAM</button><button class="button-single" onclick="window.open('https://cu300078.opcyc.net/setup/')">Opcyc</button><button class="button-single" onclick="window.open('https://xenapp/Citrix/WSTWWeb/')">Citrix</button><button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">4me-Ticket</button><button class="button-single" onclick="window.open('https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome')">Lernplattform</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/WE_Personal')">Informationsplattform Personal</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04')">Persönlicher Kundenkanal</button></div>`},
-            { id: 'system', title: 'System', x: 5, y: 0, w: 4, h: 3, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f&flags=themeOption%3Ddarkmode')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button></div>`},
-            { id: 'empfang', title: 'Empfang', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:w:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7BE431621F-EAB4-41A2-9455-918F13452C1D%7D')">Zeitbestätigung Erdberg</button><button class="button-single" onclick="window.open('https://intranet.wienerstadtwerke.at/speiseplan')">Kuchl Speiseplan</button></div>`},
-            { id: 'zeitplaene', title: 'Zeitpläne', x: 0, y: 3, w: 5, h: 3, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc2.aspx?action=edit&sourcedoc=%7B79c7fd17-3b8b-4f6b-9e7e-b6f96c0d6cd8%7D')">Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365-my.sharepoint.com/:x:/r/personal/nmuama_wstw_energy-it_net/_layouts/15/doc2.aspx?sourcedoc=%7BA77101AB-64A6-450B-9620-6FDE51765F08%7D')">HO/Flexi - Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7B4A5869C9-A49F-41A1-8BB8-AC2A80484B92%7D')">Sitzplan-CB08</button><button class="button-single" onclick="window.open('https://apps.powerapps.com/play/e/0089faf5-df22-4012-a29b-93b3d081d5da/a/c9242c89-c412-4a5c-94fe-29e2a847c0d2?tenantId=2df2bcec-2017-4339-b493-e3d7b3a460c8')">DeskFinder</button></div>`},
-            { id: 'stromgas', title: 'Strom & Gas', x: 5, y: 3, w: 4, h: 2, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sapc2p.wstw.energy-it.net:8144/sap(bD1kZSZjPTIwMCZkPW1pbg==)/bc/bsp/sap/crm_ui_start/default.htm')">CRM</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_412d4c/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F412d4c%2FFreigegebene%20Dokumente%2FiTWIIN%2FPreisbl%C3%A4tter')">Preisblätter</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('https://sarchpam30/pam4ws/frame/workplaceframe.aspx')">PAM</button></div><div class="text-sm mt-4 flex-shrink-0"><p>Dummy GP-Nr. 1250001023</p><p>PV-VK-Vorlage 228000183897</p></div>`},
-            { id: 'fernwaerme', title: 'Fernwärme', x: 9, y: 3, w: 3, h: 2, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://spam01/PAM4/frame/workplaceframe.aspx')">PAM</button><button class="button-single" style="background-color: #f58484; border: red solid 2px; color: black" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_8cb9ed/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F8cb9ed%2FFreigegebene%20Dokumente%2FGeneral%2FWiener%20Wohnen%20Vertr%C3%A4ge')">WiWo Verträge</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand.waerme@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('http://wstw365.sharepoint.com/:x:/r/sites/msteams_412d4c/Freigegebene%20Dokumente/iTWIIN/Dokumente/Fernw%C3%A4rme/Kalkulation%20der%20Ersteinstufung%20W%C3%A4rme%20-TBs.xlsx')">Wärme Kalkulator</button><button class="button-single" onclick="window.open('https://webgis.wienit.at/WEB_P/synserver?project=fww&client=core')">WebGIS</button></div>`},
-            { id: 'superschnell', title: 'SuperSchnell', x: 0, y: 6, w: 5, h: 2, minW: 3, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sp.wienenergie.at/APP/IntTvTel/_layouts/15/WopiFrame2.aspx?sourcedoc=%7BDF4E3B1B-5FC7-400F-98FA-A1336C0A3942%7D&action=edit&source=https%3A%2F%2Fsp%2Ewienenergie%2Eat%2FAPP%2FIntTvTel%2FSitePages%2FHomepage%2Easpx')">Sharepointliste</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/bd41fccab9604cf896920b2660d932b9')">Kodierung</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/fe72647b59ca4f68a750f8a593e4d829')">Rabatte</button></div>` },
-            { id: 'tanke', title: 'Tanke', x: 5, y: 6, w: 4, h: 4, minW: 2, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://app.chargecloud.de/quicknavigation')">EMEX</button><button class="button-single" onclick="window.open('https://sp.wienenergie.at/CTY/emob/SitePages/Homepage.aspx')">Sharepoint</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/apps/c7a71521-6fe0-47c0-a548-2d8e05c7a57b/reports/6738a907-c364-4785-a8f8-094a0e38bcfa/ReportSection1d4125bf56b4c39f32a4')">Stellplatz 🔎</button><button class="button-single" onclick="window.open('https://itap.wstw.energy-it.net/#/orderMenue')">Störungsticket</button></div>`},
-            { id: 'docs', title: 'Nützliche Dokumente', x: 9, y: 6, w: 3, h: 4, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210215-sm_anleitung_landis_gyr_uk_v5_bf')">LGZ - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_siemens_uk_v4_bf')">SMS - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_iskrameco_uk_v06_bf')">ISK - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/documents/34846/261085/Der_Ableseprozess.pdf/b2f018a6-fc82-578f-5bd4-d6d880c3f946?t=1586340649529')">WN - Ableseprozess</button></div>` },
-            { id: 'wnetze', title: 'Wiener Netze', x: 0, y: 8, w: 5, h: 2, minW: 3, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/stromversorgung')">Stromausfälle</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienernetze.at/')">Backlog</button><button class="button-single" onclick="window.open('http://sarchpam20/pam4weg/frame/workplaceframe.aspx')">PAM</button></div>` },
-            { id: 'wstw', title: 'Wiener Stadtwerke', x: 0, y: 10, w: 12, h: 2, minW: 6, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/')"><img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230"/></button><button class="button-single" onclick="window.open('https://www.wienerlinien.at/')"><img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139"/></button><button class="button-single" onclick="window.open('https://www.wienenergie.at/')"><img class="logo-invert-on-light" src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"/></button><button class="button-single" onclick="window.open('https://www.wienernetze.at/')"><img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159"/></button><button class="button-single" onclick="window.open('https://www.wlb.at/')"><img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554"/></button><button class="button-single" onclick="window.open('https://www.wipark.at/')"><img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665"/></button><button class="button-single" onclick="window.open('https://www.wienit.at/')"><img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000"/></button><button class="button-single" onclick="window.open('https://www.bestattungwien.at/')"><img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249"/></button><button class="button-single" onclick="window.open('https://www.friedhoefewien.at/')"><img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382"/></button><button class="button-single" onclick="window.open('https://www.immoh.at/')"><img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283" style="max-height: 28px !important;"/></button></div>`},
-        ];
+        const iframe = document.getElementById('content-frame');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const overlay = document.getElementById('modal-overlay');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const resetLayoutBtn = document.getElementById('reset-layout-btn');
         
-        const grid = GridStack.init({ float: true, cellHeight: 90, minRow: 1 });
-        const widgetDataMap = new Map(initialLayoutData.map(item => [item.id, item]));
+        const openModal = () => { settingsModal.classList.remove('hidden'); overlay.classList.remove('hidden'); };
+        const closeModal = () => { settingsModal.classList.add('hidden'); overlay.classList.add('hidden'); };
+        
+        settingsBtn.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+        resetLayoutBtn.addEventListener('click', () => {
+            iframe.contentWindow.postMessage('reset-layout', '*');
+            closeModal();
+        });
 
-        function createWidgetHTML(data) {
-            return `<div><div class="grid-stack-item-content"><div class="widget-header">${data.title}</div><div class="widget-content">${data.content}</div></div></div>`;
-        }
+        const themeRadios = document.querySelectorAll('input[name="theme"]');
         
-        function loadLayout(isReset = false) {
-            if (isReset) {
-                localStorage.removeItem('savedGridLayout');
-            }
-            const savedLayout = JSON.parse(localStorage.getItem('savedGridLayout'));
-            grid.removeAll(true);
-            if (savedLayout && savedLayout.length > 0) {
-                const validSavedLayout = savedLayout.filter(node => widgetDataMap.has(node.id));
-                validSavedLayout.forEach(node => {
-                    const data = widgetDataMap.get(node.id);
-                    if(data) grid.addWidget(createWidgetHTML(data), node);
-                });
+        function applyTheme(theme) {
+            let effectiveTheme;
+            if (theme === 'system') {
+                effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             } else {
-                initialLayoutData.forEach(widgetData => {
-                    grid.addWidget(createWidgetHTML(widgetData), widgetData);
-                });
+                effectiveTheme = theme;
+            }
+            // UPDATE: Apply theme to <html> tag
+            document.documentElement.dataset.theme = effectiveTheme;
+            if(iframe.contentWindow) {
+                iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
             }
         }
 
-        window.addEventListener('message', (event) => {
-            if (event.data.startsWith('set-theme-')) {
-                const theme = event.data.replace('set-theme-', '');
-                // UPDATE: Apply theme to <html> tag
-                document.documentElement.dataset.theme = theme;
-            } else if (event.data === 'reset-layout') {
-                loadLayout(true);
-            }
+        function handleThemeChange(event) {
+            const selectedTheme = event.target.value;
+            localStorage.setItem('theme', selectedTheme);
+            applyTheme(selectedTheme);
+        }
+        
+        themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            if (savedTheme === 'system') applyTheme('system');
         });
 
-        grid.on('change', () => {
-            const serializedData = grid.save(false);
-            if (serializedData.length > 0) {
-              localStorage.setItem('savedGridLayout', JSON.stringify(serializedData));
-            }
+        iframe.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            document.querySelector(`input[name="theme"][value="${savedTheme}"]`).checked = true;
+            applyTheme(savedTheme);
         });
-
-        loadLayout();
     </script>
 </body>
 </html>
