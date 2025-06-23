@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
+            --widget-bg: #ffffff; --widget-border: #e5e7eb; --accent-color: #f97316;
+            --list-item-hover-bg: #f3f4f6; --list-item-active-bg: var(--accent-color);
+        }
+        html[data-theme='dark'] {
+            --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
+            --widget-bg: #262626; --widget-border: #404040;
+            --list-item-hover-bg: #404040;
+        }
+        html { background-color: var(--bg-color); }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
+        body { background-color: var(--bg-color); }
+        .main-header { color: var(--header-text-color); }
+        .main-subheader { color: var(--text-color-light); }
+        .contact-list-item { border-bottom: 1px solid var(--widget-border); }
+        .contact-list-item:hover { background-color: var(--list-item-hover-bg); }
+        .contact-list-item.active { background-color: var(--list-item-active-bg); color: white; }
+        .detail-card { background-color: var(--widget-bg); border: 1px solid var(--widget-border); }
+        .detail-label { color: var(--text-color-light); }
+        .notes { white-space: pre-wrap; } /* Preserve line breaks in notes */
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 md:p-8">
+    <div class="text-center mb-8">
+        <h1 class="main-header text-4xl font-bold">Wichtige Kontakte</h1>
+        <p class="main-subheader mt-2">Eine Übersicht aller relevanten Ansprechpartner</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Left Panel: Contact List -->
+        <div id="contact-list" class="md:col-span-1 h-full max-h-[70vh] overflow-y-auto rounded-lg" style="border: 1px solid var(--widget-border);">
+            <!-- Contact items will be injected here by JS -->
+        </div>
+
+        <!-- Right Panel: Contact Details -->
+        <div id="contact-details" class="md:col-span-2">
+            <!-- Details will be injected here by JS -->
+        </div>
+    </div>
+
+    <script>
+        const kontakte = [
+            { id: 1, name: "ISTA", nummer: "050 230 230 300", adresse: "-", mail: "info@ista.at", notizen: "", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT683fy7ftfs8q18hrQVO3LoFp8lpnSckinzw&s" },
+            { id: 2, name: "Thermomatic", nummer: "01 712 63 35", adresse: "-", mail: "we@thermomatic.at", notizen: "", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9J6u93AhfwlDMfBiQfE6IyBvb6NUu1PlHwQ&s" },
+            { id: 3, name: "Fernablesung", nummer: "01 4004 84555", adresse: "-", mail: "-", notizen: "Erreichbar von MO-DO 07:30 - 16:00 Uhr, FR 07:30 - 12:00 Uhr\n(EDW - Energiedienstleistungen wirtschaftlicher Anlagenbetrieb)" },
+            { id: 4, name: "Schönherr", nummer: "+43 1 53437 50522", adresse: "-", mail: "fww@schoenherr.eu", notizen: "" },
+            { id: 5, name: "Störungsdienst FW", nummer: "0800 500 751", adresse: "-", mail: "technischerkundendienst@wienenergie.at", notizen: "01 4004 84830 - direkte nummer" },
+            { id: 6, name: "ServiceTreff Spittelau", nummer: "0800 500 800", adresse: "Spittelauer Lände 45\n1090 Wien", mail: "-", notizen: "Öffnungszeiten:\nMontag - Donnerstag: 8:00 - 19:00 Uhr (bis 20:00 Uhr mit Termin)\nFreitag: 8:00 - 15:00 Uhr (bis 16:00 Uhr mit Termin)\nTerminvereinbarung unter: https://www.servicetreff.at/", logoUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple118/v4/31/16/1c/31161cc4-fded-44dd-74e6-1c4c2deb4ac0/source/256x256bb.jpg" },
+            { id: 7, name: "WienerNetze", nummer: "050 128 10100", adresse: "Spittelauer Lände 45\n1090 Wien", mail: "-", notizen: "Öffnungszeiten:\nMontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr\nTerminvereinbarung unter: https://www.servicetreff.at/", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5WqXRlwouRsGNkI5Nvt5YxPpR-2xJgxeYdw&s" },
+            { id: 8, name: "ServicePoint Erdberg", nummer: "0800 500 800", adresse: "Thomas-Klestil-Platz 4\n1030 Wien", mail: "-", notizen: "Öffnungszeiten:\nMo-Do: 8:00-19:00 Uhr (mit Termin bis 20:00 Uhr)\nFr: 8:00-15:00 Uhr (mit Termin bis 16:00 Uhr)\nTerminvereinbarung unter: https://www.servicetreff.at/", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTv03ei5n3ez9GhH72LHGR2K5usLgz5QUC1cw&s" },
+            { id: 9, name: "ServicePoint Guntramsdorf", nummer: "0800 500 800", adresse: "Rathaus Viertel 1, 1. OG\n2353 Guntramsdorf", mail: "-", notizen: "Öffnungszeiten:\nontag, Dienstag, Mittwoch, Freitag: 8:00 - 15:00 Uhr\nDonnerstag: 8:00 - 17:30 Uhr", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdXijbpW-SOBlF4c8ktTS_vsyJiFrDs8FuJw&s" },
+            { id: 10, name: "Inkassobüro Riverty", nummer: "+43 (0)386 80 90 38", adresse: "Getrude-Fröhlich-Sandner-Straße 1/2\n1100 Wien", mail: "-", notizen: "Homepage: www.riverty.com", logoUrl: "https://riverty.design/favicons/green/apple-touch-icon.png" },
+            { id: 11, name: "MA40", nummer: "+43 1 4000-8040", adresse: "Thomas-Klestil-Platz 8\n1030 Wien", mail: "servicestelle@ma40.wien.gv.at", notizen: "Homepage: www.riverty.com", logoUrl: "https://toptransfer.at/wp-content/uploads/2017/02/MA40.jpg" },
+            { id: 12, name: "Wohnschirm", nummer: "+43 1 2185690", adresse: "Erdbergstraße 228\n1110 Wien", mail: "fawos@volkshilfe-wien.at", notizen: " - ", logoUrl: "https://konsumentenfragen.at/GenticsImageStore/600/auto/prop/konsumentenfragen/Aktuelles/Konsumentenfragen/logo-wohnschirm.png" },
+            { id: 13, name: "Caritas Erzdiözese Wien", nummer: "05 1780 0", adresse: "Albrechtskreithgasse 19-20\n1160 Wien", mail: "office@caritas-wien.at", notizen: " - ", logoUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7FBEW2g64RIbxdBshtoLdgku2LM3NkCjLPg&s" },
+            { id: 14, name: "Warmwasser Zählertausch | ImmOH!", nummer: "0800 510 880", adresse: " - ", mail: "office-plt@facilitycomfort.at", notizen: " - ", logoUrl: " - " }
+        ];
+
+        const contactListEl = document.getElementById('contact-list');
+        const contactDetailsEl = document.getElementById('contact-details');
+
+        function displayContactDetails(contactId) {
+            const contact = kontakte.find(k => k.id === contactId);
+            if (!contact) return;
+            
+            contactDetailsEl.innerHTML = `
+                <div class="detail-card rounded-lg shadow-lg p-6">
+                    <div class="flex items-center mb-6">
+                        ${contact.logoUrl && contact.logoUrl !== ' - ' ? `<img src="${contact.logoUrl}" alt="${contact.name} Logo" class="w-16 h-16 rounded-full mr-4 object-contain bg-white">` : '<div class="w-16 h-16 rounded-full mr-4 bg-gray-300 dark:bg-gray-700 flex items-center justify-center font-bold text-2xl" style="color: var(--text-color-light);">${contact.name.charAt(0)}</div>'}
+                        <h2 class="main-header text-3xl font-bold">${contact.name}</h2>
+                    </div>
+                    <div class="space-y-4">
+                        ${contact.nummer !== '-' ? `<div><p class="detail-label text-sm">Nummer</p><p class="text-lg">${contact.nummer}</p></div>` : ''}
+                        ${contact.mail !== '-' ? `<div><p class="detail-label text-sm">E-Mail</p><p class="text-lg break-all">${contact.mail}</p></div>` : ''}
+                        ${contact.adresse !== '-' ? `<div><p class="detail-label text-sm">Adresse</p><p class="text-lg notes">${contact.adresse}</p></div>` : ''}
+                        ${contact.notizen !== '-' && contact.notizen.trim() !== '' ? `<div><p class="detail-label text-sm">Notizen</p><p class="text-lg notes">${contact.notizen}</p></div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Highlight active item in the list
+            document.querySelectorAll('.contact-list-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.id == contactId);
+            });
+        }
+
+        // Populate the list and set up event listeners
+        kontakte.forEach(contact => {
+            const item = document.createElement('div');
+            item.className = 'contact-list-item p-4 cursor-pointer';
+            item.textContent = contact.name;
+            item.dataset.id = contact.id;
+            item.addEventListener('click', () => displayContactDetails(contact.id));
+            contactListEl.appendChild(item);
+        });
+
+        // Listen for messages from the parent window (for theme changes)
+        window.addEventListener('message', (event) => {
+            if (event.data.startsWith('set-theme-')) {
+                const theme = event.data.replace('set-theme-', '');
+                document.documentElement.dataset.theme = theme;
+            }
+        });
+
+        // Display the first contact by default
+        if (kontakte.length > 0) {
+            displayContactDetails(kontakte[0].id);
+        }
+    </script>
+</body>
+</html>
+
