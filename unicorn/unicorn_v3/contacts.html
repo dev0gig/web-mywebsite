@@ -10,11 +10,13 @@
             --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
             --widget-bg: #ffffff; --widget-border: #e5e7eb; --accent-color: #f97316;
             --list-item-hover-bg: #f3f4f6; --list-item-active-bg: var(--accent-color);
+            --input-bg: #ffffff;
         }
         html[data-theme='dark'] {
             --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
             --widget-bg: #262626; --widget-border: #404040;
             --list-item-hover-bg: #404040;
+            --input-bg: #262626;
         }
         html { background-color: var(--bg-color); }
         html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
@@ -27,6 +29,11 @@
         .detail-card { background-color: var(--widget-bg); border: 1px solid var(--widget-border); }
         .detail-label { color: var(--text-color-light); }
         .notes { white-space: pre-wrap; } /* Preserve line breaks in notes */
+        .search-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--widget-border);
+            color: var(--text-color);
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,9 +46,14 @@
     </div>
 
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Left Panel: Contact List -->
-        <div id="contact-list" class="md:col-span-1 h-full max-h-[70vh] overflow-y-auto rounded-lg" style="border: 1px solid var(--widget-border);">
-            <!-- Contact items will be injected here by JS -->
+        <!-- Left Panel: Contact List & Search -->
+        <div class="md:col-span-1 flex flex-col gap-4">
+            <div>
+                 <input type="text" id="search-input" placeholder="Suchen..." class="search-input w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            <div id="contact-list" class="flex-grow h-full max-h-[65vh] overflow-y-auto rounded-lg" style="border: 1px solid var(--widget-border);">
+                <!-- Contact items will be injected here by JS -->
+            </div>
         </div>
 
         <!-- Right Panel: Contact Details -->
@@ -70,10 +82,14 @@
 
         const contactListEl = document.getElementById('contact-list');
         const contactDetailsEl = document.getElementById('contact-details');
+        const searchInputEl = document.getElementById('search-input');
 
         function displayContactDetails(contactId) {
             const contact = kontakte.find(k => k.id === contactId);
-            if (!contact) return;
+            if (!contact) {
+                contactDetailsEl.innerHTML = `<div class="detail-card rounded-lg shadow-lg p-6 text-center"><p class="detail-label">Kein Kontakt ausgewählt.</p></div>`;
+                return;
+            }
             
             contactDetailsEl.innerHTML = `
                 <div class="detail-card rounded-lg shadow-lg p-6">
@@ -90,23 +106,43 @@
                 </div>
             `;
             
-            // Highlight active item in the list
             document.querySelectorAll('.contact-list-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.id == contactId);
             });
         }
 
-        // Populate the list and set up event listeners
-        kontakte.forEach(contact => {
-            const item = document.createElement('div');
-            item.className = 'contact-list-item p-4 cursor-pointer';
-            item.textContent = contact.name;
-            item.dataset.id = contact.id;
-            item.addEventListener('click', () => displayContactDetails(contact.id));
-            contactListEl.appendChild(item);
+        function renderContactList(searchTerm = '') {
+            contactListEl.innerHTML = '';
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+            const filteredKontakte = kontakte.filter(k => 
+                k.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+                k.nummer.toLowerCase().includes(lowerCaseSearchTerm) ||
+                k.mail.toLowerCase().includes(lowerCaseSearchTerm) ||
+                k.notizen.toLowerCase().includes(lowerCaseSearchTerm)
+            );
+
+            if (filteredKontakte.length > 0) {
+                filteredKontakte.forEach(contact => {
+                    const item = document.createElement('div');
+                    item.className = 'contact-list-item p-4 cursor-pointer';
+                    item.textContent = contact.name;
+                    item.dataset.id = contact.id;
+                    item.addEventListener('click', () => displayContactDetails(contact.id));
+                    contactListEl.appendChild(item);
+                });
+                // Display the first result of the filtered list
+                displayContactDetails(filteredKontakte[0].id);
+            } else {
+                contactListEl.innerHTML = `<div class="p-4 text-center detail-label">Keine Ergebnisse</div>`;
+                contactDetailsEl.innerHTML = `<div class="detail-card rounded-lg shadow-lg p-6 text-center"><p class="detail-label">Keine Kontakte gefunden.</p></div>`;
+            }
+        }
+
+        searchInputEl.addEventListener('input', (e) => {
+            renderContactList(e.target.value);
         });
 
-        // Listen for messages from the parent window (for theme changes)
         window.addEventListener('message', (event) => {
             if (event.data.startsWith('set-theme-')) {
                 const theme = event.data.replace('set-theme-', '');
@@ -114,10 +150,9 @@
             }
         });
 
-        // Display the first contact by default
-        if (kontakte.length > 0) {
-            displayContactDetails(kontakte[0].id);
-        }
+        // Initial render
+        renderContactList();
+
     </script>
 </body>
 </html>
