@@ -11,7 +11,8 @@
             --sidebar-bg: #f3f4f6cc; --sidebar-border: #e5e7eb; --modal-bg: #ffffff;
             --accent-color: #f97316;
         }
-        body[data-theme='dark'] {
+        /* UPDATE: Theme is now applied to the <html> tag */
+        html[data-theme='dark'] {
             --bg-color: #171717; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
             --sidebar-bg: #262626cc; --sidebar-border: #404040; --modal-bg: #262626;
             --accent-color: #f97316;
@@ -75,8 +76,6 @@
 
     <script type="text/javascript">
         const iframe = document.getElementById('content-frame');
-
-        // --- MODAL LOGIC ---
         const settingsBtn = document.getElementById('settings-btn');
         const settingsModal = document.getElementById('settings-modal');
         const overlay = document.getElementById('modal-overlay');
@@ -90,23 +89,21 @@
         closeModalBtn.addEventListener('click', closeModal);
         overlay.addEventListener('click', closeModal);
         resetLayoutBtn.addEventListener('click', () => {
-            // Send reset message to iframe
             iframe.contentWindow.postMessage('reset-layout', '*');
             closeModal();
         });
 
-        // --- THEME LOGIC ---
         const themeRadios = document.querySelectorAll('input[name="theme"]');
         
-        function applyTheme(theme, isInitial = false) {
+        function applyTheme(theme) {
             let effectiveTheme;
             if (theme === 'system') {
                 effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             } else {
                 effectiveTheme = theme;
             }
-            document.body.dataset.theme = effectiveTheme;
-            // Send theme message to iframe
+            // UPDATE: Apply theme to <html> tag
+            document.documentElement.dataset.theme = effectiveTheme;
             if(iframe.contentWindow) {
                 iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
             }
@@ -120,18 +117,15 @@
         
         themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
         
-        // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
             const savedTheme = localStorage.getItem('theme') || 'system';
             if (savedTheme === 'system') applyTheme('system');
         });
 
-        // --- INITIALIZE ---
-        // Ensure iframe is loaded before sending the initial theme message
         iframe.addEventListener('load', () => {
             const savedTheme = localStorage.getItem('theme') || 'system';
             document.querySelector(`input[name="theme"][value="${savedTheme}"]`).checked = true;
-            applyTheme(savedTheme, true);
+            applyTheme(savedTheme);
         });
     </script>
 </body>
