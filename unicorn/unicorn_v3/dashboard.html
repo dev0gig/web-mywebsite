@@ -13,12 +13,18 @@
             --widget-bg: #ffffff; --widget-header-bg: rgba(0,0,0,0.02);
             --widget-border: #e5e7eb; --button-bg: #f3f4f6; --button-border: #d1d5db; --button-hover-bg: #f97316;
         }
-        body[data-theme='dark'] {
+        /* UPDATE: Theme is now applied to the <html> tag */
+        html[data-theme='dark'] {
             --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
             --widget-bg: #262626; --widget-header-bg: rgba(0,0,0,0.25);
             --widget-border: #404040; --button-bg: #404040; --button-border: #525252; --button-hover-bg: #f97316;
         }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
+        /* UPDATE: Apply background color to html tag to fix scrolling issue */
+        html {
+             background-color: var(--bg-color);
+        }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
+        body { background-color: var(--bg-color); }
         .main-header { color: var(--header-text-color); }
         .main-subheader { color: var(--text-color-light); }
         .grid-stack-item-content {
@@ -39,13 +45,13 @@
         }
         .button-single:hover { transform: translateY(-2px); background-color: var(--button-hover-bg); color: #ffffff; border-color: var(--button-hover-bg); }
         .button-single img { max-height: 32px; max-width: 90%; object-fit: contain; }
-        body[data-theme='light'] .logo-invert-on-light { filter: invert(1); }
+        html[data-theme='light'] .logo-invert-on-light { filter: invert(1); }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body data-theme="system" class="p-4 md:p-8 pb-20">
+<body class="p-4 md:p-8 pb-20">
     <div class="text-center mb-8">
         <h1 class="main-header text-4xl font-bold">Wichtige & Tägliche Arbeitsressourcen 🛠️</h1>
         <p class="main-subheader mt-2">Verschieben und Grösse ändern nach Belieben</p>
@@ -53,7 +59,6 @@
     <div class="grid-stack"></div>
 
     <script type="text/javascript">
-        // --- DATA ---
         const initialLayoutData = [
             { id: 'official', title: 'Official Tools', x: 0, y: 0, w: 5, h: 3, minW: 4, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://intranet.wienenergie.at')">Intranet</button><button class="button-single" onclick="window.open('https://wien-energie.secova.de/module/dashboardpreview/?preview')">SAM</button><button class="button-single" onclick="window.open('https://cu300078.opcyc.net/setup/')">Opcyc</button><button class="button-single" onclick="window.open('https://xenapp/Citrix/WSTWWeb/')">Citrix</button><button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">4me-Ticket</button><button class="button-single" onclick="window.open('https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome')">Lernplattform</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/WE_Personal')">Informationsplattform Personal</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04')">Persönlicher Kundenkanal</button></div>`},
             { id: 'system', title: 'System', x: 5, y: 0, w: 4, h: 3, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f&flags=themeOption%3Ddarkmode')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button></div>`},
@@ -68,11 +73,9 @@
             { id: 'wstw', title: 'Wiener Stadtwerke', x: 0, y: 10, w: 12, h: 2, minW: 6, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/')"><img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230"/></button><button class="button-single" onclick="window.open('https://www.wienerlinien.at/')"><img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139"/></button><button class="button-single" onclick="window.open('https://www.wienenergie.at/')"><img class="logo-invert-on-light" src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"/></button><button class="button-single" onclick="window.open('https://www.wienernetze.at/')"><img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159"/></button><button class="button-single" onclick="window.open('https://www.wlb.at/')"><img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554"/></button><button class="button-single" onclick="window.open('https://www.wipark.at/')"><img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665"/></button><button class="button-single" onclick="window.open('https://www.wienit.at/')"><img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000"/></button><button class="button-single" onclick="window.open('https://www.bestattungwien.at/')"><img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249"/></button><button class="button-single" onclick="window.open('https://www.friedhoefewien.at/')"><img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382"/></button><button class="button-single" onclick="window.open('https://www.immoh.at/')"><img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283" style="max-height: 28px !important;"/></button></div>`},
         ];
         
-        // --- GRIDSTACK SETUP ---
         const grid = GridStack.init({ float: true, cellHeight: 90, minRow: 1 });
         const widgetDataMap = new Map(initialLayoutData.map(item => [item.id, item]));
 
-        // --- FUNCTIONS ---
         function createWidgetHTML(data) {
             return `<div><div class="grid-stack-item-content"><div class="widget-header">${data.title}</div><div class="widget-content">${data.content}</div></div></div>`;
         }
@@ -96,20 +99,16 @@
             }
         }
 
-        // --- MESSAGE LISTENER FROM PARENT ---
         window.addEventListener('message', (event) => {
-            // Optional: Check event.origin for security if parent is on a different domain
-            // if (event.origin !== 'http://your-parent-domain.com') return;
-
             if (event.data.startsWith('set-theme-')) {
                 const theme = event.data.replace('set-theme-', '');
-                document.body.dataset.theme = theme;
+                // UPDATE: Apply theme to <html> tag
+                document.documentElement.dataset.theme = theme;
             } else if (event.data === 'reset-layout') {
-                loadLayout(true); // true indicates it's a reset
+                loadLayout(true);
             }
         });
 
-        // --- GRID SAVE LOGIC ---
         grid.on('change', () => {
             const serializedData = grid.save(false);
             if (serializedData.length > 0) {
@@ -117,7 +116,6 @@
             }
         });
 
-        // --- INITIALIZE ---
         loadLayout();
     </script>
 </body>
