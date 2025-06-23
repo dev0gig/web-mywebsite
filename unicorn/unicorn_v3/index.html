@@ -62,7 +62,7 @@
         </div>
         <div>
             <h3 class="text-lg font-semibold mb-2" style="color: var(--header-text-color);">Layout</h3>
-            <p class="text-sm mb-4">Setzt die Position und Grösse aller Widgets auf den Standard zurück.</p>
+            <p class="text-sm mb-4">Setzt die Position und Grösse der Widgets auf der Dashboard-Seite zurück.</p>
             <button id="reset-layout-btn" class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg">Layout zurücksetzen</button>
         </div>
         <hr class="my-6" style="border-color: var(--sidebar-border);">
@@ -85,8 +85,9 @@
         function handleNavClick(event) {
             event.preventDefault();
             const link = event.currentTarget;
-            iframe.src = link.href;
-
+            if (iframe.src !== link.href) {
+                iframe.src = link.href;
+            }
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         }
@@ -125,7 +126,6 @@
                 iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
             }
         }
-
         function handleThemeChange(event) {
             const selectedTheme = event.target.value;
             localStorage.setItem('theme', selectedTheme);
