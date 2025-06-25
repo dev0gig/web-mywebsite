@@ -1,37 +1,98 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Widgets-Iframe</title>
+    <title>Widgets-Iframe Layout</title>
     <link rel="icon" href="https://img.icons8.com/color/512/color-widgets.png" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* CSS-Variablen für Theme-Farben */
+        :root {
+            --header-text-color: #111827; /* Dunkler Text für Light Mode Überschriften */
+            --text-color: #6b7280;      /* Mittlerer Text für Light Mode */
+        }
+        html[data-theme='dark'] {
+            --header-text-color: #fafafa; /* Heller Text für Dark Mode Überschriften */
+            --text-color: #a3a3a3;      /* Mittlerer Text für Dark Mode */
+        }
+
+        /* Custom font for a better look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent; /* Hintergrund transparent gemacht */
+        }
+        /* Specific iframe styling for border, matching original dashed style */
+        .iframe-container {
+            border: 4px dashed;
+            border-color: gray; /* Tailwind border-gray-400 could also be used */
+            background-color: transparent; /* Hintergrund des Containers transparent gemacht */
+        }
+
+        /* Stile für Überschrift und Text, die die CSS-Variablen verwenden */
+        .main-header {
+            color: var(--header-text-color);
+        }
+        .main-text {
+            color: var(--text-color);
+        }
+
+        /* Stellt sicher, dass der Iframe selbst die volle Breite und feste Höhe einnimmt */
+        iframe {
+            width: 100%;
+            height: 700px; /* Feste Höhe, wie zuvor besprochen */
+            border: none; /* Keine zusätzlichen Rahmen für den Iframe selbst */
+        }
+    </style>
 </head>
+<body class="p-4 min-h-screen flex flex-col items-center justify-center">
+    <div class="container mx-auto p-4 shadow-lg rounded-xl">
+        <!-- Überschrift verwendet jetzt die adaptive Farbe -->
+        <h1 class="text-3xl font-bold mb-6 text-center main-header">Ihre Widgets</h1>
 
-<style>
-    body{
-        margin: 0px;
-        padding: 20px;
-        background-color: #222;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-    }
-    iframe{
-        flex: 1 100%;
-        height: 700px;
-        border: 4px gray dashed;
-        border-radius: 50px;
-    }
-</style>
+        <!-- Text verwendet jetzt die adaptive Farbe -->
+        <p class="text-lg mb-8 text-center main-text">
+            Hier sind Ihre Iframes in einem responsiven Layout, das auf größeren Bildschirmen zwei Spalten und auf kleineren Bildschirmen eine Spalte anzeigt.
+        </p>
 
-<body>
-    <iframe src="jap-kana.html"></iframe>
-    <iframe src="calculator.html"></iframe>
-    <iframe src="clock.html"></iframe>
-    <iframe src="easy-math.html"></iframe>
-    <iframe src="tariff.html"></iframe>
-    <iframe src="capital-city-EU.html"></iframe>
-    <iframe src="weather.html"></iframe>
+        <!-- Grid Container for Iframes -->
+        <!--
+            The 'grid grid-cols-1' sets a single column by default (for mobile).
+            'md:grid-cols-2' changes it to two columns on medium screens and larger.
+            'gap-6' adds spacing between the grid items.
+            The 'h-[700px]' class directly applies the 700px height to each iframe.
+        -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Each iframe is wrapped in a div to apply consistent styling -->
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="jap-kana.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="calculator.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="clock.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="easy-math.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="tariff.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="capital-city-EU.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+
+            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
+                <iframe src="weather.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
 </body>
+</html>
