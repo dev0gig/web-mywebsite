@@ -11,12 +11,13 @@
             --widget-bg: #ffffff; --widget-border: #e5e7eb; --accent-color: #f97316;
             --list-item-hover-bg: #f3f4f6; --list-item-active-bg: var(--accent-color);
             --input-bg: #ffffff;
+            --scrollbar-thumb: #d1d5db; --scrollbar-thumb-hover: #9ca3af;
         }
         html[data-theme='dark'] {
             --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
             --widget-bg: #262626; --widget-border: #404040;
-            --list-item-hover-bg: #404040;
-            --input-bg: #262626;
+            --list-item-hover-bg: #404040; --input-bg: #262626;
+            --scrollbar-thumb: #404040; --scrollbar-thumb-hover: #525252;
         }
         html { background-color: var(--bg-color); }
         html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
@@ -28,37 +29,59 @@
         .contact-list-item.active { background-color: var(--list-item-active-bg); color: white; }
         .detail-card { background-color: var(--widget-bg); border: 1px solid var(--widget-border); }
         .detail-label { color: var(--text-color-light); }
-        .notes { white-space: pre-wrap; } /* Preserve line breaks in notes */
+        .notes { white-space: pre-wrap; }
         .search-input {
             background-color: var(--input-bg);
             border: 1px solid var(--widget-border);
             color: var(--text-color);
+        }
+
+        #contact-list::-webkit-scrollbar { width: 8px; }
+        #contact-list::-webkit-scrollbar-track { background: transparent; }
+        #contact-list::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+        #contact-list:hover::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-hover);
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="p-4 md:p-8">
-    <div class="text-center mb-8">
-        <h1 class="main-header text-4xl font-bold">Wichtige Kontakte</h1>
-        <p class="main-subheader mt-2">Eine Übersicht aller relevanten Ansprechpartner</p>
-    </div>
+<body class="flex items-center justify-center p-4 md:p-8">
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Left Panel: Contact List & Search -->
-        <div class="md:col-span-1 flex flex-col gap-4">
-            <div>
-                 <input type="text" id="search-input" placeholder="Suchen..." class="search-input w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-            </div>
-            <div id="contact-list" class="flex-grow h-full max-h-[65vh] overflow-y-auto rounded-lg" style="border: 1px solid var(--widget-border);">
-                <!-- Contact items will be injected here by JS -->
-            </div>
+    <div class="w-full">
+        <div class="text-center mb-8">
+            <h1 class="main-header text-4xl font-bold">Wichtige Kontakte</h1>
+            <p class="main-subheader mt-2">Eine Übersicht aller relevanten Ansprechpartner</p>
         </div>
 
-        <!-- Right Panel: Contact Details -->
-        <div id="contact-details" class="md:col-span-2">
-            <!-- Details will be injected here by JS -->
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Panel: Contact List & Search -->
+            <div class="md:col-span-1 flex flex-col gap-4">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                    </div>
+                     <input type="text" id="search-input" placeholder="Suchen..." class="search-input w-full p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                     <div class="absolute inset-y-0 right-0 flex items-center">
+                        <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
+                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="contact-list" class="flex-grow h-full max-h-[60vh] overflow-y-auto rounded-lg pr-1" style="border: 1px solid var(--widget-border);">
+                    <!-- Contact items will be injected here by JS -->
+                </div>
+            </div>
+
+            <!-- Right Panel: Contact Details -->
+            <div id="contact-details" class="md:col-span-2">
+                <!-- Details will be injected here by JS -->
+            </div>
         </div>
     </div>
 
@@ -83,6 +106,7 @@
         const contactListEl = document.getElementById('contact-list');
         const contactDetailsEl = document.getElementById('contact-details');
         const searchInputEl = document.getElementById('search-input');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
 
         function displayContactDetails(contactId) {
             const contact = kontakte.find(k => k.id === contactId);
@@ -94,7 +118,6 @@
             contactDetailsEl.innerHTML = `
                 <div class="detail-card rounded-lg shadow-lg p-6">
                     <div class="flex items-center mb-6">
-                        ${contact.logoUrl && contact.logoUrl !== ' - ' ? `<img src="${contact.logoUrl}" alt="${contact.name} Logo" class="w-16 h-16 rounded-full mr-4 object-contain bg-white">` : '<div class="w-16 h-16 rounded-full mr-4 bg-gray-300 dark:bg-gray-700 flex items-center justify-center font-bold text-2xl" style="color: var(--text-color-light);">${contact.name.charAt(0)}</div>'}
                         <h2 class="main-header text-3xl font-bold">${contact.name}</h2>
                     </div>
                     <div class="space-y-4">
@@ -131,7 +154,6 @@
                     item.addEventListener('click', () => displayContactDetails(contact.id));
                     contactListEl.appendChild(item);
                 });
-                // Display the first result of the filtered list
                 displayContactDetails(filteredKontakte[0].id);
             } else {
                 contactListEl.innerHTML = `<div class="p-4 text-center detail-label">Keine Ergebnisse</div>`;
@@ -140,7 +162,15 @@
         }
 
         searchInputEl.addEventListener('input', (e) => {
-            renderContactList(e.target.value);
+            const searchTerm = e.target.value;
+            renderContactList(searchTerm);
+            clearSearchBtn.classList.toggle('hidden', searchTerm === '');
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInputEl.value = '';
+            renderContactList('');
+            clearSearchBtn.classList.add('hidden');
         });
 
         window.addEventListener('message', (event) => {
@@ -150,10 +180,7 @@
             }
         });
 
-        // Initial render
         renderContactList();
-
     </script>
 </body>
 </html>
-

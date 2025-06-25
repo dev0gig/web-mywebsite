@@ -12,21 +12,17 @@
             --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
             --widget-bg: #ffffff; --widget-header-bg: rgba(0,0,0,0.02);
             --widget-border: #e5e7eb; --button-bg: #f3f4f6; --button-border: #d1d5db; --button-hover-bg: #f97316;
+            --accent-color: #f97316;
         }
-        /* UPDATE: Theme is now applied to the <html> tag */
         html[data-theme='dark'] {
             --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
             --widget-bg: #262626; --widget-header-bg: rgba(0,0,0,0.25);
             --widget-border: #404040; --button-bg: #404040; --button-border: #525252; --button-hover-bg: #f97316;
         }
-        /* UPDATE: Apply background color to html tag to fix scrolling issue */
-        html {
-             background-color: var(--bg-color);
-        }
+        html { background-color: var(--bg-color); }
         html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
         body { background-color: var(--bg-color); }
         .main-header { color: var(--header-text-color); }
-        .main-subheader { color: var(--text-color-light); }
         .grid-stack-item-content {
             background-color: var(--widget-bg); border: 1px solid var(--widget-border);
             color: var(--text-color); border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -41,74 +37,105 @@
             border: 1px solid var(--button-border);
             border-radius: 0.375rem; padding: 0.25rem 0.5rem; text-align: center; transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
             font-weight: 500; font-size: 0.875rem; line-height: 1.2; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100%; min-height: 48px; word-break: break-word; overflow: hidden;
+            width: 100%; height: 100%; 
+            word-break: break-word; overflow: hidden;
         }
         .button-single:hover { transform: translateY(-2px); background-color: var(--button-hover-bg); color: #ffffff; border-color: var(--button-hover-bg); }
         .button-single img { max-height: 32px; max-width: 90%; object-fit: contain; }
         html[data-theme='light'] .logo-invert-on-light { filter: invert(1); }
+
+        .grid-stack-placeholder > .placeholder-content {
+            border: 2px dashed var(--accent-color) !important;
+            background-color: rgba(249, 115, 22, 0.1) !important;
+        }
+        #coords-info {
+            position: fixed;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: pre;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body class="p-4 md:p-8 pb-20">
-    <div class="text-center mb-8">
-        <h1 class="main-header text-4xl font-bold">Wichtige & Tägliche Arbeitsressourcen 🛠️</h1>
-        <p class="main-subheader mt-2">Verschieben und Grösse ändern nach Belieben</p>
-    </div>
-    <div class="grid-stack"></div>
 
+    <div id="coords-info"></div>
+    <div class="grid-stack"></div>
     <script type="text/javascript">
         const initialLayoutData = [
-            { id: 'official', title: 'Official Tools', x: 0, y: 0, w: 5, h: 3, minW: 4, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://intranet.wienenergie.at')">Intranet</button><button class="button-single" onclick="window.open('https://wien-energie.secova.de/module/dashboardpreview/?preview')">SAM</button><button class="button-single" onclick="window.open('https://cu300078.opcyc.net/setup/')">Opcyc</button><button class="button-single" onclick="window.open('https://xenapp/Citrix/WSTWWeb/')">Citrix</button><button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">4me-Ticket</button><button class="button-single" onclick="window.open('https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome')">Lernplattform</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/WE_Personal')">Informationsplattform Personal</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04')">Persönlicher Kundenkanal</button></div>`},
-            { id: 'system', title: 'System', x: 5, y: 0, w: 4, h: 3, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f&flags=themeOption%3Ddarkmode')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button></div>`},
-            { id: 'empfang', title: 'Empfang', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:w:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7BE431621F-EAB4-41A2-9455-918F13452C1D%7D')">Zeitbestätigung Erdberg</button><button class="button-single" onclick="window.open('https://intranet.wienerstadtwerke.at/speiseplan')">Kuchl Speiseplan</button></div>`},
-            { id: 'zeitplaene', title: 'Zeitpläne', x: 0, y: 3, w: 5, h: 3, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc2.aspx?action=edit&sourcedoc=%7B79c7fd17-3b8b-4f6b-9e7e-b6f96c0d6cd8%7D')">Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365-my.sharepoint.com/:x:/r/personal/nmuama_wstw_energy-it_net/_layouts/15/doc2.aspx?sourcedoc=%7BA77101AB-64A6-450B-9620-6FDE51765F08%7D')">HO/Flexi - Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7B4A5869C9-A49F-41A1-8BB8-AC2A80484B92%7D')">Sitzplan-CB08</button><button class="button-single" onclick="window.open('https://apps.powerapps.com/play/e/0089faf5-df22-4012-a29b-93b3d081d5da/a/c9242c89-c412-4a5c-94fe-29e2a847c0d2?tenantId=2df2bcec-2017-4339-b493-e3d7b3a460c8')">DeskFinder</button></div>`},
-            { id: 'stromgas', title: 'Strom & Gas', x: 5, y: 3, w: 4, h: 2, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sapc2p.wstw.energy-it.net:8144/sap(bD1kZSZjPTIwMCZkPW1pbg==)/bc/bsp/sap/crm_ui_start/default.htm')">CRM</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_412d4c/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F412d4c%2FFreigegebene%20Dokumente%2FiTWIIN%2FPreisbl%C3%A4tter')">Preisblätter</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('https://sarchpam30/pam4ws/frame/workplaceframe.aspx')">PAM</button></div><div class="text-sm mt-4 flex-shrink-0"><p>Dummy GP-Nr. 1250001023</p><p>PV-VK-Vorlage 228000183897</p></div>`},
-            { id: 'fernwaerme', title: 'Fernwärme', x: 9, y: 3, w: 3, h: 2, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://spam01/PAM4/frame/workplaceframe.aspx')">PAM</button><button class="button-single" style="background-color: #f58484; border: red solid 2px; color: black" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_8cb9ed/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F8cb9ed%2FFreigegebene%20Dokumente%2FGeneral%2FWiener%20Wohnen%20Vertr%C3%A4ge')">WiWo Verträge</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand.waerme@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('http://wstw365.sharepoint.com/:x:/r/sites/msteams_412d4c/Freigegebene%20Dokumente/iTWIIN/Dokumente/Fernw%C3%A4rme/Kalkulation%20der%20Ersteinstufung%20W%C3%A4rme%20-TBs.xlsx')">Wärme Kalkulator</button><button class="button-single" onclick="window.open('https://webgis.wienit.at/WEB_P/synserver?project=fww&client=core')">WebGIS</button></div>`},
-            { id: 'superschnell', title: 'SuperSchnell', x: 0, y: 6, w: 5, h: 2, minW: 3, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sp.wienenergie.at/APP/IntTvTel/_layouts/15/WopiFrame2.aspx?sourcedoc=%7BDF4E3B1B-5FC7-400F-98FA-A1336C0A3942%7D&action=edit&source=https%3A%2F%2Fsp%2Ewienenergie%2Eat%2FAPP%2FIntTvTel%2FSitePages%2FHomepage%2Easpx')">Sharepointliste</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/bd41fccab9604cf896920b2660d932b9')">Kodierung</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/fe72647b59ca4f68a750f8a593e4d829')">Rabatte</button></div>` },
-            { id: 'tanke', title: 'Tanke', x: 5, y: 6, w: 4, h: 4, minW: 2, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://app.chargecloud.de/quicknavigation')">EMEX</button><button class="button-single" onclick="window.open('https://sp.wienenergie.at/CTY/emob/SitePages/Homepage.aspx')">Sharepoint</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/apps/c7a71521-6fe0-47c0-a548-2d8e05c7a57b/reports/6738a907-c364-4785-a8f8-094a0e38bcfa/ReportSection1d4125bf56b4c39f32a4')">Stellplatz 🔎</button><button class="button-single" onclick="window.open('https://itap.wstw.energy-it.net/#/orderMenue')">Störungsticket</button></div>`},
-            { id: 'docs', title: 'Nützliche Dokumente', x: 9, y: 6, w: 3, h: 4, minW: 3, minH: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210215-sm_anleitung_landis_gyr_uk_v5_bf')">LGZ - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_siemens_uk_v4_bf')">SMS - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_iskrameco_uk_v06_bf')">ISK - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/documents/34846/261085/Der_Ableseprozess.pdf/b2f018a6-fc82-578f-5bd4-d6d880c3f946?t=1586340649529')">WN - Ableseprozess</button></div>` },
-            { id: 'wnetze', title: 'Wiener Netze', x: 0, y: 8, w: 5, h: 2, minW: 3, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/stromversorgung')">Stromausfälle</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienernetze.at/')">Backlog</button><button class="button-single" onclick="window.open('http://sarchpam20/pam4weg/frame/workplaceframe.aspx')">PAM</button></div>` },
-            { id: 'wstw', title: 'Wiener Stadtwerke', x: 0, y: 10, w: 12, h: 2, minW: 6, minH: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/')"><img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230"/></button><button class="button-single" onclick="window.open('https://www.wienerlinien.at/')"><img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139"/></button><button class="button-single" onclick="window.open('https://www.wienenergie.at/')"><img class="logo-invert-on-light" src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"/></button><button class="button-single" onclick="window.open('https://www.wienernetze.at/')"><img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159"/></button><button class="button-single" onclick="window.open('https://www.wlb.at/')"><img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554"/></button><button class="button-single" onclick="window.open('https://www.wipark.at/')"><img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665"/></button><button class="button-single" onclick="window.open('https://www.wienit.at/')"><img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000"/></button><button class="button-single" onclick="window.open('https://www.bestattungwien.at/')"><img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249"/></button><button class="button-single" onclick="window.open('https://www.friedhoefewien.at/')"><img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382"/></button><button class="button-single" onclick="window.open('https://www.immoh.at/')"><img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283" style="max-height: 28px !important;"/></button></div>`},
+            { id: 'official', title: 'Official Tools', x: 3, y: 6, w: 4, h: 4, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://intranet.wienenergie.at')">Intranet</button><button class="button-single" onclick="window.open('https://wien-energie.secova.de/module/dashboardpreview/?preview')">SAM</button><button class="button-single" onclick="window.open('https://cu300078.opcyc.net/setup/')">Opcyc</button><button class="button-single" onclick="window.open('https://xenapp/Citrix/WSTWWeb/')">Citrix</button><button class="button-single" onclick="window.open('https://wienenergie.4me.com/self-service')">4me-Ticket</button><button class="button-single" onclick="window.open('https://fa-epql-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/faces/FuseWelcome')">Lernplattform</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/WE_Personal')">Informationsplattform Personal</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/reports/b027b4e7-9d01-4670-93a7-0060477e6968/df4cdaae83560ef0ac04')">Persönlicher Kundenkanal</button></div>` },
+            { id: 'system', title: 'System', x: 0, y: 0, w: 6, h: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f&flags=themeOption%3Ddarkmode')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button></div>` },
+            { id: 'empfang', title: 'Empfang', x: 6, y: 0, w: 2, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:w:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7BE431621F-EAB4-41A2-9455-918F13452C1D%7D')">Zeitbestätigung Erdberg</button><button class="button-single" onclick="window.open('https://intranet.wienerstadtwerke.at/speiseplan')">Kuchl Speiseplan</button></div>` },
+            { id: 'zeitplaene', title: 'Zeitpläne', x: 0, y: 3, w: 2, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc2.aspx?action=edit&sourcedoc=%7B79c7fd17-3b8b-4f6b-9e7e-b6f96c0d6cd8%7D')">Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365-my.sharepoint.com/:x:/r/personal/nmuama_wstw_energy-it_net/_layouts/15/doc2.aspx?sourcedoc=%7BA77101AB-64A6-450B-9620-6FDE51765F08%7D')">HO/Flexi - Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7B4A5869C9-A49F-41A1-8BB8-AC2A80484B92%7D')">Sitzplan-CB08</button><button class="button-single" onclick="window.open('https://apps.powerapps.com/play/e/0089faf5-df22-4012-a29b-93b3d081d5da/a/c9242c89-c412-4a5c-94fe-29e2a847c0d2?tenantId=2df2bcec-2017-4339-b493-e3d7b3a460c8')">DeskFinder</button></div>` },
+            { id: 'fernwaerme', title: 'Fernwärme', x: 6, y: 3, w: 3, h: 3, content: `<div class="button-group-tools"><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://spam01/PAM4/frame/workplaceframe.aspx')">PAM</button><button class="button-single" style="background-color: #f58484; border: red solid 2px; color: black" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_8cb9ed/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F8cb9ed%2FFreigegebene%20Dokumente%2FGeneral%2FWiener%20Wohnen%20Vertr%C3%A4ge')">WiWo Verträge</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand.waerme@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('http://wstw365.sharepoint.com/:x:/r/sites/msteams_412d4c/Freigegebene%20Dokumente/iTWIIN/Dokumente/Fernw%C3%A4rme/Kalkulation%20der%20Ersteinstufung%20W%C3%A4rme%20-TBs.xlsx')">Wärme Kalkulator</button><button class="button-single" onclick="window.open('https://webgis.wienit.at/WEB_P/synserver?project=fww&client=core')">WebGIS</button></div>` },
+            { id: 'nützliche-dokumente', title: 'Nützliche Dokumente', x: 8, y: 0, w: 4, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210215-sm_anleitung_landis_gyr_uk_v5_bf')">LGZ - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_siemens_uk_v4_bf')">SMS - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/o/document/210213-sm_anleitung_iskrameco_uk_v06_bf')">ISK - Anleitung</button><button class="button-single" onclick="window.open('https://www.wienernetze.at/documents/34846/261085/Der_Ableseprozess.pdf/b2f018a6-fc82-578f-5bd4-d6d880c3f946?t=1586340649529')">WN - Ableseprozess</button></div>` },
+            { id: 'stromgas', title: 'Strom & Gas', x: 2, y: 3, w: 4, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sapc2p.wstw.energy-it.net:8144/sap(bD1kZSZjPTIwMCZkPW1pbg==)/bc/bsp/sap/crm_ui_start/default.htm')">CRM</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_412d4c/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F412d4c%2FFreigegebene%20Dokumente%2FiTWIIN%2FPreisbl%C3%A4tter')">Preisblätter</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('https://sarchpam30/pam4ws/frame/workplaceframe.aspx')">PAM</button></div><div class="text-sm mt-4 flex-shrink-0"><p>Dummy GP-Nr. 1250001023</p><p>PV-VK-Vorlage 228000183897</p></div>` },
+            { id: 'wstw', title: 'Wiener Stadtwerke', x: 7, y: 6, w: 5, h: 4, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienerstadtwerke.at/')"><img src="https://www.wienerstadtwerke.at/image/layout_set_logo?img_id=22615230"/></button><button class="button-single" onclick="window.open('https://www.wienerlinien.at/')"><img src="https://www.wienerlinien.at/image/layout_set_logo?img_id=18381139"/></button><button class="button-single" onclick="window.open('https://www.wienenergie.at/')"><img class="logo-invert-on-light" src="https://www.wienenergie.at/wp-content/themes/we-theme/public/wp-content/themes/we-theme/public/logo-we-theme-regular.svg"/></button><button class="button-single" onclick="window.open('https://www.wienernetze.at/')"><img src="https://www.wienernetze.at/image/layout_set_logo?img_id=18485159"/></button><button class="button-single" onclick="window.open('https://www.wlb.at/')"><img src="https://www.wlb.at/image/layout_set_logo?img_id=18160554"/></button><button class="button-single" onclick="window.open('https://www.wipark.at/')"><img src="https://www.wipark.at/image/layout_set_logo?img_id=6753665"/></button><button class="button-single" onclick="window.open('https://www.wienit.at/')"><img src="https://www.wienit.at/image/layout_set_logo?img_id=18163000"/></button><button class="button-single" onclick="window.open('https://www.bestattungwien.at/')"><img src="https://www.bestattungwien.at/image/layout_set_logo?img_id=18239249"/></button><button class="button-single" onclick="window.open('https://www.friedhoefewien.at/')"><img src="https://www.friedhoefewien.at/image/layout_set_logo?img_id=18169382"/></button><button class="button-single" onclick="window.open('https://www.immoh.at/')"><img src="https://www.immoh.at/image/layout_set_logo?img_id=18094283" style="max-height: 28px !important;"/></button></div>` },
+            { id: 'superschnell', title: 'SuperSchnell', x: 0, y: 6, w: 3, h: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sp.wienenergie.at/APP/IntTvTel/_layouts/15/WopiFrame2.aspx?sourcedoc=%7BDF4E3B1B-5FC7-400F-98FA-A1336C0A3942%7D&action=edit&source=https%3A%2F%2Fsp%2Ewienenergie%2Eat%2FAPP%2FIntTvTel%2FSitePages%2FHomepage%2Easpx')">Sharepointliste</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/bd41fccab9604cf896920b2660d932b9')">Kodierung</button><button class="button-single" onclick="window.open('https://wienenergie.sabio.de/web/#!/tree/node/_id/fe72647b59ca4f68a750f8a593e4d829')">Rabatte</button></div>` },
+            { id: 'tanke', title: 'Tanke', x: 9, y: 3, w: 3, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://app.chargecloud.de/quicknavigation')">EMEX</button><button class="button-single" onclick="window.open('https://sp.wienenergie.at/CTY/emob/SitePages/Homepage.aspx')">Sharepoint</button><button class="button-single" onclick="window.open('https://app.powerbi.com/groups/me/apps/c7a71521-6fe0-47c0-a548-2d8e05c7a57b/reports/6738a907-c364-4785-a8f8-094a0e38bcfa/ReportSection1d4125bf56b4c39f32a4')">Stellplatz 🔎</button><button class="button-single" onclick="window.open('https://itap.wstw.energy-it.net/#/orderMenue')">Störungsticket</button></div>` },
+            { id: 'wnetze', title: 'Wiener Netze', x: 0, y: 8, w: 3, h: 2, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://www.wienernetze.at/stromversorgung')">Stromausfälle</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienernetze.at/')">Backlog</button><button class="button-single" onclick="window.open('http://sarchpam20/pam4weg/frame/workplaceframe.aspx')">PAM</button></div>` },
         ];
-        
-        const grid = GridStack.init({ float: true, cellHeight: 90, minRow: 1 });
+        const grid = GridStack.init({ float: true, cellHeight: 80, minRow: 1 });
         const widgetDataMap = new Map(initialLayoutData.map(item => [item.id, item]));
-
-        function createWidgetHTML(data) {
-            return `<div><div class="grid-stack-item-content"><div class="widget-header">${data.title}</div><div class="widget-content">${data.content}</div></div></div>`;
-        }
+        
+        function createWidgetHTML(data) { return `<div><div class="grid-stack-item-content"><div class="widget-header">${data.title}</div><div class="widget-content">${data.content}</div></div></div>`; }
         
         function loadLayout(isReset = false) {
-            if (isReset) {
-                localStorage.removeItem('savedGridLayout');
-            }
+            if (isReset) { localStorage.removeItem('savedGridLayout'); }
             const savedLayout = JSON.parse(localStorage.getItem('savedGridLayout'));
             grid.removeAll(true);
-            if (savedLayout && savedLayout.length > 0) {
-                const validSavedLayout = savedLayout.filter(node => widgetDataMap.has(node.id));
-                validSavedLayout.forEach(node => {
-                    const data = widgetDataMap.get(node.id);
-                    if(data) grid.addWidget(createWidgetHTML(data), node);
-                });
-            } else {
-                initialLayoutData.forEach(widgetData => {
-                    grid.addWidget(createWidgetHTML(widgetData), widgetData);
-                });
-            }
+            const layoutToLoad = (savedLayout && savedLayout.length > 0) ? savedLayout : initialLayoutData;
+            
+            const validLayout = layoutToLoad.filter(node => widgetDataMap.has(node.id));
+             validLayout.forEach(node => {
+                const data = widgetDataMap.get(node.id);
+                if(data) grid.addWidget(createWidgetHTML(data), node);
+            });
         }
 
         window.addEventListener('message', (event) => {
             if (event.data.startsWith('set-theme-')) {
-                const theme = event.data.replace('set-theme-', '');
-                // UPDATE: Apply theme to <html> tag
-                document.documentElement.dataset.theme = theme;
+                document.documentElement.dataset.theme = event.data.replace('set-theme-', '');
             } else if (event.data === 'reset-layout') {
                 loadLayout(true);
             }
         });
+        
+        const coordsInfo = document.getElementById('coords-info');
+        
+        function updateCoords(el) {
+            const node = el.gridstackNode;
+            coordsInfo.style.display = 'block';
+            coordsInfo.textContent = `x:${node.x} y:${node.y}\nw:${node.w} h:${node.h}`;
+            
+            const rect = el.getBoundingClientRect();
+            const containerRect = document.body.getBoundingClientRect();
 
+            coordsInfo.style.top = `${rect.top - containerRect.top + rect.height / 2 - coordsInfo.offsetHeight / 2}px`;
+            coordsInfo.style.left = `${rect.left - containerRect.left + rect.width / 2 - coordsInfo.offsetWidth / 2}px`;
+        }
+        
+        grid.on('dragstart resizestart', (event, el) => {
+            updateCoords(el);
+        });
+
+        grid.on('drag resize', (event, el) => {
+            updateCoords(el);
+        });
+
+        grid.on('dragstop resizestop', (event, el) => {
+            coordsInfo.style.display = 'none';
+        });
+        
         grid.on('change', () => {
             const serializedData = grid.save(false);
             if (serializedData.length > 0) {
@@ -120,4 +147,3 @@
     </script>
 </body>
 </html>
-
