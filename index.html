@@ -1,184 +1,347 @@
 <!DOCTYPE html>
-<html lang="de">
-
+<html lang="de" class="h-full">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link rel="icon"
-        href="https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/102-512.png" />
-    <link rel="stylesheet" href="global/color-palette.css">
-    <link rel="stylesheet" href="global/cursor.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-    <nav>
-        <header>
-            <iframe src="widgets/clock/clock.html" title="Dashboard Clock" id="clock"></iframe>
-            <div style="padding: 0 12px;">
-                <h1>Mein Dashboard</h1>
-                <h2>dev0gig's Home</h2>
-                <p>Hier sind meine wichtigsten Tools auf einem Blick.</p>
-            </div>
-        </header>
-        <div class="nav-buttons">
-            <button onclick="window.location.href='widgets/widgets-iframe.html';">
-                <img src="https://cdn-icons-png.freepik.com/512/9995/9995840.png" alt="Widgets Icon"> My Widgets
-            </button>
-            <button onclick="window.location.href='unicorn/work-tools.html';">
-                <img src="https://cdn-icons-png.freepik.com/512/6288/6288891.png" alt="Unicorn Icon"> Unicorn
-            </button>
-            <button onclick="window.location.href='https://web.whatsapp.com';">
-                <img src="https://cdn-icons-png.freepik.com/512/3536/3536445.png" alt="Whatsapp Icon"> Whatsapp
-            </button>
-            <button onclick="window.location.href='https://messages.google.com/web/conversations';">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Google_Messages_icon_%282022%29.svg/2048px-Google_Messages_icon_%282022%29.svg.png"
-                    alt="Google Messages Icon"> Google Messenger
-            </button>
-        </div>
-    </nav>
-    <main>
-        <div class="box" id="box-favorites">
-            <div class="app-header-container">
-                <h1 class="app-title">AppDrawer</h1>
-                <input type="search" id="searchInput" placeholder="Nach ID suchen...">
-            </div>
-            <div class="app-container"></div>
-            <script src="appsData.js"></script>
-            <script src="appdrawer-search.js"></script>
-        </div>
-        <div class="box" id="box-mails">
-            <button class="mail-button" title="Gmail"
-                style="background-image: url('https://wallpapers.com/images/hd/gmail-background-zsyjopx1r5l5izz0.jpg');"
-                onclick="window.location.href='https://mail.google.com/mail/u/0/#inbox';">
-            </button>
-            <button class="mail-button" title="Outlook"
-                style="background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');"
-                onclick="window.location.href='https://outlook.live.com/mail/inbox';">
-            </button>
-            <button class="mail-button" title="Proton Mail"
-                style="background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=Proton_Mail_bbaad42705.png');"
-                onclick="window.location.href='https://www.proton.me/de/mail';">
-            </button>
-            <button class="mail-button" title="Apple Mail"
-                style="background-image: url('https://media.idownloadblog.com/wp-content/uploads/2023/04/Mail-app-icon.jpg');"
-                onclick="window.location.href='https://www.icloud.com/mail/';">
-            </button>
-        </div>
-        <div class="box" id="my-tools">
-            <button title="Github"
-                style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSslJPXa2CrpQgp3QRJePQ69ezWxpDtVI2mjw&s');"
-                onclick="window.location.href='https://github.com';">
-            </button>
-            <button title="Trello"
-                style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Pr5wzx8Zk6wNxHBg5dqAYQWn7s-hJ9soyg&s');"
-                onclick="window.location.href='https://trello.com/b/zygeoDI2/%F0%9F%A6%84';">
-            </button>
-            <button title="Google Calendar"
-                style="background-image: url('https://cdn.prod.website-files.com/634681057b887c6f4830fae2/6712a22812e6b71494f3a426_66e0c1b9d03cccf4b2404449_Untitled%2520design%2520(20).png');"
-                onclick="window.location.href='https://calendar.google.com/calendar/u/0/r';">
-            </button>
-        </div>
-    </main>
-
-    <script>
-        function adjustLayoutForMobile() {
-            const mobileBreakpoint = 1200; // Maximale Breite für mobile Ansicht
-            const isMobile = window.innerWidth < mobileBreakpoint;
-
-            const navElement = document.querySelector('nav');
-            const mainElement = document.querySelector('main');
-            const allBoxes = document.querySelectorAll('main > .box');
-            const boxFavorites = document.getElementById('box-favorites'); // Direkter Zugriff auf box-favorites
-
-            if (isMobile) {
-                // --- Mobile Ansicht ---
-
-                // Navigationsleiste ausblenden
-                if (navElement) {
-                    navElement.style.display = 'none';
-                }
-
-                // Main-Element anpassen (nimmt volle Breite ein, Padding für Mobilgeräte)
-                if (mainElement) {
-                    mainElement.style.marginLeft = '0';
-                    mainElement.style.gridTemplateColumns = '1fr';
-                    mainElement.style.gridTemplateAreas = '"favorites"'; // Nur "favorites" anzeigen
-                    mainElement.style.padding = '16px'; // Beispiel-Padding für Mobilgeräte (anpassen bei Bedarf)
-                }
-
-                allBoxes.forEach(box => {
-                    if (box.id === 'box-favorites') {
-                        box.style.display = 'flex'; // Sicherstellen, dass es ein Flex-Container ist
-                        box.style.gridArea = 'favorites'; // Dem Grid-Bereich zuweisen
-
-                        // Höhe von box-favorites anpassen
-                        if (mainElement) {
-                            // Berechne die verfügbare Höhe innerhalb von main
-                            const mainComputedStyle = getComputedStyle(mainElement);
-                            const mainPaddingTop = parseFloat(mainComputedStyle.paddingTop) || 0;
-                            const mainPaddingBottom = parseFloat(mainComputedStyle.paddingBottom) || 0;
-
-                            // Da .box (und somit #box-favorites) box-sizing: border-box verwendet,
-                            // setzt diese Höhe die Außenkante der Box.
-                            box.style.height = (window.innerHeight - mainPaddingTop - mainPaddingBottom) + 'px';
-                        } else {
-                            // Fallback, falls mainElement nicht existiert (unwahrscheinlich)
-                            box.style.height = window.innerHeight + 'px';
-                        }
-                    } else {
-                        // Alle anderen Boxen ausblenden
-                        box.style.display = 'none';
-                    }
-                });
-
-            } else {
-                // --- Desktop Ansicht ---
-
-                // Navigationsleiste wieder einblenden
-                if (navElement) {
-                    navElement.style.display = 'flex'; // Oder 'block', je nach ursprünglichem display
-                }
-
-                // Main-Element zurücksetzen
-                if (mainElement) {
-                    mainElement.style.marginLeft = '415px'; // Ursprünglicher linker Rand
-                    mainElement.style.gridTemplateColumns = 'repeat(4, 1fr)';
-                    mainElement.style.gridTemplateAreas = `
-                    "favorites favorites favorites tools"
-                    "mails mails mails mails"
-                `;
-                    mainElement.style.padding = '24px'; // Ursprüngliches Padding
-                }
-
-                // Alle Boxen auf Desktop-Standard zurücksetzen
-                allBoxes.forEach(box => {
-                    box.style.display = 'flex'; // Oder der jeweilige Standard-Display-Typ der Box
-
-                    if (box.id === 'box-favorites') {
-                        box.style.gridArea = 'favorites';
-                        box.style.height = '672px'; // Feste Höhe aus deinem CSS für Desktop wiederherstellen
-                    } else if (box.id === 'box-mails') {
-                        box.style.gridArea = 'mails';
-                        box.style.flexDirection = 'row'; // Spezifisches Styling wiederherstellen
-                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
-                    } else if (box.id === 'my-tools') {
-                        box.style.gridArea = 'tools';
-                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
-                    } else {
-                        // Für alle anderen Boxen, die Höhe ebenfalls durch CSS bestimmen lassen
-                        box.style.height = '';
-                    }
-                });
-            }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ihr Persönliches Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafb; 
+            --text-color-light: #6b7280; 
+            --header-text-color: #111827;
+            --sidebar-bg: #f3f4f6cc; 
+            --sidebar-border: #e5e7eb; 
+            --modal-bg: #ffffff;
+            --accent-color: #7c3aed; 
+            --accent-color-hover: #8b5cf6;
+            --sidebar-link-active-bg: #7c3aed;
+        }
+        html[data-theme='dark'] {
+            --bg-color: #171717; 
+            --text-color-light: #a3a3a3; 
+            --header-text-color: #fafafa;
+            --sidebar-bg: #262626cc; 
+            --sidebar-border: #404040; 
+            --modal-bg: #262626;
+            --accent-color: #7c3aed; 
+            --accent-color-hover: #8b5cf6;
+            --sidebar-link-active-bg: #7c3aed;
         }
 
-        // Führe die Funktion beim Laden der Seite aus
-        window.addEventListener('load', adjustLayoutForMobile);
-        // Führe die Funktion auch aus, wenn die Fenstergröße geändert wird (z.B. Drehen des Smartphones)
-        window.addEventListener('resize', adjustLayoutForMobile);
+        html, body { 
+            height: 100%; 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color-light); 
+            overflow: hidden; 
+        }
+        
+        /* Haupt-Inhaltsbereich relativ positioniert für den Loader */
+        #main-content {
+            position: relative;
+        }
+
+        /* Lade-Abdeckung für den Iframe-Wechsel */
+        #content-loader {
+            position: absolute;
+            inset: 0;
+            background-color: var(--bg-color);
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Klicks durchlassen, wenn unsichtbar */
+        }
+        #content-loader.hidden {
+            opacity: 0;
+        }
+        
+        #content-frame {
+             transition: opacity 0.3s ease-in-out;
+        }
+
+
+        /* Desktop Sidebar: Bleibt fixiert, Hover-Effekt wie bisher */
+        #sidebar { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            height: 100vh; 
+            z-index: 50; 
+            width: 5rem; 
+            transition: width 0.3s; 
+            background-color: var(--sidebar-bg); 
+            border-right: 1px solid var(--sidebar-border); 
+            backdrop-filter: blur(8px); 
+        }
+        #sidebar:hover { 
+            width: 16rem; 
+        }
+        .sidebar-text { 
+            opacity: 0; max-width: 0; transition: opacity 0.2s ease, max-width 0.3s ease; white-space: nowrap; overflow: hidden; margin-left: 0.75rem; 
+        }
+        #sidebar:hover .sidebar-text { 
+            opacity: 1; max-width: 150px; 
+        }
+        .sidebar-link { 
+            color: var(--text-color-light); 
+        }
+        .sidebar-link:hover { 
+            background-color: var(--accent-color-hover); color: #ffffff; 
+        }
+        .sidebar-link.active { 
+            background-color: var(--sidebar-link-active-bg); color: #ffffff; 
+        }
+
+        /* Mobile Header */
+        #mobile-header {
+             background-color: var(--sidebar-bg);
+             backdrop-filter: blur(8px);
+             border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        /* Mobile Menu Panel */
+        #mobile-menu {
+            background-color: var(--bg-color);
+            border-right: 1px solid var(--sidebar-border);
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        #settings-modal { 
+            background-color: var(--modal-bg); z-index: 100; 
+        }
+        .theme-radio-label { 
+            border: 2px solid var(--sidebar-border); 
+            color: var(--text-color-light);
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .theme-radio-label:hover {
+            background-color: var(--sidebar-border);
+            color: var(--header-text-color);
+        }
+        .theme-radio-peer:checked ~ .theme-radio-label { 
+            border-color: var(--accent-color); 
+            color: var(--header-text-color);
+            background-color: transparent;
+        }
+        .theme-radio-peer:checked ~ .theme-radio-label:hover {
+            background-color: var(--sidebar-border);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body data-theme="system">
+
+    <!-- Mobile Header (wird auf md und grösser versteckt) -->
+    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4">
+        <span id="mobile-header-title" class="font-bold text-lg" style="color: var(--header-text-color);">Appdrawer</span>
+        <button id="hamburger-btn" class="p-1">
+            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
+    <nav id="sidebar" class="hidden md:flex flex-col p-2">
+        <ul id="nav-links" class="space-y-2 mt-2">
+             <li><a href="appdrawer.html" class="sidebar-link flex items-center p-3 rounded-lg active"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25A2.25 2.25 0 0 1 8.25 21H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25h2.25A2.25 2.25 0 0 1 20.25 6v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25A2.25 2.25 0 0 1 13.5 8.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" /></svg><span class="sidebar-text font-medium">Appdrawer</span></a></li>
+            <li><a href="unicorn/unicorn_v3/index.html" target="_blank" rel="noopener noreferrer" class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.375v2.25m0 0L15 8.25M12.75 5.625L10.5 8.25M12.75 5.625V2.25m0 3.375c-1.125 0-2.25.375-3.188.938A5.25 5.25 0 0 0 6 11.25V15a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75V12a3 3 0 0 1 3-3h1.5a3 3 0 0 1 3 3v3a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75v-3.75a5.25 5.25 0 0 0-3.563-5.062A8.25 8.25 0 0 0 12.75 3.375Z" /></svg><span class="sidebar-text font-medium">Arbeitswerkzeuge</span></a></li>
+            <li><a href="widgets.html" class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" /></svg><span class="sidebar-text font-medium">Widgets</span></a></li>
+            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg><span class="sidebar-text font-medium">Einstellungen</span></button></li>
+        </ul>
+    </nav>
+
+    <!-- Mobile Menu Panel -->
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <nav id="mobile-menu" class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Menü</h2>
+            <button id="close-mobile-menu-btn" class="p-1">
+                 <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <ul id="mobile-nav-links" class="space-y-2">
+            <!-- Mobile links werden hier via JS eingefügt -->
+        </ul>
+    </nav>
+
+    <!-- Iframe Content Area -->
+    <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
+        <div id="content-loader"></div>
+        <iframe id="content-frame" src="./appdrawer.html" class="w-full h-full border-0"></iframe>
+    </main>
+    
+    <!-- Settings Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50"></div>
+    <div id="settings-modal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6 z-[60]">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Einstellungen</h2>
+            <button id="close-modal-btn" class="hover:text-white text-2xl" style="color: var(--text-color-light);">&times;</button>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
+            <fieldset class="space-y-3">
+                <legend class="sr-only">Theme selection</legend>
+                <div><input type="radio" name="theme" id="theme-light" value="light" class="theme-radio-peer hidden"><label for="theme-light" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label></div>
+                <div><input type="radio" name="theme" id="theme-dark" value="dark" class="theme-radio-peer hidden"><label for="theme-dark" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label></div>
+                <div><input type="radio" name="theme" id="theme-system" value="system" class="theme-radio-peer hidden"><label for="theme-system" class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.getElementById('content-frame');
+            const contentLoader = document.getElementById('content-loader');
+            
+            // --- Desktop Sidebar ---
+            const desktopNavLinks = document.querySelectorAll('#nav-links > li > a, #nav-links > li > button');
+            
+            // --- Mobile Menu ---
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
+            const mobileNavLinksContainer = document.getElementById('mobile-nav-links');
+            const mobileHeaderTitle = document.getElementById('mobile-header-title');
+
+            // --- Settings Modal ---
+            const settingsModal = document.getElementById('settings-modal');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            const openMobileMenu = () => {
+                mobileMenu.classList.add('open');
+                mobileMenuOverlay.classList.remove('hidden');
+            };
+
+            const closeMobileMenu = () => {
+                mobileMenu.classList.remove('open');
+                mobileMenuOverlay.classList.add('hidden');
+            };
+
+            const openSettingsModal = () => {
+                settingsModal.classList.remove('hidden');
+                modalOverlay.classList.remove('hidden');
+            };
+
+            const closeSettingsModal = () => {
+                settingsModal.classList.add('hidden');
+                modalOverlay.classList.add('hidden');
+            };
+
+            function updateActiveLink(targetHref) {
+                document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => {
+                    if(l.target === '_blank') {
+                        l.classList.remove('active');
+                        return;
+                    }
+                    if (new URL(l.href).pathname === new URL(targetHref).pathname) {
+                        l.classList.add('active');
+                    } else {
+                        l.classList.remove('active');
+                    }
+                });
+                const activeLink = document.querySelector(`a.active`);
+                if(activeLink) {
+                    mobileHeaderTitle.textContent = activeLink.querySelector('span').textContent;
+                }
+            }
+            
+            function handleNavLinkClick(e) {
+                const target = e.currentTarget;
+
+                if (target.getAttribute('target') === '_blank') {
+                    if (mobileMenu.classList.contains('open')) closeMobileMenu();
+                    return; 
+                }
+                
+                e.preventDefault();
+
+                if (target.id.includes('settings-btn')) {
+                    openSettingsModal();
+                } else {
+                    const href = target.href;
+                    if (new URL(iframe.src).pathname === new URL(href).pathname) {
+                         if (mobileMenu.classList.contains('open')) closeMobileMenu();
+                        return;
+                    }
+                    
+                    contentLoader.classList.remove('hidden'); // Loader sofort anzeigen
+                    iframe.src = href; // Quelle ändern
+                    updateActiveLink(href);
+                }
+
+                if (mobileMenu.classList.contains('open')) closeMobileMenu();
+            }
+
+            // Links für Mobile-Menü klonen
+            desktopNavLinks.forEach(link => {
+                const li = document.createElement('li');
+                const newLink = link.cloneNode(true);
+                newLink.querySelector('.sidebar-text').classList.remove('sidebar-text');
+                newLink.classList.add('w-full');
+                li.appendChild(newLink);
+                mobileNavLinksContainer.appendChild(li);
+                newLink.addEventListener('click', handleNavLinkClick);
+            });
+            
+            desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
+            
+            hamburgerBtn.addEventListener('click', openMobileMenu);
+            closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            
+            closeModalBtn.addEventListener('click', closeSettingsModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (!settingsModal.classList.contains('hidden')) closeSettingsModal();
+            });
+
+            // --- Theme Wechsler ---
+            const themeRadios = document.querySelectorAll('input[name="theme"]');
+            function applyTheme(theme) {
+                let effectiveTheme;
+                if (theme === 'system') {
+                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                } else {
+                    effectiveTheme = theme;
+                }
+                document.documentElement.dataset.theme = effectiveTheme;
+                if(iframe.contentWindow) iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+            }
+            function handleThemeChange(event) {
+                const selectedTheme = event.target.value;
+                localStorage.setItem('theme', selectedTheme);
+                applyTheme(selectedTheme);
+            }
+            
+            themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                if (savedTheme === 'system') applyTheme('system');
+            });
+
+            // Iframe 'load' Event Listener
+            iframe.addEventListener('load', () => {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+                if (themeRadio) themeRadio.checked = true;
+                
+                applyTheme(savedTheme);
+                updateActiveLink(iframe.contentWindow.location.href);
+
+                // Loader sanft ausblenden, sobald der Iframe geladen ist
+                contentLoader.classList.add('hidden');
+            });
+            
+            // Initialen Status setzen
+             updateActiveLink(iframe.src);
+        });
     </script>
 </body>
-
 </html>

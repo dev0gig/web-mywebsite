@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderner Taschenrechner</title>
+    
+    <!-- Einbindung von Tailwind CSS für modernes Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Einbindung der Google Font "Inter" für ein sauberes Schriftbild -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Zusätzlicher Stil, um das Layout und die Schriftart global zu definieren */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Verhindert das unschöne Highlighten von Buttons auf mobilen Geräten */
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-transparent flex items-center justify-center min-h-screen">
+
+    <!-- Hauptcontainer für den Taschenrechner -->
+    <div class="calculator bg-gray-800 p-6 rounded-3xl shadow-2xl w-full max-w-sm">
+        
+        <!-- Anzeige des Taschenrechners mit fester Höhe -->
+        <div class="display bg-gray-900 text-white text-right p-6 rounded-2xl mb-6 flex flex-col justify-end h-36">
+            <div data-previous-operand class="text-gray-400 text-2xl break-all"></div>
+            <div data-current-operand class="text-5xl font-bold break-all">0</div>
+        </div>
+
+        <!-- Tastenfeld -->
+        <div class="buttons grid grid-cols-4 gap-4">
+            <!-- Reihe 1 -->
+            <button data-all-clear class="bg-red-500 hover:bg-red-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">AC</button>
+            <button data-clear-entry class="bg-gray-600 hover:bg-gray-700 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">C</button>
+            <button data-operator class="bg-amber-500 hover:bg-amber-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">%</button>
+            <button data-operator class="bg-amber-500 hover:bg-amber-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">÷</button>
+
+            <!-- Reihe 2 -->
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">7</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">8</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">9</button>
+            <button data-operator class="bg-amber-500 hover:bg-amber-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">×</button>
+
+            <!-- Reihe 3 -->
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">4</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">5</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">6</button>
+            <button data-operator class="bg-amber-500 hover:bg-amber-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">-</button>
+
+            <!-- Reihe 4 -->
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">1</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">2</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">3</button>
+            <button data-operator class="bg-amber-500 hover:bg-amber-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">+</button>
+
+            <!-- Reihe 5 -->
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95 col-span-2">0</button>
+            <button data-number class="bg-gray-700 hover:bg-gray-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">.</button>
+            <button data-equals class="bg-green-500 hover:bg-green-600 text-white text-3xl font-bold rounded-xl p-4 transition-all duration-200 active:scale-95">=</button>
+        </div>
+    </div>
+
+    <script>
+        // Kapselt die gesamte Logik des Taschenrechners in einer Klasse.
+        class Calculator {
+            constructor(previousOperandTextElement, currentOperandTextElement) {
+                this.previousOperandTextElement = previousOperandTextElement;
+                this.currentOperandTextElement = currentOperandTextElement;
+                this.clear();
+                this.registerKeyboardListeners();
+            }
+
+            // Setzt alle Werte auf den Standardzustand zurück (AC)
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.updateDisplay();
+            }
+
+            // Löscht nur die aktuelle Eingabe (C)
+            clearEntry() {
+                this.currentOperand = '0';
+                this.updateDisplay();
+            }
+
+            // Entfernt die letzte Ziffer (wird von der Backspace-Taste verwendet)
+            backspace() {
+                if (this.currentOperand.toString().length <= 1) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                }
+                this.updateDisplay();
+            }
+
+            // Fügt eine Zahl oder einen Dezimalpunkt zur aktuellen Eingabe hinzu
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                if (this.currentOperand === '0' && number !== '.') {
+                   this.currentOperand = number;
+                } else {
+                   this.currentOperand = this.currentOperand.toString() + number.toString();
+                }
+                this.updateDisplay();
+            }
+
+            // Legt die auszuführende Operation fest
+            chooseOperation(operation) {
+                // Wenn die aktuelle Eingabe '0' ist und keine vorherige Operation existiert, nichts tun.
+                if (this.currentOperand === '0' && this.previousOperand === '') return;
+                
+                // Behandelt die Prozentrechnung gemäß der ursprünglichen Logik
+                if (operation === '%') {
+                    const current = parseFloat(this.currentOperand);
+                    if (isNaN(current)) return;
+
+                    // Wenn eine vorherige Operation existiert, berechne den Prozentsatz dieses Wertes
+                    if (this.previousOperand !== '') {
+                        const prev = parseFloat(this.previousOperand);
+                        if (isNaN(prev)) return;
+                        // Der neue currentOperand ist der berechnete Prozentwert
+                        // z.B. 50 * 10% -> neuer Operand ist 5
+                        this.currentOperand = (prev * (current / 100)).toString();
+                    } else {
+                        // Wenn keine vorherige Operation existiert, teile einfach durch 100
+                        // z.B. 10% -> neuer Operand ist 0.1
+                        this.currentOperand = (current / 100).toString();
+                    }
+                    this.updateDisplay();
+                    return; // Beenden, '%' wird nicht als Operation gesetzt
+                }
+                
+                // Wenn bereits eine Operation ansteht, berechne sie zuerst
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '0';
+                this.updateDisplay();
+            }
+
+            // Führt die Berechnung durch
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            this.showError();
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                // Rundet auf eine vernünftige Anzahl von Dezimalstellen, um Fließkommafehler zu vermeiden
+                this.currentOperand = (Math.round(computation * 1e12) / 1e12).toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.updateDisplay();
+            }
+            
+            // Zeigt eine Fehlermeldung an
+            showError() {
+                this.currentOperandTextElement.innerText = "Error";
+                setTimeout(() => {
+                   this.clear();
+                }, 1500);
+            }
+
+            // Formatiert Zahlen für die Anzeige
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const [integerDigits, decimalDigits] = stringNumber.split('.');
+                let integerDisplay;
+
+                if (isNaN(parseFloat(integerDigits))) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = parseFloat(integerDigits).toLocaleString('de-DE', { maximumFractionDigits: 0 });
+                }
+
+                if (decimalDigits != null) {
+                    return `${integerDisplay},${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            // Aktualisiert die Anzeige
+            updateDisplay() {
+                this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand);
+                if (this.operation != null) {
+                    this.previousOperandTextElement.innerText = `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    // Wichtig: Leerzeichen einfügen, damit die Höhe erhalten bleibt, anstatt ganz zu leeren
+                    this.previousOperandTextElement.innerText = '\u00A0'; 
+                }
+            }
+
+            // Fügt Event-Listener für Tastatureingaben hinzu
+            registerKeyboardListeners() {
+                document.addEventListener('keydown', (event) => {
+                    if (event.key >= '0' && event.key <= '9') this.appendNumber(event.key);
+                    else if (event.key === '.' || event.key === ',') this.appendNumber('.');
+                    else if (event.key === 'Enter' || event.key === '=') {
+                        event.preventDefault();
+                        this.compute();
+                    } else if (event.key === 'Backspace') this.backspace();
+                    else if (event.key === 'Escape') this.clear();
+                    else if (event.key.toLowerCase() === 'c') this.clearEntry();
+                    else if (event.key === '+') this.chooseOperation('+');
+                    else if (event.key === '-') this.chooseOperation('-');
+                    else if (event.key === '*') this.chooseOperation('×');
+                    else if (event.key === '/') {
+                        event.preventDefault();
+                        this.chooseOperation('÷');
+                    } else if (event.key === '%') this.chooseOperation('%');
+                });
+            }
+        }
+
+        // --- Initialisierung des Skripts ---
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operatorButtons = document.querySelectorAll('[data-operator]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const clearEntryButton = document.querySelector('[data-clear-entry]');
+        const allClearButton = document.querySelector('[data-all-clear]');
+        const previousOperandTextElement = document.querySelector('[data-previous-operand]');
+        const currentOperandTextElement = document.querySelector('[data-current-operand]');
+
+        const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => calculator.appendNumber(button.innerText));
+        });
+
+        operatorButtons.forEach(button => {
+            button.addEventListener('click', () => calculator.chooseOperation(button.innerText));
+        });
+
+        equalsButton.addEventListener('click', () => calculator.compute());
+        allClearButton.addEventListener('click', () => calculator.clear());
+        clearEntryButton.addEventListener('click', () => calculator.clearEntry());
+    </script>
+</body>
+</html>

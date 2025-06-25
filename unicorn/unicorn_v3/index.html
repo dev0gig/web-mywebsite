@@ -22,6 +22,10 @@
         #sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 50; width: 5rem; transition: width 0.3s; background-color: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); backdrop-filter: blur(8px); }
         #sidebar:hover { width: 16rem; }
         #main-content { margin-left: 5rem; height: 100%; }
+        /* Style to smoothly transition the iframe's opacity */
+        #content-frame {
+            transition: opacity 200ms ease-in-out;
+        }
         .sidebar-text { opacity: 0; max-width: 0; transition: opacity 0.2s ease, max-width 0.3s ease; white-space: nowrap; overflow: hidden; margin-left: 0.75rem; }
         #sidebar:hover .sidebar-text { opacity: 1; max-width: 150px; }
         .sidebar-link { color: var(--text-color-light); }
@@ -44,7 +48,6 @@
         <ul id="nav-links" class="space-y-2 mt-2">
             <li><a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded-lg active"><svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg><span class="sidebar-text font-medium">Dashboard</span></a></li>
             <li><a href="contacts.html" class="sidebar-link flex items-center p-3 rounded-lg">
-                <!-- NEW ICON for Contacts -->
                 <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
@@ -95,11 +98,26 @@
         const overlay = document.getElementById('modal-overlay');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const resetLayoutBtn = document.getElementById('reset-layout-btn');
+        const transitionDuration = 200; // Must match CSS transition duration
         
+        // This function now handles the smooth transition
         function handleNavClick(event) {
             event.preventDefault();
             const link = event.currentTarget;
-            if (iframe.src !== link.href) iframe.src = link.href;
+            
+            const targetUrl = new URL(link.href, window.location.href);
+            const currentUrl = new URL(iframe.src, window.location.href);
+
+            if (targetUrl.pathname !== currentUrl.pathname) {
+                // Fade out the iframe
+                iframe.classList.add('opacity-0');
+                
+                // Wait for the transition to finish before changing the src
+                setTimeout(() => {
+                    iframe.src = link.href;
+                }, transitionDuration);
+            }
+            
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         }
@@ -139,10 +157,18 @@
             if (savedTheme === 'system') applyTheme('system');
         });
 
+        // The 'load' event fires after the iframe content has been fully loaded
         iframe.addEventListener('load', () => {
             const savedTheme = localStorage.getItem('theme') || 'system';
-            document.querySelector(`input[name="theme"][value="${savedTheme}"]`).checked = true;
+            // Ensure the correct radio button is checked on initial load and subsequent loads
+            const currentThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+            if(currentThemeRadio) {
+                currentThemeRadio.checked = true;
+            }
             applyTheme(savedTheme);
+            
+            // Fade the iframe back in smoothly
+            iframe.classList.remove('opacity-0');
         });
     </script>
 </body>

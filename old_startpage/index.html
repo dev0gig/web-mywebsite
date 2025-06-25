@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="icon"
+        href="https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/102-512.png" />
+    <link rel="stylesheet" href="global/color-palette.css">
+    <link rel="stylesheet" href="global/cursor.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <header>
+            <iframe src="widgets/clock/clock.html" title="Dashboard Clock" id="clock"></iframe>
+            <div style="padding: 0 12px;">
+                <h1>Mein Dashboard</h1>
+                <h2>dev0gig's Home</h2>
+                <p>Hier sind meine wichtigsten Tools auf einem Blick.</p>
+            </div>
+        </header>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='widgets/widgets-iframe.html';">
+                <img src="https://cdn-icons-png.freepik.com/512/9995/9995840.png" alt="Widgets Icon"> My Widgets
+            </button>
+            <button onclick="window.location.href='unicorn/work-tools.html';">
+                <img src="https://cdn-icons-png.freepik.com/512/6288/6288891.png" alt="Unicorn Icon"> Unicorn
+            </button>
+            <button onclick="window.location.href='https://web.whatsapp.com';">
+                <img src="https://cdn-icons-png.freepik.com/512/3536/3536445.png" alt="Whatsapp Icon"> Whatsapp
+            </button>
+            <button onclick="window.location.href='https://messages.google.com/web/conversations';">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Google_Messages_icon_%282022%29.svg/2048px-Google_Messages_icon_%282022%29.svg.png"
+                    alt="Google Messages Icon"> Google Messenger
+            </button>
+        </div>
+    </nav>
+    <main>
+        <div class="box" id="box-favorites">
+            <div class="app-header-container">
+                <h1 class="app-title">AppDrawer</h1>
+                <input type="search" id="searchInput" placeholder="Nach ID suchen...">
+            </div>
+            <div class="app-container"></div>
+            <script src="appsData.js"></script>
+            <script src="appdrawer-search.js"></script>
+        </div>
+        <div class="box" id="box-mails">
+            <button class="mail-button" title="Gmail"
+                style="background-image: url('https://wallpapers.com/images/hd/gmail-background-zsyjopx1r5l5izz0.jpg');"
+                onclick="window.location.href='https://mail.google.com/mail/u/0/#inbox';">
+            </button>
+            <button class="mail-button" title="Outlook"
+                style="background-image: url('https://m.media-amazon.com/images/I/61nf9xhtt5L.jpg');"
+                onclick="window.location.href='https://outlook.live.com/mail/inbox';">
+            </button>
+            <button class="mail-button" title="Proton Mail"
+                style="background-image: url('https://pmecdn.protonweb.com/image-transformation/?s=s&image=Proton_Mail_bbaad42705.png');"
+                onclick="window.location.href='https://www.proton.me/de/mail';">
+            </button>
+            <button class="mail-button" title="Apple Mail"
+                style="background-image: url('https://media.idownloadblog.com/wp-content/uploads/2023/04/Mail-app-icon.jpg');"
+                onclick="window.location.href='https://www.icloud.com/mail/';">
+            </button>
+        </div>
+        <div class="box" id="my-tools">
+            <button title="Github"
+                style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSslJPXa2CrpQgp3QRJePQ69ezWxpDtVI2mjw&s');"
+                onclick="window.location.href='https://github.com';">
+            </button>
+            <button title="Trello"
+                style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Pr5wzx8Zk6wNxHBg5dqAYQWn7s-hJ9soyg&s');"
+                onclick="window.location.href='https://trello.com/b/zygeoDI2/%F0%9F%A6%84';">
+            </button>
+            <button title="Google Calendar"
+                style="background-image: url('https://cdn.prod.website-files.com/634681057b887c6f4830fae2/6712a22812e6b71494f3a426_66e0c1b9d03cccf4b2404449_Untitled%2520design%2520(20).png');"
+                onclick="window.location.href='https://calendar.google.com/calendar/u/0/r';">
+            </button>
+        </div>
+    </main>
+
+    <script>
+        function adjustLayoutForMobile() {
+            const mobileBreakpoint = 1200; // Maximale Breite für mobile Ansicht
+            const isMobile = window.innerWidth < mobileBreakpoint;
+
+            const navElement = document.querySelector('nav');
+            const mainElement = document.querySelector('main');
+            const allBoxes = document.querySelectorAll('main > .box');
+            const boxFavorites = document.getElementById('box-favorites'); // Direkter Zugriff auf box-favorites
+
+            if (isMobile) {
+                // --- Mobile Ansicht ---
+
+                // Navigationsleiste ausblenden
+                if (navElement) {
+                    navElement.style.display = 'none';
+                }
+
+                // Main-Element anpassen (nimmt volle Breite ein, Padding für Mobilgeräte)
+                if (mainElement) {
+                    mainElement.style.marginLeft = '0';
+                    mainElement.style.gridTemplateColumns = '1fr';
+                    mainElement.style.gridTemplateAreas = '"favorites"'; // Nur "favorites" anzeigen
+                    mainElement.style.padding = '16px'; // Beispiel-Padding für Mobilgeräte (anpassen bei Bedarf)
+                }
+
+                allBoxes.forEach(box => {
+                    if (box.id === 'box-favorites') {
+                        box.style.display = 'flex'; // Sicherstellen, dass es ein Flex-Container ist
+                        box.style.gridArea = 'favorites'; // Dem Grid-Bereich zuweisen
+
+                        // Höhe von box-favorites anpassen
+                        if (mainElement) {
+                            // Berechne die verfügbare Höhe innerhalb von main
+                            const mainComputedStyle = getComputedStyle(mainElement);
+                            const mainPaddingTop = parseFloat(mainComputedStyle.paddingTop) || 0;
+                            const mainPaddingBottom = parseFloat(mainComputedStyle.paddingBottom) || 0;
+
+                            // Da .box (und somit #box-favorites) box-sizing: border-box verwendet,
+                            // setzt diese Höhe die Außenkante der Box.
+                            box.style.height = (window.innerHeight - mainPaddingTop - mainPaddingBottom) + 'px';
+                        } else {
+                            // Fallback, falls mainElement nicht existiert (unwahrscheinlich)
+                            box.style.height = window.innerHeight + 'px';
+                        }
+                    } else {
+                        // Alle anderen Boxen ausblenden
+                        box.style.display = 'none';
+                    }
+                });
+
+            } else {
+                // --- Desktop Ansicht ---
+
+                // Navigationsleiste wieder einblenden
+                if (navElement) {
+                    navElement.style.display = 'flex'; // Oder 'block', je nach ursprünglichem display
+                }
+
+                // Main-Element zurücksetzen
+                if (mainElement) {
+                    mainElement.style.marginLeft = '415px'; // Ursprünglicher linker Rand
+                    mainElement.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    mainElement.style.gridTemplateAreas = `
+                    "favorites favorites favorites tools"
+                    "mails mails mails mails"
+                `;
+                    mainElement.style.padding = '24px'; // Ursprüngliches Padding
+                }
+
+                // Alle Boxen auf Desktop-Standard zurücksetzen
+                allBoxes.forEach(box => {
+                    box.style.display = 'flex'; // Oder der jeweilige Standard-Display-Typ der Box
+
+                    if (box.id === 'box-favorites') {
+                        box.style.gridArea = 'favorites';
+                        box.style.height = '672px'; // Feste Höhe aus deinem CSS für Desktop wiederherstellen
+                    } else if (box.id === 'box-mails') {
+                        box.style.gridArea = 'mails';
+                        box.style.flexDirection = 'row'; // Spezifisches Styling wiederherstellen
+                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
+                    } else if (box.id === 'my-tools') {
+                        box.style.gridArea = 'tools';
+                        box.style.height = ''; // Höhe durch CSS bestimmen lassen
+                    } else {
+                        // Für alle anderen Boxen, die Höhe ebenfalls durch CSS bestimmen lassen
+                        box.style.height = '';
+                    }
+                });
+            }
+        }
+
+        // Führe die Funktion beim Laden der Seite aus
+        window.addEventListener('load', adjustLayoutForMobile);
+        // Führe die Funktion auch aus, wenn die Fenstergröße geändert wird (z.B. Drehen des Smartphones)
+        window.addEventListener('resize', adjustLayoutForMobile);
+    </script>
+</body>
+
+</html>
