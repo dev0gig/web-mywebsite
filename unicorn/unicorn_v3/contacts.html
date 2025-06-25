@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,42 +8,102 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
-            --widget-bg: #ffffff; --widget-border: #e5e7eb; --accent-color: #f97316;
-            --list-item-hover-bg: #f3f4f6; --list-item-active-bg: var(--accent-color);
+            --bg-color: #f9fafb;
+            --text-color: #1f2937;
+            --text-color-light: #6b7280;
+            --header-text-color: #111827;
+            --widget-bg: #ffffff;
+            --widget-border: #e5e7eb;
+            --accent-color: #f97316;
+            --list-item-hover-bg: #f3f4f6;
+            --list-item-active-bg: var(--accent-color);
             --input-bg: #ffffff;
-            --scrollbar-thumb: #d1d5db; --scrollbar-thumb-hover: #9ca3af;
+            --scrollbar-thumb: #d1d5db;
+            --scrollbar-thumb-hover: #9ca3af;
         }
+
         html[data-theme='dark'] {
-            --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
-            --widget-bg: #262626; --widget-border: #404040;
-            --list-item-hover-bg: #404040; --input-bg: #262626;
-            --scrollbar-thumb: #404040; --scrollbar-thumb-hover: #525252;
+            --bg-color: #171717;
+            --text-color: #d4d4d4;
+            --text-color-light: #a3a3a3;
+            --header-text-color: #fafafa;
+            --widget-bg: #262626;
+            --widget-border: #404040;
+            --list-item-hover-bg: #404040;
+            --input-bg: #262626;
+            --scrollbar-thumb: #404040;
+            --scrollbar-thumb-hover: #525252;
         }
-        html { background-color: var(--bg-color); }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
-        body { background-color: var(--bg-color); }
-        .main-header { color: var(--header-text-color); }
-        .main-subheader { color: var(--text-color-light); }
-        .contact-list-item { border-bottom: 1px solid var(--widget-border); }
-        .contact-list-item:hover { background-color: var(--list-item-hover-bg); }
-        .contact-list-item.active { background-color: var(--list-item-active-bg); color: white; }
-        .detail-card { background-color: var(--widget-bg); border: 1px solid var(--widget-border); }
-        .detail-label { color: var(--text-color-light); }
-        .notes { white-space: pre-wrap; }
+
+        html {
+            background-color: var(--bg-color);
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        body {
+            background-color: var(--bg-color);
+        }
+
+        .main-header {
+            color: var(--header-text-color);
+        }
+
+        .main-subheader {
+            color: var(--text-color-light);
+        }
+
+        .contact-list-item {
+            border-bottom: 1px solid var(--widget-border);
+        }
+
+        .contact-list-item:hover {
+            background-color: var(--list-item-hover-bg);
+        }
+
+        .contact-list-item.active {
+            background-color: var(--list-item-active-bg);
+            color: white;
+        }
+
+        .detail-card {
+            background-color: var(--widget-bg);
+            border: 1px solid var(--widget-border);
+        }
+
+        .detail-label {
+            color: var(--text-color-light);
+        }
+
+        .notes {
+            white-space: pre-wrap;
+        }
+
         .search-input {
             background-color: var(--input-bg);
             border: 1px solid var(--widget-border);
             color: var(--text-color);
         }
 
-        #contact-list::-webkit-scrollbar { width: 8px; }
-        #contact-list::-webkit-scrollbar-track { background: transparent; }
+        #contact-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #contact-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
         #contact-list::-webkit-scrollbar-thumb {
             background-color: var(--scrollbar-thumb);
             border-radius: 10px;
             border: 2px solid var(--bg-color);
         }
+
         #contact-list:hover::-webkit-scrollbar-thumb {
             background-color: var(--scrollbar-thumb-hover);
         }
@@ -51,6 +112,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="flex items-center justify-center p-4 md:p-8">
 
     <div class="w-full">
@@ -64,16 +126,25 @@
             <div class="md:col-span-1 flex flex-col gap-4">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
                     </div>
-                     <input type="text" id="search-input" placeholder="Suchen..." class="search-input w-full p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                     <div class="absolute inset-y-0 right-0 flex items-center">
+                    <input type="text" id="search-input" placeholder="Suchen..."
+                        class="search-input w-full p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <div class="absolute inset-y-0 right-0 flex items-center">
                         <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
-                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     </div>
                 </div>
-                <div id="contact-list" class="flex-grow h-full max-h-[60vh] overflow-y-auto rounded-lg pr-1" style="border: 1px solid var(--widget-border);">
+                <div id="contact-list" class="flex-grow h-full max-h-[60vh] overflow-y-auto rounded-lg pr-1"
+                    style="border: 1px solid var(--widget-border);">
                     <!-- Contact items will be injected here by JS -->
                 </div>
             </div>
@@ -114,7 +185,7 @@
                 contactDetailsEl.innerHTML = `<div class="detail-card rounded-lg shadow-lg p-6 text-center"><p class="detail-label">Kein Kontakt ausgewählt.</p></div>`;
                 return;
             }
-            
+
             contactDetailsEl.innerHTML = `
                 <div class="detail-card rounded-lg shadow-lg p-6">
                     <div class="flex items-center mb-6">
@@ -128,7 +199,7 @@
                     </div>
                 </div>
             `;
-            
+
             document.querySelectorAll('.contact-list-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.id == contactId);
             });
@@ -138,7 +209,7 @@
             contactListEl.innerHTML = '';
             const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-            const filteredKontakte = kontakte.filter(k => 
+            const filteredKontakte = kontakte.filter(k =>
                 k.name.toLowerCase().includes(lowerCaseSearchTerm) ||
                 k.nummer.toLowerCase().includes(lowerCaseSearchTerm) ||
                 k.mail.toLowerCase().includes(lowerCaseSearchTerm) ||
@@ -183,4 +254,5 @@
         renderContactList();
     </script>
 </body>
+
 </html>
