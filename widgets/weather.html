@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modernes Wetter-Widget</title>
+    
+    <!-- Einbindung von Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Einbindung von Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent;
+        }
+        /* Dynamische Hintergrundfarbe und Textfarbe basierend auf CSS-Variablen */
+        .weather-card {
+            background-color: var(--bg-color, #4A5568);
+            color: var(--text-color, #FFFFFF);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        .forecast-day.selected {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="weather-card rounded-2xl shadow-2xl w-full max-w-lg p-6">
+        
+        <!-- Lade- und Fehleranzeige -->
+        <div id="loader" class="text-center py-10">
+            <p>Ermittle Standort und lade Wetterdaten...</p>
+        </div>
+        <div id="error-message" class="text-center py-10 text-red-300 hidden">
+            <p>Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.</p>
+        </div>
+
+        <!-- Haupt-Wetteranzeige -->
+        <div id="weather-content" class="text-center hidden">
+            <!-- Aktuelles Wetter -->
+            <div class="current-weather flex flex-col items-center">
+                <h1 id="location" class="text-3xl font-bold">Wien</h1>
+                <p id="current-description" class="text-xl opacity-80 h-8">Sonnig</p> <!-- Feste Höhe -->
+                <div class="flex items-center my-4">
+                    <div id="current-icon" class="w-24 h-24"></div>
+                    <!-- Temperaturanzeige als Flex-Container, um Umbruch zu verhindern -->
+                    <div id="current-temp" class="text-7xl font-bold w-56 text-center flex items-baseline justify-center gap-1"></div>
+                </div>
+                
+                <!-- Container für Details mit fester Höhe, um Sprünge zu vermeiden -->
+                <div class="h-16">
+                    <div id="current-details" class="grid grid-cols-3 gap-4 text-sm w-full max-w-xs mx-auto transition-opacity duration-300">
+                        <div class="text-center">
+                            <p class="font-semibold">Gefühlt</p>
+                            <p id="feels-like" class="opacity-80">26°</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-semibold">Wind</p>
+                            <p id="wind-speed" class="opacity-80">10 km/h</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-semibold">Feuchtigkeit</p>
+                            <p id="humidity" class="opacity-80">40%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7-Tage-Vorschau -->
+            <div class="forecast-7-days mt-8 border-t border-white/20 pt-4">
+                <div id="forecast-grid" class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <!-- Vorschau-Items werden hier per JS eingefügt -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WeatherWidget {
+            constructor() {
+                // DOM-Elemente
+                this.card = document.querySelector('.weather-card');
+                this.loader = document.getElementById('loader');
+                this.errorMessage = document.getElementById('error-message');
+                this.weatherContent = document.getElementById('weather-content');
+                
+                this.locationEl = document.getElementById('location');
+                this.currentDescEl = document.getElementById('current-description');
+                this.currentIconEl = document.getElementById('current-icon');
+                this.currentTempEl = document.getElementById('current-temp');
+                this.currentDetailsEl = document.getElementById('current-details');
+                
+                this.feelsLikeEl = document.getElementById('feels-like');
+                this.windSpeedEl = document.getElementById('wind-speed');
+                this.humidityEl = document.getElementById('humidity');
+
+                this.forecastGridEl = document.getElementById('forecast-grid');
+                
+                // Datenspeicher
+                this.currentData = null;
+                this.dailyData = null;
+
+                // Standard-Ort (Wien)
+                this.defaultCoords = { latitude: 48.2082, longitude: 16.3738, name: "Wien" };
+
+                this.init();
+            }
+
+            init() {
+                this.showLoading(true);
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => this.fetchWeatherData(position.coords.latitude, position.coords.longitude),
+                        () => this.fetchWeatherData(this.defaultCoords.latitude, this.defaultCoords.longitude, this.defaultCoords.name, true)
+                    );
+                } else {
+                    this.fetchWeatherData(this.defaultCoords.latitude, this.defaultCoords.longitude, this.defaultCoords.name, true);
+                }
+            }
+            
+            async fetchWeatherData(lat, lon, knownCityName = null, isErrorCase = false) {
+                if(isErrorCase) this.showError(true);
+
+                try {
+                    let cityName = knownCityName;
+                    if (!cityName) {
+                        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=de`);
+                        const geoData = await geoResponse.json();
+                        cityName = geoData?.address?.city || geoData?.address?.town || geoData?.address?.village || "Unbekannter Ort";
+                    }
+                    
+                    const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`);
+                    const weatherData = await weatherResponse.json();
+
+                    this.currentData = weatherData.current;
+                    this.dailyData = weatherData.daily;
+                    this.locationEl.textContent = cityName;
+                    
+                    this.renderForecast();
+                    this.displayDayDetails(0); // Zeigt initial das heutige Wetter an
+                    
+                } catch (error) {
+                    this.showError(true, "Wetterdaten konnten nicht geladen werden.");
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            renderForecast() {
+                this.forecastGridEl.innerHTML = '';
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(this.dailyData.time[i]);
+                    const dayName = i === 0 ? 'Heute' : day.toLocaleDateString('de-DE', { weekday: 'short' });
+                    
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'forecast-day text-center p-2 rounded-lg bg-white/10 cursor-pointer transition-colors';
+                    dayEl.dataset.dayIndex = i;
+                    dayEl.innerHTML = `
+                        <p class="font-semibold text-sm">${dayName}</p>
+                        <div class="w-10 h-10 mx-auto my-1">${this.getWeatherDetails(this.dailyData.weather_code[i]).icon}</div>
+                        <p class="text-sm">
+                            <span class="font-bold">${Math.round(this.dailyData.temperature_2m_max[i])}°</span>
+                            <span class="opacity-70">/${Math.round(this.dailyData.temperature_2m_min[i])}°</span>
+                        </p>
+                    `;
+                    dayEl.addEventListener('click', () => this.displayDayDetails(i));
+                    this.forecastGridEl.appendChild(dayEl);
+                }
+            }
+
+            displayDayDetails(index) {
+                document.querySelectorAll('.forecast-day').forEach(el => {
+                    el.classList.toggle('selected', parseInt(el.dataset.dayIndex) === index);
+                });
+
+                const weatherCode = this.dailyData.weather_code[index];
+                const { description, icon, color, textColor } = this.getWeatherDetails(weatherCode);
+
+                this.currentDescEl.textContent = description;
+                this.currentIconEl.innerHTML = icon;
+                this.card.style.setProperty('--bg-color', color);
+                this.card.style.setProperty('--text-color', textColor);
+                
+                if (index === 0) {
+                    // Zeige aktuelle Details für "Heute"
+                    const currentTemp = Math.round(this.currentData.temperature_2m);
+                    this.currentTempEl.innerHTML = `<span>${currentTemp}°</span>`; // Einzelne Temperatur
+                    this.feelsLikeEl.textContent = `${Math.round(this.currentData.apparent_temperature)}°`;
+                    this.windSpeedEl.textContent = `${Math.round(this.currentData.wind_speed_10m)} km/h`;
+                    this.humidityEl.textContent = `${this.currentData.relative_humidity_2m}%`;
+                    this.currentDetailsEl.classList.remove('opacity-0');
+                } else {
+                    // Zeige Max/Min für zukünftige Tage
+                    const maxTemp = Math.round(this.dailyData.temperature_2m_max[index]);
+                    const minTemp = Math.round(this.dailyData.temperature_2m_min[index]);
+                    this.currentTempEl.innerHTML = `<span>${maxTemp}°</span> <span class="text-4xl opacity-70">/${minTemp}°</span>`;
+                    this.currentDetailsEl.classList.add('opacity-0');
+                }
+            }
+
+            getWeatherDetails(code) {
+                if ([0, 1].includes(code)) return { description: 'Sonnig', icon: this.getIcon('sunny'), color: '#4A90E2', textColor: '#FFFFFF' };
+                if ([2].includes(code)) return { description: 'Teils bewölkt', icon: this.getIcon('partly-cloudy'), color: '#5472d3', textColor: '#FFFFFF' };
+                if ([3].includes(code)) return { description: 'Bedeckt', icon: this.getIcon('cloudy'), color: '#7E8B99', textColor: '#FFFFFF' };
+                if ([45, 48].includes(code)) return { description: 'Nebel', icon: this.getIcon('fog'), color: '#B0BEC5', textColor: '#263238' };
+                if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { description: 'Regen', icon: this.getIcon('rain'), color: '#0288D1', textColor: '#FFFFFF' };
+                if ([71, 73, 75, 85, 86].includes(code)) return { description: 'Schnee', icon: this.getIcon('snow'), color: '#FFFFFF', textColor: '#37474F' };
+                if ([95, 96, 99].includes(code)) return { description: 'Gewitter', icon: this.getIcon('thunderstorm'), color: '#455A64', textColor: '#FFFFFF' };
+                return { description: 'Unbekannt', icon: this.getIcon('cloudy'), color: '#7E8B99', textColor: '#FFFFFF' };
+            }
+
+            getIcon(name) {
+                const icons = {
+                    'sunny': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.03-0.17,0.06-0.33,0.1-0.5l-1.41-1.41c-0.09,0.16-0.18,0.32-0.28,0.48L2,13z M20,13l2,0 c-0.02-0.17-0.06-0.33-0.1-0.5l1.41-1.41c0.09,0.16,0.18,0.32,0.28,0.48L20,13z M11.5,2.1c0.17,0.03,0.33,0.06,0.5,0.1 l1.41-1.41C13.24,0.61,13.08,0.5,12.92,0.4L11.5,2.1z M11.5,21.9c-0.17,0.03-0.33,0.06-0.5,0.1l-1.41-1.41 c0.16,0.09,0.32,0.18,0.48,0.28L11.5,21.9z M12,4c0.17,0.02,0.33,0.06,0.5,0.1L11.08,5.52c-0.16-0.09-0.32-0.18-0.48-0.28 L12,4z M20,11h2c-0.02-0.17-0.06-0.33-0.1-0.5L20.48,9.08C20.39,9.24,20.3,9.4,20.2,9.57L20,11z M4,11H2 c0.02-0.17,0.06-0.33,0.1-0.5l1.41-1.41C3.33,9.25,3.17,9.42,3,9.59L4,11z M18.92,19.5l1.41,1.41c0.17-0.16,0.32-0.33,0.47-0.5 L19.38,18.9C19.22,19.07,19.07,19.22,18.92,19.5z M4.5,18.92c-0.16,0.17-0.33,0.32-0.5,0.47l1.41,1.41c0.16-0.17,0.32-0.33,0.47-0.5 L4.5,18.92z M12.5,20c-0.17-0.02-0.33-0.06-0.5-0.1l1.41-1.41c0.16,0.09,0.32,0.18,0.48,0.28L12.5,20z"/></svg>`,
+                    'partly-cloudy': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.95,15.14c-0.29-2.58-2.3-4.6-4.88-4.88C14.53,7.69,12.44,6,10,6c-2.76,0-5,2.24-5,5c0,0.41,0.05,0.81,0.15,1.19 c-2.02,0.39-3.65,2.02-4.04,4.04C1.05,16.6,1,17,1,17.42C1,19.39,2.61,21,4.58,21h13.83c1.98,0,3.58-1.61,3.58-3.58 C22,16.51,21.15,15.42,19.95,15.14z"/></svg>`,
+                    'cloudy': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`,
+                    'rain': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 10c0-3.31-2.69-6-6-6S6 6.69 6 10c0 .34.03.68.08.1L2.1 14.1c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L6 11.2V10c0-3.31 2.69-6 6-6s6 2.69 6 6v1.2l3.2 3.2c.2.2.51.2.71 0 .2-.2.2-.51 0-.71L17.92 10.1C17.97 10.08 18 10.04 18 10zM8 16v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2zm8 0v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2zm-4 2v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2z"/></svg>`,
+                    'snow': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.34 10.51c-.44-.29-1.03-.15-1.32.29l-1.5 2.25c-.29.44-.15 1.03.29 1.32.44.29 1.03.15 1.32-.29l1.5-2.25c.29-.44.15-1.03-.29-1.32zM3.66 10.51c.44-.29.58-.88.29-1.32l-1.5-2.25c-.29-.44-.88-.58-1.32-.29-.44.29-.58.88-.29 1.32l1.5 2.25c.29.44.88.58 1.32.29zM12 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-1.06 6.09c-.44.29-1.03.15-1.32-.29l-1.5-2.25c-.29-.44-.15-1.03.29-1.32.44-.29 1.03.15 1.32.29l1.5 2.25c.29.44.15 1.03-.29 1.32zm3.12 0c-.44.29-.58.88-.29 1.32l1.5 2.25c.29.44.88.58 1.32.29.44-.29.58-.88.29-1.32l-1.5-2.25c-.29-.43-.88-.57-1.32-.28zM12 2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1s1-.45 1-1V3c0-.55-.45-1-1-1zm6.71.29c-.39-.39-1.02-.39-1.41 0l-2.12 2.12c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l2.12-2.12c.39-.39.39-1.02 0-1.41zM5.29.29c-.39-.39-1.02-.39-1.41 0L1.76 2.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l2.12-2.12c.39-.39.39-1.02 0-1.41z"/></svg>`,
+                    'thunderstorm': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16v-5H9l4-7v5h2l-4 7z"/></svg>`,
+                    'fog': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 7H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2zM4 15h16c1.1 0 2-.9 2-2s-.9-2-2-2H4c-1.1 0-2 .9-2 2s.9 2 2 2z"/></svg>`
+                };
+                return icons[name] || icons['cloudy'];
+            }
+
+            showLoading(isLoading) {
+                this.loader.style.display = isLoading ? 'block' : 'none';
+                this.weatherContent.style.display = isLoading ? 'none' : 'block';
+                 if (isLoading) {
+                    this.errorMessage.classList.add('hidden');
+                }
+            }
+            
+            showError(isError, message = "Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.") {
+                 if (isError) {
+                    this.errorMessage.querySelector('p').textContent = message;
+                    this.errorMessage.classList.remove('hidden');
+                } else {
+                    this.errorMessage.classList.add('hidden');
+                }
+            }
+        }
+
+        // --- INITIALISIERUNG ---
+        document.addEventListener('DOMContentLoaded', () => {
+            new WeatherWidget();
+        });
+    </script>
+</body>
+</html>

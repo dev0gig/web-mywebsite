@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderner Tarifrechner</title>
+    
+    <!-- Einbindung von Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Einbindung von Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent; /* Ermöglicht die Einbettung als Widget */
+        }
+        /* Style für die Pfeile in den Number-Inputs (für Firefox) */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Style für die Pfeile in den Number-Inputs (für Chrome, Safari, Edge) */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Hauptcontainer -->
+    <div class="widget-container bg-gray-800 text-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Tarifrechner</h1>
+
+        <!-- Eingabebereich -->
+        <div class="input-section grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div>
+                <label for="price-net" class="block text-sm font-medium text-gray-400 mb-2">Preis (Netto, Cent/kWh)</label>
+                <input type="number" id="price-net" class="bg-gray-700 border border-gray-600 text-white text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3" placeholder="z.B. 25">
+            </div>
+            <div>
+                <label for="discount-net" class="block text-sm font-medium text-gray-400 mb-2">Rabatt (Netto, Cent/kWh)</label>
+                <input type="number" id="discount-net" class="bg-gray-700 border border-gray-600 text-white text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3" placeholder="z.B. 5" value="0">
+            </div>
+        </div>
+        
+        <!-- Ergebnisbereich -->
+        <div class="result-section border-t border-gray-700 pt-6">
+             <h2 class="text-xl font-semibold mb-4 text-center">Bruttopreise</h2>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-lg">
+                    <span class="text-gray-300">Preis inkl. 20% USt</span>
+                    <span id="result-vat" class="text-2xl font-bold text-green-400">0.0000</span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-700 p-4 rounded-lg">
+                    <span class="text-gray-300">Preis inkl. USt + 6% Gebrauchsabgabe</span>
+                    <span id="result-vat-tax" class="text-2xl font-bold text-amber-400">0.0000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TariffCalculator {
+            constructor() {
+                // DOM-Elemente
+                this.priceNetInput = document.getElementById('price-net');
+                this.discountNetInput = document.getElementById('discount-net');
+                this.resultVatOutput = document.getElementById('result-vat');
+                this.resultVatTaxOutput = document.getElementById('result-vat-tax');
+
+                // Konstanten
+                this.VAT_RATE = 0.20; // 20% Umsatzsteuer
+                this.TAX_RATE = 0.06; // 6% Gebrauchsabgabe (für Wien)
+
+                this.setupEventListeners();
+                this.calculate(); // Initialberechnung
+            }
+
+            setupEventListeners() {
+                this.priceNetInput.addEventListener('input', () => this.calculate());
+                this.discountNetInput.addEventListener('input', () => this.calculate());
+            }
+
+            calculate() {
+                const priceNet = parseFloat(this.priceNetInput.value) || 0;
+                const discountNet = parseFloat(this.discountNetInput.value) || 0;
+
+                // 1. Preis nach Rabatt berechnen
+                const priceAfterDiscount = priceNet - discountNet;
+
+                // 2. Preis inklusive Umsatzsteuer (20%)
+                const priceWithVat = priceAfterDiscount * (1 + this.VAT_RATE);
+
+                // 3. Preis inklusive USt und Gebrauchsabgabe (6% auf den Bruttopreis)
+                const priceWithVatAndTax = priceWithVat * (1 + this.TAX_RATE);
+                
+                // Ergebnisse auf 4 Dezimalstellen formatieren und anzeigen
+                this.resultVatOutput.textContent = priceWithVat.toFixed(4);
+                this.resultVatTaxOutput.textContent = priceWithVatAndTax.toFixed(4);
+            }
+        }
+
+        // --- INITIALISIERUNG ---
+        document.addEventListener('DOMContentLoaded', () => {
+            new TariffCalculator();
+        });
+    </script>
+</body>
+</html>
