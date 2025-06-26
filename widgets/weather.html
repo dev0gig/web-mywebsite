@@ -50,13 +50,12 @@
                 <p id="current-description" class="text-xl opacity-80 h-8">Sonnig</p> <!-- Feste Höhe -->
                 <div class="flex items-center my-4">
                     <div id="current-icon" class="w-24 h-24"></div>
-                    <!-- Temperaturanzeige als Flex-Container, um Umbruch zu verhindern -->
-                    <div id="current-temp" class="text-7xl font-bold w-56 text-center flex items-baseline justify-center gap-1"></div>
+                    <div id="current-temp" class="text-5xl font-bold w-56 text-center flex items-baseline justify-center gap-1"></div>
                 </div>
                 
                 <!-- Container für Details mit fester Höhe, um Sprünge zu vermeiden -->
-                <div class="h-16">
-                    <div id="current-details" class="grid grid-cols-3 gap-4 text-sm w-full max-w-xs mx-auto transition-opacity duration-300">
+                <div class="h-16 flex items-center justify-center">
+                    <div id="current-details" class="grid grid-cols-4 gap-x-4 text-sm w-full max-w-lg mx-auto">
                         <div class="text-center">
                             <p class="font-semibold">Gefühlt</p>
                             <p id="feels-like" class="opacity-80">26°</p>
@@ -69,13 +68,17 @@
                             <p class="font-semibold">Feuchtigkeit</p>
                             <p id="humidity" class="opacity-80">40%</p>
                         </div>
+                        <div class="text-center">
+                            <p class="font-semibold">Regen</p>
+                            <p id="rain-chance" class="opacity-80">10%</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 7-Tage-Vorschau -->
-            <div class="forecast-7-days mt-8 border-t border-white/20 pt-4">
-                <div id="forecast-grid" class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            <!-- 4-Tage-Vorschau -->
+            <div class="forecast-4-days mt-8 border-t border-white/20 pt-4">
+                <div id="forecast-grid" class="grid grid-cols-4 gap-2">
                     <!-- Vorschau-Items werden hier per JS eingefügt -->
                 </div>
             </div>
@@ -100,6 +103,7 @@
                 this.feelsLikeEl = document.getElementById('feels-like');
                 this.windSpeedEl = document.getElementById('wind-speed');
                 this.humidityEl = document.getElementById('humidity');
+                this.rainChanceEl = document.getElementById('rain-chance');
 
                 this.forecastGridEl = document.getElementById('forecast-grid');
                 
@@ -136,7 +140,7 @@
                         cityName = geoData?.address?.city || geoData?.address?.town || geoData?.address?.village || "Unbekannter Ort";
                     }
                     
-                    const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`);
+                    const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,wind_speed_10m_max,precipitation_probability_max&forecast_days=4&timezone=auto`);
                     const weatherData = await weatherResponse.json();
 
                     this.currentData = weatherData.current;
@@ -155,7 +159,7 @@
             
             renderForecast() {
                 this.forecastGridEl.innerHTML = '';
-                for (let i = 0; i < 7; i++) {
+                for (let i = 0; i < 4; i++) {
                     const day = new Date(this.dailyData.time[i]);
                     const dayName = i === 0 ? 'Heute' : day.toLocaleDateString('de-DE', { weekday: 'short' });
                     
@@ -165,10 +169,7 @@
                     dayEl.innerHTML = `
                         <p class="font-semibold text-sm">${dayName}</p>
                         <div class="w-10 h-10 mx-auto my-1">${this.getWeatherDetails(this.dailyData.weather_code[i]).icon}</div>
-                        <p class="text-sm">
-                            <span class="font-bold">${Math.round(this.dailyData.temperature_2m_max[i])}°</span>
-                            <span class="opacity-70">/${Math.round(this.dailyData.temperature_2m_min[i])}°</span>
-                        </p>
+                        <p class="text-sm">${Math.round(this.dailyData.temperature_2m_min[i])}° - ${Math.round(this.dailyData.temperature_2m_max[i])}°</p>
                     `;
                     dayEl.addEventListener('click', () => this.displayDayDetails(i));
                     this.forecastGridEl.appendChild(dayEl);
@@ -189,21 +190,26 @@
                 this.card.style.setProperty('--text-color', textColor);
                 
                 if (index === 0) {
-                    // Zeige aktuelle Details für "Heute"
-                    const currentTemp = Math.round(this.currentData.temperature_2m);
-                    this.currentTempEl.innerHTML = `<span>${currentTemp}°</span>`; // Einzelne Temperatur
+                    // Zeige Min/Max für "Heute" und aktuelle Details
+                    const maxTemp = Math.round(this.dailyData.temperature_2m_max[index]);
+                    const minTemp = Math.round(this.dailyData.temperature_2m_min[index]);
+                    this.currentTempEl.innerHTML = `<span>${minTemp}°</span><span class="text-3xl opacity-70 mx-2">-</span><span>${maxTemp}°</span>`;
                     this.feelsLikeEl.textContent = `${Math.round(this.currentData.apparent_temperature)}°`;
                     this.windSpeedEl.textContent = `${Math.round(this.currentData.wind_speed_10m)} km/h`;
                     this.humidityEl.textContent = `${this.currentData.relative_humidity_2m}%`;
-                    this.currentDetailsEl.classList.remove('opacity-0');
+                    this.rainChanceEl.textContent = `${this.dailyData.precipitation_probability_max[0]}%`;
                 } else {
-                    // Zeige Max/Min für zukünftige Tage
+                    // Zeige Max/Min für zukünftige Tage und tägliche Max-Details
                     const maxTemp = Math.round(this.dailyData.temperature_2m_max[index]);
                     const minTemp = Math.round(this.dailyData.temperature_2m_min[index]);
-                    this.currentTempEl.innerHTML = `<span>${maxTemp}°</span> <span class="text-4xl opacity-70">/${minTemp}°</span>`;
-                    this.currentDetailsEl.classList.add('opacity-0');
+                    this.currentTempEl.innerHTML = `<span>${minTemp}°</span><span class="text-3xl opacity-70 mx-2">-</span><span>${maxTemp}°</span>`;
+                    this.feelsLikeEl.textContent = `${Math.round(this.dailyData.apparent_temperature_max[index])}°`;
+                    this.windSpeedEl.textContent = `${Math.round(this.dailyData.wind_speed_10m_max[index])} km/h`;
+                    this.humidityEl.textContent = `---`; // Keine tägliche Feuchtigkeit verfügbar
+                    this.rainChanceEl.textContent = `${this.dailyData.precipitation_probability_max[index]}%`;
                 }
             }
+
 
             getWeatherDetails(code) {
                 if ([0, 1].includes(code)) return { description: 'Sonnig', icon: this.getIcon('sunny'), color: '#4A90E2', textColor: '#FFFFFF' };
@@ -218,13 +224,13 @@
 
             getIcon(name) {
                 const icons = {
-                    'sunny': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.03-0.17,0.06-0.33,0.1-0.5l-1.41-1.41c-0.09,0.16-0.18,0.32-0.28,0.48L2,13z M20,13l2,0 c-0.02-0.17-0.06-0.33-0.1-0.5l1.41-1.41c0.09,0.16,0.18,0.32,0.28,0.48L20,13z M11.5,2.1c0.17,0.03,0.33,0.06,0.5,0.1 l1.41-1.41C13.24,0.61,13.08,0.5,12.92,0.4L11.5,2.1z M11.5,21.9c-0.17,0.03-0.33,0.06-0.5,0.1l-1.41-1.41 c0.16,0.09,0.32,0.18,0.48,0.28L11.5,21.9z M12,4c0.17,0.02,0.33,0.06,0.5,0.1L11.08,5.52c-0.16-0.09-0.32-0.18-0.48-0.28 L12,4z M20,11h2c-0.02-0.17-0.06-0.33-0.1-0.5L20.48,9.08C20.39,9.24,20.3,9.4,20.2,9.57L20,11z M4,11H2 c0.02-0.17,0.06-0.33,0.1-0.5l1.41-1.41C3.33,9.25,3.17,9.42,3,9.59L4,11z M18.92,19.5l1.41,1.41c0.17-0.16,0.32-0.33,0.47-0.5 L19.38,18.9C19.22,19.07,19.07,19.22,18.92,19.5z M4.5,18.92c-0.16,0.17-0.33,0.32-0.5,0.47l1.41,1.41c0.16-0.17,0.32-0.33,0.47-0.5 L4.5,18.92z M12.5,20c-0.17-0.02-0.33-0.06-0.5-0.1l1.41-1.41c0.16,0.09,0.32,0.18,0.48,0.28L12.5,20z"/></svg>`,
-                    'partly-cloudy': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.95,15.14c-0.29-2.58-2.3-4.6-4.88-4.88C14.53,7.69,12.44,6,10,6c-2.76,0-5,2.24-5,5c0,0.41,0.05,0.81,0.15,1.19 c-2.02,0.39-3.65,2.02-4.04,4.04C1.05,16.6,1,17,1,17.42C1,19.39,2.61,21,4.58,21h13.83c1.98,0,3.58-1.61,3.58-3.58 C22,16.51,21.15,15.42,19.95,15.14z"/></svg>`,
-                    'cloudy': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`,
-                    'rain': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 10c0-3.31-2.69-6-6-6S6 6.69 6 10c0 .34.03.68.08.1L2.1 14.1c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L6 11.2V10c0-3.31 2.69-6 6-6s6 2.69 6 6v1.2l3.2 3.2c.2.2.51.2.71 0 .2-.2.2-.51 0-.71L17.92 10.1C17.97 10.08 18 10.04 18 10zM8 16v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2zm8 0v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2zm-4 2v3h2v-3c0-1.11-.89-2-2-2s-2 .89-2 2z"/></svg>`,
-                    'snow': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.34 10.51c-.44-.29-1.03-.15-1.32.29l-1.5 2.25c-.29.44-.15 1.03.29 1.32.44.29 1.03.15 1.32-.29l1.5-2.25c.29-.44.15-1.03-.29-1.32zM3.66 10.51c.44-.29.58-.88.29-1.32l-1.5-2.25c-.29-.44-.88-.58-1.32-.29-.44.29-.58.88-.29 1.32l1.5 2.25c.29.44.88.58 1.32.29zM12 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-1.06 6.09c-.44.29-1.03.15-1.32-.29l-1.5-2.25c-.29-.44-.15-1.03.29-1.32.44-.29 1.03.15 1.32.29l1.5 2.25c.29.44.15 1.03-.29 1.32zm3.12 0c-.44.29-.58.88-.29 1.32l1.5 2.25c.29.44.88.58 1.32.29.44-.29.58-.88.29-1.32l-1.5-2.25c-.29-.43-.88-.57-1.32-.28zM12 2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1s1-.45 1-1V3c0-.55-.45-1-1-1zm6.71.29c-.39-.39-1.02-.39-1.41 0l-2.12 2.12c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l2.12-2.12c.39-.39.39-1.02 0-1.41zM5.29.29c-.39-.39-1.02-.39-1.41 0L1.76 2.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l2.12-2.12c.39-.39.39-1.02 0-1.41z"/></svg>`,
-                    'thunderstorm': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16v-5H9l4-7v5h2l-4 7z"/></svg>`,
-                    'fog': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 7H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2zM4 15h16c1.1 0 2-.9 2-2s-.9-2-2-2H4c-1.1 0-2 .9-2 2s.9 2 2 2z"/></svg>`
+                    'sunny': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 5C8.13 5 5 8.13 5 12s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM5.64 5.64l2.12 2.12 1.41-1.41-2.12-2.12L5.64 5.64zm12.72 12.72l2.12 2.12 1.41-1.41-2.12-2.12-1.41 1.41zM5.64 18.36l-1.41 1.41 2.12 2.12 1.41-1.41-2.12-2.12zM18.36 5.64l1.41-1.41 2.12 2.12-1.41 1.41-2.12-2.12z"/></svg>`,
+                    'partly-cloudy': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17C6.48 3.73 3.18 4.5 1.5 7.5c-1.07 1.93-1.07 4.07 0 6 .78 1.4 2.1 2.54 3.64 3.14C6.45 18.43 9.05 20 12 20c4.42 0 8-3.58 8-8 0-1.4-.37-2.71-.99-3.82.93-.65 1.6-1.67 1.8-2.8.25-1.39-.04-2.83-.84-3.99-.2-.29-.43-.56-.69-.81z"/></svg>`,
+                    'cloudy': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`,
+                    'rain': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM7 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm4 2c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm4-2c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`,
+                    'snow': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 10.5V8h-4.5l-2-4-2 4H7v2.5L3.5 12 7 13.5V16h4.5l2 4 2-4H20v-2.5L23.5 12 20 10.5zM12 13.2l-1.4-1.4-1.4 1.4L7.8 12l1.4-1.4-1.4-1.4L9.2 8l1.4 1.4 1.4-1.4L13.4 8l-1.4 1.4 1.4 1.4L14.8 12l-1.4 1.4 1.4 1.4L13.4 16l-1.4-1.4-1.4 1.4z"/></svg>`,
+                    'thunderstorm': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM13 19h-2v-5H9l4-7v5h2l-4 7z"/></svg>`,
+                    'fog': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 7H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2zm0 6H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2z"/></svg>`
                 };
                 return icons[name] || icons['cloudy'];
             }
