@@ -305,9 +305,11 @@
 
     <!-- Iframe Content Area -->
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
-        <div id="content-loader"></div>
-        <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe active"></iframe>
-        <iframe id="frame-widgets" src="widgets/widgets-iframe.html" class="content-iframe"></iframe>
+        <div class="relative w-full h-full">
+            <div id="content-loader"></div>
+            <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe active"></iframe>
+            <iframe id="frame-widgets" src="widgets/widgets-iframe.html" class="content-iframe"></iframe>
+        </div>
     </main>
 
     <!-- Settings Modal -->
