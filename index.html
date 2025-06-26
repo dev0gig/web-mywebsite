@@ -33,6 +33,11 @@
             --sidebar-link-active-bg: #7c3aed;
         }
 
+        /* Bilder im Dark Mode invertieren (z.B. schwarze Icons zu weißen Icons) */
+        html[data-theme='dark'] #sidebar img {
+            filter: invert(1) brightness(1.5) contrast(1.2); /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
+        }
+
         html,
         body {
             height: 100%;
@@ -143,17 +148,6 @@
             color: #ffffff;
         }
 
-        /* Styling for the new SVG icon */
-        .sidebar-link svg .st0 {
-            /* We set fill to currentColor, but the path also uses a stroke for the outlines */
-            fill: none;
-            /* Make sure the path is not filled if we want only a stroke */
-            stroke: currentColor;
-            /* Inherit color from parent for the SVG stroke */
-            stroke-width: 0.5;
-            /* Adjust this value to make the stroke thicker or thinner */
-        }
-
         /* Mobile Header */
         #mobile-header {
             background-color: var(--sidebar-bg);
@@ -219,95 +213,41 @@
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
-            <li><a href="appdrawer.html" data-target="frame-appdrawer"
-                    class="sidebar-link flex items-center p-3 rounded-lg active"><svg class="w-8 h-8 flex-shrink-0"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25A2.25 2.25 0 0 1 8.25 21H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25h2.25A2.25 2.25 0 0 1 20.25 6v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25A2.25 2.25 0 0 1 13.5 8.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
-                    </svg><span class="sidebar-text font-medium">Appdrawer</span></a></li>
-            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
-                    class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M2 12C2 10.1308 2 9.19615 2.40192 8.5C2.66523 8.04394 3.04394 7.66523 3.5 7.40192C4.19615 7 5.13077 7 7 7H17C18.8692 7 19.8038 7 20.5 7.40192C20.9561 7.66523 21.3348 8.04394 21.5981 8.5C22 9.19615 22 10.1308 22 12C22 13.8692 22 14.8038 21.5981 15.5C21.3348 15.9561 20.9561 16.3348 20.5 16.5981C19.8038 17 18.8692 17 17 17H7C5.13077 17 4.19615 17 3.5 16.5981C3.04394 16.3348 2.66523 15.9561 2.40192 15.5C2 14.8038 2 13.8692 2 12Z"
-                            stroke="currentColor" stroke-width="1.5" />
-                        <path d="M19 4C19 2.89543 18.1046 2 17 2H7C5.89543 2 5 2.89543 5 4" stroke="currentColor"
-                            stroke-width="1.5" />
-                        <path d="M19 20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20" stroke="currentColor"
-                            stroke-width="1.5" />
-                        <rect x="5.5" y="10.5" width="5" height="1" rx="0.5" stroke="currentColor" />
-                    </svg><span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125-1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V6.375m0 0H3.75m0 0v-.75A.75.75 0 0 0 3 4.5h-.75m0 0h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375M16.5 18.75h-9m9 0a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-6.75c-.621 0-1.125.504-1.125 1.125v3.375m9 0h-9" />
-                    </svg>
+            <li><a href="appdrawer.html" data-target="frame-appdrawer" class="sidebar-link flex items-center p-3 rounded-lg active">
+                    <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Appdrawer</span></a></li>
+            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets" class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/widgets.svg" alt="Widgets Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Widgets</span></a></li>
+            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea" class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
-            <li><a href="memomea/memomea.html" data-target="frame-memomea"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                    </svg>
+            <li><a href="memomea/memomea.html" data-target="frame-memomea" class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Memomea</span></a>
             </li>
             <li><a href="unicorn/work-tools.html" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M16.414 16.414a2 2 0 0 1 -2.828 0l-2.828 -2.828a2 2 0 0 1 0 -2.828l2.828 -2.828a2 2 0 0 1 2.828 0l2.828 2.828a2 2 0 0 1 0 2.828l-2.828 2.828z" />
-                        <path d="M15 11l-2 -2" />
-                        <path d="M18 14l-2 -2" />
-                        <path d="M12 3l2 3l2 -3" />
-                        <path d="M3 15l1 1" />
-                        <path d="M19 15l1 1" />
-                        <path d="M12 21l-1 -1" />
-                        <path d="M7 12a5 5 0 0 1 5 -5h2a3 3 0 0 1 3 3v2a5 5 0 0 1 -5 5h-2a3 3 0 0 1 -3 -3z" />
-                        <path d="M10 14l-1 -1" />
-                    </svg>
+                    <img src="assets/icons/unicorn.svg" alt="Unicorn Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Unicorn</span></a></li>
             <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18M12 12.75h.008v.008H12v-.008Zm-3 0h.008v.008H9v-.008Zm-3 0h.008v.008H6v-.008Zm3 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Zm-3 3h.008v.008H12v-.008Zm-3 0h.008v.008H9v-.008Z" />
-                    </svg>
+                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Kalender</span></a></li>
             <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <!-- Äußeres Dreieck -->
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2 L2 22 H22 L12 2 Z" />
-                        <!-- Inneres Dreieck -->
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8 L6 18 H18 L12 8 Z" />
-                    </svg>
+                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Drive</span></a></li>
             <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                    </svg>
+                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
         <ul class="space-y-2">
-            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg"><svg
-                        class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                    </svg><span class="sidebar-text font-medium">Einstellungen</span></button></li>
+            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Einstellungen</span></button></li>
         </ul>
     </nav>
 
