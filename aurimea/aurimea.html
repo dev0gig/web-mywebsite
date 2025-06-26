@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuriMea - Interaktives Finanz-Dashboard</title>
+    <!-- Einbindung von Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Einbindung von Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Farben-Schema von appdrawer.html für Konsistenz übernommen */
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --header-color: #111827;
+            /* Angepasst */
+            --card-bg: #ffffff;
+            --card-text: #111827;
+            /* Angepasst */
+            --subtle-text: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --header-color: #fafafa;
+            /* Angepasst */
+            --card-bg: #262626;
+            --card-text: #fafafa;
+            /* Angepasst */
+            --subtle-text: #a3a3a3;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .main-title {
+            color: var(--header-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .subtle-text {
+            color: var(--subtle-text);
+        }
+
+        .filter-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--subtle-text);
+        }
+
+        .filter-btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .filter-btn.active {
+            border-color: #4f46e5;
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .table-header-sortable:hover {
+            background-color: var(--border-color);
+            cursor: pointer;
+        }
+
+        .iframe-wrapper {
+            width: 100%;
+            max-width: 768px;
+            height: 100%;
+            overflow-y: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-6">
+    <h1 class="text-3xl md:text-4xl font-bold main-title mb-6 text-center">AuriMea</h1>
+
+    <!-- === KONTEN-FILTER === -->
+    <div id="account-filter" class="w-full max-w-6xl mx-auto flex justify-center flex-wrap gap-2 mb-6">
+        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
+            Konten</button>
+        <button data-filter="Erste Bank" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste
+            Bank</button>
+        <button data-filter="N26" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
+        <button data-filter="Revolut" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
+    </div>
+
+    <!-- === FINANZ-ÜBERSICHT === -->
+    <div id="summary-cards" class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card p-4 rounded-xl shadow-md text-center">
+            <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
+            <p id="total-einnahmen" class="text-2xl font-bold text-green-500">Lädt...</p>
+        </div>
+        <div class="card p-4 rounded-xl shadow-md text-center">
+            <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
+            <p id="total-ausgaben" class="text-2xl font-bold text-red-500">Lädt...</p>
+        </div>
+        <div class="card p-4 rounded-xl shadow-md text-center">
+            <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
+            <p id="bilanz" class="text-2xl font-bold">Lädt...</p>
+        </div>
+    </div>
+
+    <!-- === DIAGRAMM-BEREICH === -->
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+            <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
+            <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
+        </div>
+        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+            <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
+            <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div>
+        </div>
+        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+            <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
+            <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
+        </div>
+    </div>
+
+    <!-- === TRANSAKTIONSTABELLE === -->
+    <div class="w-full max-w-6xl mx-auto card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto">
+        <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+            <h2 class="text-xl font-bold">Alle Transaktionen</h2>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                </span>
+                <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..." class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg" style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                    <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <table class="w-full text-left min-w-[600px]">
+            <thead>
+                <tr class="border-b" style="border-color: var(--border-color);">
+                    <th class="p-2 table-header-sortable" data-sort="Datum">Datum</th>
+                    <th class="p-2 table-header-sortable" data-sort="Kategorie">Kategorie / Art</th>
+                    <th class="p-2 table-header-sortable" data-sort="Beschreibung">Beschreibung</th>
+                    <th class="p-2">Zahlungsmethode</th>
+                    <th class="p-2 table-header-sortable" data-sort="Konto">Konto</th>
+                    <th class="p-2 table-header-sortable" data-sort="Betrag">Betrag</th>
+                    <th class="p-2">Sonstige Infos</th>
+                </tr>
+            </thead>
+            <tbody id="transaction-table-body">
+                <!-- Rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Floating Action Button & Modal -->
+    <button id="open-modal-btn"
+        class="fixed bottom-6 right-6 z-50 bg-indigo-600 hover:bg-indigo-700 text-white font-bold w-14 h-14 rounded-full flex items-center justify-center text-3xl transition-transform active:scale-95 shadow-lg">
+        <span class="sr-only">Formular öffnen</span>+
+    </button>
+    <div id="modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
+    </div>
+    <div id="form-modal"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-3xl h-5/6 z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
+        <div class="bg-transparent rounded-xl flex flex-col h-full">
+            <button id="close-modal-btn"
+                class="ml-auto w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full text-red-500 hover:bg-red-200 dark:hover:bg-red-900/50 mb-2">
+                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="iframe-wrapper flex-grow"><iframe
+                    src="https://docs.google.com/forms/d/e/1FAIpQLScIxiENM6kyJ3ud2v3FMsAaYDgJydKox_mnZMWk6MUk5ZttVw/viewform?embedded=true">Lädt...</iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let allTransactions = [];
+            let searchTerm = '';
+            let currentFilter = 'all';
+            let sortConfig = { key: 'Datum', direction: 'desc' };
+            let charts = { ausgaben: null, einnahmen: null, konto: null };
+            const formatCurrency = (value) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+
+            // --- DATA FETCHING ---
+            const csvUrl = 'data-aurimea/aurimea-data - Formularantworten 1.csv';
+            Papa.parse(csvUrl, {
+                download: true, header: true, skipEmptyLines: true,
+                transformHeader: header => header.trim(),
+                complete: (results) => {
+                    allTransactions = results.data.map(row => ({
+                        ...row,
+                        Betrag: parseFloat(String(row.Betrag).replace(',', '.')) || 0,
+                        parsedDate: `20${row.Datum.substring(6, 8)}-${row.Datum.substring(3, 5)}-${row.Datum.substring(0, 2)}`
+                    }));
+                    updateDashboard();
+                },
+                error: (err) => console.error("Fehler beim Laden der CSV-Datei:", err)
+            });
+
+            // --- MAIN UPDATE FUNCTION ---
+            function updateDashboard() {
+                const accountFilteredData = (currentFilter === 'all')
+                    ? allTransactions
+                    : allTransactions.filter(row => row.Konto === currentFilter);
+
+                // Process and update summaries and charts based on the account filter only
+                const financialSummary = processData(accountFilteredData);
+                updateSummaryCards(financialSummary);
+                createOrUpdateCharts(financialSummary);
+
+                // Now, apply search filter for the table view
+                let tableData = [...accountFilteredData]; // Create a copy to sort
+                if (searchTerm) {
+                    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                    tableData = tableData.filter(row => {
+                        const displayKategorie = (row.Wiederkehrend === 'Ja' ? 'fixkosten' : (row.Kategorie || '')).toLowerCase(); // Kategorie/Art
+                        const formattedBetrag = formatCurrency(row.Betrag).replace(/\./g, '').toLowerCase(); // Betrag ohne Tausenderpunkte
+                        return (row.Beschreibung?.toLowerCase().includes(lowerCaseSearchTerm) ||
+                                displayKategorie.includes(lowerCaseSearchTerm) ||
+                                row.Konto?.toLowerCase().includes(lowerCaseSearchTerm) ||
+                                row['Sonstige Infos']?.toLowerCase().includes(lowerCaseSearchTerm) ||
+                                row.Datum?.includes(lowerCaseSearchTerm) || // Suche nach Datum
+                                formattedBetrag.includes(lowerCaseSearchTerm)); // Suche nach Betrag
+                    });
+                }
+                sortData(tableData);
+                renderTransactionTable(tableData);
+            }
+            // --- SORTING ---
+            function sortData(data) {
+                data.sort((a, b) => {
+                    let aValue = a[sortConfig.key];
+                    let bValue = b[sortConfig.key];
+                    if (sortConfig.key === 'Datum') {
+                        aValue = a.parsedDate;
+                        bValue = b.parsedDate;
+                    }
+
+                    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+                    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            // --- DATA PROCESSING ---
+            function processData(data) {
+                const summary = {
+                    ausgabenByCat: {}, einnahmenByCat: {}, ausgabenByKonto: {},
+                    totalAusgaben: 0, totalEinnahmen: 0
+                };
+                allTransactions.forEach(row => {
+                    if (row.Art === 'Ausgabe' && row.Konto) {
+                        summary.ausgabenByKonto[row.Konto] = (summary.ausgabenByKonto[row.Konto] || 0) + row.Betrag;
+                    }
+                });
+                data.forEach(row => {
+                    if (row.Art === 'Ausgabe') {
+                        summary.ausgabenByCat[row.Kategorie] = (summary.ausgabenByCat[row.Kategorie] || 0) + row.Betrag;
+                        summary.totalAusgaben += row.Betrag;
+                    } else if (row.Art === 'Einnahme') {
+                        summary.einnahmenByCat[row.Kategorie] = (summary.einnahmenByCat[row.Kategorie] || 0) + row.Betrag;
+                        summary.totalEinnahmen += row.Betrag;
+                    }
+                });
+                return summary;
+            }
+
+            // --- UI RENDERING ---
+            function updateSummaryCards(summary) {
+                const bilanz = summary.totalEinnahmen - summary.totalAusgaben;
+                document.getElementById('total-einnahmen').textContent = formatCurrency(summary.totalEinnahmen);
+                document.getElementById('total-ausgaben').textContent = formatCurrency(summary.totalAusgaben);
+                const bilanzEl = document.getElementById('bilanz');
+                bilanzEl.textContent = formatCurrency(bilanz);
+                bilanzEl.className = `text-2xl font-bold ${bilanz >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            }
+
+            function renderTransactionTable(data) {
+                const tbody = document.getElementById('transaction-table-body');
+                tbody.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-800/50 text-sm'; // text-sm für kompaktere Darstellung
+                    tr.style.borderColor = 'var(--border-color)';
+                    // Logik für "Fixkosten" bei wiederkehrenden Einträgen
+                    const displayKategorie = row.Wiederkehrend === 'Ja' ? 'Fixkosten' : (row.Kategorie || '');
+                    tr.innerHTML = `
+                        <td class="p-2">${row.Datum || ''}</td>
+                        <td class="p-2">${displayKategorie}</td>
+                        <td class="p-2">${row.Beschreibung || ''}</td>
+                        <td class="p-2">${row.Zahlungsmethode || ''}</td>
+                        <td class="p-2">${row.Konto || ''}</td>
+                        <td class="p-2 text-right ${row.Art === 'Einnahme' ? 'text-green-500' : 'text-red-500'}">${formatCurrency(row.Betrag)}</td>
+                        <td class="p-2">${row['Sonstige Infos'] || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function createOrUpdateCharts(summary) {
+                const isDarkMode = document.documentElement.dataset.theme === 'dark';
+                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+                const subtleTextColor = getComputedStyle(document.documentElement).getPropertyValue('--subtle-text').trim();
+                const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+                const chartColors = {
+                    ausgaben: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'],
+                    einnahmen: ['#22c55e', '#16a34a', '#15803d', '#10b285'],
+                    konto: ['#3b82f6', '#8b5cf6', '#ec4899', '#6366f1']
+                };
+
+                const doughnutOptions = {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: textColor } } }
+                };
+                const barOptions = {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { color: subtleTextColor }, grid: { color: gridColor } },
+                        x: { ticks: { color: subtleTextColor }, grid: { color: gridColor } }
+                    }
+                };
+
+                const createChart = (id, type, data, options, colors) => {
+                    if (charts[id]) charts[id].destroy();
+                    const ctx = document.getElementById(id + 'Chart').getContext('2d');
+                    charts[id] = new Chart(ctx, {
+                        type,
+                        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderWidth: 0 }] },
+                        options
+                    });
+                };
+
+                createChart('ausgaben', 'doughnut', summary.ausgabenByCat, doughnutOptions, chartColors.ausgaben);
+                createChart('einnahmen', 'doughnut', summary.einnahmenByCat, doughnutOptions, chartColors.einnahmen);
+                createChart('konto', 'bar', summary.ausgabenByKonto, barOptions, chartColors.konto);
+            }
+
+            // --- EVENT LISTENERS ---
+            const searchInput = document.getElementById('transaction-search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                clearSearchBtn.classList.toggle('hidden', !searchTerm);
+                updateDashboard();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchTerm = '';
+                clearSearchBtn.classList.add('hidden');
+                updateDashboard();
+            });
+            document.getElementById('account-filter').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    currentFilter = e.target.dataset.filter;
+                    document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateDashboard();
+                }
+            });
+
+            document.querySelectorAll('.table-header-sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const key = header.dataset.sort;
+                    sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc';
+                    sortConfig.key = key;
+                    updateDashboard();
+                });
+            });
+
+            const modalElements = {
+                btnOpen: document.getElementById('open-modal-btn'), btnClose: document.getElementById('close-modal-btn'),
+                overlay: document.getElementById('modal-overlay'), modal: document.getElementById('form-modal')
+            };
+            const openModal = () => { modalElements.overlay.classList.remove('opacity-0', 'pointer-events-none'); modalElements.modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95'); };
+            const closeModal = () => { modalElements.overlay.classList.add('opacity-0', 'pointer-events-none'); modalElements.modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95'); };
+            modalElements.btnOpen.addEventListener('click', openModal);
+            modalElements.btnClose.addEventListener('click', closeModal);
+            modalElements.overlay.addEventListener('click', closeModal);
+
+            // --- THEME-SYNCHRONISATION ---
+            window.addEventListener('message', (event) => {
+                if (event.data === 'set-theme-dark' || event.data === 'set-theme-light') {
+                    const theme = event.data.split('-')[2];
+                    document.documentElement.dataset.theme = theme;
+                    updateDashboard(); // Redraw everything on theme change
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
