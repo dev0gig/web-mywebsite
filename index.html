@@ -58,16 +58,26 @@
             pointer-events: none;
             /* Klicks durchlassen, wenn unsichtbar */
         }
-
         #content-loader.hidden {
             opacity: 0;
         }
 
-        #content-frame {
-            transition: opacity 0.3s ease-in-out;
+        .content-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            opacity: 0;
+            transition: opacity 200ms ease-in-out;
+            pointer-events: none;
         }
 
-
+        .content-iframe.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
         /* Desktop Sidebar: Bleibt fixiert, Hover-Effekt wie bisher */
         #sidebar {
             position: fixed;
@@ -80,12 +90,17 @@
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
-            display: flex;
-            /* Flexbox hinzugefügt */
+            display: none; /* Standardmäßig auf mobilen Geräten ausblenden */
             flex-direction: column;
             /* Anordnung in Spalte */
             justify-content: space-between;
             /* Elemente oben und unten ausrichten */
+        }
+
+        @media (min-width: 768px) { /* Tailwind's 'md' breakpoint */
+            #sidebar {
+                display: flex;
+            }
         }
 
         #sidebar:hover {
@@ -213,7 +228,7 @@
     </header>
 
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
-    <nav id="sidebar" class="hidden md:flex flex-col p-2">
+    <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg active"><svg
@@ -291,9 +306,8 @@
     <!-- Iframe Content Area -->
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
         <div id="content-loader"></div>
-        <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe w-full h-full border-0"></iframe>
-        <iframe id="frame-widgets" src="widgets/widgets-iframe.html"
-            class="content-iframe w-full h-full border-0 hidden"></iframe>
+        <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe active"></iframe>
+        <iframe id="frame-widgets" src="widgets/widgets-iframe.html" class="content-iframe"></iframe>
     </main>
 
     <!-- Settings Modal -->
@@ -385,13 +399,15 @@
                     if (!targetFrameId) return;
 
                     const targetFrame = document.getElementById(targetFrameId);
-                    const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
 
-                    if (targetFrame && (!activeFrame || activeFrame.id !== targetFrameId)) {
+                    if (targetFrame && !targetFrame.classList.contains('active')) {
+                        // Deactivate the currently active frame
+                        const activeFrame = document.querySelector('.content-iframe.active');
                         if (activeFrame) {
-                            activeFrame.classList.add('hidden');
+                            activeFrame.classList.remove('active');
                         }
-                        targetFrame.classList.remove('hidden');
+                        // Activate the new frame
+                        targetFrame.classList.add('active');
 
                         // Update active state for all links
                         document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => l.classList.remove('active'));
