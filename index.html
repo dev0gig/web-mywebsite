@@ -75,7 +75,7 @@
             left: 0;
             height: 100vh;
             z-index: 50;
-            width: 5rem;
+            width: 4.5rem;
             transition: width 0.3s;
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
@@ -214,33 +214,34 @@
 
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="hidden md:flex flex-col p-2">
-        <ul id="nav-links" class="space-y-2 mt-2">
-            <li><a href="appdrawer.html" class="sidebar-link flex items-center p-3 rounded-lg active"><svg
+        <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
+            <li><a href="appdrawer.html" data-target="frame-appdrawer"
+                    class="sidebar-link flex items-center p-3 rounded-lg active"><svg
                         class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25A2.25 2.25 0 0 1 8.25 21H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25h2.25A2.25 2.25 0 0 1 20.25 6v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25A2.25 2.25 0 0 1 13.5 8.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
                     </svg><span class="sidebar-text font-medium">Appdrawer</span></a></li>
-            <li><a href="unicorn/work-tools.html" target="_blank" rel="noopener noreferrer"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg height="27px" width="27px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15.36 15.36" xml:space="preserve">
-                        <style type="text/css">
-                            .st0 {
-                                fill: none;
-                                stroke: currentColor;
-                                stroke-width: 0.5;
-                            }
-                        </style>
-                        <g>
-                            <path class="st0" d="M10.48 6.65a0.507 0.507 0 1 0 0 1.013 0.507 0.507 0 0 0 0 -1.013" />
-                            <path class="st0"
-                                d="m14.883 7.739 -2.251 -1.948 1.223 -3.18 0.001 -0.002h0a0.48 0.48 0 0 0 0.031 -0.167 0.476 0.476 0 0 0 -0.224 -0.404 0.474 0.474 0 0 0 -0.252 -0.072h-0.002c-0.001 0 -0.001 0 -0.001 0a0.474 0.474 0 0 0 -0.347 0.153l-2.077 2.245 -0.552 -0.477 -0.516 -1.308a0.605 0.605 0 0 0 -0.502 -0.38 0.5 0.5 0 0 0 -0.061 -0.003 0.605 0.605 0 0 0 -0.509 0.278L7.729 4.206c-0.443 0.171 -0.88 0.269 -1.284 0.389h0c-0.217 0.066 -0.427 0.139 -0.622 0.242 -0.194 0.104 -0.376 0.241 -0.518 0.429h0a1.07 1.07 0 0 0 -0.171 0.326 1.07 1.07 0 0 0 -0.048 0.321v0.001c0.001 0.171 0.034 0.321 0.061 0.449l0 0.001c0.027 0.127 0.048 0.236 0.048 0.322v0.003c0 0.052 -0.006 0.095 -0.02 0.139 -0.014 0.045 -0.035 0.089 -0.076 0.142 -0.038 0.05 -0.071 0.08 -0.106 0.104l0 0c-0.059 0.04 -0.122 0.061 -0.216 0.075l0 0c-0.068 0.01 -0.151 0.014 -0.243 0.018h0c-0.138 0.007 -0.304 0.012 -0.484 0.069h0c-0.09 0.029 -0.182 0.071 -0.27 0.133a1.06 1.06 0 0 0 -0.242 0.235l-0.003 0.004 0.003 -0.004a1.07 1.07 0 0 0 -0.171 0.326 1.07 1.07 0 0 0 -0.048 0.321v0.002c0 0.172 0.034 0.321 0.061 0.449l0 0.001c0.027 0.126 0.048 0.236 0.048 0.321v0.003c0 0.052 -0.006 0.095 -0.02 0.139h0c-0.014 0.044 -0.035 0.088 -0.076 0.142h0c-0.038 0.049 -0.071 0.08 -0.105 0.104l-0.001 0.001c-0.059 0.04 -0.122 0.06 -0.214 0.074h0c-0.068 0.01 -0.151 0.014 -0.243 0.017h0c-0.138 0.007 -0.304 0.012 -0.484 0.069h0c-0.09 0.029 -0.182 0.071 -0.27 0.132l0.008 -0.005 -0.008 0.005a1.07 1.07 0 0 0 -0.242 0.235l0 0a1.08 1.08 0 0 0 -0.171 0.327 1.07 1.07 0 0 0 -0.048 0.321v0.002c0.001 0.172 0.034 0.321 0.061 0.449l0 0c0.027 0.127 0.048 0.236 0.048 0.322v0.003c0 0.052 -0.006 0.095 -0.02 0.14 -0.014 0.044 -0.035 0.088 -0.075 0.142l0 0c-0.079 0.103 -0.167 0.168 -0.283 0.231 -0.086 0.046 -0.186 0.088 -0.296 0.135l0 0c-0.163 0.071 -0.355 0.156 -0.529 0.316a1.17 1.17 0 0 0 -0.232 0.295q-0.098 0.175 -0.149 0.404L0 13.394h9.456l1.137 -2.877 2.519 0.501 0.001 -0.003c0.071 0.011 0.143 0.019 0.213 0.019a1.381 1.381 0 0 0 1.105 -0.552l0.653 -0.871a1.377 1.377 0 0 0 0.276 -0.828v-0.001c0 -0.387 -0.164 -0.772 -0.477 -1.044m-1.629 -5.046 -0.387 1.006 -0.441 -0.111zm-1.063 1.15 0.567 0.142 -0.179 0.466 -0.737 -0.23zm-0.578 0.625 0.856 0.267 -0.293 0.762 -0.841 -0.728zm-9.358 8.395H0.707a0.65 0.65 0 0 1 0.184 -0.201c0.064 -0.046 0.138 -0.085 0.223 -0.125 0.127 -0.058 0.277 -0.114 0.432 -0.197 0.155 -0.084 0.316 -0.199 0.449 -0.375a1 1 0 0 0 0.159 -0.304 0.99 0.99 0 0 0 0.044 -0.299c0 -0.162 -0.032 -0.306 -0.059 -0.434 -0.028 -0.129 -0.05 -0.242 -0.049 -0.34 0 -0.058 0.007 -0.11 0.023 -0.162a0.54 0.54 0 0 1 0.088 -0.165 0.53 0.53 0 0 1 0.123 -0.12c0.071 -0.049 0.148 -0.073 0.247 -0.088 0.074 -0.011 0.159 -0.015 0.251 -0.018 0.139 -0.007 0.297 -0.012 0.465 -0.065a0.94 0.94 0 0 0 0.25 -0.122 0.99 0.99 0 0 0 0.224 -0.218 1 1 0 0 0 0.159 -0.304 0.99 0.99 0 0 0 0.044 -0.299c0 -0.162 -0.032 -0.306 -0.059 -0.434 -0.027 -0.129 -0.05 -0.242 -0.049 -0.34 0 -0.058 0.007 -0.11 0.023 -0.163 0.017 -0.052 0.043 -0.105 0.088 -0.165a0.54 0.54 0 0 1 0.123 -0.121c0.071 -0.048 0.148 -0.073 0.247 -0.088 0.074 -0.011 0.158 -0.015 0.251 -0.018 0.139 -0.007 0.297 -0.012 0.464 -0.065a0.92 0.92 0 0 0 0.25 -0.122 0.99 0.99 0 0 0 0.225 -0.219 1 1 0 0 0 0.159 -0.304 0.99 0.99 0 0 0 0.044 -0.299c0 -0.162 -0.032 -0.306 -0.059 -0.434 -0.028 -0.129 -0.05 -0.242 -0.049 -0.34 0 -0.058 0.007 -0.11 0.023 -0.163 0.017 -0.052 0.042 -0.105 0.087 -0.165 0.087 -0.115 0.199 -0.203 0.344 -0.281 0.217 -0.116 0.508 -0.201 0.844 -0.292a20.4 20.4 0 0 0 0.466 -0.13zm12.404 -3.571 -0.653 0.87a0.848 0.848 0 0 1 -0.862 0.32l-0.001 0 -2.88 -0.572 -1.168 2.953H2.796l6.529 -10.156 -0.035 0.055a0.073 0.073 0 0 1 0.062 -0.034l0.006 0 0.002 0a0.074 0.074 0 0 1 0.061 0.046l0.564 1.429 4.55 3.938a0.847 0.847 0 0 1 0.293 0.642 0.845 0.845 0 0 1 -0.17 0.509" />
-                        </g>
+            <li><a href="unicorn/work-tools.html" target="_blank" rel="noopener noreferrer" class="sidebar-link flex items-center p-3 rounded-lg">
+                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M16.414 16.414a2 2 0 0 1 -2.828 0l-2.828 -2.828a2 2 0 0 1 0 -2.828l2.828 -2.828a2 2 0 0 1 2.828 0l2.828 2.828a2 2 0 0 1 0 2.828l-2.828 2.828z" />
+                        <path d="M15 11l-2 -2" />
+                        <path d="M18 14l-2 -2" />
+                        <path d="M12 3l2 3l2 -3" />
+                        <path d="M3 15l1 1" />
+                        <path d="M19 15l1 1" />
+                        <path d="M12 21l-1 -1" />
+                        <path d="M7 12a5 5 0 0 1 5 -5h2a3 3 0 0 1 3 3v2a5 5 0 0 1 -5 5h-2a3 3 0 0 1 -3 -3z" />
+                        <path d="M10 14l-1 -1" />
                     </svg>
                     <span class="sidebar-text font-medium">Unicorn</span>
                 </a></li>
-            <li><a href="widgets/widgets-iframe.html" class="sidebar-link flex items-center p-3 rounded-lg"><svg
+            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
+                    class="sidebar-link flex items-center p-3 rounded-lg"><svg
                         class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -290,7 +291,9 @@
     <!-- Iframe Content Area -->
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
         <div id="content-loader"></div>
-        <iframe id="content-frame" src="./appdrawer.html" class="w-full h-full border-0"></iframe>
+        <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe w-full h-full border-0"></iframe>
+        <iframe id="frame-widgets" src="widgets/widgets-iframe.html"
+            class="content-iframe w-full h-full border-0 hidden"></iframe>
     </main>
 
     <!-- Settings Modal -->
@@ -324,8 +327,8 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
-            const iframe = document.getElementById('content-frame');
             const contentLoader = document.getElementById('content-loader');
+            const contentFrames = document.querySelectorAll('.content-iframe');
 
             // --- Desktop Sidebar ---
             const desktopNavLinks = document.querySelectorAll('#nav-links > li > a, #nav-links > li > button');
@@ -363,46 +366,41 @@
                 modalOverlay.classList.add('hidden');
             };
 
-            function updateActiveLink(targetHref) {
-                document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => {
-                    if (l.target === '_blank') {
-                        l.classList.remove('active');
-                        return;
-                    }
-                    if (new URL(l.href).pathname === new URL(targetHref).pathname) {
-                        l.classList.add('active');
-                    } else {
-                        l.classList.remove('active');
-                    }
-                });
-                const activeLink = document.querySelector(`a.active`);
-                if (activeLink) {
-                    mobileHeaderTitle.textContent = activeLink.querySelector('span').textContent;
-                }
-            }
-
             function handleNavLinkClick(e) {
                 const target = e.currentTarget;
 
-                if (target.getAttribute('target') === '_blank') {
-                    if (mobileMenu.classList.contains('open')) closeMobileMenu();
+                // If the link is meant to open in a new tab, allow default behavior
+                if (target.target === '_blank') {
+                    // No need to preventDefault() or handle iframe logic
+                    if (mobileMenu.classList.contains('open')) closeMobileMenu(); // Close mobile menu if open
                     return;
                 }
 
-                e.preventDefault();
-
                 if (target.id.includes('settings-btn')) {
+                    e.preventDefault();
                     openSettingsModal();
                 } else {
-                    const href = target.href;
-                    if (new URL(iframe.src).pathname === new URL(href).pathname) {
-                        if (mobileMenu.classList.contains('open')) closeMobileMenu();
-                        return;
-                    }
+                    e.preventDefault();
+                    const targetFrameId = target.dataset.target;
+                    if (!targetFrameId) return;
 
-                    contentLoader.classList.remove('hidden'); // Loader sofort anzeigen
-                    iframe.src = href; // Quelle ändern
-                    updateActiveLink(href);
+                    const targetFrame = document.getElementById(targetFrameId);
+                    const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
+
+                    if (targetFrame && (!activeFrame || activeFrame.id !== targetFrameId)) {
+                        if (activeFrame) {
+                            activeFrame.classList.add('hidden');
+                        }
+                        targetFrame.classList.remove('hidden');
+
+                        // Update active state for all links
+                        document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll(`a[data-target="${targetFrameId}"]`).forEach(l => l.classList.add('active'));
+
+                        // Update mobile header title
+                        const activeLinkText = target.querySelector('span')?.textContent || 'Appdrawer';
+                        mobileHeaderTitle.textContent = activeLinkText;
+                    }
                 }
 
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
@@ -415,6 +413,9 @@
                 // Entfernen Sie die 'sidebar-text' Klasse, da sie nur für Desktop-Hover-Effekte relevant ist
                 const sidebarTextSpan = newLink.querySelector('.sidebar-text');
                 if (sidebarTextSpan) {
+                    // For mobile, we want the text to be visible immediately.
+                    sidebarTextSpan.style.opacity = 1;
+                    sidebarTextSpan.style.maxWidth = '150px';
                     sidebarTextSpan.classList.remove('sidebar-text');
                 }
                 newLink.classList.add('w-full');
@@ -444,7 +445,13 @@
                     effectiveTheme = theme;
                 }
                 document.documentElement.dataset.theme = effectiveTheme;
-                if (iframe.contentWindow) iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+                contentFrames.forEach(frame => {
+                    try {
+                        if (frame.contentWindow) {
+                            frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+                        }
+                    } catch (e) { /* ignore cross-origin errors */ }
+                });
             }
             function handleThemeChange(event) {
                 const selectedTheme = event.target.value;
@@ -458,21 +465,41 @@
                 if (savedTheme === 'system') applyTheme('system');
             });
 
-            // Iframe 'load' Event Listener
-            iframe.addEventListener('load', () => {
-                const savedTheme = localStorage.getItem('theme') || 'system';
-                const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
-                if (themeRadio) themeRadio.checked = true;
+            // --- Iframe Loading and Initial State ---
+            let loadedFrames = 0;
+            const totalFrames = contentFrames.length;
 
-                applyTheme(savedTheme);
-                updateActiveLink(iframe.contentWindow.location.href);
+            if (totalFrames > 0) {
+                contentFrames.forEach(frame => {
+                    frame.addEventListener('load', () => {
+                        loadedFrames++;
+                        const savedTheme = localStorage.getItem('theme') || 'system';
+                        let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
+                        try {
+                            if (frame.contentWindow) {
+                                frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+                            }
+                        } catch (e) { /* ignore */ }
 
-                // Loader sanft ausblenden, sobald der Iframe geladen ist
+                        if (loadedFrames >= totalFrames) {
+                            contentLoader.classList.add('hidden');
+                        }
+                    });
+                });
+            } else {
                 contentLoader.classList.add('hidden');
-            });
+            }
 
             // Initialen Status setzen
-            updateActiveLink(iframe.src);
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+            if (themeRadio) themeRadio.checked = true;
+            applyTheme(savedTheme);
+
+            const initialActiveLink = document.querySelector('#nav-links a.active');
+            if (initialActiveLink) {
+                mobileHeaderTitle.textContent = initialActiveLink.querySelector('span').textContent;
+            }
         });
     </script>
 </body>

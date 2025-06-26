@@ -86,8 +86,6 @@
             border: 1px solid var(--widget-border);
             border-radius: 12px;
             margin-bottom: 1rem;
-            /* Übergangs-Eigenschaften für das Aufklappen/Zuklappen */
-            transition: all 0.3s ease-in-out;
             overflow: hidden;
             /* Wichtig, um den Inhalt abzuschneiden, wenn max-height gesetzt wird */
         }
@@ -111,18 +109,6 @@
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 0.75rem;
             padding: 0 1rem 1rem 1rem;
-            /* Animation für max-height */
-            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            max-height: 0;
-            /* Standardmäßig versteckt */
-            opacity: 0;
-        }
-
-        /* Wenn das details-Element geöffnet ist */
-        .box-mail[open] .button-group-mail {
-            max-height: 500px;
-            /* Eine ausreichend große Höhe, die den Inhalt aufnehmen kann */
-            opacity: 1;
         }
 
         .button-single {
@@ -145,9 +131,14 @@
         }
 
         #search-input-container {
-            position: relative;
+            position: -webkit-sticky; /* Für Safari */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--bg-color); /* Hintergrund, um durchscrollenden Text zu verdecken */
+            padding-bottom: 1rem; /* Ersetzt margin-bottom, um den Abstand zu halten */
             flex-shrink: 0;
-            margin-bottom: 1rem;
+            /* margin-bottom: 1rem; */ /* Wird durch padding-bottom ersetzt */
         }
 
         #search-input {
@@ -220,21 +211,23 @@
         <section class="mail-main">
             <div class="mail-main--left">
                 <div id="search-input-container">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-                    </div>
-                    <input type="text" id="search-input" placeholder="Vorlagen durchsuchen...">
-                    <div class="absolute inset-y-0 right-0 flex items-center">
-                        <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                             </svg>
-                        </button>
+                        </div>
+                        <input type="text" id="search-input" placeholder="Vorlagen durchsuchen...">
+                        <div class="absolute inset-y-0 right-0 flex items-center">
+                            <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div id="template-container">
@@ -357,9 +350,9 @@
                 for (const categoryName in filteredData) {
                     const details = document.createElement('details');
                     details.className = 'box-mail';
-                    // Das `open`-Attribut wird nur gesetzt, wenn kein Filter aktiv ist,
-                    // damit beim Filtern nur die relevanten Kategorien angezeigt werden.
-                    details.open = (filter === '');
+                    // Kategorien mit Suchergebnissen standardmäßig öffnen.
+                    // Ohne Filter sind alle geöffnet, außer 'Allgemein' und 'Wiener Netze'.
+                    details.open = (filter !== '') || (categoryName !== 'Allgemein' && categoryName !== 'Wiener Netze');
 
                     const summary = document.createElement('summary');
                     summary.textContent = categoryName;
@@ -380,30 +373,6 @@
 
                     details.appendChild(buttonGroup);
                     templateContainer.appendChild(details);
-
-                    // Beim erstmaligen Rendern oder wenn der Filter leer ist,
-                    // stellen wir sicher, dass die geöffneten Elemente auch animiert werden.
-                    if (details.open) {
-                        buttonGroup.style.maxHeight = buttonGroup.scrollHeight + 'px';
-                        buttonGroup.style.opacity = 1;
-                    }
-
-                    // Event-Listener für das Öffnen/Schließen der Details
-                    details.addEventListener('toggle', () => {
-                        if (details.open) {
-                            // Wenn geöffnet, setze die max-height auf die tatsächliche Scrollhöhe,
-                            // um die Animation zu starten. Verwende setTimeout, um die Animation
-                            // nach dem Rendern des DOMs zu starten.
-                            setTimeout(() => {
-                                buttonGroup.style.maxHeight = buttonGroup.scrollHeight + 'px';
-                                buttonGroup.style.opacity = 1;
-                            }, 0);
-                        } else {
-                            // Wenn geschlossen, setze die max-height auf 0
-                            buttonGroup.style.maxHeight = '0';
-                            buttonGroup.style.opacity = 0;
-                        }
-                    });
                 }
             }
 

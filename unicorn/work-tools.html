@@ -48,7 +48,7 @@
             left: 0;
             height: 100vh;
             z-index: 50;
-            width: 5rem;
+            width: 4.5rem;
             transition: width 0.3s;
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
@@ -68,8 +68,8 @@
             height: 100%;
         }
 
-        /* Style to smoothly transition the iframe's opacity */
-        #content-frame {
+        /* Style to smoothly transition the iframes' opacity */
+        .content-iframe {
             transition: opacity 200ms ease-in-out;
         }
 
@@ -148,47 +148,232 @@
 <body data-theme="system">
 
     <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="p-2">
-        <ul id="nav-links" class="space-y-2 mt-2">
-            <li><a href="we-iframe/dashboard.html" class="sidebar-link flex items-center p-3 rounded-lg active"><svg
-                        class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                    </svg><span class="sidebar-text font-medium">Dashboard</span></a></li>
-            <li><a href="we-iframe/contacts.html" class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    </svg>
-                    <span class="sidebar-text font-medium">Kontakte</span>
-                </a></li>
-            <li><a href="we-iframe/templates.html" class="sidebar-link flex items-center p-3 rounded-lg"><svg
-                        class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                    </svg><span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
-            <!-- New 'Tools' link added with the new SVG icon -->
-            <li><a href="we-iframe/tool-widgets.html" class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                        stroke-width="0.1" stroke="currentColor">
-                        <!-- Path 3757 for the main tool shape -->
-                        <path
-                            d="M385.788,432.722l9.221-9.221a3.471,3.471,0,0,0,0-4.9l-1.627-1.627a3.549,3.549,0,0,0-4.9,0l-8.5,8.5a7.836,7.836,0,0,0-10.791-8.463,1,1,0,0,0-.318,1.628l3.016,3.015-.642,1.584-1.569.648-3.026-3.026a1,1,0,0,0-1.628.318,7.83,7.83,0,0,0,9.422,10.567,3.481,3.481,0,0,0-.1.8,3.439,3.439,0,0,0,.34,1.471l-6.193,6.193-1.224.676c-.009,0-.013.014-.021.018a.963.963,0,0,0-.192.175,1,1,0,0,0-.135.133c0,.006-.01.008-.014.014l-2.772,4.377a1,1,0,0,0,.138,1.243l.863.862a1,1,0,0,0,1.242.137l4.378-2.772c.006,0,.009-.01.014-.014a4.349,4.349,0,0,0,.308-.327c.005-.008.014-.012.019-.02l.675-1.225,6.191-6.191a3.278,3.278,0,0,0,2.479.174l9.055,9.055a3.571,3.571,0,1,0,5.05-5.049Zm-17.669-4.36a5.816,5.816,0,0,1-1.665-4.876l2.286,2.286a1,1,0,0,0,1.089.218l2.573-1.064a1,1,0,0,0,.545-.549l1.048-2.586a1,1,0,0,0-.22-1.083l-2.272-2.272a5.844,5.844,0,0,1,6.125,8.071,1,1,0,0,0,.214,1.1l.007.007-2.22,2.22-.006-.006a1,1,0,0,0-1.1-.214A5.82,5.82,0,0,1,368.119,428.362Zm2.845,13.109-.45-.45,5.434-5.434.449.449Zm-3.036,1.885.045.045.656.655-1.911,1.211Zm10.528-8.109-1.765-1.764a1.451,1.451,0,0,1,.084-1.969L389.9,418.39a1.464,1.464,0,0,1,2.069,0l1.626,1.626a1.467,1.467,0,0,1,0,2.071l-13.126,13.124A1.491,1.491,0,0,1,378.456,435.247Zm14.676,9.868a1.607,1.607,0,0,1-2.221,0l-8.759-8.759,2.221-2.221,8.76,8.76a1.568,1.568,0,0,1,0,2.22Z"
-                            transform="translate(-364 -416)" fill="currentColor" />
-                        <!-- Path 3758 for the small circle -->
-                        <path d="M391.108,443.091a.824.824,0,1,0,1.165,0A.823.823,0,0,0,391.108,443.091Z"
-                            transform="translate(-364 -416)" fill="currentColor" />
-                        <!-- Path 3759 for the diagonal line -->
-                        <path
-                            d="M391.3,420.688a.578.578,0,0,0-.818,0L379.071,432.1a.579.579,0,0,0,.821.818l11.4-11.406A.578.578,0,0,0,391.3,420.688Z"
-                            transform="translate(-364 -416)" fill="currentColor" />
-                    </svg>
-                    <span class="sidebar-text font-medium">Tools</span>
-                </a></li>
-            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
+    <nav id="sidebar" class="p-2 flex flex-col">
+        <!-- This div will grow and push the others down -->
+        <div class="flex-grow">
+            <ul id="nav-links" class="space-y-2 mt-2">
+                <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
+                        class="sidebar-link flex items-center p-3 rounded-lg active"><svg class="w-8 h-8 flex-shrink-0"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg><span class="sidebar-text font-medium">Dashboard</span></a></li>
+                <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
+                        class="sidebar-link flex items-center p-3 rounded-lg">
+                        <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                        <span class="sidebar-text font-medium">Kontakte</span>
+                    </a></li>
+                <li><a href="we-iframe/templates.html" data-target="frame-templates"
+                        class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                        </svg><span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
+                <!-- New 'Tools' link added with the new SVG icon -->
+                <li><a href="we-iframe/tool-widgets.html" data-target="frame-tools"
+                        class="sidebar-link flex items-center p-3 rounded-lg">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+                            stroke-width="0.1" stroke="currentColor">
+                            <!-- Path 3757 for the main tool shape -->
+                            <path
+                                d="M385.788,432.722l9.221-9.221a3.471,3.471,0,0,0,0-4.9l-1.627-1.627a3.549,3.549,0,0,0-4.9,0l-8.5,8.5a7.836,7.836,0,0,0-10.791-8.463,1,1,0,0,0-.318,1.628l3.016,3.015-.642,1.584-1.569.648-3.026-3.026a1,1,0,0,0-1.628.318,7.83,7.83,0,0,0,9.422,10.567,3.481,3.481,0,0,0-.1.8,3.439,3.439,0,0,0,.34,1.471l-6.193,6.193-1.224.676c-.009,0-.013.014-.021.018a.963.963,0,0,0-.192.175,1,1,0,0,0-.135.133c0,.006-.01.008-.014.014l-2.772,4.377a1,1,0,0,0,.138,1.243l.863.862a1,1,0,0,0,1.242.137l4.378-2.772c.006,0,.009-.01.014-.014a4.349,4.349,0,0,0,.308-.327c.005-.008.014-.012.019-.02l.675-1.225,6.191-6.191a3.278,3.278,0,0,0,2.479.174l9.055,9.055a3.571,3.571,0,1,0,5.05-5.049Zm-17.669-4.36a5.816,5.816,0,0,1-1.665-4.876l2.286,2.286a1,1,0,0,0,1.089.218l2.573-1.064a1,1,0,0,0,.545-.549l1.048-2.586a1,1,0,0,0-.22-1.083l-2.272-2.272a5.844,5.844,0,0,1,6.125,8.071,1,1,0,0,0,.214,1.1l.007.007-2.22,2.22-.006-.006a1,1,0,0,0-1.1-.214A5.82,5.82,0,0,1,368.119,428.362Zm2.845,13.109-.45-.45,5.434-5.434.449.449Zm-3.036,1.885.045.045.656.655-1.911,1.211Zm10.528-8.109-1.765-1.764a1.451,1.451,0,0,1,.084-1.969L389.9,418.39a1.464,1.464,0,0,1,2.069,0l1.626,1.626a1.467,1.467,0,0,1,0,2.071l-13.126,13.124A1.491,1.491,0,0,1,378.456,435.247Zm14.676,9.868a1.607,1.607,0,0,1-2.221,0l-8.759-8.759,2.221-2.221,8.76,8.76a1.568,1.568,0,0,1,0,2.22Z"
+                                transform="translate(-364 -416)" fill="currentColor" />
+                            <!-- Path 3758 for the small circle -->
+                            <path d="M391.108,443.091a.824.824,0,1,0,1.165,0A.823.823,0,0,0,391.108,443.091Z"
+                                transform="translate(-364 -416)" fill="currentColor" />
+                            <!-- Path 3759 for the diagonal line -->
+                            <path
+                                d="M391.3,420.688a.578.578,0,0,0-.818,0L379.071,432.1a.579.579,0,0,0,.821.818l11.4-11.406A.578.578,0,0,0,391.3,420.688Z"
+                                transform="translate(-364 -416)" fill="currentColor" />
+                        </svg>
+                        <span class="sidebar-text font-medium">Tools</span>
+                    </a></li>
+                <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
+                        <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                        </svg>
+                        <span class="sidebar-text font-medium">Einstellungen</span>
+                    </button></li>
+            </ul>
+        </div>
+        <!-- This div will contain the bottom items -->
+        <div>
+            <!-- Copyright information at the bottom of the sidebar -->
+            <div class="copyright-info">
+                &copy; NGIPAV
+            </div>
+        </div>
+    </nav>
+
+    <!-- Iframe Content Area -->
+    <main id="main-content">
+        <iframe id="frame-dashboard" src="we-iframe/dashboard.html"
+            class="content-iframe w-full h-full border-0 opacity-0"></iframe>
+        <iframe id="frame-contacts" src="we-iframe/contacts.html"
+            class="content-iframe w-full h-full border-0 opacity-0 hidden"></iframe>
+        <iframe id="frame-templates" src="we-iframe/templates.html"
+            class="content-iframe w-full h-full border-0 opacity-0 hidden"></iframe>
+        <iframe id="frame-tools" src="we-iframe/tool-widgets.html"
+            class="content-iframe w-full h-full border-0 opacity-0 hidden"></iframe>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70"></div>
+    <div id="settings-modal"
+        class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Einstellungen</h2>
+            <button id="close-modal-btn" class="hover:text-white text-2xl"
+                style="color: var(--text-color-light);">&times;</button>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-2" style="color: var(--header-text-color);">Layout</h3>
+            <p class="text-sm mb-4">Setzt die Position und Grösse der Widgets auf der aktuellen Seite zurück.</p>
+            <button id="reset-layout-btn"
+                class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg mb-4">Layout
+                zurücksetzen</button>
+        </div>
+        <hr class="my-6" style="border-color: var(--sidebar-border);">
+        <div>
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
+            <fieldset class="space-y-3">
+                <legend class="sr-only">Theme selection</legend>
+                <div><input type="radio" name="theme" id="theme-light" value="light"
+                        class="theme-radio-peer hidden"><label for="theme-light"
+                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
+                </div>
+                <div><input type="radio" name="theme" id="theme-dark" value="dark"
+                        class="theme-radio-peer hidden"><label for="theme-dark"
+                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
+                </div>
+                <div><input type="radio" name="theme" id="theme-system" value="system"
+                        class="theme-radio-peer hidden"><label for="theme-system"
+                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const contentFrames = document.querySelectorAll('.content-iframe');
+            const navLinks = document.querySelectorAll('#nav-links a');
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const overlay = document.getElementById('modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const resetLayoutBtn = document.getElementById('reset-layout-btn');
+            const transitionDuration = 200; // Must match CSS transition duration
+
+            function handleNavClick(event) {
+                event.preventDefault();
+                const link = event.currentTarget;
+                const targetId = link.dataset.target;
+                const targetFrame = document.getElementById(targetId);
+                const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
+
+                if (targetFrame && activeFrame && activeFrame.id !== targetId) {
+                    // Hide current frame and reset its opacity for next time
+                    activeFrame.classList.add('hidden');
+                    activeFrame.classList.add('opacity-0');
+
+                    // Show the new frame (it's still transparent)
+                    targetFrame.classList.remove('hidden');
+
+                    // After a tiny delay, fade it in.
+                    // This delay ensures the browser has processed the display change.
+                    setTimeout(() => {
+                        targetFrame.classList.remove('opacity-0');
+                    }, 10);
+                }
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+
+            const openModal = () => { settingsModal.classList.remove('hidden'); overlay.classList.remove('hidden'); };
+            const closeModal = () => { settingsModal.classList.add('hidden'); overlay.classList.add('hidden'); };
+
+            settingsBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+            resetLayoutBtn.addEventListener('click', () => {
+                const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
+                if (activeFrame) {
+                    activeFrame.contentWindow.postMessage('reset-layout', '*');
+                }
+                closeModal();
+            });
+
+            const themeRadios = document.querySelectorAll('input[name="theme"]');
+            function applyTheme(theme) {
+                let effectiveTheme;
+                if (theme === 'system') {
+                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                } else {
+                    effectiveTheme = theme;
+                }
+                document.documentElement.dataset.theme = effectiveTheme;
+                contentFrames.forEach(frame => {
+                    // Post message only if the iframe's content is accessible
+                    try {
+                        if (frame.contentWindow) {
+                            frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+                        }
+                    } catch (e) {
+                        // Could be a cross-origin error if the iframe src changes, ignore for now.
+                    }
+                });
+            }
+            function handleThemeChange(event) {
+                const selectedTheme = event.target.value;
+                localStorage.setItem('theme', selectedTheme);
+                applyTheme(selectedTheme);
+            }
+
+            themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                if (savedTheme === 'system') applyTheme('system');
+            });
+
+            // Handle initial load and theme for all frames
+            contentFrames.forEach(frame => {
+                frame.addEventListener('load', () => {
+                    const savedTheme = localStorage.getItem('theme') || 'system';
+                    let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
+
+                    // Apply theme to the newly loaded iframe
+                    frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+
+                    // If this is the initially visible frame, fade it in
+                    if (!frame.classList.contains('hidden')) {
+                        frame.classList.remove('opacity-0');
+                    }
+                });
+            });
+
+            // Set initial theme on page load
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            const currentThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+            if (currentThemeRadio) {
+                currentThemeRadio.checked = true;
+            }
+            applyTheme(savedTheme);
+        });
+    </script>
+</body>
+
+</html>
                     <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
