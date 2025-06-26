@@ -12,18 +12,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Farben-Schema von appdrawer.html für Konsistenz übernommen */
+        /* Farben-Schema für Konsistenz */
         :root {
             --bg-color: #f9fafb;
             --text-color: #111827;
             --text-color-light: #6b7280;
             --header-color: #111827;
-            /* Angepasst */
             --card-bg: #ffffff;
             --card-text: #111827;
-            /* Angepasst */
             --subtle-text: #6b7280;
             --border-color: #e5e7eb;
+            --edit-btn-hover-bg: #3b82f6;
+            /* blue-600 */
         }
 
         html[data-theme='dark'] {
@@ -31,18 +31,42 @@
             --text-color: #fafafa;
             --text-color-light: #a3a3a3;
             --header-color: #fafafa;
-            /* Angepasst */
             --card-bg: #262626;
             --card-text: #fafafa;
-            /* Angepasst */
             --subtle-text: #a3a3a3;
             --border-color: #404040;
+            --edit-btn-hover-bg: #2563eb;
+            /* blue-700 */
+        }
+
+        html {
+            /* Verhindert das "Springen" der Seite, wenn der Scrollbalken erscheint/verschwindet */
+            scrollbar-gutter: stable;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+        }
+
+        /* --- Benutzerdefinierte Scrollbar-Stile --- */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+            border: 3px solid var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--subtle-text);
         }
 
         .main-title {
@@ -82,9 +106,7 @@
 
         .calendar-day {
             width: 32px;
-            /* Angepasst für kleineren Kalender */
             height: 32px;
-            /* Angepasst für kleineren Kalender */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -131,20 +153,25 @@
             background-color: white;
         }
 
-        .iframe-wrapper {
-            width: 100%;
-            max-width: 768px;
-            height: 100%;
-            overflow-y: auto;
-            margin-left: auto;
-            margin-right: auto;
+        /* Stile für Aktions-Buttons */
+        .action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            color: var(--subtle-text);
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        iframe {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border: none;
+        .delete-btn:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: var(--edit-btn-hover-bg);
+            color: white;
         }
     </style>
 </head>
@@ -152,9 +179,9 @@
 <body class="p-4 md:p-6">
     <h1 class="text-3xl md:text-4xl font-bold main-title mb-6 text-center">AuriMea</h1>
 
-    <!-- === HAUPTINHALTSBEREICH: Grid für alle Hauptkomponenten === -->
+    <!-- HAUPTINHALTSBEREICH -->
     <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 px-4 md:px-6">
-        <!-- === KONTEN-FILTER (links oben, gleiche Höhe wie Finanz-Übersicht) === -->
+        <!-- KONTEN-FILTER -->
         <div class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col justify-center h-full">
             <div id="account-filter" class="flex justify-center flex-wrap gap-2">
                 <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
@@ -167,23 +194,23 @@
             </div>
         </div>
 
-        <!-- === FINANZ-ÜBERSICHT (rechts oben, gleiche Höhe wie Konten-Filter) === -->
+        <!-- FINANZ-ÜBERSICHT -->
         <div id="summary-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:col-span-2">
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
-                <p id="total-einnahmen" class="text-2xl font-bold text-green-500">Lädt...</p>
+                <p id="total-einnahmen" class="text-2xl font-bold text-green-500">0,00 €</p>
             </div>
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
-                <p id="total-ausgaben" class="text-2xl font-bold text-red-500">Lädt...</p>
+                <p id="total-ausgaben" class="text-2xl font-bold text-red-500">0,00 €</p>
             </div>
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
-                <p id="bilanz" class="text-2xl font-bold">Lädt...</p>
+                <p id="bilanz" class="text-2xl font-bold">0,00 €</p>
             </div>
         </div>
 
-        <!-- === KALENDER (links unten, gleiche Höhe wie Diagramme) === -->
+        <!-- KALENDER -->
         <div class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col h-full">
             <div id="calendar-container" class="flex flex-col w-full h-full">
                 <div class="flex justify-between items-center mb-4 w-full">
@@ -201,9 +228,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg></button>
                 </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center flex-grow">
-                    <!-- Wochentags-Header und Tage werden hier per JavaScript eingefügt -->
-                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center flex-grow"></div>
             </div>
             <div class="text-center mt-4 w-full min-h-[40px]">
                 <button id="clear-date-filter-btn"
@@ -212,7 +237,7 @@
             </div>
         </div>
 
-        <!-- === DIAGRAMM-BEREICH (rechts unten, gleiche Höhe wie Kalender) === -->
+        <!-- DIAGRAMM-BEREICH -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:col-span-2">
             <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
                 <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
@@ -228,28 +253,50 @@
             </div>
         </div>
 
-        <!-- === TRANSAKTIONSTABELLE === -->
+        <!-- TRANSAKTIONSTABELLE -->
         <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto lg:col-span-3">
             <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-                <h2 class="text-xl font-bold">Alle Transaktionen</h2>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-xl font-bold">Transaktionen</h2>
+                    <button id="add-transaction-btn" title="Neue Transaktion hinzufügen"
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
+                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                                clip-rule="evenodd" />
+                        </svg><span>Neu</span></button>
+                    <button id="import-csv-btn" title="Transaktionen aus CSV-Datei importieren"
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
+                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3v11.25" />
+                        </svg><span>Importieren</span></button>
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                    <button id="export-csv-btn" title="Alle Transaktionen als CSV-Datei exportieren"
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
+                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg><span>Exportieren</span></button>
+                </div>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><svg
+                            class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-                    </span>
+                        </svg></span>
                     <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..."
                         class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg"
                         style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
                     <button id="clear-search-btn"
-                        class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-                        <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
+                        class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"><svg
+                            class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                        </svg></button>
                 </div>
             </div>
             <table class="w-full text-left min-w-[600px]">
@@ -262,36 +309,79 @@
                         <th class="p-2 table-header-sortable" data-sort="Konto">Konto</th>
                         <th class="p-2 table-header-sortable" data-sort="Betrag">Betrag</th>
                         <th class="p-2">Sonstige Infos</th>
+                        <th class="p-2 text-center">Aktionen</th>
                     </tr>
                 </thead>
-                <tbody id="transaction-table-body">
-                    <!-- Rows will be inserted here by JavaScript -->
-                </tbody>
+                <tbody id="transaction-table-body"></tbody>
             </table>
+            <div id="pagination-controls" class="flex justify-between items-center mt-4 pt-4 border-t"
+                style="border-color: var(--border-color);"></div>
         </div>
     </div>
 
-    <!-- Floating Action Button & Modal -->
-    <button id="open-modal-btn"
-        class="fixed bottom-6 right-6 z-50 bg-indigo-600 hover:bg-indigo-700 text-white font-bold w-14 h-14 rounded-full flex items-center justify-center text-3xl transition-transform active:scale-95 shadow-lg">
-        <span class="sr-only">Formular öffnen</span>+
-    </button>
-    <div id="modal-overlay"
+    <!-- Modal zum Hinzufügen/Bearbeiten einer Transaktion -->
+    <div id="transaction-modal-overlay"
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
-    <div id="form-modal"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-3xl h-5/6 z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <div class="bg-transparent rounded-xl flex flex-col h-full">
-            <button id="close-modal-btn"
-                class="ml-auto w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full text-red-500 hover:bg-red-200 dark:hover:bg-red-900/50 mb-2">
-                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <div class="iframe-wrapper flex-grow"><iframe
-                    src="https://docs.google.com/forms/d/e/1FAIpQLScIxiENM6kyJ3ud2v3FMsAaYDgJydKox_mnZMWk6MUk5ZttVw/viewform?embedded=true">Lädt...</iframe>
+    <div id="transaction-modal"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
+                <button id="close-modal-btn"
+                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition"><svg
+                        class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
             </div>
+            <form id="transaction-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="trans-datum" class="block text-sm font-medium subtle-text mb-1">Datum</label><input
+                            type="date" id="trans-datum" required class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div><label for="trans-art" class="block text-sm font-medium subtle-text mb-1">Art</label><select
+                            id="trans-art" required class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                            <option value="Ausgabe">Ausgabe</option>
+                            <option value="Einnahme">Einnahme</option>
+                        </select></div>
+                    <div class="md:col-span-2"><label for="trans-betrag"
+                            class="block text-sm font-medium subtle-text mb-1">Betrag (€)</label><input type="number"
+                            id="trans-betrag" step="0.01" required placeholder="z.B. 19.99"
+                            class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div class="md:col-span-2"><label for="trans-beschreibung"
+                            class="block text-sm font-medium subtle-text mb-1">Beschreibung</label><input type="text"
+                            id="trans-beschreibung" required placeholder="z.B. Wocheneinkauf"
+                            class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div><label for="trans-kategorie"
+                            class="block text-sm font-medium subtle-text mb-1">Kategorie</label><input type="text"
+                            id="trans-kategorie" required placeholder="z.B. Lebensmittel" class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div><label for="trans-konto"
+                            class="block text-sm font-medium subtle-text mb-1">Konto</label><select id="trans-konto"
+                            required class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                            <option>Erste Bank</option>
+                            <option>N26</option>
+                            <option>Revolut</option>
+                            <option>Bargeld</option>
+                            <option>Sonstige</option>
+                        </select></div>
+                    <div><label for="trans-zahlungsmethode"
+                            class="block text-sm font-medium subtle-text mb-1">Zahlungsmethode</label><input type="text"
+                            id="trans-zahlungsmethode" placeholder="z.B. Karte" class="w-full p-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="trans-wiederkehrend"
+                            class="h-4 w-4 rounded" style="border-color: var(--border-color);"><label
+                            for="trans-wiederkehrend" class="text-sm font-medium">Wiederkehrend</label></div>
+                </div>
+                <div class="mt-6 flex justify-end"><button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition">Speichern</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -310,70 +400,58 @@
             let sortConfig = { key: 'Datum', direction: 'desc' };
             let charts = { ausgaben: null, einnahmen: null, konto: null };
             let transactionDates = new Set();
+            let currentPage = 1;
+            const itemsPerPage = 25;
             const formatCurrency = (value) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+            const STORAGE_KEY = 'aurimea-transactions';
 
-            // --- DATA FETCHING ---
-            const csvUrl = 'data-aurimea/aurimea-data - Formularantworten 1.csv';
-            Papa.parse(csvUrl, {
-                download: true, header: true, skipEmptyLines: true,
-                transformHeader: header => header.trim(),
-                complete: (results) => {
-                    allTransactions = results.data.map(row => ({
-                        ...row,
-                        Betrag: parseFloat(String(row.Betrag).replace(',', '.')) || 0, // Konvertiert Komma zu Punkt für die korrekte Zahlenerkennung
-                        parsedDate: `${row.Datum.substring(6, 10)}-${row.Datum.substring(3, 5)}-${row.Datum.substring(0, 2)}` // Konvertiert DD.MM.YYYY zu YYYY-MM-DD
-                    }));
-                    transactionDates = new Set(allTransactions.map(t => t.parsedDate).filter(d => d && d.length === 10));
-                    updateDashboard();
-                    renderCalendar();
-                },
-                error: (err) => console.error("Fehler beim Laden der CSV-Datei:", err)
-            });
+            // --- DATA HANDLING ---
+            function loadTransactions() {
+                const storedTransactions = localStorage.getItem(STORAGE_KEY);
+                try {
+                    allTransactions = storedTransactions ? JSON.parse(storedTransactions) : [];
+                    allTransactions.forEach(t => { if (!t.id) { t.id = crypto.randomUUID(); } });
+                    saveTransactions();
+                } catch (e) {
+                    console.error("Fehler beim Laden der Transaktionen:", e);
+                    allTransactions = [];
+                }
+                transactionDates = new Set(allTransactions.map(t => t.parsedDate).filter(d => d && d.length === 10));
+            }
+
+            function saveTransactions() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allTransactions));
+            }
 
             // --- MAIN UPDATE FUNCTION ---
             function updateDashboard() {
-                const accountFilteredData = (currentFilter === 'all')
-                    ? allTransactions
-                    : allTransactions.filter(row => row.Konto === currentFilter);
-
-                // Process and update summaries and charts based on the account filter only
+                const accountFilteredData = (currentFilter === 'all') ? allTransactions : allTransactions.filter(row => row.Konto === currentFilter);
                 const financialSummary = processData(accountFilteredData);
                 updateSummaryCards(financialSummary);
                 createOrUpdateCharts(financialSummary);
-
-                // Now, apply search filter for the table view
-                let tableData = [...accountFilteredData]; // Create a copy to sort
-
+                let tableData = [...accountFilteredData];
                 if (selectedDate) {
                     tableData = tableData.filter(row => row.parsedDate === selectedDate);
                 }
-
                 if (searchTerm) {
                     const lowerCaseSearchTerm = searchTerm.toLowerCase();
                     tableData = tableData.filter(row => {
-                        const displayKategorie = (row.Wiederkehrend === 'Ja' ? 'fixkosten' : (row.Kategorie || '')).toLowerCase(); // Kategorie/Art
-                        const formattedBetrag = formatCurrency(row.Betrag).replace(/\./g, '').toLowerCase(); // Betrag ohne Tausenderpunkte
-                        return (row.Beschreibung?.toLowerCase().includes(lowerCaseSearchTerm) ||
-                            displayKategorie.includes(lowerCaseSearchTerm) ||
-                            row.Konto?.toLowerCase().includes(lowerCaseSearchTerm) ||
-                            row['Sonstige Infos']?.toLowerCase().includes(lowerCaseSearchTerm) ||
-                            row.Datum?.includes(lowerCaseSearchTerm) || // Suche nach Datum
-                            formattedBetrag.includes(lowerCaseSearchTerm)); // Suche nach Betrag
+                        const displayKategorie = (row.Wiederkehrend === 'Ja' ? 'fixkosten' : (row.Kategorie || '')).toLowerCase();
+                        const formattedBetrag = formatCurrency(row.Betrag).replace(/\./g, '').toLowerCase();
+                        return Object.values(row).some(val => String(val).toLowerCase().includes(lowerCaseSearchTerm)) || displayKategorie.includes(lowerCaseSearchTerm) || formattedBetrag.includes(lowerCaseSearchTerm);
                     });
                 }
                 sortData(tableData);
-                renderTransactionTable(tableData);
+                const paginatedData = tableData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+                renderTransactionTable(paginatedData);
+                renderPaginationControls(tableData.length);
             }
+
             // --- SORTING ---
             function sortData(data) {
                 data.sort((a, b) => {
-                    let aValue = a[sortConfig.key];
-                    let bValue = b[sortConfig.key];
-                    if (sortConfig.key === 'Datum') {
-                        aValue = a.parsedDate;
-                        bValue = b.parsedDate;
-                    }
-
+                    let aValue = a[sortConfig.key]; let bValue = b[sortConfig.key];
+                    if (sortConfig.key === 'Datum') { aValue = a.parsedDate; bValue = b.parsedDate; }
                     if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
                     if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
                     return 0;
@@ -382,15 +460,12 @@
 
             // --- DATA PROCESSING ---
             function processData(data) {
-                const summary = {
-                    ausgabenByCat: {}, einnahmenByCat: {}, ausgabenByKonto: {},
-                    totalAusgaben: 0, totalEinnahmen: 0
-                };
+                const summary = { ausgabenByCat: {}, einnahmenByCat: {}, ausgabenByKonto: {}, totalAusgaben: 0, totalEinnahmen: 0 };
+                const kontoSummary = {};
                 allTransactions.forEach(row => {
-                    if (row.Art === 'Ausgabe' && row.Konto) {
-                        summary.ausgabenByKonto[row.Konto] = (summary.ausgabenByKonto[row.Konto] || 0) + row.Betrag;
-                    }
+                    if (row.Art === 'Ausgabe' && row.Konto) { kontoSummary[row.Konto] = (kontoSummary[row.Konto] || 0) + row.Betrag; }
                 });
+                summary.ausgabenByKonto = kontoSummary;
                 data.forEach(row => {
                     if (row.Art === 'Ausgabe') {
                         summary.ausgabenByCat[row.Kategorie] = (summary.ausgabenByCat[row.Kategorie] || 0) + row.Betrag;
@@ -416,11 +491,14 @@
             function renderTransactionTable(data) {
                 const tbody = document.getElementById('transaction-table-body');
                 tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 subtle-text">Keine Transaktionen gefunden.</td></tr>`;
+                    return;
+                }
                 data.forEach(row => {
                     const tr = document.createElement('tr');
-                    tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-800/50 text-sm'; // text-sm für kompaktere Darstellung
+                    tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-800/50 text-sm';
                     tr.style.borderColor = 'var(--border-color)';
-                    // Logik für "Fixkosten" bei wiederkehrenden Einträgen
                     const displayKategorie = row.Wiederkehrend === 'Ja' ? 'Fixkosten' : (row.Kategorie || '');
                     tr.innerHTML = `
                         <td class="p-2">${row.Datum || ''}</td>
@@ -430,174 +508,252 @@
                         <td class="p-2">${row.Konto || ''}</td>
                         <td class="p-2 text-right ${row.Art === 'Einnahme' ? 'text-green-500' : 'text-red-500'}">${formatCurrency(row.Betrag)}</td>
                         <td class="p-2">${row['Sonstige Infos'] || ''}</td>
+                        <td class="p-2 text-center flex justify-center items-center gap-2">
+                           <button class="action-btn edit-btn" data-id="${row.id}" title="Transaktion bearbeiten">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                           </button>
+                           <button class="action-btn delete-btn" data-id="${row.id}" title="Transaktion löschen">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                           </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
             function createOrUpdateCharts(summary) {
-                const isDarkMode = document.documentElement.dataset.theme === 'dark';
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
-                const subtleTextColor = getComputedStyle(document.documentElement).getPropertyValue('--subtle-text').trim();
-                const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
-
+                const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() + '80';
                 const chartColors = {
                     ausgaben: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'],
                     einnahmen: ['#22c55e', '#16a34a', '#15803d', '#10b285'],
                     konto: ['#3b82f6', '#8b5cf6', '#ec4899', '#6366f1']
                 };
-
-                const doughnutOptions = {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: textColor } } }
-                };
-                const barOptions = {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { ticks: { color: subtleTextColor }, grid: { color: gridColor } },
-                        x: { ticks: { color: subtleTextColor }, grid: { color: gridColor } }
-                    }
-                };
-
+                const doughnutOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } } } };
+                const barOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { color: gridColor } } } };
                 const createChart = (id, type, data, options, colors) => {
                     if (charts[id]) charts[id].destroy();
-                    const ctx = document.getElementById(id + 'Chart').getContext('2d');
-                    charts[id] = new Chart(ctx, {
-                        type,
-                        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderWidth: 0 }] },
-                        options
-                    });
+                    const canvas = document.getElementById(id + 'Chart'); if (!canvas) return;
+                    charts[id] = new Chart(canvas.getContext('2d'), { type, data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderWidth: 0 }] }, options });
                 };
-
                 createChart('ausgaben', 'doughnut', summary.ausgabenByCat, doughnutOptions, chartColors.ausgaben);
                 createChart('einnahmen', 'doughnut', summary.einnahmenByCat, doughnutOptions, chartColors.einnahmen);
                 createChart('konto', 'bar', summary.ausgabenByKonto, barOptions, chartColors.konto);
             }
 
+            function renderPaginationControls(totalItems) {
+                const paginationControls = document.getElementById('pagination-controls');
+                paginationControls.innerHTML = '';
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                if (totalPages <= 1) return;
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+                paginationControls.innerHTML = `<span class="text-sm subtle-text">Zeige ${startItem}–${endItem} von ${totalItems}</span><div class="flex items-center gap-2"><button id="prev-page-btn" class="filter-btn px-3 py-1 rounded-md font-semibold transition text-sm">Zurück</button><span class="text-sm subtle-text font-semibold px-2">Seite ${currentPage} von ${totalPages}</span><button id="next-page-btn" class="filter-btn px-3 py-1 rounded-md font-semibold transition text-sm">Weiter</button></div>`;
+                const prevBtn = document.getElementById('prev-page-btn');
+                const nextBtn = document.getElementById('next-page-btn');
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+                if (prevBtn.disabled) prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                if (nextBtn.disabled) nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; updateDashboard(); } });
+                nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; updateDashboard(); } });
+            }
+
             // --- CALENDAR LOGIC ---
             const monthYearHeader = document.getElementById('month-year-header');
             const calendarGrid = document.getElementById('calendar-grid');
-            const prevMonthBtn = document.getElementById('prev-month-btn');
-            const nextMonthBtn = document.getElementById('next-month-btn');
-            const clearDateFilterBtn = document.getElementById('clear-date-filter-btn');
-
             function renderCalendar() {
                 calendarGrid.innerHTML = '';
-                const month = calendarDate.getMonth();
-                const year = calendarDate.getFullYear();
-
+                const month = calendarDate.getMonth(), year = calendarDate.getFullYear();
                 monthYearHeader.textContent = `${new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate)}`;
-
-                const firstDayOfMonth = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDayOfMonth = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
                 const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-
-                ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => {
-                    const headerEl = document.createElement('div');
-                    headerEl.className = 'font-bold subtle-text text-sm h-9 flex items-center justify-center';
-                    headerEl.textContent = day;
-                    calendarGrid.appendChild(headerEl);
-                });
-
-                for (let i = 0; i < startOffset; i++) {
-                    calendarGrid.appendChild(document.createElement('div'));
-                }
-
-                const today = new Date();
-                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
+                ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => { const el = document.createElement('div'); el.className = 'font-bold subtle-text text-sm h-9 flex items-center justify-center'; el.textContent = day; calendarGrid.appendChild(el); });
+                for (let i = 0; i < startOffset; i++) { calendarGrid.appendChild(document.createElement('div')); }
+                const todayStr = new Date().toISOString().slice(0, 10);
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayEl = document.createElement('div');
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    dayEl.dataset.date = dateStr;
-                    dayEl.textContent = day;
-                    dayEl.className = 'calendar-day text-sm';
-
+                    dayEl.dataset.date = dateStr; dayEl.textContent = day; dayEl.className = 'calendar-day text-sm';
                     if (transactionDates.has(dateStr)) dayEl.classList.add('has-transactions');
                     if (dateStr === todayStr) dayEl.classList.add('today');
                     if (dateStr === selectedDate) dayEl.classList.add('selected');
-
                     dayEl.addEventListener('click', handleDateClick);
                     calendarGrid.appendChild(dayEl);
                 }
             }
-
             function handleDateClick(e) {
                 const clickedDate = e.target.dataset.date;
-                selectedDate = (selectedDate === clickedDate) ? null : clickedDate;
-                clearDateFilterBtn.classList.toggle('hidden', !selectedDate);
-                renderCalendar();
-                updateDashboard();
+                currentPage = 1; selectedDate = (selectedDate === clickedDate) ? null : clickedDate;
+                document.getElementById('clear-date-filter-btn').classList.toggle('hidden', !selectedDate);
+                renderCalendar(); updateDashboard();
             }
 
-            prevMonthBtn.addEventListener('click', () => {
-                calendarDate.setMonth(calendarDate.getMonth() - 1);
-                renderCalendar();
-            });
-            nextMonthBtn.addEventListener('click', () => {
-                calendarDate.setMonth(calendarDate.getMonth() + 1);
-                renderCalendar();
-            });
-            clearDateFilterBtn.addEventListener('click', () => {
-                selectedDate = null;
-                clearDateFilterBtn.classList.add('hidden');
-                renderCalendar();
-                updateDashboard();
-            });
+            // --- CSV IMPORT / EXPORT ---
+            function exportToCSV() {
+                const headers = ['Datum', 'Art', 'Betrag', 'Beschreibung', 'Kategorie', 'Konto', 'Zahlungsmethode', 'Wiederkehrend', 'Sonstige Infos'];
+                const dataToExport = allTransactions.map(t => ({ Datum: t.Datum, Art: t.Art, Betrag: String(t.Betrag).replace('.', ','), Beschreibung: t.Beschreibung, Kategorie: t.Kategorie, Konto: t.Konto, Zahlungsmethode: t.Zahlungsmethode, Wiederkehrend: t.Wiederkehrend, 'Sonstige Infos': t['Sonstige Infos'] }));
+                const csv = Papa.unparse({ fields: headers, data: dataToExport });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.setAttribute("href", URL.createObjectURL(blob));
+                link.setAttribute("download", "aurimea-transaktionen.csv");
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            }
+
+            function importFromCSV(file) {
+                Papa.parse(file, {
+                    header: true, skipEmptyLines: true,
+                    complete: (results) => {
+                        let importedCount = 0;
+                        results.data.forEach(row => {
+                            if (!row.Datum || !row.Betrag || !row.Art) { console.warn("Skipping invalid row:", row); return; }
+                            const dateParts = row.Datum.split('.');
+                            const parsedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                            const newTransaction = { id: crypto.randomUUID(), 'Datum': row.Datum, 'Art': row.Art, 'Betrag': parseFloat(String(row.Betrag).replace(',', '.')), 'Beschreibung': row.Beschreibung || '', 'Kategorie': row.Kategorie || '', 'Konto': row.Konto || '', 'Zahlungsmethode': row.Zahlungsmethode || '', 'Wiederkehrend': row.Wiederkehrend === 'Ja' ? 'Ja' : 'Nein', 'parsedDate': parsedDate, 'Sonstige Infos': row['Sonstige Infos'] || '' };
+                            allTransactions.push(newTransaction);
+                            transactionDates.add(newTransaction.parsedDate);
+                            importedCount++;
+                        });
+                        if (importedCount > 0) {
+                            saveTransactions(); updateDashboard(); renderCalendar(); alert(`${importedCount} Transaktionen erfolgreich importiert!`);
+                        } else { alert("Keine gültigen Transaktionen in der Datei gefunden."); }
+                    },
+                    error: (err) => { alert("Fehler beim Parsen der CSV-Datei."); console.error("CSV Parse Error:", err); }
+                });
+            }
 
             // --- EVENT LISTENERS ---
-            const searchInput = document.getElementById('transaction-search-input');
-            const clearSearchBtn = document.getElementById('clear-search-btn');
+            document.getElementById('transaction-search-input').addEventListener('input', (e) => { currentPage = 1; searchTerm = e.target.value; document.getElementById('clear-search-btn').classList.toggle('hidden', !searchTerm); updateDashboard(); });
+            document.getElementById('clear-search-btn').addEventListener('click', () => { currentPage = 1; document.getElementById('transaction-search-input').value = ''; searchTerm = ''; document.getElementById('clear-search-btn').classList.add('hidden'); updateDashboard(); });
+            document.getElementById('account-filter').addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { currentPage = 1; currentFilter = e.target.dataset.filter; document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); updateDashboard(); } });
+            document.querySelectorAll('.table-header-sortable').forEach(header => { header.addEventListener('click', () => { const key = header.dataset.sort; currentPage = 1; sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc'; sortConfig.key = key; updateDashboard(); }); });
+            document.getElementById('prev-month-btn').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); });
+            document.getElementById('next-month-btn').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); });
+            document.getElementById('clear-date-filter-btn').addEventListener('click', () => { selectedDate = null; currentPage = 1; document.getElementById('clear-date-filter-btn').classList.add('hidden'); renderCalendar(); updateDashboard(); });
+            document.getElementById('import-csv-btn').addEventListener('click', () => document.getElementById('csv-file-input').click());
+            document.getElementById('csv-file-input').addEventListener('change', (e) => { if (e.target.files.length > 0) { importFromCSV(e.target.files[0]); } });
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
 
-            searchInput.addEventListener('input', (e) => {
-                searchTerm = e.target.value;
-                clearSearchBtn.classList.toggle('hidden', !searchTerm);
-                updateDashboard();
-            });
-
-            clearSearchBtn.addEventListener('click', () => {
-                searchInput.value = '';
-                searchTerm = '';
-                clearSearchBtn.classList.add('hidden');
-                updateDashboard();
-            });
-            document.getElementById('account-filter').addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    currentFilter = e.target.dataset.filter;
-                    document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
+            document.getElementById('transaction-table-body').addEventListener('click', (e) => {
+                const editButton = e.target.closest('.edit-btn');
+                const deleteButton = e.target.closest('.delete-btn');
+                if (editButton) {
+                    openModal(editButton.dataset.id);
+                } else if (deleteButton) {
+                    allTransactions = allTransactions.filter(t => t.id !== deleteButton.dataset.id);
+                    transactionDates = new Set(allTransactions.map(t => t.parsedDate));
+                    saveTransactions();
                     updateDashboard();
+                    renderCalendar();
                 }
             });
 
-            document.querySelectorAll('.table-header-sortable').forEach(header => {
-                header.addEventListener('click', () => {
-                    const key = header.dataset.sort;
-                    sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc';
-                    sortConfig.key = key;
-                    updateDashboard();
+            // --- TRANSACTION MODAL LOGIC (ADD/EDIT) ---
+            const modal = document.getElementById('transaction-modal');
+            const modalOverlay = document.getElementById('transaction-modal-overlay');
+            const modalForm = document.getElementById('transaction-form');
+            const modalTitle = document.getElementById('modal-title');
+
+            function openModal(transactionId = null) {
+                modalForm.reset();
+                if (transactionId) {
+                    // Edit Mode
+                    modalTitle.textContent = "Transaktion bearbeiten";
+                    const transaction = allTransactions.find(t => t.id === transactionId);
+                    if (transaction) {
+                        modalForm.dataset.editingId = transactionId;
+                        document.getElementById('trans-datum').value = transaction.parsedDate;
+                        document.getElementById('trans-art').value = transaction.Art;
+                        document.getElementById('trans-betrag').value = transaction.Betrag;
+                        document.getElementById('trans-beschreibung').value = transaction.Beschreibung;
+                        document.getElementById('trans-kategorie').value = transaction.Kategorie;
+                        document.getElementById('trans-konto').value = transaction.Konto;
+                        document.getElementById('trans-zahlungsmethode').value = transaction.Zahlungsmethode;
+                        document.getElementById('trans-wiederkehrend').checked = transaction.Wiederkehrend === 'Ja';
+                    }
+                } else {
+                    // Add Mode
+                    modalTitle.textContent = "Neue Transaktion hinzufügen";
+                    delete modalForm.dataset.editingId;
+                    document.getElementById('trans-datum').value = new Date().toISOString().split('T')[0];
+                }
+                modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+            }
+
+            function closeModal() {
+                modalOverlay.classList.add('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            }
+
+            document.getElementById('add-transaction-btn').addEventListener('click', () => openModal());
+            document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', closeModal);
+
+            modalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const editingId = modalForm.dataset.editingId;
+                const parsedDate = document.getElementById('trans-datum').value;
+                const dateParts = parsedDate.split('-');
+                const displayDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+                const transactionData = {
+                    Datum: displayDate, Art: document.getElementById('trans-art').value,
+                    Betrag: parseFloat(document.getElementById('trans-betrag').value),
+                    Beschreibung: document.getElementById('trans-beschreibung').value,
+                    Kategorie: document.getElementById('trans-kategorie').value,
+                    Konto: document.getElementById('trans-konto').value,
+                    Zahlungsmethode: document.getElementById('trans-zahlungsmethode').value,
+                    Wiederkehrend: document.getElementById('trans-wiederkehrend').checked ? 'Ja' : 'Nein',
+                    parsedDate: parsedDate,
+                    ['Sonstige Infos']: '' // oder bestehenden Wert behalten
+                };
+
+                if (editingId) {
+                    // Update existing transaction
+                    const index = allTransactions.findIndex(t => t.id === editingId);
+                    if (index !== -1) {
+                        allTransactions[index] = { ...allTransactions[index], ...transactionData };
+                    }
+                } else {
+                    // Add new transaction
+                    allTransactions.push({ ...transactionData, id: crypto.randomUUID() });
+                }
+
+                transactionDates = new Set(allTransactions.map(t => t.parsedDate));
+                saveTransactions();
+                currentPage = 1;
+                updateDashboard();
+                renderCalendar();
+                closeModal();
+            });
+
+            // --- THEME SYNCHRONISATION ---
+            const themeObserver = new MutationObserver((mutations) => {
+                mutations.forEach(mutation => {
+                    if (mutation.attributeName === 'data-theme') {
+                        // Update charts on theme change
+                        const accountFilteredData = (currentFilter === 'all') ? allTransactions : allTransactions.filter(row => row.Konto === currentFilter);
+                        const financialSummary = processData(accountFilteredData);
+                        createOrUpdateCharts(financialSummary);
+                    }
                 });
             });
+            themeObserver.observe(document.documentElement, { attributes: true });
 
-            const modalElements = {
-                btnOpen: document.getElementById('open-modal-btn'), btnClose: document.getElementById('close-modal-btn'),
-                overlay: document.getElementById('modal-overlay'), modal: document.getElementById('form-modal')
-            };
-            const openModal = () => { modalElements.overlay.classList.remove('opacity-0', 'pointer-events-none'); modalElements.modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95'); };
-            const closeModal = () => { modalElements.overlay.classList.add('opacity-0', 'pointer-events-none'); modalElements.modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95'); };
-            modalElements.btnOpen.addEventListener('click', openModal);
-            modalElements.btnClose.addEventListener('click', closeModal);
-            modalElements.overlay.addEventListener('click', closeModal);
-
-            // --- THEME-SYNCHRONISATION ---
             window.addEventListener('message', (event) => {
-                if (event.data === 'set-theme-dark' || event.data === 'set-theme-light') {
+                if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
                     const theme = event.data.split('-')[2];
-                    document.documentElement.dataset.theme = theme;
-                    updateDashboard(); // Redraw everything on theme change
+                    if (theme === 'light' || theme === 'dark') {
+                        document.documentElement.dataset.theme = theme;
+                    }
                 }
             });
+
+            // --- INITIALIZATION ---
+            loadTransactions();
+            updateDashboard();
+            renderCalendar();
         });
     </script>
 </body>
