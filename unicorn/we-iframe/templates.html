@@ -1,77 +1,258 @@
 <!DOCTYPE html>
 <html lang="de" class="h-full">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mail-Vorlagen</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* CSS-Variablen für Farben und Design (bleiben unverändert) */
         :root {
-            --bg-color: #f9fafb; --text-color: #1f2937; --text-color-light: #6b7280; --header-text-color: #111827;
-            --widget-bg: #ffffff; --widget-header-bg: rgba(0,0,0,0.02);
-            --widget-border: #e5e7eb; --button-bg: #f3f4f6; --button-border: #d1d5db; --button-hover-bg: #f97316;
-            --input-bg: #ffffff; --accent-color: #f97316;
-            --scrollbar-thumb: #d1d5db; --scrollbar-thumb-hover: #9ca3af;
+            --bg-color: #f9fafb;
+            --text-color: #1f2937;
+            --text-color-light: #6b7280;
+            --header-text-color: #111827;
+            --widget-bg: #ffffff;
+            --widget-header-bg: rgba(0, 0, 0, 0.02);
+            --widget-border: #e5e7eb;
+            --button-bg: #f3f4f6;
+            --button-border: #d1d5db;
+            --button-hover-bg: #f97316;
+            --input-bg: #ffffff;
+            --accent-color: #f97316;
+            --scrollbar-thumb: #d1d5db;
+            --scrollbar-thumb-hover: #9ca3af;
         }
+
         html[data-theme='dark'] {
-            --bg-color: #171717; --text-color: #d4d4d4; --text-color-light: #a3a3a3; --header-text-color: #fafafa;
-            --widget-bg: #262626; --widget-header-bg: rgba(0,0,0,0.25);
-            --widget-border: #404040; --button-bg: #404040; --button-border: #525252; --button-hover-bg: #f97316;
+            --bg-color: #171717;
+            --text-color: #d4d4d4;
+            --text-color-light: #a3a3a3;
+            --header-text-color: #fafafa;
+            --widget-bg: #262626;
+            --widget-header-bg: rgba(0, 0, 0, 0.25);
+            --widget-border: #404040;
+            --button-bg: #404040;
+            --button-border: #525252;
+            --button-hover-bg: #f97316;
             --input-bg: #262626;
-            --scrollbar-thumb: #404040; --scrollbar-thumb-hover: #525252;
+            --scrollbar-thumb: #404040;
+            --scrollbar-thumb-hover: #525252;
         }
-        html { background-color: var(--bg-color); }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); }
-        body { background-color: var(--bg-color); }
-        main { display: flex; flex-grow: 1; }
-        .mail-main { display: flex; flex-direction: row; gap: 2rem; height: calc(100vh - 4rem); width: 100%; }
-        .mail-main--left, .mail-main--right { flex: 1; display: flex; flex-direction: column; }
-        .mail-main--left { overflow-y: auto; padding-right: 0.5rem; }
-        .box-mail { background-color: var(--widget-bg); border: 1px solid var(--widget-border); border-radius: 12px; margin-bottom: 1rem; }
-        .box-mail summary { cursor: pointer; font-weight: 700; padding: 1rem; user-select: none; color: var(--header-text-color); }
-        .box-mail summary::marker, .box-mail summary::-webkit-details-marker { color: var(--text-color-light); }
-        .box-mail .button-group-mail { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.75rem; padding: 0 1rem 1rem 1rem; }
-        .button-single { background-color: var(--button-bg); border: 1px solid var(--button-border); border-radius: 0.5rem; padding: 0.5rem; text-align: center; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: background-color 0.2s, transform 0.2s; word-break: break-word; }
-        .button-single:hover { background-color: var(--button-hover-bg); color: #fff; transform: translateY(-2px); }
-        #search-input-container { position: relative; flex-shrink: 0; margin-bottom: 1rem; }
-        #search-input { width: 100%; padding: 0.75rem; padding-left: 2.5rem; border: 1px solid var(--widget-border); border-radius: 0.5rem; font-size: 1rem; background-color: var(--input-bg); color: var(--text-color); outline: none; }
-        #nameInput { width: 100%; padding: 0.75rem; border: 1px solid var(--widget-border); border-radius: 0.5rem; font-size: 1rem; background-color: var(--input-bg); color: var(--text-color); outline: none; margin-bottom: 0.5rem; }
-        #outputArea { width: 100%; flex-grow: 1; padding: 1rem; border: 1px solid var(--widget-border); border-radius: 0.5rem; font-size: 1rem; background-color: var(--input-bg); color: var(--text-color); resize: none; outline: none; }
-        #copy-toast { z-index: 100; transition: opacity 0.3s ease, transform 0.3s ease; }
-        .mail-main--left::-webkit-scrollbar { width: 8px; }
-        .mail-main--left::-webkit-scrollbar-track { background: transparent; }
-        .mail-main--left::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 10px; border: 2px solid var(--bg-color); }
-        .mail-main--left:hover::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-hover); }
+
+        html {
+            background-color: var(--bg-color);
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        body {
+            background-color: var(--bg-color);
+        }
+
+        main {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .mail-main {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            height: calc(100vh - 4rem);
+            width: 100%;
+        }
+
+        .mail-main--left,
+        .mail-main--right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mail-main--left {
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .box-mail {
+            background-color: var(--widget-bg);
+            border: 1px solid var(--widget-border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            /* Übergangs-Eigenschaften für das Aufklappen/Zuklappen */
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+            /* Wichtig, um den Inhalt abzuschneiden, wenn max-height gesetzt wird */
+        }
+
+        .box-mail summary {
+            cursor: pointer;
+            font-weight: 700;
+            padding: 1rem;
+            user-select: none;
+            color: var(--header-text-color);
+        }
+
+        .box-mail summary::marker,
+        .box-mail summary::-webkit-details-marker {
+            color: var(--text-color-light);
+        }
+
+        /* Stil für den Inhalt der Details, um die Höhe zu animieren */
+        .box-mail .button-group-mail {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+            padding: 0 1rem 1rem 1rem;
+            /* Animation für max-height */
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            /* Standardmäßig versteckt */
+            opacity: 0;
+        }
+
+        /* Wenn das details-Element geöffnet ist */
+        .box-mail[open] .button-group-mail {
+            max-height: 500px;
+            /* Eine ausreichend große Höhe, die den Inhalt aufnehmen kann */
+            opacity: 1;
+        }
+
+        .button-single {
+            background-color: var(--button-bg);
+            border: 1px solid var(--button-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            word-break: break-word;
+        }
+
+        .button-single:hover {
+            background-color: var(--button-hover-bg);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        #search-input-container {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            flex-shrink: 0;
+            margin-bottom: 1rem;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 0.75rem;
+            padding-left: 2.5rem;
+            border: 1px solid var(--widget-border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        #nameInput {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--widget-border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            margin-bottom: 0.5rem;
+        }
+
+        #outputArea {
+            width: 100%;
+            flex-grow: 1;
+            padding: 1rem;
+            border: 1px solid var(--widget-border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            resize: none;
+            outline: none;
+        }
+
+        #copy-toast {
+            z-index: 100;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .mail-main--left::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .mail-main--left::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .mail-main--left::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+
+        .mail-main--left:hover::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-hover);
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="p-4 md:p-8">
     <main>
         <section class="mail-main">
             <div class="mail-main--left">
                 <div id="search-input-container">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
                     </div>
                     <input type="text" id="search-input" placeholder="Vorlagen durchsuchen...">
                     <div class="absolute inset-y-0 right-0 flex items-center">
                         <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
-                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     </div>
                 </div>
                 <div id="template-container">
-                    <!-- Categories and buttons will be dynamically generated here -->
+                    <!-- Kategorien und Schaltflächen werden hier dynamisch generiert -->
                 </div>
             </div>
             <div class="mail-main--right">
-                <label for="nameInput" class="mb-1 text-sm font-medium" style="color: var(--text-color-light)">Dein Kürzel für die Signatur:</label>
+                <label for="nameInput" class="mb-1 text-sm font-medium" style="color: var(--text-color-light)">Dein
+                    Kürzel für die Signatur:</label>
                 <input type="text" id="nameInput" placeholder="Dein Name...">
-                <label for="outputArea" class="mt-4 mb-1 text-sm font-medium" style="color: var(--text-color-light)">Mail-Vorlage (zum Kopieren klicken):</label>
+                <label for="outputArea" class="mt-4 mb-1 text-sm font-medium"
+                    style="color: var(--text-color-light)">Mail-Vorlage (zum Kopieren klicken):</label>
                 <textarea id="outputArea" placeholder="Wähle links eine Vorlage aus..."></textarea>
-                <div id="copy-toast" class="absolute bottom-4 right-4 bg-green-500 text-white text-sm font-bold py-2 px-4 rounded-lg opacity-0 transform translate-y-2">Kopiert!</div>
+                <div id="copy-toast"
+                    class="absolute bottom-4 right-4 bg-green-500 text-white text-sm font-bold py-2 px-4 rounded-lg opacity-0 transform translate-y-2">
+                    Kopiert!</div>
             </div>
         </section>
     </main>
@@ -84,55 +265,67 @@
             const clearSearchBtn = document.getElementById('clear-search-btn');
             let templateCache = [];
 
+            // Die Struktur der Vorlagen (bleibt unverändert)
             const templateStructure = [
-                { category: 'Allgemein', buttons: [
-                    { title: 'Grundgerüst', file: 'grundgeruest.txt' },
-                    { title: 'Tois-Vorlage', file: 'tois_vorlage.txt' },
-                    { title: 'Anliegen nicht klar', file: 'anliegen-nicht-klar.txt' },
-                    { title: 'Kundennummer benötigt', file: 'kdnr_benötigt.txt' }
-                ]},
-                { category: 'Strom & Gas', buttons: [
-                    { title: 'Anmeldung', file: 'anmeldung.txt' },
-                    { title: 'Abmeldung', file: 'abmeldung.txt' },
-                    { title: 'RE Korrektur, falsche Zählerstände', file: 're-korr-falsche-zählerstände.txt' },
-                    { title: 'PV - kein Zählpunkt', file: 'pv-kein-zp.txt' },
-                    { title: 'PV - fehlende Unterlagen', file: 'pv-fehlende-unterlagen.txt' },
-                    { title: 'PV angemeldet', file: 'pv-angemeldet.txt' },
-                    { title: 'Verlassenschaft', file: 'verlassenschaft.txt' },
-                    { title: 'Tarifwechsel', file: 'tw.txt' },
-                    { title: 'Trockenlegungbrief', file: 'trockenlegungsbrief.txt' },
-                    { title: 'Ummeldung erfolgreich', file: 'ummeldung_erfolgreich.txt' },
-                    { title: 'ANM PV', file: 'anm_pv.txt' },
-                    { title: 'WIES Anfrage', file: 'wies-anfrage.txt' },
-                    { title: 'WIES durchgeführt', file: 'wies-dgf.txt' }
-                ]},
-                { category: 'Guthaben', buttons: [
-                    { title: 'ID fehlt', file: 'gh_auszahlung_ausweis_fehlt.txt' },
-                    { title: 'GH Auszahlung', file: 'gh_auszahlung.txt' },
-                    { title: 'Allgemeines Wording', file: 'gh_allgemein.txt' },
-                    { title: 'GH Verlassenschaft', file: 'gh-verlassenschaft.txt' },
-                    { title: 'Auszahlung - ID NICHT notwendig', file: 'GH-ID-nicht-nötig.txt' }
-                ]},
-                { category: 'Wärme', buttons: [
-                    { title: 'Anmeldung', file: 'waerme_anm.txt' },
-                    { title: 'An-/Abmeldung', file: 'waerme_an_abm.txt' },
-                    { title: 'Mieterwechsel', file: 'waerme_mieterwechsel.txt' },
-                    { title: 'Heizkostenabrechnung', file: 'heizkostenabrechnung.txt' },
-                    { title: 'Mieterwechsel Untermieter', file: 'mw_untermieter.txt' },
-                    { title: 'Eigentümerwechsel', file: 'fw-eigentuemerwechsel.txt' }
-                ]},
-                { category: 'Wiener Netze', buttons: [
-                    { title: 'Einzelner Zäst gespeichert', file: 'Einzelner_Zäst_gespeichert.txt' },
-                    { title: 'Mehrere Zäst gespeichert', file: 'Mehrere_Zäst_gespeichert.txt' },
-                    { title: 'Smart Meter/ Keine ZÄST benötigt', file: 'SmartMeter_Keine_ZÄST_benötigt.txt' },
-                    { title: 'Wenn der Kunde SMART Meter Zäst schickt bei Ummeldung', file: 'Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung.txt' },
-                    { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt', file: 'KD_ZÄST_von_Gas_und_SMART_Meter_schickt.txt' },
-                    { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist', file: 'KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung.txt' }
-                ]}
+                {
+                    category: 'Allgemein', buttons: [
+                        { title: 'Grundgerüst', file: 'grundgeruest.txt' },
+                        { title: 'Tois-Vorlage', file: 'tois_vorlage.txt' },
+                        { title: 'Anliegen nicht klar', file: 'anliegen-nicht-klar.txt' },
+                        { title: 'Kundennummer benötigt', file: 'kdnr_benötigt.txt' }
+                    ]
+                },
+                {
+                    category: 'Strom & Gas', buttons: [
+                        { title: 'Anmeldung', file: 'anmeldung.txt' },
+                        { title: 'Abmeldung', file: 'abmeldung.txt' },
+                        { title: 'RE Korrektur, falsche Zählerstände', file: 're-korr-falsche-zählerstände.txt' },
+                        { title: 'PV - kein Zählpunkt', file: 'pv-kein-zp.txt' },
+                        { title: 'PV - fehlende Unterlagen', file: 'pv-fehlende-unterlagen.txt' },
+                        { title: 'PV angemeldet', file: 'pv-angemeldet.txt' },
+                        { title: 'Verlassenschaft', file: 'verlassenschaft.txt' },
+                        { title: 'Tarifwechsel', file: 'tw.txt' },
+                        { title: 'Trockenlegungbrief', file: 'trockenlegungsbrief.txt' },
+                        { title: 'Ummeldung erfolgreich', file: 'ummeldung_erfolgreich.txt' },
+                        { title: 'ANM PV', file: 'anm_pv.txt' },
+                        { title: 'WIES Anfrage', file: 'wies-anfrage.txt' },
+                        { title: 'WIES durchgeführt', file: 'wies-dgf.txt' }
+                    ]
+                },
+                {
+                    category: 'Guthaben', buttons: [
+                        { title: 'ID fehlt', file: 'gh_auszahlung_ausweis_fehlt.txt' },
+                        { title: 'GH Auszahlung', file: 'gh_auszahlung.txt' },
+                        { title: 'Allgemeines Wording', file: 'gh_allgemein.txt' },
+                        { title: 'GH Verlassenschaft', file: 'gh-verlassenschaft.txt' },
+                        { title: 'Auszahlung - ID NICHT notwendig', file: 'GH-ID-nicht-nötig.txt' }
+                    ]
+                },
+                {
+                    category: 'Wärme', buttons: [
+                        { title: 'Anmeldung', file: 'waerme_anm.txt' },
+                        { title: 'An-/Abmeldung', file: 'waerme_an_abm.txt' },
+                        { title: 'Mieterwechsel', file: 'waerme_mieterwechsel.txt' },
+                        { title: 'Heizkostenabrechnung', file: 'heizkostenabrechnung.txt' },
+                        { title: 'Mieterwechsel Untermieter', file: 'mw_untermieter.txt' },
+                        { title: 'Eigentümerwechsel', file: 'fw-eigentuemerwechsel.txt' }
+                    ]
+                },
+                {
+                    category: 'Wiener Netze', buttons: [
+                        { title: 'Einzelner Zäst gespeichert', file: 'Einzelner_Zäst_gespeichert.txt' },
+                        { title: 'Mehrere Zäst gespeichert', file: 'Mehrere_Zäst_gespeichert.txt' },
+                        { title: 'Smart Meter/ Keine ZÄST benötigt', file: 'SmartMeter_Keine_ZÄST_benötigt.txt' },
+                        { title: 'Wenn der Kunde SMART Meter Zäst schickt bei Ummeldung', file: 'Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung.txt' },
+                        { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt', file: 'KD_ZÄST_von_Gas_und_SMART_Meter_schickt.txt' },
+                        { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist', file: 'KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung.txt' }
+                    ]
+                }
             ];
 
+            // Funktion zum Vorabladen der Vorlagen (bleibt unverändert)
             async function prefetchTemplates() {
-                const promises = templateStructure.flatMap(category => 
+                const promises = templateStructure.flatMap(category =>
                     category.buttons.map(async button => {
                         try {
                             const response = await fetch(`./mail-template-txt/${button.file}`);
@@ -148,6 +341,7 @@
                 templateCache = await Promise.all(promises);
             }
 
+            // Funktion zum Rendern der UI mit Filter (leicht angepasst)
             function renderUI(filter = '') {
                 templateContainer.innerHTML = '';
                 const lowerFilter = filter.toLowerCase();
@@ -165,7 +359,9 @@
                 for (const categoryName in filteredData) {
                     const details = document.createElement('details');
                     details.className = 'box-mail';
-                    details.open = true;
+                    // Das `open`-Attribut wird nur gesetzt, wenn kein Filter aktiv ist,
+                    // damit beim Filtern nur die relevanten Kategorien angezeigt werden.
+                    details.open = (filter === '');
 
                     const summary = document.createElement('summary');
                     summary.textContent = categoryName;
@@ -186,21 +382,48 @@
 
                     details.appendChild(buttonGroup);
                     templateContainer.appendChild(details);
+
+                    // Beim erstmaligen Rendern oder wenn der Filter leer ist,
+                    // stellen wir sicher, dass die geöffneten Elemente auch animiert werden.
+                    if (details.open) {
+                        buttonGroup.style.maxHeight = buttonGroup.scrollHeight + 'px';
+                        buttonGroup.style.opacity = 1;
+                    }
+
+                    // Event-Listener für das Öffnen/Schließen der Details
+                    details.addEventListener('toggle', () => {
+                        if (details.open) {
+                            // Wenn geöffnet, setze die max-height auf die tatsächliche Scrollhöhe,
+                            // um die Animation zu starten. Verwende setTimeout, um die Animation
+                            // nach dem Rendern des DOMs zu starten.
+                            setTimeout(() => {
+                                buttonGroup.style.maxHeight = buttonGroup.scrollHeight + 'px';
+                                buttonGroup.style.opacity = 1;
+                            }, 0);
+                        } else {
+                            // Wenn geschlossen, setze die max-height auf 0
+                            buttonGroup.style.maxHeight = '0';
+                            buttonGroup.style.opacity = 0;
+                        }
+                    });
                 }
             }
-            
+
+            // Event-Listener für die Suchleiste (bleiben unverändert)
             searchInput.addEventListener('input', () => {
                 const searchTerm = searchInput.value;
                 renderUI(searchTerm);
                 clearSearchBtn.classList.toggle('hidden', searchTerm === '');
             });
 
+            // Event-Listener für den "Suchen löschen"-Button (bleibt unverändert)
             clearSearchBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 renderUI('');
                 clearSearchBtn.classList.add('hidden');
             });
 
+            // Event-Listener für das Textfeld zum Kopieren (bleibt unverändert)
             templateTextArea.addEventListener('click', () => {
                 if (templateTextArea.value.trim() === '') return;
                 const signatureName = nameInput.value.trim();
@@ -218,15 +441,18 @@
                 });
             });
 
+            // Event-Listener für Nachrichten vom übergeordneten Fenster (für Themes) (bleibt unverändert)
             window.addEventListener('message', (event) => {
                 if (event.data.startsWith('set-theme-')) {
                     document.documentElement.dataset.theme = event.data.replace('set-theme-', '');
                 }
             });
 
+            // Initialisierung: Vorlagen vorabladen und UI rendern
             await prefetchTemplates();
             renderUI();
         });
     </script>
 </body>
+
 </html>
