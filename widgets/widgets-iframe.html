@@ -7,6 +7,9 @@
     <link rel="icon" href="https://img.icons8.com/color/512/color-widgets.png" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* CSS-Variablen für Theme-Farben */
         :root {
@@ -25,8 +28,7 @@
         }
         /* Specific iframe styling for border, matching original dashed style */
         .iframe-container {
-            border: 4px dashed;
-            border-color: gray; /* Tailwind border-gray-400 could also be used */
+            /* Rahmen entfernt */
             background-color: transparent; /* Hintergrund des Containers transparent gemacht */
         }
 
@@ -44,55 +46,114 @@
             height: 700px; /* Feste Höhe, wie zuvor besprochen */
             border: none; /* Keine zusätzlichen Rahmen für den Iframe selbst */
         }
+
+        /* Styles for the widget navigation buttons */
+        .widget-nav-button {
+            background-color: #e5e7eb; /* Light gray */
+            color: #374151; /* Darker text */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .widget-nav-button:hover {
+            background-color: #d1d5db; /* Slightly darker gray on hover */
+        }
+
+        html[data-theme='dark'] .widget-nav-button {
+            background-color: #4b5563; /* Darker gray for dark mode */
+            color: #f9fafb; /* Lighter text for dark mode */
+        }
+
+        html[data-theme='dark'] .widget-nav-button:hover {
+            background-color: #6b7280; /* Even darker gray on hover in dark mode */
+        }
     </style>
 </head>
 <body class="p-4 min-h-screen flex flex-col items-center justify-center">
-    <div class="container mx-auto p-4 shadow-lg rounded-xl">
+    <div class="container mx-auto p-4">
         <!-- Überschrift verwendet jetzt die adaptive Farbe -->
         <h1 class="text-3xl font-bold mb-6 text-center main-header">Ihre Widgets</h1>
 
-        <!-- Text verwendet jetzt die adaptive Farbe -->
-        <p class="text-lg mb-8 text-center main-text">
-            Hier sind Ihre Iframes in einem responsiven Layout, das auf größeren Bildschirmen zwei Spalten und auf kleineren Bildschirmen eine Spalte anzeigt.
-        </p>
-
-        <!-- Grid Container for Iframes -->
-        <!--
-            The 'grid grid-cols-1' sets a single column by default (for mobile).
-            'md:grid-cols-2' changes it to two columns on medium screens and larger.
-            'gap-6' adds spacing between the grid items.
-            The 'h-[700px]' class directly applies the 700px height to each iframe.
+        <!-- 
+            Layout-Container:
+            - Mobile (default): flex-col-reverse -> Navigationsleiste ist oben, Widgets unten.
+            - Large screens (lg:): flex-row -> Widgets links, Navigationsleiste rechts.
         -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Each iframe is wrapped in a div to apply consistent styling -->
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="jap-kana.html" class="w-full h-[700px]" frameborder="0"></iframe>
+        <div class="flex flex-col-reverse lg:flex-row lg:gap-8 lg:items-start">
+
+            <!-- Hauptinhaltsbereich (Widgets), der den verfügbaren Platz einnimmt -->
+            <div class="flex-grow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-jap-kana" src="jap-kana.html" title="Japanisch Kana" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-calculator" src="calculator.html" title="Taschenrechner" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-clock" src="clock.html" title="Uhr Widget" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-easy-math" src="easy-math.html" title="Einfache Mathematik" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe src="tariff.html" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-capital-city-eu" src="capital-city-EU.html" title="Europäische Hauptstädte Quiz" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                        <iframe id="widget-weather" src="weather.html" title="Wetter Widget" class="w-full h-[700px]" frameborder="0"></iframe>
+                    </div>
+                </div>
             </div>
 
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="calculator.html" class="w-full h-[700px]" frameborder="0"></iframe>
-            </div>
-
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="clock.html" class="w-full h-[700px]" frameborder="0"></iframe>
-            </div>
-
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="easy-math.html" class="w-full h-[700px]" frameborder="0"></iframe>
-            </div>
-
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="tariff.html" class="w-full h-[700px]" frameborder="0"></iframe>
-            </div>
-
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="capital-city-EU.html" class="w-full h-[700px]" frameborder="0"></iframe>
-            </div>
-
-            <div class="iframe-container p-2 rounded-[50px] shadow-md overflow-hidden">
-                <iframe src="weather.html" class="w-full h-[700px]" frameborder="0"></iframe>
+            <!-- Sticky Navigationsleiste rechts (auf großen Bildschirmen) -->
+            <div class="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-8 mb-8 lg:mb-0">
+                <div id="widget-nav-list" class="flex flex-row flex-wrap justify-center gap-2 lg:flex-col">
+                    <!-- Links will be populated by JavaScript -->
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event-Listener für Nachrichten vom übergeordneten Fenster, um das Theme zu ändern
+            window.addEventListener('message', (event) => {
+                if (event.data === 'set-theme-dark') {
+                    document.documentElement.dataset.theme = 'dark';
+                } else if (event.data === 'set-theme-light') {
+                    document.documentElement.dataset.theme = 'light';
+                }
+            });
+
+            const widgetNavList = document.getElementById('widget-nav-list');
+            const iframes = document.querySelectorAll('.grid.grid-cols-1 iframe'); // Select iframes within the grid
+
+            iframes.forEach(iframe => {
+                const title = iframe.title;
+                const id = iframe.id; // Use the already assigned ID
+
+                if (title && id) {
+                    const button = document.createElement('button');
+                    button.textContent = title;
+                    button.className = 'widget-nav-button';
+                    button.dataset.targetId = id; // Store the target iframe's ID
+
+                    button.addEventListener('click', () => {
+                        const targetIframe = document.getElementById(button.dataset.targetId);
+                        if (targetIframe) {
+                            targetIframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    });
+                    widgetNavList.appendChild(button);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
