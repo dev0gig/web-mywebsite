@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mein Journal mit Gemini</title>
+    <!-- Tailwind CSS für das Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js zur Umwandlung von Markdown in HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- JSZip zum Erstellen von ZIP-Dateien für den Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Lucide Icons für Symbole -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Zusätzliche Stile für ein besseres Aussehen und Gefühl */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        .prose-preview h1 { font-size: 1.875rem; font-weight: 700; margin-top: 1em; margin-bottom: 0.6em; }
+        .prose-preview h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        .prose-preview h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        .prose-preview p { margin-bottom: 0.75em; line-height: 1.6; }
+        .prose-preview ul, .prose-preview ol { padding-left: 1.5em; margin-bottom: 1em; }
+        .prose-preview blockquote { border-left-width: 4px; border-left-color: #cbd5e1; padding-left: 1em; margin-left: 0; color: #64748b; }
+        .prose-preview code { background-color: #e2e8f0; padding: 0.1em 0.3em; border-radius: 4px; font-family: monospace; }
+        .prose-preview pre { background-color: #f1f5f9; padding: 1em; border-radius: 8px; overflow-x: auto; }
+        .prose-preview pre code { background-color: transparent; padding: 0; }
+        .date-header { cursor: pointer; }
+
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Kalender-Stile */
+        .calendar-day-has-entry {
+            position: relative;
+        }
+        .calendar-day-has-entry::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-200">
+            <h1 class="text-3xl font-bold text-slate-700 mb-4 sm:mb-0">Mein Journal</h1>
+            <div class="flex items-center space-x-2">
+                <label for="import-files" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md font-semibold text-xs text-slate-700 uppercase tracking-widest shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
+                    <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
+                </label>
+                <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt">
+
+                <button id="export-button" class="inline-flex items-center px-4 py-2 bg-slate-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                    <i data-lucide="download" class="mr-2 h-4 w-4"></i> Exportieren
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <main id="journal-container"></main>
+                <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
+            </div>
+            <aside class="lg:col-span-1">
+                <div id="calendar-container" class="bg-white p-4 rounded-lg shadow-sm sticky top-8">
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Einträge exportieren</h3>
+                <div class="mt-2 px-7 py-3">
+                     <p class="text-sm text-gray-500 mb-4">Wählen Sie den Datumsbereich für den Export.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="start-date" class="text-left block text-sm font-medium text-gray-700">Startdatum</label>
+                            <input type="date" id="start-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="end-date" class="text-left block text-sm font-medium text-gray-700">Enddatum</label>
+                            <input type="date" id="end-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3 space-x-2">
+                    <button id="confirm-export-button" class="px-4 py-2 bg-slate-800 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                        Export starten
+                    </button>
+                    <button id="cancel-export-button" class="px-4 py-2 bg-white border border-slate-300 text-gray-900 text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const journalContainer = document.getElementById('journal-container');
+            const paginationControls = document.getElementById('pagination-controls');
+            const calendarContainer = document.getElementById('calendar-container');
+            const importInput = document.getElementById('import-files');
+            const exportButton = document.getElementById('export-button');
+            const exportModal = document.getElementById('export-modal');
+            const confirmExportButton = document.getElementById('confirm-export-button');
+            const cancelExportButton = document.getElementById('cancel-export-button');
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+
+            const STORAGE_KEY = 'markdownJournalEntries';
+            const ENTRIES_PER_PAGE = 20;
+            let currentPage = 1;
+            let calendarDate = new Date();
+
+            const loadEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            const saveEntries = (entries) => localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+            
+            let journalEntries = loadEntries();
+
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            // KORRIGIERT: Behandelt das Datum als UTC für eine konsistente Anzeige.
+            const formatDisplayDate = (dateString) => {
+                const date = new Date(dateString); // "YYYY-MM-DD" wird als UTC-Mitternacht interpretiert
+                return new Intl.DateTimeFormat('de-DE', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    timeZone: 'UTC' // Wichtig, um Zeitzonenfehler zu vermeiden
+                }).format(date);
+            };
+
+            async function callGemini(prompt) {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API-Antwort war nicht ok: ${response.statusText}`);
+                    const result = await response.json();
+                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        return result.candidates[0].content.parts[0].text;
+                    }
+                    console.error("Unerwartete API-Antwortstruktur:", result);
+                    return "Fehler: Konnte keine gültige Antwort von der KI erhalten.";
+                } catch (error) {
+                    console.error("Fehler beim Aufrufen der Gemini API:", error);
+                    return `Ein Fehler ist aufgetreten: ${error.message}`;
+                }
+            }
+
+            const createEntryElement = (dateString, content) => {
+                const entryDiv = document.createElement('div');
+                entryDiv.classList.add('journal-entry', 'mb-6', 'bg-white', 'p-6', 'rounded-lg', 'shadow-sm', 'transition-all', 'duration-300');
+                entryDiv.dataset.date = dateString;
+                const displayDate = formatDisplayDate(dateString);
+                const header = document.createElement('h2');
+                header.textContent = displayDate;
+                header.classList.add('text-xl', 'font-semibold', 'text-slate-600', 'mb-3', 'pb-2', 'border-b', 'border-slate-200', 'date-header');
+                const previewDiv = document.createElement('div');
+                previewDiv.classList.add('prose', 'prose-slate', 'max-w-none', 'prose-preview');
+                previewDiv.innerHTML = marked.parse(content || '<p class="text-slate-400">Klicken, um zu schreiben...</p>');
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'border-slate-300', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
+                textArea.setAttribute('rows', '8');
+                const geminiFooter = document.createElement('div');
+                geminiFooter.classList.add('mt-4', 'pt-4', 'border-t', 'border-slate-200');
+                const geminiButtons = document.createElement('div');
+                geminiButtons.classList.add('flex', 'flex-wrap', 'gap-2', 'mb-4');
+                const geminiOutput = document.createElement('div');
+                geminiOutput.classList.add('gemini-output', 'p-4', 'bg-slate-50', 'rounded-md', 'text-sm', 'text-slate-700', 'hidden', 'prose', 'prose-slate', 'max-w-none');
+                
+                const createGeminiButton = (text, icon, colorClasses, promptFn) => {
+                    const button = document.createElement('button');
+                    button.innerHTML = `<i data-lucide="${icon}" class="mr-2 h-4 w-4"></i> ${text} ✨`;
+                    button.classList.add('inline-flex', 'items-center', 'px-3', 'py-1.5', ...colorClasses, 'text-xs', 'font-semibold', 'rounded-full', 'transition-colors');
+                    button.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const entryContent = journalEntries[dateString];
+                        if (!entryContent.trim()) return alert("Bitte schreiben Sie zuerst einen Eintrag.");
+                        geminiOutput.innerHTML = '<div class="loader"></div>';
+                        geminiOutput.classList.remove('hidden');
+                        const prompt = promptFn(entryContent);
+                        const result = await callGemini(prompt);
+                        
+                        if (text === 'Umschreiben') {
+                            geminiOutput.innerHTML = '';
+                            const resultContainer = document.createElement('div');
+                            const rewrittenContentDiv = document.createElement('div');
+                            rewrittenContentDiv.innerHTML = marked.parse(result);
+                            const applyButton = document.createElement('button');
+                            applyButton.textContent = 'Umschriebenen Text übernehmen';
+                            applyButton.classList.add('mt-4', 'px-4', 'py-2', 'bg-slate-800', 'text-white', 'text-xs', 'font-semibold', 'rounded-md', 'hover:bg-slate-700', 'transition-colors');
+                            applyButton.onclick = (event) => {
+                                event.stopPropagation();
+                                textArea.value = result;
+                                textArea.dispatchEvent(new FocusEvent('blur'));
+                            };
+                            resultContainer.appendChild(rewrittenContentDiv);
+                            resultContainer.appendChild(applyButton);
+                            geminiOutput.appendChild(resultContainer);
+                        } else {
+                            geminiOutput.innerHTML = marked.parse(result);
+                        }
+                    });
+                    return button;
+                };
+
+                const summarizeButton = createGeminiButton('Zusammenfassen', 'file-text', ['bg-blue-100', 'text-blue-800', 'hover:bg-blue-200'], content => `Fasse den folgenden deutschen Tagebucheintrag prägnant in 2-3 Sätzen zusammen: "${content}"`);
+                const reflectButton = createGeminiButton('Reflektieren', 'sparkles', ['bg-purple-100', 'text-purple-800', 'hover:bg-purple-200'], content => `Basierend auf diesem deutschen Tagebucheintrag, stelle genau 3 nachdenkliche Fragen, die zur Selbstreflexion anregen. Formuliere nur die Fragen in einer nummerierten Liste (z.B. 1. ... 2. ...). Der Eintrag: "${content}"`);
+                const rewriteButton = createGeminiButton('Umschreiben', 'pen-square', ['bg-green-100', 'text-green-800', 'hover:bg-green-200'], content => `Schreibe den folgenden deutschen Tagebucheintrag um. Verwende dabei einfaches, klares und gut verständliches Deutsch, wie man es in einem persönlichen Tagebuch schreiben würde. Behalte den ursprünglichen Sinn bei, aber verbessere den Textfluss und die Klarheit. Gib nur den umgeschriebenen Text zurück, ohne zusätzliche Einleitung oder Kommentare. Der Eintrag: "${content}"`);
+                
+                geminiButtons.append(summarizeButton, reflectButton, rewriteButton);
+                geminiFooter.append(geminiButtons, geminiOutput);
+                entryDiv.append(header, previewDiv, textArea, geminiFooter);
+
+                entryDiv.addEventListener('click', () => {
+                    if (textArea.classList.contains('hidden')) {
+                        previewDiv.classList.add('hidden');
+                        geminiFooter.classList.add('hidden');
+                        textArea.classList.remove('hidden');
+                        textArea.focus();
+                    }
+                });
+
+                textArea.addEventListener('blur', () => {
+                    const newContent = textArea.value;
+                    journalEntries[dateString] = newContent;
+                    saveEntries(journalEntries);
+                    previewDiv.innerHTML = marked.parse(newContent || '<p class="text-slate-400">Klicken, um zu schreiben...</p>');
+                    previewDiv.classList.remove('hidden');
+                    geminiFooter.classList.remove('hidden');
+                    textArea.classList.add('hidden');
+                    geminiOutput.classList.add('hidden');
+                    renderCalendar();
+                });
+                return entryDiv;
+            };
+            
+            const renderCalendar = () => {
+                const year = calendarDate.getFullYear();
+                const month = calendarDate.getMonth();
+                calendarContainer.innerHTML = ''; 
+
+                const header = document.createElement('div');
+                header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
+                const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
+                header.innerHTML = `
+                    <button id="prev-month" class="p-2 rounded-full hover:bg-slate-100"><i data-lucide="chevron-left"></i></button>
+                    <h3 class="font-semibold text-lg">${monthName}</h3>
+                    <button id="next-month" class="p-2 rounded-full hover:bg-slate-100"><i data-lucide="chevron-right"></i></button>
+                `;
+                calendarContainer.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-center', 'text-sm');
+                
+                const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+                weekdays.forEach(day => {
+                    grid.innerHTML += `<div class="font-medium text-slate-500">${day}</div>`;
+                });
+
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+                for (let i = 0; i < dayOffset; i++) {
+                    grid.innerHTML += '<div></div>';
+                }
+
+                const today = new Date();
+                const todayString = formatDate(today);
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    // KORRIGIERT: Erstellt das Datum in UTC, um Zeitzonenfehler zu vermeiden.
+                    const currentDate = new Date(Date.UTC(year, month, day));
+                    const dateString = formatDate(currentDate);
+                    
+                    const dayButton = document.createElement('button');
+                    dayButton.textContent = day;
+                    dayButton.dataset.date = dateString;
+                    dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'transition-colors');
+                    
+                    if(dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                    if(journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
+
+                    dayButton.addEventListener('click', () => {
+                        const allSortedDates = Object.keys(journalEntries).sort().reverse();
+                        const entryIndex = allSortedDates.findIndex(d => d === dateString);
+                        if (entryIndex !== -1) {
+                            const targetPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
+                            currentPage = targetPage;
+                            renderJournal();
+                            setTimeout(() => {
+                                const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    element.classList.add('ring-2', 'ring-blue-400');
+                                    setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                                }
+                            }, 100);
+                        }
+                    });
+
+                    grid.appendChild(dayButton);
+                }
+                
+                calendarContainer.appendChild(grid);
+                document.getElementById('prev-month').addEventListener('click', () => { calendarDate.setMonth(month - 1); renderCalendar(); });
+                document.getElementById('next-month').addEventListener('click', () => { calendarDate.setMonth(month + 1); renderCalendar(); });
+                lucide.createIcons();
+            };
+
+            const renderJournal = () => {
+                journalContainer.innerHTML = '';
+                paginationControls.innerHTML = '';
+                const todayString = formatDate(new Date());
+
+                if (!journalEntries[todayString]) {
+                    journalEntries[todayString] = '';
+                    saveEntries(journalEntries);
+                }
+                const sortedDates = Object.keys(journalEntries).sort().reverse();
+                const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
+                const endIndex = startIndex + ENTRIES_PER_PAGE;
+                const paginatedDates = sortedDates.slice(startIndex, endIndex);
+
+                paginatedDates.forEach(dateString => {
+                    const entryElement = createEntryElement(dateString, journalEntries[dateString]);
+                    journalContainer.appendChild(entryElement);
+                });
+                
+                setupPagination(sortedDates.length);
+                lucide.createIcons();
+            };
+            
+            const setupPagination = (totalEntries) => {
+                const totalPages = Math.ceil(totalEntries / ENTRIES_PER_PAGE);
+                if (totalPages <= 1) return;
+
+                const createButton = (text, onClick, condition) => {
+                    const button = document.createElement('button');
+                    button.textContent = text;
+                    button.classList.add('px-4', 'py-2', 'bg-white', 'border', 'border-slate-300', 'text-sm', 'font-medium', 'rounded-md', 'hover:bg-slate-50', 'disabled:opacity-50', 'disabled:cursor-not-allowed');
+                    button.disabled = condition;
+                    button.addEventListener('click', onClick);
+                    return button;
+                };
+
+                const prevButton = createButton('Zurück', () => { currentPage--; renderJournal(); }, currentPage === 1);
+                const pageInfo = document.createElement('span');
+                pageInfo.textContent = `Seite ${currentPage} von ${totalPages}`;
+                pageInfo.classList.add('text-sm', 'text-slate-600');
+                const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); }, currentPage === totalPages);
+                
+                paginationControls.append(prevButton, pageInfo, nextButton);
+            };
+
+            const updateAll = () => {
+                renderJournal();
+                renderCalendar();
+            };
+
+            importInput.addEventListener('change', (event) => {
+                const files = event.target.files;
+                if (!files.length) return;
+                
+                let filesRead = 0;
+                const importedDates = [];
+
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const dateMatch = file.name.match(/^(\d{4}-\d{2}-\d{2})/);
+                        if (dateMatch) {
+                            const dateString = dateMatch[1];
+                            journalEntries[dateString] = e.target.result;
+                            importedDates.push(dateString);
+                        } else {
+                            console.warn(`Konnte kein Datum aus dem Dateinamen extrahieren: ${file.name}`);
+                        }
+                        filesRead++;
+
+                        if (filesRead === files.length) {
+                            saveEntries(journalEntries);
+                            
+                            let newestImportedDate = '';
+                            if (importedDates.length > 0) {
+                                const allSortedDates = Object.keys(journalEntries).sort().reverse();
+                                newestImportedDate = importedDates.sort().reverse()[0];
+                                const entryIndex = allSortedDates.findIndex(d => d === newestImportedDate);
+
+                                if (entryIndex !== -1) {
+                                    currentPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
+                                }
+                            } else {
+                                currentPage = 1;
+                            }
+
+                            updateAll();
+                            alert(`${files.length} Datei(en) erfolgreich importiert.`);
+                            
+                            if(newestImportedDate) {
+                                setTimeout(() => {
+                                    const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        element.classList.add('ring-2', 'ring-blue-400');
+                                        setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                                    }
+                                }, 100);
+                            }
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+                importInput.value = '';
+            });
+
+            exportButton.addEventListener('click', () => {
+                const dates = Object.keys(journalEntries).sort();
+                if(dates.length > 0){
+                   startDateInput.value = dates[0];
+                   endDateInput.value = dates[dates.length - 1];
+                } else {
+                   const today = formatDate(new Date());
+                   startDateInput.value = today;
+                   endDateInput.value = today;
+                }
+                exportModal.classList.remove('hidden');
+            });
+
+            cancelExportButton.addEventListener('click', () => exportModal.classList.add('hidden'));
+            window.addEventListener('click', (event) => { if (event.target == exportModal) exportModal.classList.add('hidden'); });
+
+            confirmExportButton.addEventListener('click', () => {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                if (!startDate || !endDate || startDate > endDate) return alert('Bitte wählen Sie einen gültigen Datumsbereich.');
+                const zip = new JSZip();
+                let filesAdded = 0;
+                Object.keys(journalEntries).forEach(dateString => {
+                    if (dateString >= startDate && dateString <= endDate) {
+                        zip.file(`${dateString}.md`, journalEntries[dateString]);
+                        filesAdded++;
+                    }
+                });
+                if (filesAdded === 0) return alert('Keine Einträge im ausgewählten Zeitraum gefunden.');
+                zip.generateAsync({ type: "blob" })
+                    .then(content => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(content);
+                        link.download = `Journal-Export_${startDate}_bis_${endDate}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    });
+                exportModal.classList.add('hidden');
+            });
+            updateAll();
+        });
+    </script>
+</body>
+</html>
