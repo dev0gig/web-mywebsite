@@ -53,6 +53,10 @@
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
+            display: flex; /* Added for flexbox layout */
+            flex-direction: column; /* Arrange items vertically */
+            justify-content: space-between; /* Push copyright to bottom */
+            padding-bottom: 1rem; /* Add some padding at the bottom */
         }
 
         #sidebar:hover {
@@ -121,15 +125,19 @@
             background-color: var(--accent-color-hover);
         }
 
-        /* Styling for the lock button SVG */
-        #lock-view-btn .lock-icon-fill {
-            fill: none;
-            /* Default to empty */
+        /* Copyright text styling */
+        .copyright-info {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            font-size: 0.875rem; /* text-sm */
+            color: var(--text-color-light);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        #lock-view-btn.locked .lock-icon-fill {
-            fill: currentColor;
-            /* Filled when locked */
+        #sidebar:hover .copyright-info {
+            opacity: 1;
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -189,6 +197,10 @@
                     <span class="sidebar-text font-medium">Einstellungen</span>
                 </button></li>
         </ul>
+        <!-- Copyright information at the bottom of the sidebar -->
+        <div class="copyright-info">
+            &copy; NGIPAV
+        </div>
     </nav>
 
     <!-- Iframe Content Area -->
@@ -211,20 +223,6 @@
             <button id="reset-layout-btn"
                 class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg mb-4">Layout
                 zurücksetzen</button>
-
-            <!-- New Lock View Button -->
-            <h3 class="text-lg font-semibold mb-2" style="color: var(--header-text-color);">Ansicht Sperren</h3>
-            <p class="text-sm mb-4">Sperrt oder entsperrt die Verschiebbarkeit der Widgets.</p>
-            <button id="lock-view-btn"
-                class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center space-x-2">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" fill="none">
-                    <path class="lock-icon-fill" d="M12 17.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                <span>Ansicht sperren</span>
-            </button>
         </div>
         <hr class="my-6" style="border-color: var(--sidebar-border);">
         <div>
@@ -255,7 +253,6 @@
         const overlay = document.getElementById('modal-overlay');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const resetLayoutBtn = document.getElementById('reset-layout-btn');
-        const lockViewBtn = document.getElementById('lock-view-btn'); // New lock button
         const transitionDuration = 200; // Must match CSS transition duration
 
         // This function now handles the smooth transition
@@ -292,31 +289,6 @@
             closeModal();
         });
 
-        // Lock/Unlock View functionality
-        let isLocked = localStorage.getItem('isLocked') === 'true'; // Get initial state from localStorage
-
-        function updateLockButtonUI() {
-            if (isLocked) {
-                lockViewBtn.classList.add('locked');
-                lockViewBtn.querySelector('span').textContent = 'Ansicht entsperren';
-            } else {
-                lockViewBtn.classList.remove('locked');
-                lockViewBtn.querySelector('span').textContent = 'Ansicht sperren';
-            }
-        }
-
-        function toggleLockView() {
-            isLocked = !isLocked;
-            localStorage.setItem('isLocked', isLocked); // Save state to localStorage
-            updateLockButtonUI();
-            iframe.contentWindow.postMessage(`lock-view-${isLocked}`, '*'); // Send message to iframe
-        }
-
-        lockViewBtn.addEventListener('click', toggleLockView);
-
-        // Initialize button UI on load
-        updateLockButtonUI();
-
         const themeRadios = document.querySelectorAll('input[name="theme"]');
         function applyTheme(theme) {
             let effectiveTheme;
@@ -352,9 +324,6 @@
 
             // Fade the iframe back in smoothly
             iframe.classList.remove('opacity-0');
-
-            // Send initial lock state to the iframe on load
-            iframe.contentWindow.postMessage(`lock-view-${isLocked}`, '*');
         });
     </script>
 </body>

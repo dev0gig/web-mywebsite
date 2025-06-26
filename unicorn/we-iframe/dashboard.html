@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Inhalt</title>
+    <title>Startseite - Dashboard Inhalt</title> <!-- Geänderter Titel im Browser-Tab -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/gridstack@10.2.1/dist/gridstack.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/gridstack@10.2.1/dist/gridstack-all.js"></script>
+    <!-- Font Awesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --bg-color: #f9fafb;
@@ -154,13 +156,49 @@
             pointer-events: none;
             white-space: pre;
         }
+
+        /* Styling for the lock button */
+        #lock-button {
+            position: absolute;
+            top: 1rem; /* Adjust as needed */
+            right: 1rem; /* Adjust as needed */
+            background-color: transparent; /* Changed to transparent */
+            color: var(--text-color-light); /* Changed for more subtlety */
+            border: none; /* Changed to none */
+            border-radius: 50%; /* Makes it circular */
+            padding: 0.75rem; /* Adjust padding for icon size */
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none; /* Removed box shadow for subtlety */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        #lock-button:hover {
+            background-color: transparent; /* Keep transparent on hover */
+            color: var(--accent-color); /* Change color on hover for feedback */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }
+
+        #lock-button i {
+            font-size: 1.25rem; /* Icon size */
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
-<body class="p-4 md:p-8 pb-20">
+<body class="p-4 md:p-8 pb-20 relative"> <!-- Added 'relative' to body for absolute positioning of button -->
+    <h1 class="text-3xl font-bold text-center mb-2 main-header">Startseite</h1>
+    <h2 class="text-xl text-center mb-6 text-gray-600 dark:text-gray-400">Elemente können in der Größe verändert und verschoben werden</h2>
+
+    <!-- Lock/Unlock Button -->
+    <button id="lock-button" aria-label="Layout sperren/entsperren">
+        <i id="lock-icon" class="fas fa-lock"></i> <!-- Initial lock icon -->
+    </button>
 
     <div id="coords-info"></div>
     <div class="grid-stack"></div>
@@ -194,6 +232,8 @@
                 const data = widgetDataMap.get(node.id);
                 if (data) grid.addWidget(createWidgetHTML(data), node);
             });
+            // Initial state: locked
+            toggleGridInteractivity(true);
         }
 
         window.addEventListener('message', (event) => {
@@ -235,6 +275,33 @@
             if (serializedData.length > 0) {
                 localStorage.setItem('savedGridLayout', JSON.stringify(serializedData));
             }
+        });
+
+        // Toggle GridStack interactivity and lock icon
+        let isLocked = true; // Initial state
+        const lockButton = document.getElementById('lock-button');
+        const lockIcon = document.getElementById('lock-icon');
+
+        function toggleGridInteractivity(lock) {
+            isLocked = lock;
+            if (isLocked) {
+                grid.movable('.grid-stack-item', false);
+                grid.resizable('.grid-stack-item', false);
+                lockIcon.classList.remove('fa-lock-open');
+                lockIcon.classList.add('fa-lock');
+                lockButton.setAttribute('aria-label', 'Layout entsperren');
+            } else {
+                grid.movable('.grid-stack-item', true);
+                grid.resizable('.grid-stack-item', true);
+                lockIcon.classList.remove('fa-lock');
+                lockIcon.classList.add('fa-lock-open');
+                lockButton.setAttribute('aria-label', 'Layout sperren');
+            }
+        }
+
+        // Add event listener to the lock button
+        lockButton.addEventListener('click', () => {
+            toggleGridInteractivity(!isLocked); // Toggle the state
         });
 
         loadLayout();
