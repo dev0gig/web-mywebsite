@@ -80,6 +80,39 @@
             cursor: pointer;
         }
 
+        .calendar-day {
+            width: 32px; /* Angepasst für kleineren Kalender */
+            height: 32px; /* Angepasst für kleineren Kalender */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            margin: auto;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background-color: var(--border-color);
+        }
+        .calendar-day.has-transactions {
+            font-weight: 700;
+            box-shadow: inset 0 0 0 1px var(--text-color-light);
+        }
+        .calendar-day.today {
+            font-weight: 700;
+        }
+        .calendar-day.today::after {
+            content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background-color: #4f46e5;
+        }
+        .calendar-day.selected {
+            background-color: #4f46e5; color: white; font-weight: 700; box-shadow: none;
+        }
+        .calendar-day.selected.today::after {
+            background-color: white;
+        }
+
         .iframe-wrapper {
             width: 100%;
             max-width: 768px;
@@ -101,82 +134,102 @@
 <body class="p-4 md:p-6">
     <h1 class="text-3xl md:text-4xl font-bold main-title mb-6 text-center">AuriMea</h1>
 
-    <!-- === KONTEN-FILTER === -->
-    <div id="account-filter" class="w-full max-w-6xl mx-auto flex justify-center flex-wrap gap-2 mb-6">
-        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
-            Konten</button>
-        <button data-filter="Erste Bank" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste
-            Bank</button>
-        <button data-filter="N26" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
-        <button data-filter="Revolut" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
-    </div>
-
-    <!-- === FINANZ-ÜBERSICHT === -->
-    <div id="summary-cards" class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="card p-4 rounded-xl shadow-md text-center">
-            <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
-            <p id="total-einnahmen" class="text-2xl font-bold text-green-500">Lädt...</p>
-        </div>
-        <div class="card p-4 rounded-xl shadow-md text-center">
-            <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
-            <p id="total-ausgaben" class="text-2xl font-bold text-red-500">Lädt...</p>
-        </div>
-        <div class="card p-4 rounded-xl shadow-md text-center">
-            <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
-            <p id="bilanz" class="text-2xl font-bold">Lädt...</p>
-        </div>
-    </div>
-
-    <!-- === DIAGRAMM-BEREICH === -->
-    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
-            <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
-            <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
-        </div>
-        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
-            <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
-            <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div>
-        </div>
-        <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
-            <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
-            <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
-        </div>
-    </div>
-
-    <!-- === TRANSAKTIONSTABELLE === -->
-    <div class="w-full max-w-6xl mx-auto card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto">
-        <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-            <h2 class="text-xl font-bold">Alle Transaktionen</h2>
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                </span>
-                <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..." class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg" style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-                    <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
+    <!-- === HAUPTINHALTSBEREICH: Grid für alle Hauptkomponenten === -->
+    <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 px-4 md:px-6">
+        <!-- === KONTEN-FILTER (links oben, gleiche Höhe wie Finanz-Übersicht) === -->
+        <div class="card p-4 rounded-xl shadow-md lg:col-span-1 flex items-center justify-center">
+            <div id="account-filter" class="flex justify-center flex-wrap gap-2">
+                <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle Konten</button>
+                <button data-filter="Erste Bank" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste Bank</button>
+                <button data-filter="N26" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
+                <button data-filter="Revolut" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
             </div>
         </div>
-        <table class="w-full text-left min-w-[600px]">
-            <thead>
-                <tr class="border-b" style="border-color: var(--border-color);">
-                    <th class="p-2 table-header-sortable" data-sort="Datum">Datum</th>
-                    <th class="p-2 table-header-sortable" data-sort="Kategorie">Kategorie / Art</th>
-                    <th class="p-2 table-header-sortable" data-sort="Beschreibung">Beschreibung</th>
-                    <th class="p-2">Zahlungsmethode</th>
-                    <th class="p-2 table-header-sortable" data-sort="Konto">Konto</th>
-                    <th class="p-2 table-header-sortable" data-sort="Betrag">Betrag</th>
-                    <th class="p-2">Sonstige Infos</th>
-                </tr>
-            </thead>
-            <tbody id="transaction-table-body">
-                <!-- Rows will be inserted here by JavaScript -->
-            </tbody>
-        </table>
+
+        <!-- === FINANZ-ÜBERSICHT (rechts oben, gleiche Höhe wie Konten-Filter) === -->
+        <div id="summary-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:col-span-2">
+                <div class="card p-4 rounded-xl shadow-md text-center">
+                    <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
+                    <p id="total-einnahmen" class="text-2xl font-bold text-green-500">Lädt...</p>
+                </div>
+                <div class="card p-4 rounded-xl shadow-md text-center">
+                    <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
+                    <p id="total-ausgaben" class="text-2xl font-bold text-red-500">Lädt...</p>
+                </div>
+                <div class="card p-4 rounded-xl shadow-md text-center">
+                    <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
+                    <p id="bilanz" class="text-2xl font-bold">Lädt...</p>
+                </div>
+        </div>
+
+        <!-- === KALENDER (links unten, gleiche Höhe wie Diagramme) === -->
+        <div class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col items-center">
+            <div id="calendar-container" class="flex flex-col w-full h-full">
+                <div class="flex justify-between items-center mb-4 w-full">
+                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg></button>
+                    <h3 id="month-year-header" class="text-lg font-semibold text-center w-48"></h3>
+                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg></button>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center flex-grow">
+                    <!-- Wochentags-Header und Tage werden hier per JavaScript eingefügt -->
+                </div>
+            </div>
+            <div class="text-center mt-4 w-full min-h-[40px]">
+                <button id="clear-date-filter-btn" class="filter-btn hidden px-4 py-2 rounded-lg font-semibold transition">Datumsfilter zurücksetzen</button>
+            </div>
+        </div>
+
+        <!-- === DIAGRAMM-BEREICH (rechts unten, gleiche Höhe wie Kalender) === -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:col-span-2">
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
+                <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
+            </div>
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
+                <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div> 
+            </div>
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
+                <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
+            </div> 
+        </div>
+
+        <!-- === TRANSAKTIONSTABELLE === -->
+        <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto lg:col-span-3">
+            <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+                <h2 class="text-xl font-bold">Alle Transaktionen</h2>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </span>
+                    <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..." class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg" style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                    <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                        <svg class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <table class="w-full text-left min-w-[600px]">
+                <thead>
+                    <tr class="border-b" style="border-color: var(--border-color);">
+                        <th class="p-2 table-header-sortable" data-sort="Datum">Datum</th>
+                        <th class="p-2 table-header-sortable" data-sort="Kategorie">Kategorie / Art</th>
+                        <th class="p-2 table-header-sortable" data-sort="Beschreibung">Beschreibung</th>
+                        <th class="p-2">Zahlungsmethode</th>
+                        <th class="p-2 table-header-sortable" data-sort="Konto">Konto</th>
+                        <th class="p-2 table-header-sortable" data-sort="Betrag">Betrag</th>
+                        <th class="p-2">Sonstige Infos</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-table-body">
+                    <!-- Rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Floating Action Button & Modal -->
@@ -213,8 +266,11 @@
             let allTransactions = [];
             let searchTerm = '';
             let currentFilter = 'all';
+            let selectedDate = null;
+            let calendarDate = new Date();
             let sortConfig = { key: 'Datum', direction: 'desc' };
             let charts = { ausgaben: null, einnahmen: null, konto: null };
+            let transactionDates = new Set();
             const formatCurrency = (value) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
 
             // --- DATA FETCHING ---
@@ -225,10 +281,12 @@
                 complete: (results) => {
                     allTransactions = results.data.map(row => ({
                         ...row,
-                        Betrag: parseFloat(String(row.Betrag).replace(',', '.')) || 0,
-                        parsedDate: `20${row.Datum.substring(6, 8)}-${row.Datum.substring(3, 5)}-${row.Datum.substring(0, 2)}`
+                        Betrag: parseFloat(String(row.Betrag).replace(',', '.')) || 0, // Konvertiert Komma zu Punkt für die korrekte Zahlenerkennung
+                        parsedDate: `${row.Datum.substring(6, 10)}-${row.Datum.substring(3, 5)}-${row.Datum.substring(0, 2)}` // Konvertiert DD.MM.YYYY zu YYYY-MM-DD
                     }));
+                    transactionDates = new Set(allTransactions.map(t => t.parsedDate).filter(d => d && d.length === 10));
                     updateDashboard();
+                    renderCalendar();
                 },
                 error: (err) => console.error("Fehler beim Laden der CSV-Datei:", err)
             });
@@ -246,6 +304,11 @@
 
                 // Now, apply search filter for the table view
                 let tableData = [...accountFilteredData]; // Create a copy to sort
+                
+                if (selectedDate) {
+                    tableData = tableData.filter(row => row.parsedDate === selectedDate);
+                }
+
                 if (searchTerm) {
                     const lowerCaseSearchTerm = searchTerm.toLowerCase();
                     tableData = tableData.filter(row => {
@@ -372,6 +435,77 @@
                 createChart('einnahmen', 'doughnut', summary.einnahmenByCat, doughnutOptions, chartColors.einnahmen);
                 createChart('konto', 'bar', summary.ausgabenByKonto, barOptions, chartColors.konto);
             }
+
+            // --- CALENDAR LOGIC ---
+            const monthYearHeader = document.getElementById('month-year-header');
+            const calendarGrid = document.getElementById('calendar-grid');
+            const prevMonthBtn = document.getElementById('prev-month-btn');
+            const nextMonthBtn = document.getElementById('next-month-btn');
+            const clearDateFilterBtn = document.getElementById('clear-date-filter-btn');
+
+            function renderCalendar() {
+                calendarGrid.innerHTML = '';
+                const month = calendarDate.getMonth();
+                const year = calendarDate.getFullYear();
+
+                monthYearHeader.textContent = `${new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate)}`;
+
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+                ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => {
+                    const headerEl = document.createElement('div');
+                    headerEl.className = 'font-bold subtle-text text-sm h-9 flex items-center justify-center';
+                    headerEl.textContent = day;
+                    calendarGrid.appendChild(headerEl);
+                });
+
+                for (let i = 0; i < startOffset; i++) {
+                    calendarGrid.appendChild(document.createElement('div'));
+                }
+
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = document.createElement('div');
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    dayEl.dataset.date = dateStr;
+                    dayEl.textContent = day;
+                    dayEl.className = 'calendar-day text-sm';
+
+                    if (transactionDates.has(dateStr)) dayEl.classList.add('has-transactions');
+                    if (dateStr === todayStr) dayEl.classList.add('today');
+                    if (dateStr === selectedDate) dayEl.classList.add('selected');
+
+                    dayEl.addEventListener('click', handleDateClick);
+                    calendarGrid.appendChild(dayEl);
+                }
+            }
+
+            function handleDateClick(e) {
+                const clickedDate = e.target.dataset.date;
+                selectedDate = (selectedDate === clickedDate) ? null : clickedDate;
+                clearDateFilterBtn.classList.toggle('hidden', !selectedDate);
+                renderCalendar();
+                updateDashboard();
+            }
+
+            prevMonthBtn.addEventListener('click', () => {
+                calendarDate.setMonth(calendarDate.getMonth() - 1);
+                renderCalendar();
+            });
+            nextMonthBtn.addEventListener('click', () => {
+                calendarDate.setMonth(calendarDate.getMonth() + 1);
+                renderCalendar();
+            });
+            clearDateFilterBtn.addEventListener('click', () => {
+                selectedDate = null;
+                clearDateFilterBtn.classList.add('hidden');
+                renderCalendar();
+                updateDashboard();
+            });
 
             // --- EVENT LISTENERS ---
             const searchInput = document.getElementById('transaction-search-input');
