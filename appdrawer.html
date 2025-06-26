@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,16 +36,19 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
-            padding-bottom: 120px; /* Platz für das Dock */
+            padding-bottom: 120px;
+            /* Platz für das Dock */
         }
-        
+
         /* Subtiler Scrollbalken für den Body */
         body::-webkit-scrollbar {
             width: 8px;
         }
+
         body::-webkit-scrollbar-track {
             background: transparent;
         }
+
         body::-webkit-scrollbar-thumb {
             background-color: var(--text-color-light);
             border-radius: 10px;
@@ -53,13 +57,15 @@
 
         .header-container {
             padding: 2rem 2rem 0;
-            max-width: 1200px;
+            max-width: 1660px;
+            /* Angepasst, um den seitlichen Platz zu halbieren */
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 1rem;
-            flex-wrap: wrap; /* Erlaubt Umbruch auf kleinen Bildschirmen */
+            flex-wrap: wrap;
+            /* Erlaubt Umbruch auf kleinen Bildschirmen */
         }
 
         .main-title {
@@ -82,12 +88,14 @@
             background-color: var(--bg-color);
             color: var(--text-color);
         }
+
         #search-input:focus {
             outline: 2px solid var(--text-color-light);
             outline-offset: 2px;
         }
-        
-        .search-icon, #clear-search-btn {
+
+        .search-icon,
+        #clear-search-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -105,13 +113,16 @@
             background: none;
             border: none;
         }
-        
+
         #app-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Kleinere Mindestbreite für bessere Anpassung */
-            gap: 1.5rem; /* Etwas mehr Abstand für Touch-Bedienung */
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            /* Kleinere Mindestbreite für bessere Anpassung */
+            gap: 1.5rem;
+            /* Etwas mehr Abstand für Touch-Bedienung */
             padding: 2rem;
-            max-width: 1200px;
+            max-width: 1660px;
+            /* Angepasst, um den seitlichen Platz zu halbieren */
             margin: auto;
         }
 
@@ -134,7 +145,7 @@
             width: 50px;
             height: 50px;
         }
-        
+
         .app-icon {
             width: 100%;
             height: 100%;
@@ -143,9 +154,9 @@
             box-shadow: var(--app-shadow);
             transition: box-shadow 0.2s ease;
         }
-        
+
         .app-item:hover .app-icon {
-             box-shadow: var(--app-shadow-hover);
+            box-shadow: var(--app-shadow-hover);
         }
 
         .app-label {
@@ -173,7 +184,7 @@
             opacity: 0;
             transition: opacity 0.2s ease, transform 0.2s ease;
             transform: scale(0.5);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         html[data-theme='dark'] .favorite-star {
@@ -189,12 +200,12 @@
             width: 20px;
             height: 20px;
         }
-        
+
         .favorite-star.favorited svg {
             fill: #facc15;
             stroke: #facc15;
         }
-        
+
         .favorite-star:not(.favorited) svg {
             stroke: #9ca3af;
         }
@@ -215,28 +226,34 @@
             gap: 1rem;
             z-index: 100;
             transition: background-color 0.3s ease;
-            max-width: 90vw; /* Verhindert, dass das Dock zu breit wird */
-            overflow-x: auto; /* Macht das Dock horizontal scrollbar, falls nötig */
+            max-width: 90vw;
+            /* Verhindert, dass das Dock zu breit wird */
+            overflow-x: auto;
+            /* Macht das Dock horizontal scrollbar, falls nötig */
         }
+
         /* Versteckt den Scrollbalken im Dock, lässt ihn aber scrollbar */
         #favorites-dock::-webkit-scrollbar {
             display: none;
         }
+
         #favorites-dock {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
         }
 
 
         #favorites-dock .app-item {
-             margin-bottom: 0;
+            margin-bottom: 0;
         }
-        
+
         #favorites-dock .app-icon-wrapper {
-             width: 50px;
-             height: 50px;
+            width: 50px;
+            height: 50px;
         }
-        
+
         #favorites-dock .app-item:hover {
             transform: translateY(-5px);
         }
@@ -264,13 +281,13 @@
             z-index: 200;
             text-align: center;
         }
-        
+
         .modal-button-group {
             display: flex;
             gap: 1rem;
             margin-top: 1.5rem;
         }
-        
+
         .modal-button {
             flex: 1;
             padding: 0.75rem;
@@ -285,6 +302,7 @@
             background-color: var(--danger-color);
             color: white;
         }
+
         #confirm-remove-btn:hover {
             background-color: var(--danger-color-hover);
         }
@@ -293,9 +311,11 @@
             background-color: var(--dock-border);
             color: var(--text-color);
         }
+
         html[data-theme='dark'] #cancel-remove-btn {
-             background-color: #404040;
+            background-color: #404040;
         }
+
         #cancel-remove-btn:hover {
             background-color: #9ca3af;
         }
@@ -304,43 +324,137 @@
         @media (max-width: 640px) {
             .header-container {
                 flex-direction: column;
-                align-items: stretch; /* Suchleiste nimmt volle Breite ein */
+                align-items: stretch;
+                /* Suchleiste nimmt volle Breite ein */
             }
+
             .main-title {
                 font-size: 1.875rem;
                 text-align: center;
             }
+
             .search-container {
-                max-width: 100%; /* Erlaubt der Suchleiste, die volle Breite einzunehmen */
+                max-width: 100%;
+                /* Erlaubt der Suchleiste, die volle Breite einzunehmen */
             }
+
             #app-grid {
                 padding: 1.5rem 1rem;
                 grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             }
+
             #favorites-dock {
                 padding: 0.5rem;
                 gap: 0.75rem;
             }
         }
+
+        /* Neue Stile für das Hauptlayout und die Widgets */
+        .main-layout {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Widgets oben ausrichten */
+            padding: 1rem;
+            gap: 1.5rem;
+            max-width: 1660px;
+            /* Angepasst, um den seitlichen Platz zu halbieren */
+            margin: 0 auto;
+        }
+
+        .app-drawer-container {
+            flex-grow: 1;
+            /* AppDrawer nimmt verfügbaren Platz ein */
+            min-width: 300px;
+            /* Mindestbreite für AppDrawer */
+        }
+
+        .widgets-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 500px;
+            /* Feste Breite für die Widgets-Spalte auf 500px */
+            /* Standardmäßig ausgeblendet für kleinere Bildschirme */
+            display: none;
+        }
+
+        .widgets-sidebar iframe {
+            border: none;
+            /* Rahmen entfernt */
+            border-radius: 1rem;
+            box-shadow: none;
+            /* Schatten entfernt */
+            width: 100%;
+            height: 300px;
+            /* Standardhöhe für Iframes, wenn nicht überschrieben */
+        }
+
+        #weather-iframe {
+            height: 600px;
+            /* Spezifische Höhe für das Wetter-Widget */
+        }
+
+        /* Responsivität für Widgets: Anzeigen auf größeren Bildschirmen */
+        @media (min-width: 1024px) {
+
+            /* Breakpoint für größere Bildschirme (lg) */
+            .main-layout {
+                align-items: stretch;
+                /* Widgets und AppDrawer strecken sich */
+            }
+
+            .widgets-sidebar {
+                display: flex;
+                /* Widgets-Spalte auf großen Bildschirmen anzeigen */
+            }
+
+            .app-drawer-container {
+                /* Begrenzt die Breite des AppDrawers basierend auf der Gesamtbreite minus Widgets-Breite */
+                max-width: calc(100% - 500px - 1.5rem);
+                /* Angepasst an 500px Breite des Widgets */
+            }
+        }
     </style>
-     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body data-theme="light">
-    
+
     <div class="header-container">
         <h1 class="main-title">AppDrawer</h1>
         <div class="search-container">
-            <svg class="search-icon w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+            <svg class="search-icon w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
             <input type="text" id="search-input" placeholder="App suchen...">
-            <button id="clear-search-btn" class="hidden"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg></button>
+            <button id="clear-search-btn" class="hidden"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg></button>
         </div>
     </div>
 
-    <div id="app-grid"></div>
+    <!-- Hauptlayout-Container für AppDrawer und Widgets -->
+    <div class="main-layout">
+        <!-- AppDrawer-Inhalt -->
+        <div class="app-drawer-container">
+            <div id="app-grid"></div>
+        </div>
+
+        <!-- Widgets-Seitenleiste -->
+        <div class="widgets-sidebar">
+            <iframe src="widgets/clock.html" title="Uhr Widget"></iframe>
+            <iframe src="widgets/weather.html" title="Wetter Widget" id="weather-iframe"></iframe>
+        </div>
+    </div>
+
     <div id="favorites-dock"></div>
-    
+
     <div id="confirmation-overlay" class="hidden"></div>
     <div id="confirmation-modal" class="hidden">
         <h3 class="text-lg font-medium">Favorit entfernen?</h3>
@@ -362,7 +476,7 @@
             const confirmRemoveBtn = document.getElementById('confirm-remove-btn');
             const cancelRemoveBtn = document.getElementById('cancel-remove-btn');
             let appToRemoveId = null;
-            
+
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search-btn');
 
@@ -383,7 +497,7 @@
                 favoritesDock.innerHTML = '';
 
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
-                const filteredApps = sortedApps.filter(app => 
+                const filteredApps = sortedApps.filter(app =>
                     app.ariaLabel.toLowerCase().includes(lowerCaseSearchTerm)
                 );
 
@@ -391,7 +505,7 @@
                     const isFavorited = favorites.includes(app.id);
                     appGrid.appendChild(createAppElement(app, isFavorited));
                 });
-                
+
                 const favoriteApps = sortedApps.filter(app => favorites.includes(app.id));
                 favoriteApps.forEach(app => {
                     favoritesDock.appendChild(createAppElement(app, true, true));
@@ -412,7 +526,7 @@
                 icon.src = app.iconUrl;
                 icon.alt = `${app.ariaLabel} Icon`;
                 icon.className = 'app-icon';
-                icon.onerror = function() {
+                icon.onerror = function () {
                     this.src = `https://placehold.co/50x50/e0e0e0/ffffff?text=${app.ariaLabel.charAt(0)}`;
                 };
                 iconWrapper.appendChild(icon);
@@ -429,7 +543,7 @@
                     });
                     iconWrapper.appendChild(star);
                 }
-                
+
                 if (isDockItem) {
                     item.addEventListener('contextmenu', (e) => {
                         e.preventDefault();
@@ -458,9 +572,9 @@
                 }
                 localStorage.setItem('favoriteApps', JSON.stringify(favorites));
                 // Behält den aktuellen Suchbegriff bei der Aktualisierung bei
-                renderApps(searchInput.value); 
+                renderApps(searchInput.value);
             };
-            
+
             const openConfirmationModal = (appId) => {
                 appToRemoveId = appId;
                 confirmationModal.classList.remove('hidden');
@@ -472,17 +586,17 @@
                 confirmationModal.classList.add('hidden');
                 confirmationOverlay.classList.add('hidden');
             };
-            
+
             confirmRemoveBtn.addEventListener('click', () => {
                 if (appToRemoveId) {
                     toggleFavorite(appToRemoveId);
                 }
                 closeConfirmationModal();
             });
-            
+
             cancelRemoveBtn.addEventListener('click', closeConfirmationModal);
             confirmationOverlay.addEventListener('click', closeConfirmationModal);
-            
+
             searchInput.addEventListener('input', () => {
                 const searchTerm = searchInput.value;
                 renderApps(searchTerm);
@@ -499,4 +613,5 @@
         });
     </script>
 </body>
+
 </html>
