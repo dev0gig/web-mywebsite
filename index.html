@@ -57,7 +57,11 @@
             transition: opacity 0.3s ease-in-out;
             pointer-events: none;
             /* Klicks durchlassen, wenn unsichtbar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         #content-loader.hidden {
             opacity: 0;
         }
@@ -78,6 +82,7 @@
             opacity: 1;
             pointer-events: auto;
         }
+
         /* Desktop Sidebar: Bleibt fixiert, Hover-Effekt wie bisher */
         #sidebar {
             position: fixed;
@@ -90,14 +95,17 @@
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
-            display: none; /* Standardmäßig auf mobilen Geräten ausblenden */
+            display: none;
+            /* Standardmäßig auf mobilen Geräten ausblenden */
             flex-direction: column;
             /* Anordnung in Spalte */
             justify-content: space-between;
             /* Elemente oben und unten ausrichten */
         }
 
-        @media (min-width: 768px) { /* Tailwind's 'md' breakpoint */
+        @media (min-width: 768px) {
+
+            /* Tailwind's 'md' breakpoint */
             #sidebar {
                 display: flex;
             }
@@ -212,16 +220,15 @@
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
-                    class="sidebar-link flex items-center p-3 rounded-lg active"><svg
-                        class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
+                    class="sidebar-link flex items-center p-3 rounded-lg active"><svg class="w-8 h-8 flex-shrink-0"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25A2.25 2.25 0 0 1 8.25 21H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25h2.25A2.25 2.25 0 0 1 20.25 6v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25A2.25 2.25 0 0 1 13.5 8.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25h2.25a2.25 2.25 0 0 1 2.25 2.25v2.25a2.25 2.25 0 0 1-2.25 2.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
                     </svg><span class="sidebar-text font-medium">Appdrawer</span></a></li>
             <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
-                    class="sidebar-link flex items-center p-3 rounded-lg"><svg
-                        class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+                    class="sidebar-link flex items-center p-3 rounded-lg"><svg class="w-8 h-8 flex-shrink-0"
+                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M2 12C2 10.1308 2 9.19615 2.40192 8.5C2.66523 8.04394 3.04394 7.66523 3.5 7.40192C4.19615 7 5.13077 7 7 7H17C18.8692 7 19.8038 7 20.5 7.40192C20.9561 7.66523 21.3348 8.04394 21.5981 8.5C22 9.19615 22 10.1308 22 12C22 13.8692 22 14.8038 21.5981 15.5C21.3348 15.9561 20.9561 16.3348 20.5 16.5981C19.8038 17 18.8692 17 17 17H7C5.13077 17 4.19615 17 3.5 16.5981C3.04394 16.3348 2.66523 15.9561 2.40192 15.5C2 14.8038 2 13.8692 2 12Z"
                             stroke="currentColor" stroke-width="1.5" />
@@ -231,9 +238,12 @@
                             stroke-width="1.5" />
                         <rect x="5.5" y="10.5" width="5" height="1" rx="0.5" stroke="currentColor" />
                     </svg><span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea" class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125-1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V6.375m0 0H3.75m0 0v-.75A.75.75 0 0 0 3 4.5h-.75m0 0h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375M16.5 18.75h-9m9 0a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-6.75c-.621 0-1.125.504-1.125 1.125v3.375m9 0h-9" />
+            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125-1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V6.375m0 0H3.75m0 0v-.75A.75.75 0 0 0 3 4.5h-.75m0 0h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375M16.5 18.75h-9m9 0a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-6.75c-.621 0-1.125.504-1.125 1.125v3.375m9 0h-9" />
                     </svg>
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
@@ -257,16 +267,16 @@
                     <span class="sidebar-text font-medium">Unicorn</span></a></li>
             <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
+                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18M12 12.75h.008v.008H12v-.008Zm-3 0h.008v.008H9v-.008Zm-3 0h.008v.008H6v-.008Zm3 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Zm-3 3h.008v.008H12v-.008Zm-3 0h.008v.008H9v-.008Z" />
                     </svg>
                     <span class="sidebar-text font-medium">Google Kalender</span></a></li>
             <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
+                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <!-- Äußeres Dreieck -->
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 2 L2 22 H22 L12 2 Z" />
                         <!-- Inneres Dreieck -->
@@ -275,8 +285,8 @@
                     <span class="sidebar-text font-medium">Google Drive</span></a></li>
             <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor">
+                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                     </svg>
@@ -284,11 +294,11 @@
         </ul>
         <ul class="space-y-2">
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg"><svg
-                    class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                </svg><span class="sidebar-text font-medium">Einstellungen</span></button></li>
+                        class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg><span class="sidebar-text font-medium">Einstellungen</span></button></li>
         </ul>
     </nav>
 
@@ -313,7 +323,15 @@
     <!-- Iframe Content Area -->
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
         <div class="relative w-full h-full">
-            <div id="content-loader"></div>
+            <div id="content-loader">
+                <svg class="animate-spin h-12 w-12" style="color: var(--accent-color);"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </div>
             <iframe id="frame-appdrawer" src="appdrawer.html" class="content-iframe active"></iframe>
             <iframe id="frame-widgets" src="widgets/widgets-iframe.html" class="content-iframe"></iframe>
             <iframe id="frame-aurimea" src="aurimea/aurimea.html" class="content-iframe"></iframe>
