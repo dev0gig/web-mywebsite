@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="h-full" data-theme="light"> <!-- data-theme hinzugefügt -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +11,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Definition der Farbvariablen für Hell- und Dunkelmodus */
+        :root {
+            --bg-color: #f3f4f6; /* Helles Grau für den Hintergrund */
+            --text-color: #1f2937; /* Dunkler Text für den Hellmodus */
+            --header-color: #1f2937; /* Standardfarbe für die Überschrift im Hellmodus */
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717; /* Dunkler Hintergrund für den Dunkelmodus */
+            --text-color: #e2e8f0; /* Heller Text für den Dunkelmodus */
+            --header-color: #e2e8f0; /* Heller Text für die Überschrift im Dunkelmodus */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: transparent; /* Hintergrund transparent */
-            color: #a3a3a3;
+            background-color: var(--bg-color); /* Hintergrundfarbe dynamisch */
+            color: var(--text-color); /* Textfarbe dynamisch */
         }
-        /* Styling für den Iframe-Container, ohne Rand aber mit Abrundung und Schatten */
+        /* Styling für den Iframe-Container, ohne Rand und Schatten */
         .iframe-container {
             background-color: transparent; /* Hintergrund des Iframe-Containers transparent */
         }
@@ -25,29 +38,45 @@
             width: 100%;
             border: none; /* Keine zusätzlichen Rahmen für den Iframe selbst */
         }
+
+        .main-title {
+            color: var(--header-color); /* Überschriftfarbe dynamisch */
+        }
     </style>
 </head>
 <body class="p-2 min-h-screen flex flex-col items-center justify-center">
 
-    <div class="container mx-auto p-2 shadow-lg rounded-xl">
-        <h1 class="text-3xl font-bold text-white mb-4 text-center">Meine Werkzeuge</h1>
+    <div class="container mx-auto p-2 rounded-xl">
+        <h1 class="text-3xl font-bold mb-4 text-center main-title">Meine Werkzeuge</h1> <!-- Klasse main-title hinzugefügt -->
 
         <!-- Grid Container für die Iframes -->
         <!-- Standardmäßig eine Spalte, ab mittleren Bildschirmen zwei Spalten -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <!-- Taschenrechner Iframe (links) -->
-            <div class="iframe-container p-1 rounded-[50px] shadow-md overflow-hidden h-[700px]">
+            <div class="iframe-container p-1 rounded-[50px] overflow-hidden h-[700px]">
                 <iframe src="../../widgets/calculator.html" title="Taschenrechner" class="h-full"></iframe>
             </div>
 
             <!-- Tarifrechner Iframe (rechts) -->
-            <div class="iframe-container p-1 rounded-[50px] shadow-md overflow-hidden h-[700px]">
+            <div class="iframe-container p-1 rounded-[50px] overflow-hidden h-[700px]">
                 <iframe src="../../widgets/tariff.html" title="Tarifrechner" class="h-full"></iframe>
             </div>
 
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event-Listener für Nachrichten, um das Thema zu ändern
+            window.addEventListener('message', (event) => {
+                if (event.data === 'set-theme-dark') {
+                    document.documentElement.dataset.theme = 'dark';
+                } else if (event.data === 'set-theme-light') {
+                    document.documentElement.dataset.theme = 'light';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
