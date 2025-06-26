@@ -14,28 +14,128 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Zusätzliche Stile für ein besseres Aussehen und Gefühl */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        /* Google Font für eine saubere Typografie */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        .prose-preview h1 { font-size: 1.875rem; font-weight: 700; margin-top: 1em; margin-bottom: 0.6em; }
-        .prose-preview h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
-        .prose-preview h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        /* Theming Variablen für Light & Dark Mode */
+        :root {
+            --bg-color: #f8fafc; /* slate-50 */
+            --text-color: #1e293b; /* slate-800 */
+            --text-color-light: #64748b; /* slate-500 */
+            --text-color-heading: #334155; /* slate-700 */
+            --border-color: #e2e8f0; /* slate-200 */
+            --card-bg: #ffffff; /* white */
+            --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --button-primary-bg: #1e293b; /* slate-800 */
+            --button-primary-text: #ffffff; /* white */
+            --button-primary-hover-bg: #334155; /* slate-700 */
+            --button-secondary-bg: #ffffff; /* white */
+            --button-secondary-border: #cbd5e1; /* slate-300 */
+            --button-secondary-text: #334155; /* slate-700 */
+            --button-secondary-hover-bg: #f8fafc; /* slate-50 */
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --prose-blockquote-border: #cbd5e1;
+            --prose-blockquote-text: #64748b;
+            --prose-code-bg: #e2e8f0;
+            --prose-pre-bg: #f1f5f9;
+            --gemini-output-bg: #f1f5f9;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717; /* neutral-900 */
+            --text-color: #e5e5e5; /* neutral-200 */
+            --text-color-light: #a3a3a3; /* neutral-400 */
+            --text-color-heading: #fafafa; /* neutral-50 */
+            --border-color: #404040; /* neutral-700 */
+            --card-bg: #262626; /* neutral-800 */
+            --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+            --button-primary-bg: #f5f5f5; /* neutral-100 */
+            --button-primary-text: #171717; /* neutral-900 */
+            --button-primary-hover-bg: #e5e5e5; /* neutral-200 */
+            --button-secondary-bg: #262626;
+            --button-secondary-border: #525252; /* neutral-600 */
+            --button-secondary-text: #e5e5e5;
+            --button-secondary-hover-bg: #404040;
+            --input-bg: #404040;
+            --input-border: #525252;
+            --prose-blockquote-border: #525252;
+            --prose-blockquote-text: #a3a3a3;
+            --prose-code-bg: #404040;
+            --prose-pre-bg: #171717;
+            --gemini-output-bg: #171717;
+        }
+
+        /* Basis-Styling für den Body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Überschreiben von Tailwind-Klassen mit CSS-Variablen */
+        .main-header {
+            border-color: var(--border-color);
+        }
+        .main-header h1 {
+            color: var(--text-color-heading);
+        }
+        .journal-entry {
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+        .journal-entry h2 {
+            color: var(--text-color-light);
+            border-color: var(--border-color);
+        }
+        .journal-entry textarea {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+        }
+        .journal-entry .gemini-output {
+            background-color: var(--gemini-output-bg);
+        }
+        #calendar-container {
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+        #pagination-controls button, .modal-button {
+             background-color: var(--button-secondary-bg);
+             border-color: var(--button-secondary-border);
+             color: var(--button-secondary-text);
+        }
+        #pagination-controls button:hover, .modal-button:hover {
+            background-color: var(--button-secondary-hover-bg);
+        }
+        .primary-button {
+            background-color: var(--button-primary-bg);
+            color: var(--button-primary-text);
+        }
+        .primary-button:hover {
+            background-color: var(--button-primary-hover-bg);
+        }
+
+        /* Markdown-Vorschau-Stile */
+        .prose-preview h1 { color: var(--text-color-heading); font-size: 1.875rem; font-weight: 700; margin-top: 1em; margin-bottom: 0.6em; }
+        .prose-preview h2 { color: var(--text-color-heading); font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        .prose-preview h3 { color: var(--text-color-heading); font-size: 1.25rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
         .prose-preview p { margin-bottom: 0.75em; line-height: 1.6; }
         .prose-preview ul, .prose-preview ol { padding-left: 1.5em; margin-bottom: 1em; }
-        .prose-preview blockquote { border-left-width: 4px; border-left-color: #cbd5e1; padding-left: 1em; margin-left: 0; color: #64748b; }
-        .prose-preview code { background-color: #e2e8f0; padding: 0.1em 0.3em; border-radius: 4px; font-family: monospace; }
-        .prose-preview pre { background-color: #f1f5f9; padding: 1em; border-radius: 8px; overflow-x: auto; }
+        .prose-preview blockquote { border-left-width: 4px; border-left-color: var(--prose-blockquote-border); color: var(--prose-blockquote-text); padding-left: 1em; margin-left: 0; }
+        .prose-preview code { background-color: var(--prose-code-bg); padding: 0.1em 0.3em; border-radius: 4px; font-family: monospace; }
+        .prose-preview pre { background-color: var(--prose-pre-bg); padding: 1em; border-radius: 8px; overflow-x: auto; }
         .prose-preview pre code { background-color: transparent; padding: 0; }
         .date-header { cursor: pointer; }
 
         .loader {
             width: 24px;
             height: 24px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid #3b82f6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 20px auto;
@@ -43,35 +143,28 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         /* Kalender-Stile */
-        .calendar-day-has-entry {
-            position: relative;
-        }
+        .calendar-day-has-entry { position: relative; }
         .calendar-day-has-entry::after {
-            content: '';
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: #3b82f6;
+            content: ''; position: absolute; bottom: 6px; left: 50%;
+            transform: translateX(-50%); width: 5px; height: 5px;
+            border-radius: 50%; background-color: #3b82f6;
         }
+        html[data-theme='dark'] .calendar-day-has-entry::after { background-color: #60a5fa; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="transition-colors duration-300">
 
     <div class="container mx-auto max-w-7xl px-4 py-8">
 
-        <header class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-200">
-            <h1 class="text-3xl font-bold text-slate-700 mb-4 sm:mb-0">Mein Journal</h1>
+        <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b">
+            <h1 class="text-3xl font-bold mb-4 sm:mb-0">Mein Journal</h1>
             <div class="flex items-center space-x-2">
-                <label for="import-files" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md font-semibold text-xs text-slate-700 uppercase tracking-widest shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
+                <label for="import-files" class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
                 </label>
                 <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt">
 
-                <button id="export-button" class="inline-flex items-center px-4 py-2 bg-slate-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                <button id="export-button" class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                     <i data-lucide="download" class="mr-2 h-4 w-4"></i> Exportieren
                 </button>
             </div>
@@ -83,7 +176,7 @@
                 <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
             </div>
             <aside class="lg:col-span-1">
-                <div id="calendar-container" class="bg-white p-4 rounded-lg shadow-sm sticky top-8">
+                <div id="calendar-container" class="p-4 rounded-lg sticky top-8">
                 </div>
             </aside>
         </div>
@@ -91,27 +184,27 @@
 
     <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style="background-color: var(--card-bg); border-color: var(--border-color);">
             <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Einträge exportieren</h3>
+                <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren</h3>
                 <div class="mt-2 px-7 py-3">
-                     <p class="text-sm text-gray-500 mb-4">Wählen Sie den Datumsbereich für den Export.</p>
-                    <div class="space-y-4">
+                     <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den Export.</p>
+                    <div class="space-y-4 mt-4">
                         <div>
-                            <label for="start-date" class="text-left block text-sm font-medium text-gray-700">Startdatum</label>
-                            <input type="date" id="start-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <label for="start-date" class="text-left block text-sm font-medium" style="color: var(--text-color-heading);">Startdatum</label>
+                            <input type="date" id="start-date" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
                         <div>
-                            <label for="end-date" class="text-left block text-sm font-medium text-gray-700">Enddatum</label>
-                            <input type="date" id="end-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <label for="end-date" class="text-left block text-sm font-medium" style="color: var(--text-color-heading);">Enddatum</label>
+                            <input type="date" id="end-date" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
                     </div>
                 </div>
                 <div class="items-center px-4 py-3 space-x-2">
-                    <button id="confirm-export-button" class="px-4 py-2 bg-slate-800 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                    <button id="confirm-export-button" class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
                         Export starten
                     </button>
-                    <button id="cancel-export-button" class="px-4 py-2 bg-white border border-slate-300 text-gray-900 text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button id="cancel-export-button" class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
                         Abbrechen
                     </button>
                 </div>
@@ -138,6 +231,19 @@
             let currentPage = 1;
             let calendarDate = new Date();
 
+            // =================================================================
+            // NEU: Theme-Umschaltung
+            // =================================================================
+            window.addEventListener('message', (event) => {
+                // Sicherheitsüberprüfung für die Herkunft der Nachricht wird hier vereinfacht,
+                // da es sich um eine vertrauenswürdige Kommunikation zwischen eigenen Iframes handelt.
+                if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
+                    const theme = event.data.substring('set-theme-'.length); // 'light' or 'dark'
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            });
+
+
             const loadEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             const saveEntries = (entries) => localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
             
@@ -145,15 +251,14 @@
 
             const formatDate = (date) => date.toISOString().split('T')[0];
             
-            // KORRIGIERT: Behandelt das Datum als UTC für eine konsistente Anzeige.
             const formatDisplayDate = (dateString) => {
-                const date = new Date(dateString); // "YYYY-MM-DD" wird als UTC-Mitternacht interpretiert
+                const date = new Date(dateString);
                 return new Intl.DateTimeFormat('de-DE', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
                     day: 'numeric',
-                    timeZone: 'UTC' // Wichtig, um Zeitzonenfehler zu vermeiden
+                    timeZone: 'UTC'
                 }).format(date);
             };
 
@@ -179,25 +284,26 @@
 
             const createEntryElement = (dateString, content) => {
                 const entryDiv = document.createElement('div');
-                entryDiv.classList.add('journal-entry', 'mb-6', 'bg-white', 'p-6', 'rounded-lg', 'shadow-sm', 'transition-all', 'duration-300');
+                entryDiv.classList.add('journal-entry', 'mb-6', 'p-6', 'rounded-lg', 'transition-all', 'duration-300');
                 entryDiv.dataset.date = dateString;
                 const displayDate = formatDisplayDate(dateString);
                 const header = document.createElement('h2');
                 header.textContent = displayDate;
-                header.classList.add('text-xl', 'font-semibold', 'text-slate-600', 'mb-3', 'pb-2', 'border-b', 'border-slate-200', 'date-header');
+                header.classList.add('text-xl', 'font-semibold', 'mb-3', 'pb-2', 'border-b', 'date-header');
                 const previewDiv = document.createElement('div');
                 previewDiv.classList.add('prose', 'prose-slate', 'max-w-none', 'prose-preview');
                 previewDiv.innerHTML = marked.parse(content || '<p class="text-slate-400">Klicken, um zu schreiben...</p>');
                 const textArea = document.createElement('textarea');
                 textArea.value = content;
-                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'border-slate-300', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
+                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
                 textArea.setAttribute('rows', '8');
                 const geminiFooter = document.createElement('div');
                 geminiFooter.classList.add('mt-4', 'pt-4', 'border-t', 'border-slate-200');
+                geminiFooter.style.borderColor = 'var(--border-color)';
                 const geminiButtons = document.createElement('div');
                 geminiButtons.classList.add('flex', 'flex-wrap', 'gap-2', 'mb-4');
                 const geminiOutput = document.createElement('div');
-                geminiOutput.classList.add('gemini-output', 'p-4', 'bg-slate-50', 'rounded-md', 'text-sm', 'text-slate-700', 'hidden', 'prose', 'prose-slate', 'max-w-none');
+                geminiOutput.classList.add('gemini-output', 'p-4', 'rounded-md', 'text-sm', 'hidden', 'prose', 'prose-slate', 'max-w-none');
                 
                 const createGeminiButton = (text, icon, colorClasses, promptFn) => {
                     const button = document.createElement('button');
@@ -219,7 +325,7 @@
                             rewrittenContentDiv.innerHTML = marked.parse(result);
                             const applyButton = document.createElement('button');
                             applyButton.textContent = 'Umschriebenen Text übernehmen';
-                            applyButton.classList.add('mt-4', 'px-4', 'py-2', 'bg-slate-800', 'text-white', 'text-xs', 'font-semibold', 'rounded-md', 'hover:bg-slate-700', 'transition-colors');
+                            applyButton.classList.add('primary-button', 'mt-4', 'px-4', 'py-2', 'text-xs', 'font-semibold', 'rounded-md', 'transition-colors');
                             applyButton.onclick = (event) => {
                                 event.stopPropagation();
                                 textArea.value = result;
@@ -256,7 +362,7 @@
                     const newContent = textArea.value;
                     journalEntries[dateString] = newContent;
                     saveEntries(journalEntries);
-                    previewDiv.innerHTML = marked.parse(newContent || '<p class="text-slate-400">Klicken, um zu schreiben...</p>');
+                    previewDiv.innerHTML = marked.parse(newContent || '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>');
                     previewDiv.classList.remove('hidden');
                     geminiFooter.classList.remove('hidden');
                     textArea.classList.add('hidden');
@@ -275,9 +381,9 @@
                 header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
                 const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
                 header.innerHTML = `
-                    <button id="prev-month" class="p-2 rounded-full hover:bg-slate-100"><i data-lucide="chevron-left"></i></button>
+                    <button id="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button>
                     <h3 class="font-semibold text-lg">${monthName}</h3>
-                    <button id="next-month" class="p-2 rounded-full hover:bg-slate-100"><i data-lucide="chevron-right"></i></button>
+                    <button id="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>
                 `;
                 calendarContainer.appendChild(header);
 
@@ -286,7 +392,7 @@
                 
                 const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
                 weekdays.forEach(day => {
-                    grid.innerHTML += `<div class="font-medium text-slate-500">${day}</div>`;
+                    grid.innerHTML += `<div class="font-medium text-slate-500" style="color: var(--text-color-light)">${day}</div>`;
                 });
 
                 const firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -301,16 +407,15 @@
                 const todayString = formatDate(today);
 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    // KORRIGIERT: Erstellt das Datum in UTC, um Zeitzonenfehler zu vermeiden.
                     const currentDate = new Date(Date.UTC(year, month, day));
                     const dateString = formatDate(currentDate);
                     
                     const dayButton = document.createElement('button');
                     dayButton.textContent = day;
                     dayButton.dataset.date = dateString;
-                    dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'transition-colors');
+                    dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'dark:hover:bg-neutral-700', 'transition-colors');
                     
-                    if(dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                    if(dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
                     if(journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
 
                     dayButton.addEventListener('click', () => {
@@ -370,7 +475,7 @@
                 const createButton = (text, onClick, condition) => {
                     const button = document.createElement('button');
                     button.textContent = text;
-                    button.classList.add('px-4', 'py-2', 'bg-white', 'border', 'border-slate-300', 'text-sm', 'font-medium', 'rounded-md', 'hover:bg-slate-50', 'disabled:opacity-50', 'disabled:cursor-not-allowed');
+                    button.classList.add('modal-button', 'px-4', 'py-2', 'border', 'text-sm', 'font-medium', 'rounded-md', 'disabled:opacity-50', 'disabled:cursor-not-allowed');
                     button.disabled = condition;
                     button.addEventListener('click', onClick);
                     return button;
@@ -379,7 +484,8 @@
                 const prevButton = createButton('Zurück', () => { currentPage--; renderJournal(); }, currentPage === 1);
                 const pageInfo = document.createElement('span');
                 pageInfo.textContent = `Seite ${currentPage} von ${totalPages}`;
-                pageInfo.classList.add('text-sm', 'text-slate-600');
+                pageInfo.classList.add('text-sm');
+                pageInfo.style.color = 'var(--text-color-light)';
                 const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); }, currentPage === totalPages);
                 
                 paginationControls.append(prevButton, pageInfo, nextButton);
