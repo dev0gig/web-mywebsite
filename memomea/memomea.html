@@ -224,7 +224,7 @@
             cursor: pointer;
         }
 
-        /* NEU: Tag-Styling */
+        /* Tag-Styling */
         .tag {
             background-color: var(--tag-bg);
             color: var(--tag-text);
@@ -232,6 +232,47 @@
             border-radius: 9999px;
             font-size: 0.85em;
             font-weight: 500;
+        }
+
+        /* Tag Cloud Styling */
+        #tag-cloud-container {
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .tag-cloud-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tag-cloud-tag {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .tag-cloud-tag:hover {
+            transform: scale(1.1);
+        }
+
+        /* Eigene Scrollbar-Stile */
+        #tag-cloud::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #tag-cloud::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #tag-cloud::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+        }
+
+        #tag-cloud::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-color-light);
         }
 
         /* Kalender-Stile */
@@ -292,7 +333,18 @@
                 <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
             </div>
             <aside class="lg:col-span-1">
-                <div id="calendar-container" class="p-4 rounded-lg sticky top-8">
+                <div class="sticky top-8 flex flex-col space-y-8" style="height: calc(100vh - 4rem);">
+                    <div id="calendar-container" class="p-4 rounded-lg flex-shrink-0">
+                    </div>
+                    <div id="tag-cloud-container" class="p-4 rounded-lg flex flex-col min-h-0">
+                        <h3 class="text-lg font-semibold mb-4 flex-shrink-0" style="color: var(--text-color-heading);">
+                            Tag-Wolke</h3>
+                        <div id="tag-cloud" class="flex-grow overflow-y-auto pr-2">
+                            <div class="tag-cloud-wrapper">
+                                <p class="text-sm" style="color: var(--text-color-light)">Keine Tags gefunden.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -350,6 +402,7 @@
             const journalContainer = document.getElementById('journal-container');
             const paginationControls = document.getElementById('pagination-controls');
             const calendarContainer = document.getElementById('calendar-container');
+            const tagCloud = document.getElementById('tag-cloud');
             const importInput = document.getElementById('import-files');
             const exportButton = document.getElementById('export-button');
             const exportModal = document.getElementById('export-modal');
@@ -409,16 +462,12 @@
                 }, 3000);
             };
 
-            // NEU: Funktion zum Parsen von Markdown und Stylen von Tags
             const parseAndStyleContent = (markdownText) => {
                 const defaultText = '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>';
                 if (!markdownText) {
                     return defaultText;
                 }
-                // Parse markdown to HTML
                 let html = marked.parse(markdownText);
-                // Regex to find tags (#word) and wrap them in a span
-                // It looks for a '#' preceded by a space, or at the start of a line, or after a '>' from an HTML tag.
                 html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, '$1<span class="tag">$2</span>');
                 return html;
             };
@@ -435,7 +484,7 @@
 
                 const previewDiv = document.createElement('div');
                 previewDiv.classList.add('prose', 'prose-slate', 'max-w-none', 'prose-preview');
-                previewDiv.innerHTML = parseAndStyleContent(content); // NEU: Verwendung der neuen Funktion
+                previewDiv.innerHTML = parseAndStyleContent(content);
 
                 const textArea = document.createElement('textarea');
                 textArea.value = content;
@@ -454,14 +503,54 @@
 
                 textArea.addEventListener('blur', () => {
                     const newContent = textArea.value;
-                    journalEntries[dateString] = newContent;
+                    const todayString = formatDate(new Date());
+
+                    if (newContent.trim() === '' && dateString !== todayString) {
+                        delete journalEntries[dateString];
+                    } else {
+                        journalEntries[dateString] = newContent;
+                    }
+
                     saveEntries(journalEntries);
-                    previewDiv.innerHTML = parseAndStyleContent(newContent); // NEU: Verwendung der neuen Funktion
-                    previewDiv.classList.remove('hidden');
-                    textArea.classList.add('hidden');
-                    renderCalendar();
+                    updateAll();
                 });
                 return entryDiv;
+            };
+
+            const renderTagCloud = () => {
+                const tagCounts = {};
+                const tagRegex = /#([\wÄäÖöÜüß-]+)/g;
+
+                Object.values(journalEntries).forEach(content => {
+                    const matches = content.match(tagRegex);
+                    if (matches) {
+                        matches.forEach(tag => {
+                            const normalizedTag = tag.toLowerCase();
+                            tagCounts[normalizedTag] = (tagCounts[normalizedTag] || 0) + 1;
+                        });
+                    }
+                });
+
+                const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
+
+                const cloudWrapper = tagCloud.querySelector('.tag-cloud-wrapper') || document.createElement('div');
+                cloudWrapper.className = 'tag-cloud-wrapper';
+                cloudWrapper.innerHTML = '';
+
+                if (sortedTags.length === 0) {
+                    cloudWrapper.innerHTML = `<p class="text-sm" style="color: var(--text-color-light)">Keine Tags gefunden.</p>`;
+                    tagCloud.appendChild(cloudWrapper);
+                    return;
+                }
+
+                // AKTUALISIERT: Logik zur Größenänderung entfernt
+                sortedTags.forEach(([tag, count]) => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'tag tag-cloud-tag';
+                    tagEl.textContent = tag;
+                    cloudWrapper.appendChild(tagEl);
+                });
+                tagCloud.appendChild(cloudWrapper);
             };
 
             const renderCalendar = () => {
@@ -502,18 +591,29 @@
                     if (journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
 
                     dayButton.addEventListener('click', () => {
-                        const visibleDates = Object.keys(journalEntries).filter(d => d === todayString || (journalEntries[d]?.trim() !== '')).sort().reverse();
-                        const entryIndex = visibleDates.findIndex(d => d === dateString);
+                        const wasJustCreated = journalEntries[dateString] === undefined;
+                        if (wasJustCreated) {
+                            journalEntries[dateString] = '';
+                            saveEntries(journalEntries);
+                        }
+
+                        const allSortedDates = Object.keys(journalEntries).sort().reverse();
+                        const entryIndex = allSortedDates.findIndex(d => d === dateString);
 
                         if (entryIndex !== -1) {
                             currentPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
-                            renderJournal();
+                            updateAll();
+
                             setTimeout(() => {
                                 const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                                 if (element) {
                                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    element.classList.add('ring-2', 'ring-blue-400');
-                                    setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                                    if (wasJustCreated) {
+                                        element.click();
+                                    } else {
+                                        element.classList.add('ring-2', 'ring-blue-400');
+                                        setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                                    }
                                 }
                             }, 100);
                         }
@@ -532,11 +632,12 @@
                 paginationControls.innerHTML = '';
                 const todayString = formatDate(new Date());
 
-                if (!journalEntries[todayString]) {
+                if (journalEntries[todayString] === undefined) {
                     journalEntries[todayString] = '';
+                    saveEntries(journalEntries);
                 }
 
-                const visibleDates = Object.keys(journalEntries).filter(dateString => dateString === todayString || (journalEntries[dateString]?.trim() !== '')).sort().reverse();
+                const visibleDates = Object.keys(journalEntries).sort().reverse();
 
                 const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
                 const endIndex = startIndex + ENTRIES_PER_PAGE;
@@ -577,6 +678,7 @@
             const updateAll = () => {
                 renderJournal();
                 renderCalendar();
+                renderTagCloud();
             };
 
             importInput.addEventListener('change', (event) => {
