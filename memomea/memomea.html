@@ -232,6 +232,7 @@
             border-radius: 9999px;
             font-size: 0.85em;
             font-weight: 500;
+            cursor: pointer;
         }
 
         /* Tag Cloud Styling */
@@ -249,12 +250,12 @@
         }
 
         .tag-cloud-tag {
-            cursor: pointer;
             transition: transform 0.2s;
         }
 
+        /* AKTUALISIERT: Hover-Effekt entfernt */
         .tag-cloud-tag:hover {
-            transform: scale(1.1);
+            /* Kein Hover-Effekt mehr */
         }
 
         /* Eigene Scrollbar-Stile */
@@ -311,8 +312,19 @@
 
     <div class="container mx-auto max-w-7xl px-4 py-8">
 
-        <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b">
-            <h1 class="text-3xl font-bold mb-4 sm:mb-0">MemoMea</h1>
+        <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b gap-4">
+            <h1 class="text-3xl font-bold">MemoMea</h1>
+            <!-- NEU: Suchfeld -->
+            <div class="relative flex-grow max-w-xl w-full">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
+                    style="color: var(--text-color-light)"></i>
+                <input type="text" id="search-input" placeholder="Einträge durchsuchen..."
+                    class="w-full pl-10 pr-10 py-2 rounded-lg"
+                    style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 p-1">
+                    <i data-lucide="x" class="w-5 h-5" style="color: var(--text-color-light)"></i>
+                </button>
+            </div>
             <div class="flex items-center space-x-2">
                 <label for="import-files"
                     class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
@@ -329,6 +341,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2">
+                <div id="filter-header" class="hidden items-center mb-4"></div>
                 <main id="journal-container"></main>
                 <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
             </div>
@@ -403,6 +416,9 @@
             const paginationControls = document.getElementById('pagination-controls');
             const calendarContainer = document.getElementById('calendar-container');
             const tagCloud = document.getElementById('tag-cloud');
+            const filterHeader = document.getElementById('filter-header');
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
             const importInput = document.getElementById('import-files');
             const exportButton = document.getElementById('export-button');
             const exportModal = document.getElementById('export-modal');
@@ -415,6 +431,8 @@
             const ENTRIES_PER_PAGE = 20;
             let currentPage = 1;
             let calendarDate = new Date();
+            let activeTagFilter = null;
+            let activeSearchTerm = '';
 
             window.addEventListener('message', (event) => {
                 if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
@@ -458,7 +476,7 @@
                     notification.classList.remove('show');
                     setTimeout(() => {
                         notification.classList.add('hidden');
-                    }, 300);
+                    }, 3000);
                 }, 3000);
             };
 
@@ -468,7 +486,7 @@
                     return defaultText;
                 }
                 let html = marked.parse(markdownText);
-                html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, '$1<span class="tag">$2</span>');
+                html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, '$1<span class="tag" data-tag="$2">$2</span>');
                 return html;
             };
 
@@ -493,7 +511,19 @@
 
                 entryDiv.append(header, previewDiv, textArea);
 
-                entryDiv.addEventListener('click', () => {
+                entryDiv.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tag')) {
+                        const tag = e.target.dataset.tag;
+                        if (tag) {
+                            activeTagFilter = tag;
+                            activeSearchTerm = '';
+                            searchInput.value = '';
+                            currentPage = 1;
+                            updateAll();
+                        }
+                        return;
+                    }
+
                     if (textArea.classList.contains('hidden')) {
                         previewDiv.classList.add('hidden');
                         textArea.classList.remove('hidden');
@@ -543,11 +573,17 @@
                     return;
                 }
 
-                // AKTUALISIERT: Logik zur Größenänderung entfernt
                 sortedTags.forEach(([tag, count]) => {
                     const tagEl = document.createElement('span');
                     tagEl.className = 'tag tag-cloud-tag';
                     tagEl.textContent = tag;
+                    tagEl.addEventListener('click', () => {
+                        activeTagFilter = tag;
+                        activeSearchTerm = '';
+                        searchInput.value = '';
+                        currentPage = 1;
+                        updateAll();
+                    });
                     cloudWrapper.appendChild(tagEl);
                 });
                 tagCloud.appendChild(cloudWrapper);
@@ -601,7 +637,7 @@
                         const entryIndex = allSortedDates.findIndex(d => d === dateString);
 
                         if (entryIndex !== -1) {
-                            currentPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
+                            currentPage = 1;
                             updateAll();
 
                             setTimeout(() => {
@@ -630,31 +666,81 @@
             const renderJournal = () => {
                 journalContainer.innerHTML = '';
                 paginationControls.innerHTML = '';
-                const todayString = formatDate(new Date());
 
-                if (journalEntries[todayString] === undefined) {
-                    journalEntries[todayString] = '';
-                    saveEntries(journalEntries);
+                let datesToDisplay = Object.keys(journalEntries).sort().reverse();
+
+                if (activeTagFilter) {
+                    filterHeader.innerHTML = `
+                        <h2 class="text-xl font-bold" style="color: var(--text-color-heading);">Einträge mit: <span class="tag">${activeTagFilter}</span></h2>
+                        <button id="clear-filter" class="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i data-lucide="x" class="h-5 w-5"></i>
+                        </button>
+                    `;
+                    filterHeader.classList.remove('hidden');
+                    filterHeader.classList.add('flex');
+                    document.getElementById('clear-filter').addEventListener('click', () => {
+                        activeTagFilter = null;
+                        currentPage = 1;
+                        updateAll();
+                    });
+
+                    datesToDisplay = datesToDisplay.filter(date => journalEntries[date].toLowerCase().includes(activeTagFilter));
+                } else if (activeSearchTerm) {
+                    filterHeader.innerHTML = `
+                        <h2 class="text-xl font-bold" style="color: var(--text-color-heading);">Suchergebnisse für: <span class="italic">'${activeSearchTerm}'</span></h2>
+                        <button id="clear-filter" class="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i data-lucide="x" class="h-5 w-5"></i>
+                        </button>
+                    `;
+                    filterHeader.classList.remove('hidden');
+                    filterHeader.classList.add('flex');
+                    document.getElementById('clear-filter').addEventListener('click', () => {
+                        activeSearchTerm = '';
+                        searchInput.value = '';
+                        currentPage = 1;
+                        updateAll();
+                    });
+
+                    const lowerCaseSearch = activeSearchTerm.toLowerCase();
+                    datesToDisplay = datesToDisplay.filter(date => {
+                        const content = journalEntries[date].toLowerCase();
+                        const displayDate = formatDisplayDate(date).toLowerCase();
+                        return content.includes(lowerCaseSearch) || displayDate.includes(lowerCaseSearch);
+                    });
+                } else {
+                    filterHeader.classList.add('hidden');
+                    filterHeader.classList.remove('flex');
+                    const todayString = formatDate(new Date());
+
+                    if (journalEntries[todayString] === undefined) {
+                        journalEntries[todayString] = '';
+                        saveEntries(journalEntries);
+                    }
                 }
-
-                const visibleDates = Object.keys(journalEntries).sort().reverse();
 
                 const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
                 const endIndex = startIndex + ENTRIES_PER_PAGE;
-                const paginatedDates = visibleDates.slice(startIndex, endIndex);
+                const paginatedDates = datesToDisplay.slice(startIndex, endIndex);
 
-                paginatedDates.forEach(dateString => {
-                    const entryElement = createEntryElement(dateString, journalEntries[dateString]);
-                    journalContainer.appendChild(entryElement);
-                });
+                if (paginatedDates.length === 0 && (activeTagFilter || activeSearchTerm)) {
+                    journalContainer.innerHTML = `<p style="color: var(--text-color-light)">Keine Einträge für diesen Filter gefunden.</p>`;
+                } else {
+                    paginatedDates.forEach(dateString => {
+                        const entryElement = createEntryElement(dateString, journalEntries[dateString]);
+                        journalContainer.appendChild(entryElement);
+                    });
+                }
 
-                setupPagination(visibleDates.length);
+                setupPagination(datesToDisplay.length);
                 lucide.createIcons();
             };
 
             const setupPagination = (totalEntries) => {
                 const totalPages = Math.ceil(totalEntries / ENTRIES_PER_PAGE);
-                if (totalPages <= 1) return;
+                if (totalPages <= 1) {
+                    paginationControls.innerHTML = '';
+                    return;
+                }
 
                 const createButton = (text, onClick, condition) => {
                     const button = document.createElement('button');
@@ -672,6 +758,7 @@
                 pageInfo.style.color = 'var(--text-color-light)';
                 const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); window.scrollTo(0, 0); }, currentPage === totalPages);
 
+                paginationControls.innerHTML = '';
                 paginationControls.append(prevButton, pageInfo, nextButton);
             };
 
@@ -680,6 +767,24 @@
                 renderCalendar();
                 renderTagCloud();
             };
+
+            // --- EVENT LISTENER FÜR DIE SUCHE ---
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                clearSearchBtn.classList.toggle('hidden', !searchTerm);
+                activeSearchTerm = searchTerm;
+                activeTagFilter = null; // Suche überschreibt Tag-Filter
+                currentPage = 1;
+                updateAll();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                activeSearchTerm = '';
+                currentPage = 1;
+                updateAll();
+            });
 
             importInput.addEventListener('change', (event) => {
                 const files = event.target.files;
