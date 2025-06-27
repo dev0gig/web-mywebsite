@@ -96,7 +96,8 @@
             top: 1rem;
             right: 1rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            /* MODIFIZIERT: Ausrichtung für vertikales Layout */
             gap: 0.5rem;
             background-color: var(--controls-bg);
             padding: 0.5rem;
@@ -106,22 +107,7 @@
             z-index: 100;
         }
 
-        #zoom-controls {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background-color: var(--controls-bg);
-            padding: 0.25rem 0.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border-color);
-            z-index: 100;
-            user-select: none;
-            color: var(--text-color);
-        }
+        /* GELÖSCHT: Veraltete Zoom-Steuerung */
 
         .zoom-btn {
             background: none;
@@ -205,7 +191,8 @@
 
         .separator {
             width: 1px;
-            height: 24px;
+            height: 88px;
+            /* MODIFIZIERT: Höhe an neues Layout angepasst */
             background-color: var(--border-color);
             margin: 0 0.25rem;
         }
@@ -213,7 +200,30 @@
         #color-palette {
             display: flex;
             gap: 0.5rem;
+            max-width: 350px;
+            /* MODIFIZIERT: Breite erhöht, um Platz zu nutzen */
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-bottom: 8px;
         }
+
+        #color-palette::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        #color-palette::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #color-palette::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-bg);
+            border-radius: 3px;
+        }
+
+        #color-palette::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover-bg);
+        }
+
 
         .color-swatch {
             width: 20px;
@@ -221,16 +231,24 @@
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: border-color 0.2s;
+            /* MODIFIZIERT: Hover-Animation entfernt */
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
-        .color-swatch:hover {
-            transform: scale(1.1);
+        .color-swatch[data-color="#ffffff"] {
+            border: 1px solid var(--border-color);
         }
 
         .color-swatch.active {
             border-color: var(--active-ring-color);
         }
+
+        .color-swatch[data-color="#ffffff"].active {
+            border: 2px solid var(--active-ring-color);
+        }
+
 
         #line-width-container {
             display: flex;
@@ -311,6 +329,30 @@
             transform: translateX(-50%) translateY(200%);
             pointer-events: none;
         }
+
+        /* NEU: Container für die rechte Seite der Steuerung */
+        #right-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        #file-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #zoom-controls-integrated {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--button-hover-bg);
+            border-radius: 6px;
+            padding: 0.25rem;
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -319,6 +361,7 @@
         <canvas id="drawing-canvas"></canvas>
     </div>
 
+    <!-- MODIFIZIERT: HTML-Struktur für Steuerung angepasst -->
     <div id="controls-container">
         <div class="tool-palette">
             <div class="tool-row">
@@ -348,39 +391,40 @@
 
         <div class="separator"></div>
 
-        <div style="position: relative;">
-            <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
-            <button id="export-btn-main" class="btn" title="Exportieren">
-                <i data-lucide="upload"></i>
-            </button>
-            <div id="export-menu" class="hidden">
-                <button id="export-png">
-                    <i data-lucide="image"></i>
-                    <span>Als PNG exportieren</span>
-                </button>
-                <button id="export-drawing">
-                    <i data-lucide="save"></i>
-                    <span>Zeichnung speichern</span>
+        <div id="right-controls">
+            <div id="file-controls">
+                <div style="position: relative;">
+                    <button id="export-btn-main" class="btn" title="Exportieren">
+                        <i data-lucide="upload"></i>
+                    </button>
+                    <div id="export-menu" class="hidden">
+                        <button id="export-png">
+                            <i data-lucide="image"></i>
+                            <span>Als PNG exportieren</span>
+                        </button>
+                        <button id="export-drawing">
+                            <i data-lucide="save"></i>
+                            <span>Zeichnung speichern</span>
+                        </button>
+                    </div>
+                </div>
+                <label for="file-import" class="btn" title="Importieren">
+                    <i data-lucide="download"></i>
+                </label>
+                <input type="file" id="file-import" accept=".drawing,image/*">
+                <button id="trash-can" class="btn" title="Zeichenfläche leeren">
+                    <i data-lucide="trash-2"></i>
                 </button>
             </div>
+            <div id="zoom-controls-integrated">
+                <button id="zoom-out-btn" class="zoom-btn" title="Herauszoomen">-</button>
+                <span id="zoom-display">100%</span>
+                <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
+            </div>
         </div>
-
-        <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
-        <label for="file-import" class="btn" title="Importieren">
-            <i data-lucide="download"></i>
-        </label>
-        <input type="file" id="file-import" accept=".drawing,image/*">
-
-        <button id="trash-can" class="btn" title="Zeichenfläche leeren">
-            <i data-lucide="trash-2"></i>
-        </button>
     </div>
 
-    <div id="zoom-controls">
-        <button id="zoom-out-btn" class="zoom-btn" title="Herauszoomen">-</button>
-        <span id="zoom-display">100%</span>
-        <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
-    </div>
+    <!-- GELÖSCHT: Veralteter Zoom-Controls-Container -->
 
     <button id="back-to-content-btn" class="hidden">Zurück zur Zeichnung</button>
 
@@ -402,13 +446,18 @@
             let penColor = '#000000';
 
             const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
-            let penWidth = penWidthSteps[4]; // Entspricht Regler-Wert 5
+            let penWidth = penWidthSteps[4];
 
             // --- Lasso State ---
             let lassoPath = [];
             let selectedPathIndices = [];
             let isMovingSelection = false;
             let moveStartPoint = null;
+
+            // --- PC Pan State ---
+            let isPanningWithMouse = false;
+            let lastPanPoint = { x: 0, y: 0 };
+
 
             // --- INTERACTION STATE ---
             let interactionState = {
@@ -454,7 +503,12 @@
                 }
             });
 
-            const paletteColors = ['#000000', '#808080', '#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+            const paletteColors = [
+                '#000000', '#ffffff', '#808080', '#ef4444', '#f97316', '#eab308',
+                '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1',
+                '#8b5cf6', '#f472b6', '#a16207'
+            ];
+
             paletteColors.forEach(color => {
                 const swatch = document.createElement('div');
                 swatch.className = 'color-swatch';
@@ -805,7 +859,7 @@
                     if (isMovingSelection) {
                         isMovingSelection = false;
                         moveStartPoint = null;
-                        lassoPath = getSelectionBoundsPoly(); // Update lasso path to new bounds
+                        lassoPath = getSelectionBoundsPoly();
                         saveState();
                     }
                     redrawAll();
@@ -847,7 +901,11 @@
             function getHandleUnderCursor(pos) { const handles = getHandleRects(); for (const [key, rect] of Object.entries(handles)) { if (isPointInRect(pos, rect)) return key; } return null; }
 
             function updateCursorStyle(e) {
-                if (isGesturing) { canvas.style.cursor = 'move'; return; }
+                if (isPanningWithMouse) {
+                    canvasWrapper.style.cursor = 'grabbing';
+                    return;
+                }
+                if (isGesturing) { canvasWrapper.style.cursor = 'move'; return; }
 
                 let cursor = 'default';
                 if (currentTool === 'lasso') {
@@ -876,7 +934,7 @@
                         cursor = 'move';
                     }
                 }
-                canvas.style.cursor = cursor;
+                canvasWrapper.style.cursor = cursor;
             }
 
             function handleStrokeErase(pos) {
@@ -1179,6 +1237,35 @@
             canvasWrapper.addEventListener('pointerup', handlePointerUp);
             canvasWrapper.addEventListener('pointerleave', handlePointerUp);
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
+
+            // Event Listeners für das Verschieben mit der mittleren Maustaste
+            canvasWrapper.addEventListener('mousedown', (e) => {
+                if (e.button === 1) {
+                    e.preventDefault();
+                    isPanningWithMouse = true;
+                    lastPanPoint = { x: e.clientX, y: e.clientY };
+                    updateCursorStyle();
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isPanningWithMouse) {
+                    e.preventDefault();
+                    const dx = e.clientX - lastPanPoint.x;
+                    const dy = e.clientY - lastPanPoint.y;
+                    canvasWrapper.scrollLeft -= dx;
+                    canvasWrapper.scrollTop -= dy;
+                    lastPanPoint = { x: e.clientX, y: e.clientY };
+                }
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                if (e.button === 1 && isPanningWithMouse) {
+                    isPanningWithMouse = false;
+                    updateCursorStyle();
+                }
+            });
+
 
             initializeCanvas();
             lucide.createIcons();
