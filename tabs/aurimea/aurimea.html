@@ -100,17 +100,56 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--subtle-text);
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s; /* Übergänge für Farben und Rahmen */
         }
 
         .filter-btn:hover {
             background-color: var(--border-color);
         }
 
+        /* --- STILE FÜR AKTUELLE FILTER-BUTTONS (AKTIV-ZUSTAND) --- */
         .filter-btn.active {
-            border-color: #4f46e5;
-            background-color: #4f46e5;
-            color: white;
+            color: white; /* Textfarbe auf Weiß für alle aktiven Buttons */
+            border-color: transparent; /* Setze Standard-Rahmen auf transparent, Farben werden spezifisch gesetzt */
         }
+
+        .filter-btn.active[data-filter="all"] {
+            background-color: #9333ea; /* Tailwind violet-600 */
+            border-color: #9333ea;
+        }
+        .filter-btn.active[data-filter="all"]:hover {
+            background-color: #7c2d12; /* Dunklerer Violett-Ton für Hover */
+            border-color: #7c2d12;
+        }
+
+        .filter-btn.active[data-filter="Erste Bank"] {
+            background-color: #2563eb; /* Tailwind blue-600 */
+            border-color: #2563eb;
+        }
+        .filter-btn.active[data-filter="Erste Bank"]:hover {
+            background-color: #1d4ed8; /* Dunklerer Blau-Ton für Hover */
+            border-color: #1d4ed8;
+        }
+
+        .filter-btn.active[data-filter="N26"] {
+            background-color: #14b8a6; /* Tailwind teal-500 (Türkis) */
+            border-color: #14b8a6;
+        }
+        .filter-btn.active[data-filter="N26"]:hover {
+            background-color: #0d9488; /* Dunklerer Türkis-Ton für Hover */
+            border-color: #0d9488;
+        }
+
+        .filter-btn.active[data-filter="Revolut"] {
+            background-color: #9ca3af; /* Tailwind gray-400 (Silber) */
+            border-color: #9ca3af;
+        }
+        .filter-btn.active[data-filter="Revolut"]:hover {
+            background-color: #6b7280; /* Dunklerer Grau-Ton für Hover */
+            border-color: #6b7280;
+        }
+        /* --- ENDE STILE FÜR AKTUELLE FILTER-BUTTONS --- */
+
 
         .table-header-sortable:hover {
             background-color: var(--border-color);
@@ -240,9 +279,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Konten-Filter -->
             <div class="card p-4 rounded-xl shadow-md flex flex-col justify-center">
-                <div id="account-filter" class="flex justify-center flex-wrap gap-2">
+                <!-- Geändert: 'grid grid-cols-2' um 2 Spalten zu erzwingen, was zu 2 Reihen führt -->
+                <div id="account-filter" class="grid grid-cols-2 gap-2">
+                    <!-- 'flex-grow' entfernt, da 'grid' die Breitenverteilung übernimmt -->
                     <button data-filter="all"
-                        class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle Konten</button>
+                        class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
+                        Konten</button>
                     <button data-filter="Erste Bank"
                         class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste Bank</button>
                     <button data-filter="N26"
