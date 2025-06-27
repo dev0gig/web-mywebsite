@@ -1305,7 +1305,7 @@
             document.getElementById('export-drawing').addEventListener('click', () => { 
                 saveState();
                 const stateString = localStorage.getItem('drawingState') || '{}';
-                const blob = new Blob([stateString], { type: 'application/json' });
+                const blob = new Blob([stateString], { type: 'application/octet-stream' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.download = 'zeichnung.drawing';
