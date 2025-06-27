@@ -109,7 +109,7 @@
         #zoom-controls {
             position: fixed;
             bottom: 1rem;
-            bottom: calc(1rem + env(safe-area-inset-bottom)); left: 1rem;
+            left: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -291,7 +291,7 @@
         #back-to-content-btn {
             position: fixed;
             bottom: 1rem;
-            bottom: calc(1rem + env(safe-area-inset-bottom)); left: 50%;
+            left: 50%;
             transform: translateX(-50%);
             background-color: var(--controls-bg);
             color: var(--text-color);
@@ -331,7 +331,6 @@
                 <button id="pixel-eraser-tool" class="btn" title="Radierer">
                     <i data-lucide="eraser"></i>
                 </button>
-                <!-- NEU: Lasso-Werkzeug Button -->
                 <button id="lasso-tool" class="btn" title="Lasso Auswahl">
                     <i data-lucide="crop"></i>
                 </button>
@@ -340,7 +339,7 @@
                 </button>
                 <div id="line-width-container">
                     <input type="range" id="line-width-slider" min="1" max="10" value="5" title="Stiftbreite">
-                    <span id="line-width-value">5</span>
+                    <span id="line-width-value">9</span>
                 </div>
             </div>
             <div class="tool-row" id="color-palette">
@@ -350,8 +349,9 @@
         <div class="separator"></div>
 
         <div style="position: relative;">
+            <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
             <button id="export-btn-main" class="btn" title="Exportieren">
-                <i data-lucide="download"></i>
+                <i data-lucide="upload"></i>
             </button>
             <div id="export-menu" class="hidden">
                 <button id="export-png">
@@ -365,8 +365,9 @@
             </div>
         </div>
 
+        <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
         <label for="file-import" class="btn" title="Importieren">
-            <i data-lucide="upload"></i>
+            <i data-lucide="download"></i>
         </label>
         <input type="file" id="file-import" accept=".drawing,image/*">
 
@@ -399,9 +400,11 @@
             let isDrawing = false;
             let currentTool = 'pen';
             let penColor = '#000000';
-            let penWidth = 5;
 
-            // --- NEU: Lasso State ---
+            const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
+            let penWidth = penWidthSteps[4]; // Entspricht Regler-Wert 5
+
+            // --- Lasso State ---
             let lassoPath = [];
             let selectedPathIndices = [];
             let isMovingSelection = false;
@@ -425,7 +428,7 @@
             const penToolBtn = document.getElementById('pen-tool');
             const pixelEraserBtn = document.getElementById('pixel-eraser-tool');
             const strokeEraserBtn = document.getElementById('stroke-eraser-tool');
-            const lassoToolBtn = document.getElementById('lasso-tool'); // NEU
+            const lassoToolBtn = document.getElementById('lasso-tool');
             const widthSlider = document.getElementById('line-width-slider');
             const widthValueSpan = document.getElementById('line-width-value');
             const colorPaletteContainer = document.getElementById('color-palette');
@@ -506,7 +509,6 @@
 
                 if (forExport) return;
 
-                // NEU: Lasso-Auswahl zeichnen
                 if (selectedPathIndices.length > 0 && lassoPath.length > 0) {
                     ctx.strokeStyle = isDarkMode ? '#3b82f6' : '#2563eb';
                     ctx.lineWidth = 1 / zoom;
@@ -649,6 +651,7 @@
                             selectedPathIndices = [];
                             lassoPath = [pos];
                         }
+                        redrawAll();
                         return;
                     }
 
@@ -740,7 +743,22 @@
                         imageState.y = interactionState.startImageY + dy;
                         redrawAll();
                     } else if (interactionState.type && interactionState.type.startsWith('resize-')) {
-                        // ... (resize logic)
+                        const dx = pos.x - interactionState.startX;
+                        const dy = pos.y - interactionState.startY;
+                        const handle = interactionState.type.replace('resize-', '');
+                        if (handle.includes('r')) imageState.width = Math.max(20, interactionState.startImageWidth + dx);
+                        if (handle.includes('b')) imageState.height = Math.max(20, interactionState.startImageHeight + dy);
+                        if (handle.includes('l')) {
+                            const newWidth = Math.max(20, interactionState.startImageWidth - dx);
+                            imageState.x = interactionState.startImageX + interactionState.startImageWidth - newWidth;
+                            imageState.width = newWidth;
+                        }
+                        if (handle.includes('t')) {
+                            const newHeight = Math.max(20, interactionState.startImageHeight - dy);
+                            imageState.y = interactionState.startImageY + interactionState.startImageHeight - newHeight;
+                            imageState.height = newHeight;
+                        }
+                        redrawAll();
                     } else if (interactionState.type === 'draw') {
                         if (currentTool === 'stroke-eraser') {
                             handleStrokeErase(pos);
@@ -783,20 +801,19 @@
                     if (isDrawing) {
                         isDrawing = false;
                         selectPathsInLasso();
-                        redrawAll();
                     }
                     if (isMovingSelection) {
                         isMovingSelection = false;
                         moveStartPoint = null;
-                        lassoPath = [];
+                        lassoPath = getSelectionBoundsPoly(); // Update lasso path to new bounds
                         saveState();
-                        redrawAll();
                     }
+                    redrawAll();
                 } else if (isDrawing) {
-                    if (interactionState.type === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 0) {
+                    if (interactionState.type === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
                         paths.push({ points: currentPath, color: (currentTool === 'pen') ? penColor : 'ERASER', width: penWidth });
-                        currentPath = [];
                     }
+                    currentPath = [];
                     redrawAll();
                     saveState();
                 }
@@ -862,10 +879,40 @@
                 canvas.style.cursor = cursor;
             }
 
-            function handleStrokeErase(pos) { /* ... (unverändert) ... */ }
-            function isPointNearLine(p, a, b, threshold) { /* ... (unverändert) ... */ }
+            function handleStrokeErase(pos) {
+                let didErase = false;
+                for (let i = paths.length - 1; i >= 0; i--) {
+                    const path = paths[i];
+                    if (path.color === 'ERASER') continue;
+                    const threshold = path.width / 2 + 5;
+                    for (let j = 0; j < path.points.length - 1; j++) {
+                        if (isPointNearLine(pos, path.points[j], path.points[j + 1], threshold)) {
+                            paths.splice(i, 1);
+                            didErase = true;
+                            const selectionIndex = selectedPathIndices.indexOf(i);
+                            if (selectionIndex > -1) {
+                                selectedPathIndices.splice(selectionIndex, 1);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (didErase) {
+                    redrawAll();
+                    saveState();
+                }
+            }
 
-            // NEU: Hilfsfunktionen für Lasso
+            function isPointNearLine(p, a, b, threshold) {
+                const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+                if (l2 === 0) return Math.hypot(p.x - a.x, p.y - a.y) < threshold;
+                let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+                t = Math.max(0, Math.min(1, t));
+                const dx = p.x - (a.x + t * (b.x - a.x));
+                const dy = p.y - (a.y + t * (b.y - a.y));
+                return Math.hypot(dx, dy) < threshold;
+            }
+
             function getSelectionBounds() {
                 if (selectedPathIndices.length === 0) return null;
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -878,6 +925,17 @@
                     });
                 });
                 return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+            }
+
+            function getSelectionBoundsPoly() {
+                const bounds = getSelectionBounds();
+                if (!bounds) return [];
+                return [
+                    { x: bounds.x, y: bounds.y },
+                    { x: bounds.x + bounds.width, y: bounds.y },
+                    { x: bounds.x + bounds.width, y: bounds.y + bounds.height },
+                    { x: bounds.x, y: bounds.y + bounds.height }
+                ];
             }
 
             function isPointInSelectionBounds(pos) {
@@ -900,7 +958,9 @@
                     }
                 });
 
-                if (selectedPathIndices.length === 0) {
+                if (selectedPathIndices.length > 0) {
+                    lassoPath = getSelectionBoundsPoly();
+                } else {
                     lassoPath = [];
                 }
             }
@@ -943,7 +1003,7 @@
             });
 
             widthSlider.addEventListener('input', (e) => {
-                penWidth = e.target.value;
+                penWidth = penWidthSteps[e.target.value - 1];
                 widthValueSpan.textContent = penWidth;
                 if (['pen', 'pixel-eraser'].includes(currentTool)) updateCursorStyle();
             });
@@ -968,16 +1028,146 @@
                 setZoom(zoom * zoomFactor, centerX, centerY);
             });
 
-            function calculateContentBounds() { /* ... (unverändert) ... */ }
+            function calculateContentBounds() {
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                if (paths.length === 0 && !imageState.img) return null;
+
+                if (imageState.img) {
+                    minX = Math.min(minX, imageState.x); minY = Math.min(minY, imageState.y);
+                    maxX = Math.max(maxX, imageState.x + imageState.width); maxY = Math.max(maxY, imageState.y + imageState.height);
+                }
+                paths.forEach(path => {
+                    path.points.forEach(point => {
+                        minX = Math.min(minX, point.x); minY = Math.min(minY, point.y);
+                        maxX = Math.max(maxX, point.x); maxY = Math.max(maxY, point.y);
+                    });
+                });
+                if (minX === Infinity) return null;
+                return { minX, minY, maxX, maxY };
+            }
             let scrollCheckTimeout;
-            function checkContentInView() { /* ... (unverändert) ... */ }
-            document.getElementById('trash-can').addEventListener('click', () => { /* ... (unverändert) ... */ });
+            function checkContentInView() {
+                const bounds = calculateContentBounds();
+                if (!bounds) {
+                    backToContentBtn.classList.add('hidden');
+                    return;
+                }
+                const viewport = {
+                    left: canvasWrapper.scrollLeft / zoom,
+                    top: canvasWrapper.scrollTop / zoom,
+                    right: (canvasWrapper.scrollLeft + canvasWrapper.clientWidth) / zoom,
+                    bottom: (canvasWrapper.scrollTop + canvasWrapper.clientHeight) / zoom
+                };
+
+                const contentIsVisible = (
+                    bounds.minX < viewport.right &&
+                    bounds.maxX > viewport.left &&
+                    bounds.minY < viewport.bottom &&
+                    bounds.maxY > viewport.top
+                );
+
+                backToContentBtn.classList.toggle('hidden', contentIsVisible);
+            }
+            document.getElementById('trash-can').addEventListener('click', () => {
+                if (confirm('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?')) {
+                    paths = [];
+                    imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
+                    selectedPathIndices = [];
+                    lassoPath = [];
+                    imageToolBtn.classList.add('disabled');
+                    setActiveTool('pen');
+                    saveState();
+                    redrawAll();
+                    checkContentInView();
+                }
+            });
             document.getElementById('export-btn-main').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('export-menu').classList.toggle('hidden'); });
             window.addEventListener('click', (e) => { if (!document.getElementById('export-menu').contains(e.target) && !e.target.closest('#export-btn-main')) { document.getElementById('export-menu').classList.add('hidden'); } });
-            document.getElementById('export-png').addEventListener('click', () => { /* ... (unverändert) ... */ });
-            document.getElementById('export-drawing').addEventListener('click', () => { /* ... (unverändert) ... */ });
-            document.getElementById('file-import').addEventListener('change', (e) => { /* ... (unverändert) ... */ });
-            backToContentBtn.addEventListener('click', () => { /* ... (unverändert) ... */ });
+            document.getElementById('export-png').addEventListener('click', () => {
+                const bounds = calculateContentBounds();
+                if (!bounds) { alert("Die Zeichenfläche ist leer."); return; }
+                const padding = 20;
+                const exportWidth = bounds.maxX - bounds.minX + padding * 2;
+                const exportHeight = bounds.maxY - bounds.minY + padding * 2;
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = exportWidth;
+                exportCanvas.height = exportHeight;
+                const exportCtx = exportCanvas.getContext('2d');
+
+                const tempMainCanvas = document.createElement('canvas');
+                tempMainCanvas.width = canvas.width;
+                tempMainCanvas.height = canvas.height;
+                const tempMainCtx = tempMainCanvas.getContext('2d');
+                const originalCtx = ctx;
+
+                ctx = tempMainCtx;
+                redrawAll(true);
+                ctx = originalCtx;
+
+                exportCtx.drawImage(tempMainCanvas, bounds.minX - padding, bounds.minY - padding, exportWidth, exportHeight, 0, 0, exportWidth, exportHeight);
+
+                const link = document.createElement('a');
+                link.download = 'zeichnung.png';
+                link.href = exportCanvas.toDataURL('image/png');
+                link.click();
+                document.getElementById('export-menu').classList.add('hidden');
+            });
+            document.getElementById('export-drawing').addEventListener('click', () => {
+                saveState();
+                const stateString = localStorage.getItem('drawingState') || '{}';
+                const blob = new Blob([stateString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'zeichnung.drawing';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                document.getElementById('export-menu').classList.add('hidden');
+            });
+            document.getElementById('file-import').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (!confirm('Ihre aktuelle Zeichnung wird ersetzt. Fortfahren?')) { e.target.value = ''; return; }
+                const reader = new FileReader();
+                if (file.type.startsWith('image/')) {
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            paths = [];
+                            imageState = {
+                                img: img, src: event.target.result,
+                                x: (canvas.width - img.width) / 2, y: (canvas.height - img.height) / 2,
+                                width: img.width, height: img.height
+                            };
+                            imageToolBtn.classList.remove('disabled');
+                            setActiveTool('image');
+                            saveState();
+                            redrawAll();
+                            checkContentInView();
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.name.endsWith('.drawing')) {
+                    reader.onload = (event) => { localStorage.setItem('drawingState', event.target.result); loadState(); };
+                    reader.readAsText(file);
+                } else {
+                    alert('Ungültiger Dateityp.');
+                }
+                e.target.value = '';
+            });
+            backToContentBtn.addEventListener('click', () => {
+                const bounds = calculateContentBounds();
+                if (!bounds) return;
+                const contentCenterX = (bounds.minX + bounds.maxX) / 2;
+                const contentCenterY = (bounds.minY + bounds.maxY) / 2;
+
+                canvasWrapper.scrollTo({
+                    left: contentCenterX * zoom - canvasWrapper.clientWidth / 2,
+                    top: contentCenterY * zoom - canvasWrapper.clientHeight / 2,
+                    behavior: 'smooth'
+                });
+            });
             canvasWrapper.addEventListener('scroll', () => {
                 clearTimeout(scrollCheckTimeout);
                 scrollCheckTimeout = setTimeout(checkContentInView, 150);
