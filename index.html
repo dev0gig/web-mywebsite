@@ -33,9 +33,15 @@
             --sidebar-link-active-bg: #7c3aed;
         }
 
+        /* Mobile Menu Icons im Dark Mode invertieren und zentrieren */
+        html[data-theme='dark'] #mobile-menu img {
+            filter: invert(1) brightness(1.5) contrast(1.2);
+        }
+
         /* Bilder im Dark Mode invertieren (z.B. schwarze Icons zu weißen Icons) */
         html[data-theme='dark'] #sidebar img {
-            filter: invert(1) brightness(1.5) contrast(1.2); /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
+            filter: invert(1) brightness(1.5) contrast(1.2);
+            /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
         }
 
         html,
@@ -200,7 +206,7 @@
 
     <!-- Mobile Header (wird auf md und grösser versteckt) -->
     <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4">
-        <span id="mobile-header-title" class="font-bold text-lg"
+        <span id="mobile-header-title" class="font-bold text-lg text-center"
             style="color: var(--header-text-color);">Appdrawer</span>
         <button id="hamburger-btn" class="p-1">
             <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -213,17 +219,21 @@
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
-            <li><a href="appdrawer.html" data-target="frame-appdrawer" class="sidebar-link flex items-center p-3 rounded-lg active">
+            <li><a href="appdrawer.html" data-target="frame-appdrawer"
+                    class="sidebar-link flex items-center p-3 rounded-lg active">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
-                    <span class="sidebar-text font-medium">Appdrawer</span></a></li>
-            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets" class="sidebar-link flex items-center p-3 rounded-lg">
+                    <span class="sidebar-text font-medium">Appdrawer</span></a>
+            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/widgets.svg" alt="Widgets Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea" class="sidebar-link flex items-center p-3 rounded-lg">
+            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
-            <li><a href="memomea/memomea.html" data-target="frame-memomea" class="sidebar-link flex items-center p-3 rounded-lg">
+            <li><a href="memomea/memomea.html" data-target="frame-memomea"
+                    class="sidebar-link flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">MemoMea</span></a>
             </li>
@@ -245,7 +255,7 @@
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
         <ul class="space-y-2">
-            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
+            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
         </ul>
@@ -254,7 +264,7 @@
     <!-- Mobile Menu Panel -->
     <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu"
-        class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4">
+        class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4 flex flex-col justify-between">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Menü</h2>
             <button id="close-mobile-menu-btn" class="p-1">
@@ -265,6 +275,9 @@
             </button>
         </div>
         <ul id="mobile-nav-links" class="space-y-2">
+            <!-- Mobile links werden hier via JS eingefügt -->
+        </ul>
+        <ul id="mobile-bottom-nav-links" class="space-y-2">
             <!-- Mobile links werden hier via JS eingefügt -->
         </ul>
     </nav>
@@ -400,8 +413,8 @@
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
             }
 
-            // Links für Mobile-Menü klonen
-            desktopNavLinks.forEach(link => {
+            // Nur die Haupt-Navigationslinks für den oberen Teil des Mobile-Menüs klonen
+            document.querySelectorAll('#nav-links .sidebar-link').forEach(link => {
                 const li = document.createElement('li');
                 const newLink = link.cloneNode(true);
                 // Entfernen Sie die 'sidebar-text' Klasse, da sie nur für Desktop-Hover-Effekte relevant ist
@@ -411,12 +424,27 @@
                     sidebarTextSpan.style.opacity = 1;
                     sidebarTextSpan.style.maxWidth = '150px';
                     sidebarTextSpan.classList.remove('sidebar-text');
+                    sidebarTextSpan.classList.add('ml-3'); // Add margin for mobile icons
                 }
                 newLink.classList.add('w-full');
                 li.appendChild(newLink);
                 mobileNavLinksContainer.appendChild(li);
                 newLink.addEventListener('click', handleNavLinkClick);
             });
+
+            // Clone and append settings button to mobile menu bottom
+            const desktopSettingsLi = document.querySelector('#sidebar ul:last-child li');
+            if (desktopSettingsLi) {
+                const mobileSettingsLi = desktopSettingsLi.cloneNode(true);
+                const mobileSettingsBtn = mobileSettingsLi.querySelector('#settings-btn'); // Get the button inside the cloned li
+                const mobileSettingsTextSpan = mobileSettingsBtn.querySelector('.sidebar-text');
+                if (mobileSettingsTextSpan) {
+                    mobileSettingsTextSpan.classList.remove('sidebar-text');
+                    mobileSettingsTextSpan.classList.add('ml-3'); // Add margin for mobile icons
+                }
+                document.getElementById('mobile-bottom-nav-links').appendChild(mobileSettingsLi);
+                mobileSettingsBtn.addEventListener('click', handleNavLinkClick);
+            }
 
             desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
 
@@ -496,6 +524,7 @@
             }
         });
     </script>
+</body>
 </body>
 
 </html>
