@@ -335,7 +335,7 @@
                     <i data-lucide="zap"></i>
                 </button>
                 <div id="line-width-container">
-                    <input type="range" id="line-width-slider" min="1" max="50" value="5" title="Stiftbreite">
+                    <input type="range" id="line-width-slider" min="1" max="10" value="5" title="Stiftbreite">
                     <span id="line-width-value">5</span>
                 </div>
             </div>
@@ -407,7 +407,7 @@
 
             // --- POINTER & GESTURE STATE ---
             const activePointers = new Map();
-            let isGesturing = false;
+            let isGesturing = false; // Wird für Pan & Zoom mit Fingern verwendet
             let lastGesture = { dist: 0, center: null, pan: { x: 0, y: 0 } };
 
             // --- UI ELEMENTS ---
@@ -430,6 +430,7 @@
                 updateTransform();
             }
 
+            // This function is no longer needed for color inversion but kept for potential future use.
             function invertHex(hex) {
                 if (!hex || typeof hex !== 'string') return '#000000';
                 hex = hex.replace('#', '');
@@ -461,6 +462,7 @@
                 colorPaletteContainer.appendChild(swatch);
             });
 
+            // MODIFIZIERT: Logik zum Neuzeichnen überarbeitet
             function redrawAll(forExport = false) {
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
@@ -468,26 +470,23 @@
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+                // MODIFIZIERT: Bild wird nicht mehr invertiert.
                 if (imageState.img) {
-                    let imgToDraw = imageState.img;
-                    if (isCurrentlyDark) {
-                        const tempCanvas = document.createElement('canvas');
-                        const tempCtx = tempCanvas.getContext('2d');
-                        tempCanvas.width = imgToDraw.width;
-                        tempCanvas.height = imgToDraw.height;
-                        tempCtx.filter = 'invert(1) hue-rotate(180deg)';
-                        tempCtx.drawImage(imgToDraw, 0, 0);
-                        imgToDraw = tempCanvas;
-                    }
-                    ctx.drawImage(imgToDraw, imageState.x, imageState.y, imageState.width, imageState.height);
+                    ctx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
                 }
 
+                // MODIFIZIERT: Nur schwarze Striche werden im Dark Mode invertiert.
                 paths.forEach(path => {
                     ctx.beginPath();
                     if (path.color === 'ERASER') {
                         ctx.strokeStyle = bgColor;
                     } else {
-                        ctx.strokeStyle = isCurrentlyDark ? invertHex(path.color) : path.color;
+                        // Nur schwarze Farbe im Dark Mode zu weiß invertieren
+                        if (isCurrentlyDark && path.color === '#000000') {
+                            ctx.strokeStyle = '#ffffff';
+                        } else {
+                            ctx.strokeStyle = path.color; // Alle anderen Farben bleiben original
+                        }
                     }
                     ctx.lineWidth = path.width;
                     ctx.lineCap = 'round';
@@ -591,23 +590,26 @@
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
 
-                // Allow gesture start with multiple fingers
-                if (e.pointerType === 'touch' && activePointers.size >= 1) {
-                    activePointers.set(e.pointerId, e);
-                    isDrawing = false;
-                    isGesturing = true;
-                    const pointers = Array.from(activePointers.values());
-                    lastGesture.dist = Math.hypot(pointers[0].clientX - pointers[1].clientX, pointers[0].clientY - pointers[1].clientY);
-                    lastGesture.pan.x = (pointers[0].clientX + pointers[1].clientX) / 2;
-                    lastGesture.pan.y = (pointers[0].clientY + pointers[1].clientY) / 2;
-                    return;
-                }
-
                 activePointers.set(e.pointerId, e);
                 canvasWrapper.setPointerCapture(e.pointerId);
 
-                // Start drawing ONLY with pen or mouse
-                if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && e.button === 0)) {
+                if (e.pointerType === 'touch') {
+                    isGesturing = true;
+                    isDrawing = false;
+                    const pointers = Array.from(activePointers.values());
+                    if (pointers.length === 1) {
+                        interactionState.type = 'pan';
+                        lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
+                    } else if (pointers.length >= 2) {
+                        interactionState.type = 'zoom';
+                        lastGesture.dist = Math.hypot(pointers[0].clientX - pointers[1].clientX, pointers[0].clientY - pointers[1].clientY);
+                        lastGesture.center = {
+                            x: (pointers[0].clientX + pointers[1].clientX) / 2,
+                            y: (pointers[0].clientY + pointers[1].clientY) / 2
+                        };
+                    }
+                }
+                else if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && e.button === 0)) {
                     isDrawing = true;
                     isGesturing = false;
                     const pos = getCanvasPoint(e);
@@ -642,31 +644,32 @@
             function handlePointerMove(e) {
                 if (!activePointers.has(e.pointerId)) return;
 
-                // Update pointer position in map
                 activePointers.set(e.pointerId, e);
                 updateCursorStyle(e);
 
-                if (isGesturing && activePointers.size >= 2) {
+                if (isGesturing) {
                     const pointers = Array.from(activePointers.values());
-                    const pointer1 = pointers[0];
-                    const pointer2 = pointers[1];
+                    if (pointers.length >= 2 && interactionState.type === 'zoom') {
+                        const newDist = Math.hypot(pointers[0].clientX - pointers[1].clientX, pointers[0].clientY - pointers[1].clientY);
+                        const newCenter = {
+                            x: (pointers[0].clientX + pointers[1].clientX) / 2,
+                            y: (pointers[0].clientY + pointers[1].clientY) / 2
+                        };
 
-                    const newDist = Math.hypot(pointer1.clientX - pointer2.clientX, pointer1.clientY - pointer2.clientY);
-                    const newPanX = (pointer1.clientX + pointer2.clientX) / 2;
-                    const newPanY = (pointer1.clientY + pointer2.clientY) / 2;
+                        const wrapperRect = canvasWrapper.getBoundingClientRect();
+                        const centerX = newCenter.x - wrapperRect.left;
+                        const centerY = newCenter.y - wrapperRect.top;
 
-                    canvasWrapper.scrollLeft -= newPanX - lastGesture.pan.x;
-                    canvasWrapper.scrollTop -= newPanY - lastGesture.pan.y;
+                        setZoom(zoom * (newDist / lastGesture.dist), centerX, centerY);
+                        lastGesture.dist = newDist;
 
-                    const wrapperRect = canvasWrapper.getBoundingClientRect();
-                    const centerX = newPanX - wrapperRect.left;
-                    const centerY = newPanY - wrapperRect.top;
-                    setZoom(zoom * (newDist / lastGesture.dist), centerX, centerY);
-
-                    lastGesture.dist = newDist;
-                    lastGesture.pan.x = newPanX;
-                    lastGesture.pan.y = newPanY;
-
+                    } else if (pointers.length === 1 && interactionState.type === 'pan') {
+                        const dx = pointers[0].clientX - lastGesture.pan.x;
+                        const dy = pointers[0].clientY - lastGesture.pan.y;
+                        canvasWrapper.scrollLeft -= dx;
+                        canvasWrapper.scrollTop -= dy;
+                        lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
+                    }
                 } else if (isDrawing) {
                     const pos = getCanvasPoint(e);
 
@@ -700,7 +703,19 @@
                         }
                         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
                         const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-                        const strokeStyle = (currentTool === 'pen') ? (isDarkMode ? invertHex(penColor) : penColor) : bgColor;
+
+                        // MODIFIZIERT: Logik für die Strichfarbe an die neuen Regeln angepasst
+                        let strokeStyle;
+                        if (currentTool === 'pen') {
+                            if (isDarkMode && penColor === '#000000') {
+                                strokeStyle = '#ffffff';
+                            } else {
+                                strokeStyle = penColor;
+                            }
+                        } else { // Eraser
+                            strokeStyle = bgColor;
+                        }
+
 
                         ctx.lineCap = 'round';
                         ctx.lineJoin = 'round';
@@ -730,9 +745,20 @@
                     saveState();
                 }
 
-                isDrawing = false;
                 activePointers.delete(e.pointerId);
-                if (activePointers.size < 2) isGesturing = false;
+
+                if (activePointers.size === 0) {
+                    isDrawing = false;
+                    isGesturing = false;
+                    interactionState.type = null;
+                }
+                else if (activePointers.size === 1) {
+                    const pointers = Array.from(activePointers.values());
+                    if (pointers[0].pointerType === 'touch') {
+                        interactionState.type = 'pan';
+                        lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
+                    }
+                }
 
                 canvasWrapper.releasePointerCapture(e.pointerId);
                 updateCursorStyle(e);
@@ -754,7 +780,7 @@
                 if (currentTool === 'stroke-eraser') {
                     cursor = 'crosshair';
                 } else if (['pen', 'pixel-eraser'].includes(currentTool)) {
-                    const size = Math.max(2, penWidth);
+                    const size = Math.max(2, penWidth * zoom);
                     const halfSize = size / 2;
                     const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" stroke-width="1" stroke="${isDarkMode ? 'white' : 'black'}" fill="none"/></svg>`;
                     cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
