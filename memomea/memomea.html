@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mein Journal mit Gemini</title>
+    <title>MemoMea</title>
     <!-- Tailwind CSS für das Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Marked.js zur Umwandlung von Markdown in HTML -->
@@ -16,45 +17,71 @@
     <style>
         /* Google Font für eine saubere Typografie */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+
         /* Theming Variablen für Light & Dark Mode */
         :root {
-            --bg-color: #f8fafc; /* slate-50 */
-            --text-color: #1e293b; /* slate-800 */
-            --text-color-light: #64748b; /* slate-500 */
-            --text-color-heading: #334155; /* slate-700 */
-            --border-color: #e2e8f0; /* slate-200 */
-            --card-bg: #ffffff; /* white */
+            --bg-color: #f8fafc;
+            /* slate-50 */
+            --text-color: #1e293b;
+            /* slate-800 */
+            --text-color-light: #64748b;
+            /* slate-500 */
+            --text-color-heading: #334155;
+            /* slate-700 */
+            --border-color: #e2e8f0;
+            /* slate-200 */
+            --card-bg: #ffffff;
+            /* white */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --button-primary-bg: #1e293b; /* slate-800 */
-            --button-primary-text: #ffffff; /* white */
-            --button-primary-hover-bg: #334155; /* slate-700 */
-            --button-secondary-bg: #ffffff; /* white */
-            --button-secondary-border: #cbd5e1; /* slate-300 */
-            --button-secondary-text: #334155; /* slate-700 */
-            --button-secondary-hover-bg: #f8fafc; /* slate-50 */
+            --button-primary-bg: #1e293b;
+            /* slate-800 */
+            --button-primary-text: #ffffff;
+            /* white */
+            --button-primary-hover-bg: #334155;
+            /* slate-700 */
+            --button-secondary-bg: #ffffff;
+            /* white */
+            --button-secondary-border: #cbd5e1;
+            /* slate-300 */
+            --button-secondary-text: #334155;
+            /* slate-700 */
+            --button-secondary-hover-bg: #f8fafc;
+            /* slate-50 */
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --prose-blockquote-border: #cbd5e1;
             --prose-blockquote-text: #64748b;
             --prose-code-bg: #e2e8f0;
             --prose-pre-bg: #f1f5f9;
-            --gemini-output-bg: #f1f5f9;
+            --tag-bg: #e0e7ff;
+            /* indigo-100 */
+            --tag-text: #3730a3;
+            /* indigo-800 */
         }
 
         html[data-theme='dark'] {
-            --bg-color: #171717; /* neutral-900 */
-            --text-color: #e5e5e5; /* neutral-200 */
-            --text-color-light: #a3a3a3; /* neutral-400 */
-            --text-color-heading: #fafafa; /* neutral-50 */
-            --border-color: #404040; /* neutral-700 */
-            --card-bg: #262626; /* neutral-800 */
+            --bg-color: #171717;
+            /* neutral-900 */
+            --text-color: #e5e5e5;
+            /* neutral-200 */
+            --text-color-light: #a3a3a3;
+            /* neutral-400 */
+            --text-color-heading: #fafafa;
+            /* neutral-50 */
+            --border-color: #404040;
+            /* neutral-700 */
+            --card-bg: #262626;
+            /* neutral-800 */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
-            --button-primary-bg: #f5f5f5; /* neutral-100 */
-            --button-primary-text: #171717; /* neutral-900 */
-            --button-primary-hover-bg: #e5e5e5; /* neutral-200 */
+            --button-primary-bg: #f5f5f5;
+            /* neutral-100 */
+            --button-primary-text: #171717;
+            /* neutral-900 */
+            --button-primary-hover-bg: #e5e5e5;
+            /* neutral-200 */
             --button-secondary-bg: #262626;
-            --button-secondary-border: #525252; /* neutral-600 */
+            --button-secondary-border: #525252;
+            /* neutral-600 */
             --button-secondary-text: #e5e5e5;
             --button-secondary-hover-bg: #404040;
             --input-bg: #404040;
@@ -63,7 +90,10 @@
             --prose-blockquote-text: #a3a3a3;
             --prose-code-bg: #404040;
             --prose-pre-bg: #171717;
-            --gemini-output-bg: #171717;
+            --tag-bg: #3730a3;
+            /* indigo-800 */
+            --tag-text: #e0e7ff;
+            /* indigo-100 */
         }
 
         /* Basis-Styling für den Body */
@@ -78,80 +108,164 @@
         .main-header {
             border-color: var(--border-color);
         }
+
         .main-header h1 {
             color: var(--text-color-heading);
         }
+
         .journal-entry {
             background-color: var(--card-bg);
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
         }
+
         .journal-entry h2 {
             color: var(--text-color-light);
             border-color: var(--border-color);
         }
+
         .journal-entry textarea {
             background-color: var(--input-bg);
             border-color: var(--input-border);
             color: var(--text-color);
         }
-        .journal-entry .gemini-output {
-            background-color: var(--gemini-output-bg);
-        }
+
         #calendar-container {
             background-color: var(--card-bg);
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
         }
-        #pagination-controls button, .modal-button {
-             background-color: var(--button-secondary-bg);
-             border-color: var(--button-secondary-border);
-             color: var(--button-secondary-text);
+
+        #pagination-controls button,
+        .modal-button {
+            background-color: var(--button-secondary-bg);
+            border-color: var(--button-secondary-border);
+            color: var(--button-secondary-text);
         }
-        #pagination-controls button:hover, .modal-button:hover {
+
+        #pagination-controls button:hover,
+        .modal-button:hover {
             background-color: var(--button-secondary-hover-bg);
         }
+
         .primary-button {
             background-color: var(--button-primary-bg);
             color: var(--button-primary-text);
         }
+
         .primary-button:hover {
             background-color: var(--button-primary-hover-bg);
         }
 
         /* Markdown-Vorschau-Stile */
-        .prose-preview h1 { color: var(--text-color-heading); font-size: 1.875rem; font-weight: 700; margin-top: 1em; margin-bottom: 0.6em; }
-        .prose-preview h2 { color: var(--text-color-heading); font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
-        .prose-preview h3 { color: var(--text-color-heading); font-size: 1.25rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
-        .prose-preview p { margin-bottom: 0.75em; line-height: 1.6; }
-        .prose-preview ul, .prose-preview ol { padding-left: 1.5em; margin-bottom: 1em; }
-        .prose-preview blockquote { border-left-width: 4px; border-left-color: var(--prose-blockquote-border); color: var(--prose-blockquote-text); padding-left: 1em; margin-left: 0; }
-        .prose-preview code { background-color: var(--prose-code-bg); padding: 0.1em 0.3em; border-radius: 4px; font-family: monospace; }
-        .prose-preview pre { background-color: var(--prose-pre-bg); padding: 1em; border-radius: 8px; overflow-x: auto; }
-        .prose-preview pre code { background-color: transparent; padding: 0; }
-        .date-header { cursor: pointer; }
+        .prose-preview h1 {
+            color: var(--text-color-heading);
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 1em;
+            margin-bottom: 0.6em;
+        }
 
-        .loader {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        .prose-preview h2 {
+            color: var(--text-color-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
+
+        .prose-preview h3 {
+            color: var(--text-color-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .prose-preview p {
+            margin-bottom: 0.75em;
+            line-height: 1.6;
+        }
+
+        .prose-preview ul,
+        .prose-preview ol {
+            padding-left: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .prose-preview blockquote {
+            border-left-width: 4px;
+            border-left-color: var(--prose-blockquote-border);
+            color: var(--prose-blockquote-text);
+            padding-left: 1em;
+            margin-left: 0;
+        }
+
+        .prose-preview code {
+            background-color: var(--prose-code-bg);
+            padding: 0.1em 0.3em;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .prose-preview pre {
+            background-color: var(--prose-pre-bg);
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .prose-preview pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .date-header {
+            cursor: pointer;
+        }
+
+        /* NEU: Tag-Styling */
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.1em 0.5em;
+            border-radius: 9999px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
         /* Kalender-Stile */
-        .calendar-day-has-entry { position: relative; }
-        .calendar-day-has-entry::after {
-            content: ''; position: absolute; bottom: 6px; left: 50%;
-            transform: translateX(-50%); width: 5px; height: 5px;
-            border-radius: 50%; background-color: #3b82f6;
+        .calendar-day-has-entry {
+            position: relative;
         }
-        html[data-theme='dark'] .calendar-day-has-entry::after { background-color: #60a5fa; }
+
+        .calendar-day-has-entry::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        html[data-theme='dark'] .calendar-day-has-entry::after {
+            background-color: #60a5fa;
+        }
+
+        /* Notification-Stile */
+        #notification {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #notification.show {
+            transform: translateX(0);
+        }
     </style>
 </head>
+
 <body class="transition-colors duration-300">
 
     <div class="container mx-auto max-w-7xl px-4 py-8">
@@ -159,12 +273,14 @@
         <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b">
             <h1 class="text-3xl font-bold mb-4 sm:mb-0">MemoMea</h1>
             <div class="flex items-center space-x-2">
-                <label for="import-files" class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
+                <label for="import-files"
+                    class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
                 </label>
                 <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt">
 
-                <button id="export-button" class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                <button id="export-button"
+                    class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                     <i data-lucide="download" class="mr-2 h-4 w-4"></i> Exportieren
                 </button>
             </div>
@@ -184,27 +300,38 @@
 
     <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style="background-color: var(--card-bg); border-color: var(--border-color);">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md"
+            style="background-color: var(--card-bg); border-color: var(--border-color);">
             <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren</h3>
+                <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren
+                </h3>
                 <div class="mt-2 px-7 py-3">
-                     <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den Export.</p>
+                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den
+                        Export.</p>
                     <div class="space-y-4 mt-4">
                         <div>
-                            <label for="start-date" class="text-left block text-sm font-medium" style="color: var(--text-color-heading);">Startdatum</label>
-                            <input type="date" id="start-date" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                            <label for="start-date" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Startdatum</label>
+                            <input type="date" id="start-date"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
                         <div>
-                            <label for="end-date" class="text-left block text-sm font-medium" style="color: var(--text-color-heading);">Enddatum</label>
-                            <input type="date" id="end-date" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                            <label for="end-date" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Enddatum</label>
+                            <input type="date" id="end-date"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
                     </div>
                 </div>
                 <div class="items-center px-4 py-3 space-x-2">
-                    <button id="confirm-export-button" class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
+                    <button id="confirm-export-button"
+                        class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
                         Export starten
                     </button>
-                    <button id="cancel-export-button" class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
+                    <button id="cancel-export-button"
+                        class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
                         Abbrechen
                     </button>
                 </div>
@@ -212,6 +339,11 @@
         </div>
     </div>
 
+    <!-- Notification Element -->
+    <div id="notification"
+        class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-transform transform translate-x-full hidden z-50">
+        <p id="notification-message"></p>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -231,128 +363,90 @@
             let currentPage = 1;
             let calendarDate = new Date();
 
-            // =================================================================
-            // NEU: Theme-Umschaltung
-            // =================================================================
             window.addEventListener('message', (event) => {
-                // Sicherheitsüberprüfung für die Herkunft der Nachricht wird hier vereinfacht,
-                // da es sich um eine vertrauenswürdige Kommunikation zwischen eigenen Iframes handelt.
                 if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
-                    const theme = event.data.substring('set-theme-'.length); // 'light' or 'dark'
+                    const theme = event.data.substring('set-theme-'.length);
                     document.documentElement.setAttribute('data-theme', theme);
                 }
             });
 
-
             const loadEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             const saveEntries = (entries) => localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-            
+
             let journalEntries = loadEntries();
 
             const formatDate = (date) => date.toISOString().split('T')[0];
-            
+
             const formatDisplayDate = (dateString) => {
                 const date = new Date(dateString);
-                return new Intl.DateTimeFormat('de-DE', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    timeZone: 'UTC'
-                }).format(date);
+                return new Intl.DateTimeFormat('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(date);
             };
 
-            async function callGemini(prompt) {
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                const payload = { contents: chatHistory };
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) throw new Error(`API-Antwort war nicht ok: ${response.statusText}`);
-                    const result = await response.json();
-                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        return result.candidates[0].content.parts[0].text;
-                    }
-                    console.error("Unerwartete API-Antwortstruktur:", result);
-                    return "Fehler: Konnte keine gültige Antwort von der KI erhalten.";
-                } catch (error) {
-                    console.error("Fehler beim Aufrufen der Gemini API:", error);
-                    return `Ein Fehler ist aufgetreten: ${error.message}`;
+            const showNotification = (message, type = 'success') => {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+
+                notification.className = 'fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-transform transform translate-x-full z-50';
+
+                if (type === 'success') {
+                    notification.classList.add('bg-green-500');
+                } else if (type === 'warning') {
+                    notification.classList.add('bg-yellow-500');
+                } else {
+                    notification.classList.add('bg-red-500');
                 }
-            }
+
+                messageEl.textContent = message;
+                notification.classList.remove('hidden', 'translate-x-full');
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.classList.add('hidden');
+                    }, 300);
+                }, 3000);
+            };
+
+            // NEU: Funktion zum Parsen von Markdown und Stylen von Tags
+            const parseAndStyleContent = (markdownText) => {
+                const defaultText = '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>';
+                if (!markdownText) {
+                    return defaultText;
+                }
+                // Parse markdown to HTML
+                let html = marked.parse(markdownText);
+                // Regex to find tags (#word) and wrap them in a span
+                // It looks for a '#' preceded by a space, or at the start of a line, or after a '>' from an HTML tag.
+                html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, '$1<span class="tag">$2</span>');
+                return html;
+            };
 
             const createEntryElement = (dateString, content) => {
                 const entryDiv = document.createElement('div');
                 entryDiv.classList.add('journal-entry', 'mb-6', 'p-6', 'rounded-lg', 'transition-all', 'duration-300');
                 entryDiv.dataset.date = dateString;
+
                 const displayDate = formatDisplayDate(dateString);
                 const header = document.createElement('h2');
                 header.textContent = displayDate;
                 header.classList.add('text-xl', 'font-semibold', 'mb-3', 'pb-2', 'border-b', 'date-header');
+
                 const previewDiv = document.createElement('div');
                 previewDiv.classList.add('prose', 'prose-slate', 'max-w-none', 'prose-preview');
-                previewDiv.innerHTML = marked.parse(content || '<p class="text-slate-400">Klicken, um zu schreiben...</p>');
+                previewDiv.innerHTML = parseAndStyleContent(content); // NEU: Verwendung der neuen Funktion
+
                 const textArea = document.createElement('textarea');
                 textArea.value = content;
                 textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
                 textArea.setAttribute('rows', '8');
-                const geminiFooter = document.createElement('div');
-                geminiFooter.classList.add('mt-4', 'pt-4', 'border-t', 'border-slate-200');
-                geminiFooter.style.borderColor = 'var(--border-color)';
-                const geminiButtons = document.createElement('div');
-                geminiButtons.classList.add('flex', 'flex-wrap', 'gap-2', 'mb-4');
-                const geminiOutput = document.createElement('div');
-                geminiOutput.classList.add('gemini-output', 'p-4', 'rounded-md', 'text-sm', 'hidden', 'prose', 'prose-slate', 'max-w-none');
-                
-                const createGeminiButton = (text, icon, colorClasses, promptFn) => {
-                    const button = document.createElement('button');
-                    button.innerHTML = `<i data-lucide="${icon}" class="mr-2 h-4 w-4"></i> ${text} ✨`;
-                    button.classList.add('inline-flex', 'items-center', 'px-3', 'py-1.5', ...colorClasses, 'text-xs', 'font-semibold', 'rounded-full', 'transition-colors');
-                    button.addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        const entryContent = journalEntries[dateString];
-                        if (!entryContent.trim()) return alert("Bitte schreiben Sie zuerst einen Eintrag.");
-                        geminiOutput.innerHTML = '<div class="loader"></div>';
-                        geminiOutput.classList.remove('hidden');
-                        const prompt = promptFn(entryContent);
-                        const result = await callGemini(prompt);
-                        
-                        if (text === 'Umschreiben') {
-                            geminiOutput.innerHTML = '';
-                            const resultContainer = document.createElement('div');
-                            const rewrittenContentDiv = document.createElement('div');
-                            rewrittenContentDiv.innerHTML = marked.parse(result);
-                            const applyButton = document.createElement('button');
-                            applyButton.textContent = 'Umschriebenen Text übernehmen';
-                            applyButton.classList.add('primary-button', 'mt-4', 'px-4', 'py-2', 'text-xs', 'font-semibold', 'rounded-md', 'transition-colors');
-                            applyButton.onclick = (event) => {
-                                event.stopPropagation();
-                                textArea.value = result;
-                                textArea.dispatchEvent(new FocusEvent('blur'));
-                            };
-                            resultContainer.appendChild(rewrittenContentDiv);
-                            resultContainer.appendChild(applyButton);
-                            geminiOutput.appendChild(resultContainer);
-                        } else {
-                            geminiOutput.innerHTML = marked.parse(result);
-                        }
-                    });
-                    return button;
-                };
 
-                const summarizeButton = createGeminiButton('Zusammenfassen', 'file-text', ['bg-blue-100', 'text-blue-800', 'hover:bg-blue-200'], content => `Fasse den folgenden deutschen Tagebucheintrag prägnant in 2-3 Sätzen zusammen: "${content}"`);
-                const reflectButton = createGeminiButton('Reflektieren', 'sparkles', ['bg-purple-100', 'text-purple-800', 'hover:bg-purple-200'], content => `Basierend auf diesem deutschen Tagebucheintrag, stelle genau 3 nachdenkliche Fragen, die zur Selbstreflexion anregen. Formuliere nur die Fragen in einer nummerierten Liste (z.B. 1. ... 2. ...). Der Eintrag: "${content}"`);
-                const rewriteButton = createGeminiButton('Umschreiben', 'pen-square', ['bg-green-100', 'text-green-800', 'hover:bg-green-200'], content => `Schreibe den folgenden deutschen Tagebucheintrag um. Verwende dabei einfaches, klares und gut verständliches Deutsch, wie man es in einem persönlichen Tagebuch schreiben würde. Behalte den ursprünglichen Sinn bei, aber verbessere den Textfluss und die Klarheit. Gib nur den umgeschriebenen Text zurück, ohne zusätzliche Einleitung oder Kommentare. Der Eintrag: "${content}"`);
-                
-                geminiButtons.append(summarizeButton, reflectButton, rewriteButton);
-                geminiFooter.append(geminiButtons, geminiOutput);
-                entryDiv.append(header, previewDiv, textArea, geminiFooter);
+                entryDiv.append(header, previewDiv, textArea);
 
                 entryDiv.addEventListener('click', () => {
                     if (textArea.classList.contains('hidden')) {
                         previewDiv.classList.add('hidden');
-                        geminiFooter.classList.add('hidden');
                         textArea.classList.remove('hidden');
                         textArea.focus();
                     }
@@ -362,68 +456,57 @@
                     const newContent = textArea.value;
                     journalEntries[dateString] = newContent;
                     saveEntries(journalEntries);
-                    previewDiv.innerHTML = marked.parse(newContent || '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>');
+                    previewDiv.innerHTML = parseAndStyleContent(newContent); // NEU: Verwendung der neuen Funktion
                     previewDiv.classList.remove('hidden');
-                    geminiFooter.classList.remove('hidden');
                     textArea.classList.add('hidden');
-                    geminiOutput.classList.add('hidden');
                     renderCalendar();
                 });
                 return entryDiv;
             };
-            
+
             const renderCalendar = () => {
                 const year = calendarDate.getFullYear();
                 const month = calendarDate.getMonth();
-                calendarContainer.innerHTML = ''; 
+                calendarContainer.innerHTML = '';
 
                 const header = document.createElement('div');
                 header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
                 const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
-                header.innerHTML = `
-                    <button id="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button>
-                    <h3 class="font-semibold text-lg">${monthName}</h3>
-                    <button id="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>
-                `;
+                header.innerHTML = `<button id="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button><h3 class="font-semibold text-lg">${monthName}</h3><button id="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>`;
                 calendarContainer.appendChild(header);
 
                 const grid = document.createElement('div');
                 grid.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-center', 'text-sm');
-                
+
                 const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-                weekdays.forEach(day => {
-                    grid.innerHTML += `<div class="font-medium text-slate-500" style="color: var(--text-color-light)">${day}</div>`;
-                });
+                weekdays.forEach(day => { grid.innerHTML += `<div class="font-medium" style="color: var(--text-color-light)">${day}</div>`; });
 
                 const firstDayOfMonth = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
-                for (let i = 0; i < dayOffset; i++) {
-                    grid.innerHTML += '<div></div>';
-                }
+                for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
 
-                const today = new Date();
-                const todayString = formatDate(today);
+                const todayString = formatDate(new Date());
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const currentDate = new Date(Date.UTC(year, month, day));
                     const dateString = formatDate(currentDate);
-                    
+
                     const dayButton = document.createElement('button');
                     dayButton.textContent = day;
                     dayButton.dataset.date = dateString;
                     dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'dark:hover:bg-neutral-700', 'transition-colors');
-                    
-                    if(dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
-                    if(journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
+
+                    if (dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
+                    if (journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
 
                     dayButton.addEventListener('click', () => {
-                        const allSortedDates = Object.keys(journalEntries).sort().reverse();
-                        const entryIndex = allSortedDates.findIndex(d => d === dateString);
+                        const visibleDates = Object.keys(journalEntries).filter(d => d === todayString || (journalEntries[d]?.trim() !== '')).sort().reverse();
+                        const entryIndex = visibleDates.findIndex(d => d === dateString);
+
                         if (entryIndex !== -1) {
-                            const targetPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
-                            currentPage = targetPage;
+                            currentPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
                             renderJournal();
                             setTimeout(() => {
                                 const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
@@ -435,10 +518,9 @@
                             }, 100);
                         }
                     });
-
                     grid.appendChild(dayButton);
                 }
-                
+
                 calendarContainer.appendChild(grid);
                 document.getElementById('prev-month').addEventListener('click', () => { calendarDate.setMonth(month - 1); renderCalendar(); });
                 document.getElementById('next-month').addEventListener('click', () => { calendarDate.setMonth(month + 1); renderCalendar(); });
@@ -452,22 +534,23 @@
 
                 if (!journalEntries[todayString]) {
                     journalEntries[todayString] = '';
-                    saveEntries(journalEntries);
                 }
-                const sortedDates = Object.keys(journalEntries).sort().reverse();
+
+                const visibleDates = Object.keys(journalEntries).filter(dateString => dateString === todayString || (journalEntries[dateString]?.trim() !== '')).sort().reverse();
+
                 const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
                 const endIndex = startIndex + ENTRIES_PER_PAGE;
-                const paginatedDates = sortedDates.slice(startIndex, endIndex);
+                const paginatedDates = visibleDates.slice(startIndex, endIndex);
 
                 paginatedDates.forEach(dateString => {
                     const entryElement = createEntryElement(dateString, journalEntries[dateString]);
                     journalContainer.appendChild(entryElement);
                 });
-                
-                setupPagination(sortedDates.length);
+
+                setupPagination(visibleDates.length);
                 lucide.createIcons();
             };
-            
+
             const setupPagination = (totalEntries) => {
                 const totalPages = Math.ceil(totalEntries / ENTRIES_PER_PAGE);
                 if (totalPages <= 1) return;
@@ -481,13 +564,13 @@
                     return button;
                 };
 
-                const prevButton = createButton('Zurück', () => { currentPage--; renderJournal(); }, currentPage === 1);
+                const prevButton = createButton('Zurück', () => { currentPage--; renderJournal(); window.scrollTo(0, 0); }, currentPage === 1);
                 const pageInfo = document.createElement('span');
                 pageInfo.textContent = `Seite ${currentPage} von ${totalPages}`;
                 pageInfo.classList.add('text-sm');
                 pageInfo.style.color = 'var(--text-color-light)';
-                const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); }, currentPage === totalPages);
-                
+                const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); window.scrollTo(0, 0); }, currentPage === totalPages);
+
                 paginationControls.append(prevButton, pageInfo, nextButton);
             };
 
@@ -499,68 +582,80 @@
             importInput.addEventListener('change', (event) => {
                 const files = event.target.files;
                 if (!files.length) return;
-                
-                let filesRead = 0;
-                const importedDates = [];
+
+                const readPromises = [];
 
                 for (const file of files) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const dateMatch = file.name.match(/^(\d{4}-\d{2}-\d{2})/);
-                        if (dateMatch) {
-                            const dateString = dateMatch[1];
-                            journalEntries[dateString] = e.target.result;
-                            importedDates.push(dateString);
-                        } else {
-                            console.warn(`Konnte kein Datum aus dem Dateinamen extrahieren: ${file.name}`);
-                        }
-                        filesRead++;
-
-                        if (filesRead === files.length) {
-                            saveEntries(journalEntries);
-                            
-                            let newestImportedDate = '';
-                            if (importedDates.length > 0) {
-                                const allSortedDates = Object.keys(journalEntries).sort().reverse();
-                                newestImportedDate = importedDates.sort().reverse()[0];
-                                const entryIndex = allSortedDates.findIndex(d => d === newestImportedDate);
-
-                                if (entryIndex !== -1) {
-                                    currentPage = Math.ceil((entryIndex + 1) / ENTRIES_PER_PAGE);
-                                }
+                    const promise = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const dateMatch = file.name.match(/^(\d{4}-\d{2}-\d{2})/);
+                            if (dateMatch) {
+                                resolve({ date: dateMatch[1], content: e.target.result });
                             } else {
-                                currentPage = 1;
+                                console.warn(`Konnte kein Datum aus dem Dateinamen extrahieren: ${file.name}`);
+                                resolve(null);
                             }
-
-                            updateAll();
-                            alert(`${files.length} Datei(en) erfolgreich importiert.`);
-                            
-                            if(newestImportedDate) {
-                                setTimeout(() => {
-                                    const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
-                                    if (element) {
-                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                        element.classList.add('ring-2', 'ring-blue-400');
-                                        setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
-                                    }
-                                }, 100);
-                            }
-                        }
-                    };
-                    reader.readAsText(file);
+                        };
+                        reader.onerror = (e) => {
+                            console.error("Fehler beim Lesen der Datei:", file.name, e);
+                            resolve(null);
+                        };
+                        reader.readAsText(file);
+                    });
+                    readPromises.push(promise);
                 }
+
+                Promise.all(readPromises).then(results => {
+                    const currentEntries = loadEntries();
+                    let importedCount = 0;
+                    const importedDates = [];
+                    const validResults = results.filter(r => r !== null);
+
+                    validResults.forEach(result => {
+                        currentEntries[result.date] = result.content;
+                        importedDates.push(result.date);
+                        importedCount++;
+                    });
+
+                    if (importedCount > 0) {
+                        journalEntries = currentEntries;
+                        saveEntries(journalEntries);
+                        let newestImportedDate = '';
+                        if (importedDates.length > 0) {
+                            newestImportedDate = importedDates.sort().reverse()[0];
+                            calendarDate = new Date(newestImportedDate + 'T00:00:00Z');
+                        }
+                        currentPage = 1;
+                        updateAll();
+                        showNotification(`${importedCount} Datei(en) erfolgreich importiert.`, 'success');
+                        if (newestImportedDate) {
+                            setTimeout(() => {
+                                const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    element.classList.add('ring-2', 'ring-blue-400');
+                                    setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                                }
+                            }, 100);
+                        }
+                    } else {
+                        showNotification('Keine gültigen Dateien zum Importieren gefunden.', 'warning');
+                    }
+                });
                 importInput.value = '';
             });
 
+
             exportButton.addEventListener('click', () => {
                 const dates = Object.keys(journalEntries).sort();
-                if(dates.length > 0){
-                   startDateInput.value = dates[0];
-                   endDateInput.value = dates[dates.length - 1];
+                if (dates.length > 0) {
+                    startDateInput.value = dates[0];
+                    endDateInput.value = dates[dates.length - 1];
                 } else {
-                   const today = formatDate(new Date());
-                   startDateInput.value = today;
-                   endDateInput.value = today;
+                    const today = formatDate(new Date());
+                    startDateInput.value = today;
+                    endDateInput.value = today;
                 }
                 exportModal.classList.remove('hidden');
             });
@@ -571,16 +666,22 @@
             confirmExportButton.addEventListener('click', () => {
                 const startDate = startDateInput.value;
                 const endDate = endDateInput.value;
-                if (!startDate || !endDate || startDate > endDate) return alert('Bitte wählen Sie einen gültigen Datumsbereich.');
+                if (!startDate || !endDate || startDate > endDate) return showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
+
                 const zip = new JSZip();
                 let filesAdded = 0;
                 Object.keys(journalEntries).forEach(dateString => {
                     if (dateString >= startDate && dateString <= endDate) {
-                        zip.file(`${dateString}.md`, journalEntries[dateString]);
-                        filesAdded++;
+                        const content = journalEntries[dateString];
+                        if (content?.trim()) {
+                            zip.file(`${dateString}.md`, content);
+                            filesAdded++;
+                        }
                     }
                 });
-                if (filesAdded === 0) return alert('Keine Einträge im ausgewählten Zeitraum gefunden.');
+
+                if (filesAdded === 0) return showNotification('Keine Einträge im ausgewählten Zeitraum gefunden.', 'warning');
+
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
@@ -593,8 +694,10 @@
                     });
                 exportModal.classList.add('hidden');
             });
+
             updateAll();
         });
     </script>
 </body>
+
 </html>
