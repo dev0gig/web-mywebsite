@@ -35,7 +35,8 @@
 
         /* Bilder im Dark Mode invertieren (z.B. schwarze Icons zu weißen Icons) */
         html[data-theme='dark'] #sidebar img {
-            filter: invert(1) brightness(1.5) contrast(1.2); /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
+            filter: invert(1) brightness(1.5) contrast(1.2);
+            /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
         }
 
         html,
@@ -58,10 +59,14 @@
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
-            display: flex; /* Added for flexbox layout */
-            flex-direction: column; /* Arrange items vertically */
-            justify-content: space-between; /* Push copyright to bottom */
-            padding-bottom: 1rem; /* Add some padding at the bottom */
+            display: flex;
+            /* Added for flexbox layout */
+            flex-direction: column;
+            /* Arrange items vertically */
+            justify-content: space-between;
+            /* Push copyright to bottom */
+            padding-bottom: 1rem;
+            /* Add some padding at the bottom */
         }
 
         #sidebar:hover {
@@ -130,6 +135,30 @@
             background-color: var(--accent-color-hover);
         }
 
+        /* Styles for the loader */
+        #loader {
+            position: fixed;
+            /* Fixes the loader in the viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            /* Use theme background color */
+            z-index: 9999;
+            /* Ensure it's on top of everything */
+            transition: opacity 0.5s ease-in-out;
+            /* Smooth fade out */
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+            /* Prevents interaction with hidden loader */
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -145,31 +174,39 @@
             <ul id="nav-links" class="space-y-2 mt-2">
                 <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
                         class="sidebar-link flex items-center p-3 rounded-lg active">
-                        <img src="../../assets/icons/home.svg" alt="Dashboard Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/home.svg exists -->
+                        <img src="../../assets/icons/home.svg" alt="Dashboard Icon" class="w-7 h-7 flex-shrink-0">
+                        <!-- Assumed assets/icons/home.svg exists -->
                         <span class="sidebar-text font-medium">Dashboard</span></a></li>
                 <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
                         class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/contact.svg" alt="Kontakte Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/users.svg exists -->
+                        <img src="../../assets/icons/contact.svg" alt="Kontakte Icon" class="w-7 h-7 flex-shrink-0">
+                        <!-- Assumed assets/icons/users.svg exists -->
                         <span class="sidebar-text font-medium">Kontakte</span>
                     </a></li>
                 <li><a href="we-iframe/templates.html" data-target="frame-templates"
                         class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/mail.svg" alt="Mail-Vorlagen Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/mail.svg exists -->
+                        <img src="../../assets/icons/mail.svg" alt="Mail-Vorlagen Icon" class="w-7 h-7 flex-shrink-0">
+                        <!-- Assumed assets/icons/mail.svg exists -->
                         <span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
                 <!-- New 'Tools' link added with the new SVG icon -->
                 <li><a href="we-iframe/tool-widgets.html" data-target="frame-tools"
                         class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/tools.svg" alt="Tools Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/tools.svg exists -->
+                        <img src="../../assets/icons/tools.svg" alt="Tools Icon" class="w-7 h-7 flex-shrink-0">
+                        <!-- Assumed assets/icons/tools.svg exists -->
                         <span class="sidebar-text font-medium">Tools</span>
                     </a></li>
             </ul>
         </div>
         <ul class="space-y-2">
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
-                <img src="../../assets/icons/settings.svg" alt="Einstellungen Icon" class="w-7 h-7 flex-shrink-0">
-                <span class="sidebar-text font-medium">Einstellungen</span>
-            </button></li>
+                    <img src="../../assets/icons/settings.svg" alt="Einstellungen Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Einstellungen</span>
+                </button></li>
         </ul>
+        <!-- Copyright information at the bottom of the sidebar -->
+        <div class="copyright-info">
+            &copy; NGIPAV
+        </div>
     </nav>
 
     <!-- Iframe Content Area -->
@@ -221,17 +258,25 @@
         </div>
     </div>
 
+    <!-- The loader element -->
+    <div id="loader" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
+        <!-- Changed from SVG to image -->
+        <img src="../../assets/loading/we_loading.png" alt="Loading Icon" class="h-48 animate-pulse">
+    </div>
+
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const contentFrames = document.querySelectorAll('.content-iframe');
             const navLinks = document.querySelectorAll('#nav-links a');
             const settingsBtn = document.getElementById('settings-btn');
             const settingsModal = document.getElementById('settings-modal');
+            const loader = document.getElementById('loader');
             const overlay = document.getElementById('modal-overlay');
             const closeModalBtn = document.getElementById('close-modal-btn');
             const resetLayoutBtn = document.getElementById('reset-layout-btn');
-            const transitionDuration = 200; // Must match CSS transition duration
+            const transitionDuration = 200; // Muss mit der CSS-Übergangsdauer übereinstimmen
 
+            // Funktion zur Handhabung des Navigationsklicks
             function handleNavClick(event) {
                 event.preventDefault();
                 const link = event.currentTarget;
@@ -240,39 +285,56 @@
                 const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
 
                 if (targetFrame && activeFrame && activeFrame.id !== targetId) {
-                    // Hide current frame and reset its opacity for next time
+                    // Aktuellen Frame ausblenden und dessen Deckkraft für das nächste Mal zurücksetzen
                     activeFrame.classList.add('hidden');
                     activeFrame.classList.add('opacity-0');
 
-                    // Show the new frame (it's still transparent)
+                    // Neuen Frame anzeigen (er ist immer noch transparent)
                     targetFrame.classList.remove('hidden');
 
-                    // After a tiny delay, fade it in.
-                    // This delay ensures the browser has processed the display change.
+                    // Nach einer kleinen Verzögerung einblenden.
+                    // Diese Verzögerung stellt sicher, dass der Browser die Anzeigeänderung verarbeitet hat.
                     setTimeout(() => {
                         targetFrame.classList.remove('opacity-0');
                     }, 10);
                 }
 
+                // Aktive Klasse für Navigationslinks aktualisieren
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
             }
+
+            // Loader ausblenden, nachdem alle Iframes geladen sind
+            let loadedCount = 0;
+            contentFrames.forEach(frame => {
+                frame.addEventListener('load', () => {
+                    loadedCount++;
+                    if (loadedCount === contentFrames.length) {
+                        // Loader mit einem Fade-Effekt ausblenden
+                        loader.classList.add('hidden');
+                    }
+                });
+            });
             navLinks.forEach(link => link.addEventListener('click', handleNavClick));
 
+            // Funktionen zum Öffnen und Schließen des Modals
             const openModal = () => { settingsModal.classList.remove('hidden'); overlay.classList.remove('hidden'); };
             const closeModal = () => { settingsModal.classList.add('hidden'); overlay.classList.add('hidden'); };
 
+            // Event-Listener für Modal-Buttons
             settingsBtn.addEventListener('click', openModal);
             closeModalBtn.addEventListener('click', closeModal);
             overlay.addEventListener('click', closeModal);
             resetLayoutBtn.addEventListener('click', () => {
                 const activeFrame = document.querySelector('.content-iframe:not(.hidden)');
                 if (activeFrame) {
+                    // Nachricht zum Zurücksetzen des Layouts an den aktiven Iframe senden
                     activeFrame.contentWindow.postMessage('reset-layout', '*');
                 }
                 closeModal();
             });
 
+            // Theme-Wechsel-Funktionalität
             const themeRadios = document.querySelectorAll('input[name="theme"]');
             function applyTheme(theme) {
                 let effectiveTheme;
@@ -283,13 +345,13 @@
                 }
                 document.documentElement.dataset.theme = effectiveTheme;
                 contentFrames.forEach(frame => {
-                    // Post message only if the iframe's content is accessible
+                    // Nachricht an jeden Iframe senden, um das Thema zu setzen
                     try {
                         if (frame.contentWindow) {
                             frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
                         }
                     } catch (e) {
-                        // Could be a cross-origin error if the iframe src changes, ignore for now.
+                        // Könnte ein Cross-Origin-Fehler sein, wenn sich die Iframe-SRC ändert, vorerst ignorieren.
                     }
                 });
             }
@@ -299,175 +361,36 @@
                 applyTheme(selectedTheme);
             }
 
+            // Event-Listener für Theme-Radio-Buttons und System-Theme-Änderungen
             themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 const savedTheme = localStorage.getItem('theme') || 'system';
                 if (savedTheme === 'system') applyTheme('system');
             });
 
-            // Handle initial load and theme for all frames
+            // Anfangslast und Thema für alle Frames behandeln
             contentFrames.forEach(frame => {
                 frame.addEventListener('load', () => {
                     const savedTheme = localStorage.getItem('theme') || 'system';
                     let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
 
-                    // Apply theme to the newly loaded iframe
+                    // Thema auf den neu geladenen Iframe anwenden
                     frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
 
-                    // If this is the initially visible frame, fade it in
+                    // Wenn dies der anfänglich sichtbare Frame ist, einblenden
                     if (!frame.classList.contains('hidden')) {
                         frame.classList.remove('opacity-0');
                     }
                 });
             });
 
-            // Set initial theme on page load
+            // Anfangsthema beim Laden der Seite setzen
             const savedTheme = localStorage.getItem('theme') || 'system';
             const currentThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
             if (currentThemeRadio) {
                 currentThemeRadio.checked = true;
             }
             applyTheme(savedTheme);
-        });
-    </script>
-</body>
-
-</html>
-                    <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                    </svg>
-                    <span class="sidebar-text font-medium">Einstellungen</span>
-                </button></li>
-        </ul>
-        <!-- Copyright information at the bottom of the sidebar -->
-        <div class="copyright-info">
-            &copy; NGIPAV
-        </div>
-    </nav>
-
-    <!-- Iframe Content Area -->
-    <main id="main-content">
-        <iframe id="content-frame" src="we-iframe/dashboard.html" class="w-full h-full border-0"></iframe>
-    </main>
-
-    <!-- Settings Modal -->
-    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70"></div>
-    <div id="settings-modal"
-        class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Einstellungen</h2>
-            <button id="close-modal-btn" class="hover:text-white text-2xl"
-                style="color: var(--text-color-light);">&times;</button>
-        </div>
-        <div>
-            <h3 class="text-lg font-semibold mb-2" style="color: var(--header-text-color);">Layout</h3>
-            <p class="text-sm mb-4">Setzt die Position und Grösse der Widgets auf der aktuellen Seite zurück.</p>
-            <button id="reset-layout-btn"
-                class="modal-button w-full text-white font-bold py-2 px-4 rounded-lg mb-4">Layout
-                zurücksetzen</button>
-        </div>
-        <hr class="my-6" style="border-color: var(--sidebar-border);">
-        <div>
-            <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
-            <fieldset class="space-y-3">
-                <legend class="sr-only">Theme selection</legend>
-                <div><input type="radio" name="theme" id="theme-light" value="light"
-                        class="theme-radio-peer hidden"><label for="theme-light"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
-                </div>
-                <div><input type="radio" name="theme" id="theme-dark" value="dark"
-                        class="theme-radio-peer hidden"><label for="theme-dark"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
-                </div>
-                <div><input type="radio" name="theme" id="theme-system" value="system"
-                        class="theme-radio-peer hidden"><label for="theme-system"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-
-    <script type="text/javascript">
-        const iframe = document.getElementById('content-frame');
-        const navLinks = document.querySelectorAll('#nav-links a');
-        const settingsBtn = document.getElementById('settings-btn');
-        const settingsModal = document.getElementById('settings-modal');
-        const overlay = document.getElementById('modal-overlay');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const resetLayoutBtn = document.getElementById('reset-layout-btn');
-        const transitionDuration = 200; // Must match CSS transition duration
-
-        // This function now handles the smooth transition
-        function handleNavClick(event) {
-            event.preventDefault();
-            const link = event.currentTarget;
-
-            const targetUrl = new URL(link.href, window.location.href);
-            const currentUrl = new URL(iframe.src, window.location.href);
-
-            if (targetUrl.pathname !== currentUrl.pathname) {
-                // Fade out the iframe
-                iframe.classList.add('opacity-0');
-
-                // Wait for the transition to finish before changing the src
-                setTimeout(() => {
-                    iframe.src = link.href;
-                }, transitionDuration);
-            }
-
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-        }
-        navLinks.forEach(link => link.addEventListener('click', handleNavClick));
-
-        const openModal = () => { settingsModal.classList.remove('hidden'); overlay.classList.remove('hidden'); };
-        const closeModal = () => { settingsModal.classList.add('hidden'); overlay.classList.add('hidden'); };
-
-        settingsBtn.addEventListener('click', openModal);
-        closeModalBtn.addEventListener('click', closeModal);
-        overlay.addEventListener('click', closeModal);
-        resetLayoutBtn.addEventListener('click', () => {
-            iframe.contentWindow.postMessage('reset-layout', '*');
-            closeModal();
-        });
-
-        const themeRadios = document.querySelectorAll('input[name="theme"]');
-        function applyTheme(theme) {
-            let effectiveTheme;
-            if (theme === 'system') {
-                effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            } else {
-                effectiveTheme = theme;
-            }
-            document.documentElement.dataset.theme = effectiveTheme;
-            if (iframe.contentWindow) iframe.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
-        }
-        function handleThemeChange(event) {
-            const selectedTheme = event.target.value;
-            localStorage.setItem('theme', selectedTheme);
-            applyTheme(selectedTheme);
-        }
-
-        themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            const savedTheme = localStorage.getItem('theme') || 'system';
-            if (savedTheme === 'system') applyTheme('system');
-        });
-
-        // The 'load' event fires after the iframe content has been fully loaded
-        iframe.addEventListener('load', () => {
-            const savedTheme = localStorage.getItem('theme') || 'system';
-            // Ensure the correct radio button is checked on initial load and subsequent loads
-            const currentThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
-            if (currentThemeRadio) {
-                currentThemeRadio.checked = true;
-            }
-            applyTheme(savedTheme);
-
-            // Fade the iframe back in smoothly
-            iframe.classList.remove('opacity-0');
         });
     </script>
 </body>

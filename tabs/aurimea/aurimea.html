@@ -234,73 +234,78 @@
     <h1 class="text-3xl md:text-4xl font-bold main-title mb-6 text-center">AuriMea</h1>
 
     <!-- HAUPTINHALTSBEREICH -->
-    <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 px-4 md:px-6">
+    <div class="w-full mx-auto flex flex-col gap-6 px-4 md:px-6">
 
-        <!-- KONTEN-FILTER (Linke Spalte) -->
-        <div class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col justify-center h-full">
-            <div id="account-filter" class="flex justify-center flex-wrap gap-2">
-                <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
-                    Konten</button>
-                <button data-filter="Erste Bank" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste
-                    Bank</button>
-                <button data-filter="N26" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
-                <button data-filter="Revolut"
-                    class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
+        <!-- 1. ZEILE: KONTEN & KENNZAHLEN -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Konten-Filter -->
+            <div class="card p-4 rounded-xl shadow-md flex flex-col justify-center">
+                <div id="account-filter" class="flex justify-center flex-wrap gap-2">
+                    <button data-filter="all"
+                        class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle Konten</button>
+                    <button data-filter="Erste Bank"
+                        class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste Bank</button>
+                    <button data-filter="N26"
+                        class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
+                    <button data-filter="Revolut"
+                        class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
+                </div>
             </div>
-        </div>
-
-        <!-- FINANZ-ÜBERSICHT (Rechte Seite) -->
-        <div id="summary-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:col-span-2">
+            <!-- Einnahmen -->
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
                 <p id="total-einnahmen" class="text-2xl font-bold text-green-500">0,00 €</p>
             </div>
+            <!-- Ausgaben -->
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
                 <p id="total-ausgaben" class="text-2xl font-bold text-red-500">0,00 €</p>
             </div>
+            <!-- Bilanz -->
             <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
                 <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
                 <p id="bilanz" class="text-2xl font-bold">0,00 €</p>
             </div>
         </div>
 
-        <!-- KALENDER (Linke Spalte, nur Desktop) -->
-        <div id="calendar-desktop-wrapper"
-            class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 hidden lg:flex flex-col h-full">
-            <div id="calendar-container-desktop" class="flex flex-col w-full h-full">
-                <div id="calendar-header-desktop" class="flex justify-between items-center mb-4 w-full">
-                    <!-- Inhalt wird durch JS generiert -->
-                </div>
-                <div id="calendar-grid-desktop" class="grid grid-cols-7 gap-1 text-center flex-grow">
-                    <!-- Inhalt wird durch JS generiert -->
-                </div>
-            </div>
-            <div class="text-center mt-4 w-full min-h-[40px]">
-                <button id="clear-date-filter-btn-desktop"
-                    class="filter-btn hidden px-4 py-2 rounded-lg font-semibold transition">Datumsfilter
-                    zurücksetzen</button>
-            </div>
-        </div>
-
-        <!-- DIAGRAMM-BEREICH (Rechte Seite) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:col-span-2">
+        <!-- 2. ZEILE: KALENDER & DIAGRAMME -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Ausgaben nach Kategorie -->
             <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
                 <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
                 <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
             </div>
+            <!-- Einnahmen nach Kategorie -->
             <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
                 <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
                 <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div>
             </div>
+            <!-- Ausgaben pro Konto -->
             <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
                 <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
                 <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
             </div>
+            <!-- Kalender (wird auf lg-Screens an den Anfang verschoben) -->
+            <div id="calendar-desktop-wrapper"
+                class="card p-4 md:p-6 rounded-xl shadow-md hidden lg:flex flex-col h-full lg:order-first">
+                <div id="calendar-container-desktop" class="flex flex-col w-full h-full">
+                    <div id="calendar-header-desktop" class="flex justify-between items-center mb-4 w-full">
+                        <!-- Inhalt wird durch JS generiert -->
+                    </div>
+                    <div id="calendar-grid-desktop" class="grid grid-cols-7 gap-1 text-center flex-grow">
+                        <!-- Inhalt wird durch JS generiert -->
+                    </div>
+                </div>
+                <div class="text-center mt-4 w-full min-h-[40px]">
+                    <button id="clear-date-filter-btn-desktop"
+                        class="filter-btn hidden px-4 py-2 rounded-lg font-semibold transition">Datumsfilter
+                        zurücksetzen</button>
+                </div>
+            </div>
         </div>
 
-        <!-- TRANSAKTIONSTABELLE (Volle Breite) -->
-        <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto lg:col-span-3">
+        <!-- 3. ZEILE: TRANSAKTIONSTABELLE -->
+        <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto">
             <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
                 <div class="flex items-center gap-2 flex-wrap">
                     <h2 class="text-xl font-bold">Transaktionen</h2>
@@ -514,10 +519,12 @@
     </div>
 
     <!-- Schwebende Aktionsbuttons -->
-    <button id="fab-open-calendar" title="Kalender anzeigen" class="lg:hidden fixed right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-open-calendar" title="Kalender anzeigen"
+        class="lg:hidden fixed right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <i data-lucide="calendar" class="h-7 w-7"></i>
     </button>
-    <button id="fab-add-transaction" title="Neue Transaktion hinzufügen" class="fixed right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-add-transaction" title="Neue Transaktion hinzufügen"
+        class="fixed right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -537,12 +544,22 @@
             let currentFilter = 'all';
             let selectedDate = null;
             let calendarDate = new Date();
-            let sortConfig = { key: 'Datum', direction: 'desc' };
-            let charts = { ausgaben: null, einnahmen: null, konto: null };
+            let sortConfig = {
+                key: 'Datum',
+                direction: 'desc'
+            };
+            let charts = {
+                ausgaben: null,
+                einnahmen: null,
+                konto: null
+            };
             let transactionDates = new Set();
             let currentPage = 1;
             const itemsPerPage = 25;
-            const formatCurrency = (value) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+            const formatCurrency = (value) => new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(value);
             const STORAGE_KEY = 'aurimea-transactions';
             const expenseCategories = ['Lebensmittel', 'Wohnen', 'Transport', 'Freizeit', 'Gesundheit', 'Kleidung', 'Rechnungen', 'Sonstiges'];
             const incomeCategories = ['Gehalt', 'Bonus', 'Geschenk', 'Verkauf', 'Sonstiges'];
@@ -565,7 +582,11 @@
                 const storedTransactions = localStorage.getItem(STORAGE_KEY);
                 try {
                     allTransactions = storedTransactions ? JSON.parse(storedTransactions) : [];
-                    allTransactions.forEach(t => { if (!t.id) { t.id = crypto.randomUUID(); } });
+                    allTransactions.forEach(t => {
+                        if (!t.id) {
+                            t.id = crypto.randomUUID();
+                        }
+                    });
                     saveTransactions();
                 } catch (e) {
                     console.error("Fehler beim Laden der Transaktionen:", e);
@@ -605,9 +626,16 @@
             // --- SORTING ---
             function sortData(data) {
                 data.sort((a, b) => {
-                    let aValue = a[sortConfig.key]; let bValue = b[sortConfig.key];
-                    if (sortConfig.key === 'Datum') { aValue = a.parsedDate; bValue = b.parsedDate; }
-                    if (sortConfig.key === 'Betrag') { aValue = a.Betrag; bValue = b.Betrag; }
+                    let aValue = a[sortConfig.key];
+                    let bValue = b[sortConfig.key];
+                    if (sortConfig.key === 'Datum') {
+                        aValue = a.parsedDate;
+                        bValue = b.parsedDate;
+                    }
+                    if (sortConfig.key === 'Betrag') {
+                        aValue = a.Betrag;
+                        bValue = b.Betrag;
+                    }
                     if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
                     if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
                     return 0;
@@ -616,10 +644,18 @@
 
             // --- DATA PROCESSING ---
             function processData(data) {
-                const summary = { ausgabenByCat: {}, einnahmenByCat: {}, ausgabenByKonto: {}, totalAusgaben: 0, totalEinnahmen: 0 };
+                const summary = {
+                    ausgabenByCat: {},
+                    einnahmenByCat: {},
+                    ausgabenByKonto: {},
+                    totalAusgaben: 0,
+                    totalEinnahmen: 0
+                };
                 const kontoSummary = {};
                 allTransactions.forEach(row => {
-                    if (row.Art === 'Ausgabe' && row.Konto) { kontoSummary[row.Konto] = (kontoSummary[row.Konto] || 0) + row.Betrag; }
+                    if (row.Art === 'Ausgabe' && row.Konto) {
+                        kontoSummary[row.Konto] = (kontoSummary[row.Konto] || 0) + row.Betrag;
+                    }
                 });
                 summary.ausgabenByKonto = kontoSummary;
                 data.forEach(row => {
@@ -686,12 +722,61 @@
                     einnahmen: ['#22c55e', '#16a34a', '#15803d', '#10b285'],
                     konto: ['#3b82f6', '#8b5cf6', '#ec4899', '#6366f1']
                 };
-                const doughnutOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } } } };
-                const barOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { color: gridColor } } } };
+                const doughnutOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: textColor
+                            }
+                        }
+                    }
+                };
+                const barOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: textColor
+                            },
+                            grid: {
+                                color: gridColor
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: textColor
+                            },
+                            grid: {
+                                color: gridColor
+                            }
+                        }
+                    }
+                };
                 const createChart = (id, type, data, options, colors) => {
                     if (charts[id]) charts[id].destroy();
-                    const canvas = document.getElementById(id + 'Chart'); if (!canvas) return;
-                    charts[id] = new Chart(canvas.getContext('2d'), { type, data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderWidth: 0 }] }, options });
+                    const canvas = document.getElementById(id + 'Chart');
+                    if (!canvas) return;
+                    charts[id] = new Chart(canvas.getContext('2d'), {
+                        type,
+                        data: {
+                            labels: Object.keys(data),
+                            datasets: [{
+                                data: Object.values(data),
+                                backgroundColor: colors,
+                                borderWidth: 0
+                            }]
+                        },
+                        options
+                    });
                 };
                 createChart('ausgaben', 'doughnut', summary.ausgabenByCat, doughnutOptions, chartColors.ausgaben);
                 createChart('einnahmen', 'doughnut', summary.einnahmenByCat, doughnutOptions, chartColors.einnahmen);
@@ -712,8 +797,18 @@
                 nextBtn.disabled = currentPage === totalPages;
                 if (prevBtn.disabled) prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 if (nextBtn.disabled) nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; updateDashboard(); } });
-                nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; updateDashboard(); } });
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updateDashboard();
+                    }
+                });
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updateDashboard();
+                    }
+                });
             }
 
             // --- KALENDER LOGIC ---
@@ -723,12 +818,19 @@
             const calendarHeaderMobile = document.getElementById('calendar-header-mobile');
 
             function renderCalendar() {
-                const targets = [
-                    { grid: calendarGridDesktop, header: calendarHeaderDesktop },
-                    { grid: calendarGridMobile, header: calendarHeaderMobile }
-                ];
-                const month = calendarDate.getMonth(), year = calendarDate.getFullYear();
-                const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
+                const targets = [{
+                    grid: calendarGridDesktop,
+                    header: calendarHeaderDesktop
+                }, {
+                    grid: calendarGridMobile,
+                    header: calendarHeaderMobile
+                }];
+                const month = calendarDate.getMonth(),
+                    year = calendarDate.getFullYear();
+                const monthName = new Intl.DateTimeFormat('de-DE', {
+                    month: 'long',
+                    year: 'numeric'
+                }).format(calendarDate);
                 const todayStr = new Date().toISOString().slice(0, 10);
 
                 targets.forEach(target => {
@@ -769,8 +871,14 @@
                     }
                 });
 
-                document.querySelectorAll('[data-action="prev-month"]').forEach(btn => btn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }));
-                document.querySelectorAll('[data-action="next-month"]').forEach(btn => btn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }));
+                document.querySelectorAll('[data-action="prev-month"]').forEach(btn => btn.addEventListener('click', () => {
+                    calendarDate.setMonth(calendarDate.getMonth() - 1);
+                    renderCalendar();
+                }));
+                document.querySelectorAll('[data-action="next-month"]').forEach(btn => btn.addEventListener('click', () => {
+                    calendarDate.setMonth(calendarDate.getMonth() + 1);
+                    renderCalendar();
+                }));
 
                 lucide.createIcons();
             }
@@ -793,34 +901,75 @@
             // --- CSV IMPORT / EXPORT ---
             function exportToCSV() {
                 const headers = ['Datum', 'Art', 'Betrag', 'Beschreibung', 'Kategorie', 'Konto', 'Zahlungsmethode', 'Wiederkehrend', 'Sonstige Infos'];
-                const dataToExport = allTransactions.map(t => ({ Datum: t.Datum, Art: t.Art, Betrag: String(t.Betrag).replace('.', ','), Beschreibung: t.Beschreibung, Kategorie: t.Kategorie, Konto: t.Konto, Zahlungsmethode: t.Zahlungsmethode, Wiederkehrend: t.Wiederkehrend, 'Sonstige Infos': t['Sonstige Infos'] }));
-                const csv = Papa.unparse({ fields: headers, data: dataToExport });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const dataToExport = allTransactions.map(t => ({
+                    Datum: t.Datum,
+                    Art: t.Art,
+                    Betrag: String(t.Betrag).replace('.', ','),
+                    Beschreibung: t.Beschreibung,
+                    Kategorie: t.Kategorie,
+                    Konto: t.Konto,
+                    Zahlungsmethode: t.Zahlungsmethode,
+                    Wiederkehrend: t.Wiederkehrend,
+                    'Sonstige Infos': t['Sonstige Infos']
+                }));
+                const csv = Papa.unparse({
+                    fields: headers,
+                    data: dataToExport
+                });
+                const blob = new Blob([csv], {
+                    type: 'text/csv;charset=utf-8;'
+                });
                 const link = document.createElement("a");
                 link.setAttribute("href", URL.createObjectURL(blob));
                 link.setAttribute("download", "aurimea-transaktionen.csv");
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
 
             function importFromCSV(file) {
                 Papa.parse(file, {
-                    header: true, skipEmptyLines: true,
+                    header: true,
+                    skipEmptyLines: true,
                     complete: (results) => {
                         let importedCount = 0;
                         results.data.forEach(row => {
-                            if (!row.Datum || !row.Betrag || !row.Art) { console.warn("Skipping invalid row:", row); return; }
+                            if (!row.Datum || !row.Betrag || !row.Art) {
+                                console.warn("Skipping invalid row:", row);
+                                return;
+                            }
                             const dateParts = row.Datum.split('.');
                             const parsedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                            const newTransaction = { id: crypto.randomUUID(), 'Datum': row.Datum, 'Art': row.Art, 'Betrag': parseFloat(String(row.Betrag).replace(',', '.')), 'Beschreibung': row.Beschreibung || '', 'Kategorie': row.Kategorie || '', 'Konto': row.Konto || '', 'Zahlungsmethode': row.Zahlungsmethode || '', 'Wiederkehrend': row.Wiederkehrend === 'Ja' ? 'Ja' : 'Nein', 'parsedDate': parsedDate, 'Sonstige Infos': row['Sonstige Infos'] || '' };
+                            const newTransaction = {
+                                id: crypto.randomUUID(),
+                                'Datum': row.Datum,
+                                'Art': row.Art,
+                                'Betrag': parseFloat(String(row.Betrag).replace(',', '.')),
+                                'Beschreibung': row.Beschreibung || '',
+                                'Kategorie': row.Kategorie || '',
+                                'Konto': row.Konto || '',
+                                'Zahlungsmethode': row.Zahlungsmethode || '',
+                                'Wiederkehrend': row.Wiederkehrend === 'Ja' ? 'Ja' : 'Nein',
+                                'parsedDate': parsedDate,
+                                'Sonstige Infos': row['Sonstige Infos'] || ''
+                            };
                             allTransactions.push(newTransaction);
                             transactionDates.add(newTransaction.parsedDate);
                             importedCount++;
                         });
                         if (importedCount > 0) {
-                            saveTransactions(); updateDashboard(); renderCalendar(); showNotification(`${importedCount} Transaktionen erfolgreich importiert!`);
-                        } else { showNotification("Keine gültigen Transaktionen in der Datei gefunden."); }
+                            saveTransactions();
+                            updateDashboard();
+                            renderCalendar();
+                            showNotification(`${importedCount} Transaktionen erfolgreich importiert!`);
+                        } else {
+                            showNotification("Keine gültigen Transaktionen in der Datei gefunden.");
+                        }
                     },
-                    error: (err) => { showNotification("Fehler beim Parsen der CSV-Datei."); console.error("CSV Parse Error:", err); }
+                    error: (err) => {
+                        showNotification("Fehler beim Parsen der CSV-Datei.");
+                        console.error("CSV Parse Error:", err);
+                    }
                 });
             }
 
@@ -858,10 +1007,37 @@
 
 
             // --- EVENT LISTENERS ---
-            document.getElementById('transaction-search-input').addEventListener('input', (e) => { currentPage = 1; searchTerm = e.target.value; document.getElementById('clear-search-btn').classList.toggle('hidden', !searchTerm); updateDashboard(); });
-            document.getElementById('clear-search-btn').addEventListener('click', () => { currentPage = 1; document.getElementById('transaction-search-input').value = ''; searchTerm = ''; document.getElementById('clear-search-btn').classList.add('hidden'); updateDashboard(); });
-            document.getElementById('account-filter').addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { currentPage = 1; currentFilter = e.target.dataset.filter; document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); updateDashboard(); } });
-            document.querySelectorAll('.table-header-sortable').forEach(header => { header.addEventListener('click', () => { const key = header.dataset.sort; currentPage = 1; sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc'; sortConfig.key = key; updateDashboard(); }); });
+            document.getElementById('transaction-search-input').addEventListener('input', (e) => {
+                currentPage = 1;
+                searchTerm = e.target.value;
+                document.getElementById('clear-search-btn').classList.toggle('hidden', !searchTerm);
+                updateDashboard();
+            });
+            document.getElementById('clear-search-btn').addEventListener('click', () => {
+                currentPage = 1;
+                document.getElementById('transaction-search-input').value = '';
+                searchTerm = '';
+                document.getElementById('clear-search-btn').classList.add('hidden');
+                updateDashboard();
+            });
+            document.getElementById('account-filter').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    currentPage = 1;
+                    currentFilter = e.target.dataset.filter;
+                    document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateDashboard();
+                }
+            });
+            document.querySelectorAll('.table-header-sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const key = header.dataset.sort;
+                    currentPage = 1;
+                    sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc';
+                    sortConfig.key = key;
+                    updateDashboard();
+                });
+            });
 
             const clearFilterAction = () => {
                 selectedDate = null;
@@ -875,7 +1051,11 @@
             document.getElementById('clear-date-filter-btn-mobile').addEventListener('click', clearFilterAction);
 
             document.getElementById('import-csv-btn').addEventListener('click', () => document.getElementById('csv-file-input').click());
-            document.getElementById('csv-file-input').addEventListener('change', (e) => { if (e.target.files.length > 0) { importFromCSV(e.target.files[0]); } });
+            document.getElementById('csv-file-input').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    importFromCSV(e.target.files[0]);
+                }
+            });
             document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
 
             document.getElementById('delete-all-transactions-btn').addEventListener('click', () => {
@@ -1012,7 +1192,8 @@
                 const dateParts = parsedDate.split('-');
                 const displayDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
                 const transactionData = {
-                    Datum: displayDate, Art: document.getElementById('trans-art').value,
+                    Datum: displayDate,
+                    Art: document.getElementById('trans-art').value,
                     Betrag: parseFloat(document.getElementById('trans-betrag').value),
                     Beschreibung: document.getElementById('trans-beschreibung').value,
                     Kategorie: document.getElementById('trans-kategorie').value,
@@ -1026,10 +1207,16 @@
                 if (editingId) {
                     const index = allTransactions.findIndex(t => t.id === editingId);
                     if (index !== -1) {
-                        allTransactions[index] = { ...allTransactions[index], ...transactionData };
+                        allTransactions[index] = {
+                            ...allTransactions[index],
+                            ...transactionData
+                        };
                     }
                 } else {
-                    allTransactions.push({ ...transactionData, id: crypto.randomUUID() });
+                    allTransactions.push({
+                        ...transactionData,
+                        id: crypto.randomUUID()
+                    });
                 }
 
                 transactionDates = new Set(allTransactions.map(t => t.parsedDate));
@@ -1072,7 +1259,9 @@
                     }
                 });
             });
-            themeObserver.observe(document.documentElement, { attributes: true });
+            themeObserver.observe(document.documentElement, {
+                attributes: true
+            });
 
             window.addEventListener('message', (event) => {
                 if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {

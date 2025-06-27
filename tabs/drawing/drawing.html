@@ -194,13 +194,13 @@
             background-color: var(--border-color);
             margin: 0 0.25rem;
         }
-
+        
         #color-palette {
             display: flex;
             gap: 0.5rem;
             max-width: 350px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
+            flex-wrap: nowrap; 
+            overflow-x: auto;  
             padding-bottom: 8px;
         }
 
@@ -229,22 +229,13 @@
             cursor: pointer;
             border: 2px solid transparent;
             transition: border-color 0.2s;
-            box-sizing: border-box;
-            flex-shrink: 0;
+            box-sizing: border-box; 
+            flex-shrink: 0; 
         }
-
-        .color-swatch[data-color="#ffffff"] {
-            border: 1px solid var(--border-color);
-        }
-
+        
         .color-swatch.active {
             border-color: var(--active-ring-color);
         }
-
-        .color-swatch[data-color="#ffffff"].active {
-            border: 2px solid var(--active-ring-color);
-        }
-
 
         #line-width-container {
             display: flex;
@@ -349,7 +340,6 @@
             width: 100%;
         }
 
-        /* NEU: Stile für Modal und Notification */
         #modal-overlay {
             position: fixed;
             top: 0;
@@ -382,7 +372,7 @@
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
-
+        
         #modal-overlay.visible #modal-box {
             transform: scale(1);
         }
@@ -407,12 +397,11 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
-
+        
         #modal-confirm-btn {
             background-color: var(--red-color);
             color: white;
         }
-
         #modal-confirm-btn:hover {
             background-color: var(--red-hover-color);
         }
@@ -421,7 +410,6 @@
             background-color: var(--button-active-bg);
             color: var(--text-color);
         }
-
         #modal-cancel-btn:hover {
             background-color: var(--border-color);
         }
@@ -435,15 +423,16 @@
             color: var(--text-color);
             padding: 0.75rem 1.5rem;
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 1px solid var(--border-color);
             z-index: 250;
             transition: bottom 0.5s ease-in-out;
         }
-
+        
         #notification-bar.visible {
             bottom: 20px;
         }
+
     </style>
 </head>
 
@@ -484,8 +473,9 @@
         <div id="right-controls">
             <div id="file-controls">
                 <div style="position: relative;">
+                    <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
                     <button id="export-btn-main" class="btn" title="Exportieren">
-                        <i data-lucide="upload"></i>
+                        <i data-lucide="download"></i>
                     </button>
                     <div id="export-menu" class="hidden">
                         <button id="export-png">
@@ -498,8 +488,9 @@
                         </button>
                     </div>
                 </div>
+                <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
                 <label for="file-import" class="btn" title="Importieren">
-                    <i data-lucide="download"></i>
+                    <i data-lucide="upload"></i>
                 </label>
                 <input type="file" id="file-import" accept=".drawing,image/*">
                 <button id="trash-can" class="btn" title="Zeichenfläche leeren">
@@ -516,7 +507,6 @@
 
     <button id="back-to-content-btn" class="hidden">Zurück zur Zeichnung</button>
 
-    <!-- NEU: HTML für Modal und Notification -->
     <div id="modal-overlay">
         <div id="modal-box">
             <p id="modal-message"></p>
@@ -544,7 +534,7 @@
             let isDrawing = false;
             let currentTool = 'pen';
             let penColor = '#000000';
-
+            
             const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
             let penWidth = penWidthSteps[4];
 
@@ -553,7 +543,7 @@
             let selectedPathIndices = [];
             let isMovingSelection = false;
             let moveStartPoint = null;
-
+            
             // --- PC Pan State ---
             let isPanningWithMouse = false;
             let lastPanPoint = { x: 0, y: 0 };
@@ -569,7 +559,7 @@
 
             // --- POINTER & GESTURE STATE ---
             const activePointers = new Map();
-            let isGesturing = false;
+            let isGesturing = false; 
             let lastGesture = { dist: 0, center: null, pan: { x: 0, y: 0 } };
 
             // --- UI ELEMENTS ---
@@ -609,10 +599,11 @@
                 }
             });
 
+            // MODIFIZIERT: Farben logisch sortiert
             const paletteColors = [
-                '#000000', '#ffffff', '#808080', '#ef4444', '#f97316', '#eab308',
-                '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1',
-                '#8b5cf6', '#f472b6', '#a16207'
+                '#000000', '#808080', '#8B4513', '#a16207', '#ef4444', '#f97316',
+                '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', 
+                '#6366f1', '#8b5cf6', '#f472b6'
             ];
 
             paletteColors.forEach(color => {
@@ -623,19 +614,18 @@
                 if (color === penColor) swatch.classList.add('active');
                 colorPaletteContainer.appendChild(swatch);
             });
-
-            // MODIFIZIERT: Die Funktion akzeptiert jetzt einen optionalen Context zum Zeichnen.
+            
             function redrawAll(forExport = false, targetCtx = ctx) {
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
 
                 targetCtx.fillStyle = bgColor;
                 targetCtx.fillRect(0, 0, targetCtx.canvas.width, targetCtx.canvas.height);
-
+                
                 if (imageState.img) {
                     targetCtx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
                 }
-
+                
                 paths.forEach(path => {
                     targetCtx.beginPath();
                     if (path.color === 'ERASER') {
@@ -683,7 +673,7 @@
                     targetCtx.stroke();
                     targetCtx.setLineDash([]);
                 }
-
+                
                 if (isDrawing && currentTool === 'lasso' && lassoPath.length > 1) {
                     targetCtx.strokeStyle = isDarkMode ? '#a5b4fc' : '#4f46e5';
                     targetCtx.lineWidth = 1 / zoom;
@@ -774,7 +764,7 @@
                 canvasWrapper.scrollTop = newScrollY;
                 redrawAll();
             }
-
+            
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
 
@@ -783,9 +773,9 @@
 
                 if (e.pointerType === 'touch') {
                     isGesturing = true;
-                    isDrawing = false;
+                    isDrawing = false; 
                     const pointers = Array.from(activePointers.values());
-                    if (pointers.length === 1) {
+                    if (pointers.length === 1) { 
                         interactionState.type = 'pan';
                         lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
                     } else if (pointers.length >= 2) {
@@ -813,13 +803,13 @@
                             lassoPath = [pos];
                         }
                         redrawAll();
-                        return;
+                        return; 
                     }
-
-                    isDrawing = true;
+                    
+                    isDrawing = true; 
                     interactionState.startX = pos.x;
                     interactionState.startY = pos.y;
-
+                    
                     if (currentTool === 'image') {
                         const handle = getHandleUnderCursor(pos);
                         if (handle) {
@@ -844,16 +834,16 @@
                 }
                 updateCursorStyle(e);
             }
-
+            
             function handlePointerMove(e) {
                 if (!activePointers.has(e.pointerId)) return;
                 activePointers.set(e.pointerId, e);
-
+                
                 if (isMovingSelection && currentTool === 'lasso') {
                     const pos = getCanvasPoint(e);
                     const dx = pos.x - moveStartPoint.x;
                     const dy = pos.y - moveStartPoint.y;
-
+                    
                     selectedPathIndices.forEach(pathIndex => {
                         paths[pathIndex].points.forEach(p => {
                             p.x += dx;
@@ -861,15 +851,15 @@
                         });
                     });
                     lassoPath.forEach(p => {
-                        p.x += dx;
-                        p.y += dy;
+                       p.x += dx;
+                       p.y += dy;
                     });
 
                     moveStartPoint = pos;
                     redrawAll();
-                    return;
+                    return; 
                 }
-
+                
                 updateCursorStyle(e);
 
                 if (isGesturing) {
@@ -890,13 +880,13 @@
                     }
                 } else if (isDrawing) {
                     const pos = getCanvasPoint(e);
-
+                    
                     if (currentTool === 'lasso') {
                         lassoPath.push(pos);
                         redrawAll();
                         return;
                     }
-
+                    
                     if (interactionState.type === 'move') {
                         const dx = pos.x - interactionState.startX;
                         const dy = pos.y - interactionState.startY;
@@ -927,16 +917,16 @@
                         }
                         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
                         const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-
+                        
                         let strokeStyle;
                         if (currentTool === 'pen') {
-                            if (isDarkMode && penColor === '#000000') {
-                                strokeStyle = '#ffffff';
-                            } else {
-                                strokeStyle = penColor;
-                            }
-                        } else {
-                            strokeStyle = bgColor;
+                           if (isDarkMode && penColor === '#000000') {
+                               strokeStyle = '#ffffff';
+                           } else {
+                               strokeStyle = penColor;
+                           }
+                        } else { 
+                           strokeStyle = bgColor;
                         }
 
                         ctx.lineCap = 'round';
@@ -985,7 +975,7 @@
                     isDrawing = false;
                     isGesturing = false;
                     interactionState.type = null;
-                }
+                } 
                 else if (activePointers.size === 1) {
                     const pointers = Array.from(activePointers.values());
                     if (pointers[0].pointerType === 'touch') {
@@ -993,7 +983,7 @@
                         lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
                     }
                 }
-
+                
                 canvasWrapper.releasePointerCapture(e.pointerId);
                 updateCursorStyle(e);
             }
@@ -1017,7 +1007,7 @@
                 let cursor = 'default';
                 if (currentTool === 'lasso') {
                     cursor = 'crosshair';
-                    if (e && selectedPathIndices.length > 0) {
+                     if (e && selectedPathIndices.length > 0) {
                         const pos = getCanvasPoint(e);
                         if (isPointInSelectionBounds(pos)) {
                             cursor = 'move';
@@ -1026,7 +1016,7 @@
                 } else if (currentTool === 'stroke-eraser') {
                     cursor = 'crosshair';
                 } else if (['pen', 'pixel-eraser'].includes(currentTool)) {
-                    const size = Math.max(2, penWidth * zoom);
+                    const size = Math.max(2, penWidth * zoom); 
                     const halfSize = size / 2;
                     const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" stroke-width="1" stroke="${isDarkMode ? 'white' : 'black'}" fill="none"/></svg>`;
                     cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
@@ -1055,16 +1045,16 @@
                             paths.splice(i, 1);
                             didErase = true;
                             const selectionIndex = selectedPathIndices.indexOf(i);
-                            if (selectionIndex > -1) {
+                            if(selectionIndex > -1) {
                                 selectedPathIndices.splice(selectionIndex, 1);
                             }
-                            break;
+                            break; 
                         }
                     }
                 }
-                if (didErase) {
-                    redrawAll();
-                    saveState();
+                if (didErase) { 
+                    redrawAll(); 
+                    saveState(); 
                 }
             }
 
@@ -1077,7 +1067,7 @@
                 const dy = p.y - (a.y + t * (b.y - a.y));
                 return Math.hypot(dx, dy) < threshold;
             }
-
+            
             function getSelectionBounds() {
                 if (selectedPathIndices.length === 0) return null;
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -1091,15 +1081,15 @@
                 });
                 return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
             }
-
+            
             function getSelectionBoundsPoly() {
                 const bounds = getSelectionBounds();
                 if (!bounds) return [];
                 return [
-                    { x: bounds.x, y: bounds.y },
-                    { x: bounds.x + bounds.width, y: bounds.y },
-                    { x: bounds.x + bounds.width, y: bounds.y + bounds.height },
-                    { x: bounds.x, y: bounds.y + bounds.height }
+                    {x: bounds.x, y: bounds.y},
+                    {x: bounds.x + bounds.width, y: bounds.y},
+                    {x: bounds.x + bounds.width, y: bounds.y + bounds.height},
+                    {x: bounds.x, y: bounds.y + bounds.height}
                 ];
             }
 
@@ -1108,7 +1098,7 @@
                 if (!bounds) return false;
                 return isPointInRect(pos, bounds);
             }
-
+            
             function selectPathsInLasso() {
                 selectedPathIndices = [];
                 if (lassoPath.length < 3) {
@@ -1124,9 +1114,9 @@
                 });
 
                 if (selectedPathIndices.length > 0) {
-                    lassoPath = getSelectionBoundsPoly();
+                     lassoPath = getSelectionBoundsPoly();
                 } else {
-                    lassoPath = [];
+                     lassoPath = [];
                 }
             }
 
@@ -1195,7 +1185,7 @@
 
             function calculateContentBounds() {
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                if (paths.length === 0 && !imageState.img) return null;
+                if(paths.length === 0 && !imageState.img) return null;
 
                 if (imageState.img) {
                     minX = Math.min(minX, imageState.x); minY = Math.min(minY, imageState.y);
@@ -1234,7 +1224,6 @@
                 backToContentBtn.classList.toggle('hidden', contentIsVisible);
             }
 
-            // --- NEU: Helper für Notifications und Modal ---
             let notificationTimeout;
             function showNotification(message) {
                 notificationBar.textContent = message;
@@ -1256,7 +1245,7 @@
                 modalOverlay.classList.remove('visible');
                 confirmCallback = null;
             }
-
+            
             modalConfirmBtn.addEventListener('click', () => {
                 if (typeof confirmCallback === 'function') {
                     confirmCallback();
@@ -1265,9 +1254,8 @@
             });
             modalCancelBtn.addEventListener('click', hideModal);
 
-            // MODIFIZIERT: Verwendet jetzt das Modal
             document.getElementById('trash-can').addEventListener('click', () => {
-                showModal('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?', () => {
+                 showModal('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?', () => {
                     paths = [];
                     imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
                     selectedPathIndices = [];
@@ -1277,18 +1265,17 @@
                     saveState();
                     redrawAll();
                     checkContentInView();
-                });
+                 });
             });
 
             document.getElementById('export-btn-main').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('export-menu').classList.toggle('hidden'); });
             window.addEventListener('click', (e) => { if (!document.getElementById('export-menu').contains(e.target) && !e.target.closest('#export-btn-main')) { document.getElementById('export-menu').classList.add('hidden'); } });
-
-            // MODIFIZIERT: Export-Logik korrigiert und verwendet Notifications
-            document.getElementById('export-png').addEventListener('click', () => {
+            
+            document.getElementById('export-png').addEventListener('click', () => { 
                 const bounds = calculateContentBounds();
-                if (!bounds) {
-                    showNotification("Die Zeichenfläche ist leer.");
-                    return;
+                if (!bounds) { 
+                    showNotification("Die Zeichenfläche ist leer."); 
+                    return; 
                 }
                 const padding = 20;
                 const exportWidth = bounds.maxX - bounds.minX + padding * 2;
@@ -1297,14 +1284,12 @@
                 exportCanvas.width = exportWidth;
                 exportCanvas.height = exportHeight;
                 const exportCtx = exportCanvas.getContext('2d');
-
-                // Zeichne den relevanten Ausschnitt des Haupt-Canvas auf den Export-Canvas
+                
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = canvas.width;
                 tempCanvas.height = canvas.height;
                 const tempCtx = tempCanvas.getContext('2d');
-
-                // Rufe redrawAll auf, um auf den temporären Canvas zu zeichnen (für den Export-Modus)
+                
                 redrawAll(true, tempCtx);
 
                 exportCtx.drawImage(tempCanvas, bounds.minX - padding, bounds.minY - padding, exportWidth, exportHeight, 0, 0, exportWidth, exportHeight);
@@ -1315,9 +1300,9 @@
                 link.click();
                 document.getElementById('export-menu').classList.add('hidden');
                 showNotification("Bild wird exportiert...");
-            });
+             });
 
-            document.getElementById('export-drawing').addEventListener('click', () => {
+            document.getElementById('export-drawing').addEventListener('click', () => { 
                 saveState();
                 const stateString = localStorage.getItem('drawingState') || '{}';
                 const blob = new Blob([stateString], { type: 'application/json' });
@@ -1329,9 +1314,8 @@
                 URL.revokeObjectURL(url);
                 document.getElementById('export-menu').classList.add('hidden');
                 showNotification("Zeichnung wird gespeichert...");
-            });
-
-            // MODIFIZIERT: Verwendet jetzt das Modal
+             });
+             
             document.getElementById('file-import').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -1363,13 +1347,13 @@
                     } else {
                         showNotification('Ungültiger Dateityp.');
                     }
-                    e.target.value = ''; // Input zurücksetzen
+                    e.target.value = ''; 
                 };
-
+                
                 showModal('Ihre aktuelle Zeichnung wird ersetzt. Fortfahren?', importAction);
-            });
+             });
 
-            backToContentBtn.addEventListener('click', () => {
+            backToContentBtn.addEventListener('click', () => { 
                 const bounds = calculateContentBounds();
                 if (!bounds) return;
                 const contentCenterX = (bounds.minX + bounds.maxX) / 2;
@@ -1380,7 +1364,7 @@
                     top: contentCenterY * zoom - canvasWrapper.clientHeight / 2,
                     behavior: 'smooth'
                 });
-            });
+             });
             canvasWrapper.addEventListener('scroll', () => {
                 clearTimeout(scrollCheckTimeout);
                 scrollCheckTimeout = setTimeout(checkContentInView, 150);
@@ -1392,10 +1376,10 @@
             canvasWrapper.addEventListener('pointerup', handlePointerUp);
             canvasWrapper.addEventListener('pointerleave', handlePointerUp);
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
-
+            
             // Event Listeners für das Verschieben mit der mittleren Maustaste
             canvasWrapper.addEventListener('mousedown', (e) => {
-                if (e.button === 1) {
+                if (e.button === 1) { 
                     e.preventDefault();
                     isPanningWithMouse = true;
                     lastPanPoint = { x: e.clientX, y: e.clientY };
