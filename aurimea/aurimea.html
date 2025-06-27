@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Einbindung von Lucide Icons für den Kalender -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* Farben-Schema für Konsistenz */
         :root {
@@ -104,9 +106,10 @@
             cursor: pointer;
         }
 
+        /* --- NEUE KALENDER-STILE (adaptiert von MemoMea) --- */
         .calendar-day {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -115,31 +118,45 @@
             transition: background-color 0.2s, color 0.2s;
             margin: auto;
             position: relative;
+            border: none;
+            background-color: transparent;
         }
 
         .calendar-day:hover {
             background-color: var(--border-color);
         }
 
-        .calendar-day.has-transactions {
-            font-weight: 700;
-            box-shadow: inset 0 0 0 1px var(--text-color-light);
-        }
-
-        .calendar-day.today {
-            font-weight: 700;
-        }
-
-        .calendar-day.today::after {
+        .calendar-day.has-transactions::after {
             content: '';
             position: absolute;
-            bottom: 4px;
+            bottom: 5px;
             left: 50%;
             transform: translateX(-50%);
             width: 5px;
             height: 5px;
             border-radius: 50%;
             background-color: #4f46e5;
+            /* Indigo */
+        }
+
+        html[data-theme='dark'] .calendar-day.has-transactions::after {
+            background-color: #818cf8;
+            /* Indigo-400 */
+        }
+
+        .calendar-day.today {
+            background-color: #dbeafe;
+            /* blue-100 */
+            color: #1e40af;
+            /* blue-800 */
+            font-weight: 700;
+        }
+
+        html[data-theme='dark'] .calendar-day.today {
+            background-color: #1e3a8a;
+            /* blue-900 */
+            color: #eff6ff;
+            /* blue-50 */
         }
 
         .calendar-day.selected {
@@ -149,9 +166,15 @@
             box-shadow: none;
         }
 
-        .calendar-day.selected.today::after {
+        .calendar-day.selected:hover {
+            background-color: #4338ca;
+        }
+
+        .calendar-day.selected.has-transactions::after {
             background-color: white;
         }
+
+        /* --- ENDE NEUE KALENDER-STILE --- */
 
         /* Stile für Aktions-Buttons */
         .action-btn {
@@ -222,28 +245,19 @@
             </div>
         </div>
 
-        <!-- KALENDER (Linke Spalte) -->
-        <div class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 flex flex-col h-full">
-            <div id="calendar-container" class="flex flex-col w-full h-full">
-                <div class="flex justify-between items-center mb-4 w-full">
-                    <button id="prev-month-btn"
-                        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><svg
-                            class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                        </svg></button>
-                    <h3 id="month-year-header" class="text-lg font-semibold text-center w-48"></h3>
-                    <button id="next-month-btn"
-                        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><svg
-                            class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg></button>
+        <!-- KALENDER (Linke Spalte, nur Desktop) -->
+        <div id="calendar-desktop-wrapper"
+            class="card p-4 md:p-6 rounded-xl shadow-md lg:col-span-1 hidden lg:flex flex-col h-full">
+            <div id="calendar-container-desktop" class="flex flex-col w-full h-full">
+                <div id="calendar-header-desktop" class="flex justify-between items-center mb-4 w-full">
+                    <!-- Inhalt wird durch JS generiert -->
                 </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center flex-grow"></div>
+                <div id="calendar-grid-desktop" class="grid grid-cols-7 gap-1 text-center flex-grow">
+                    <!-- Inhalt wird durch JS generiert -->
+                </div>
             </div>
             <div class="text-center mt-4 w-full min-h-[40px]">
-                <button id="clear-date-filter-btn"
+                <button id="clear-date-filter-btn-desktop"
                     class="filter-btn hidden px-4 py-2 rounded-lg font-semibold transition">Datumsfilter
                     zurücksetzen</button>
             </div>
@@ -347,7 +361,6 @@
     </div>
     <div id="transaction-modal"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <!-- MODIFICATION: Added max-h-[90vh] and overflow-y-auto to make the card scrollable on tall forms -->
         <div class="card p-6 rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
@@ -386,14 +399,12 @@
                     </div>
                     <div><label for="trans-konto"
                             class="block text-sm font-medium subtle-text mb-1">Konto</label><select id="trans-konto"
-                            required class="w-full p-2 rounded-lg"
+                            required class="w-full p-2 rounded-lg transition-opacity"
                             style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
                             <option>Erste Bank</option>
                             <option>N26</option>
                             <option>Revolut</option>
                         </select></div>
-
-                    <!-- MODIFICATION START: Nested Grid for Payment Method & Recurring -->
                     <div class="md:col-span-2 grid grid-cols-2 gap-4 items-end">
                         <div>
                             <label class="block text-sm font-medium subtle-text mb-1">Zahlungsmethode</label>
@@ -419,8 +430,6 @@
                                 class="text-sm font-medium">Wiederkehrend</label>
                         </div>
                     </div>
-                    <!-- MODIFICATION END -->
-
                     <div class="md:col-span-2"><label for="trans-sonstige-infos"
                             class="block text-sm font-medium subtle-text mb-1">Sonstige Infos</label><textarea
                             id="trans-sonstige-infos" rows="2" placeholder="Zusätzliche Notizen..."
@@ -459,7 +468,36 @@
         <p id="notification-message"></p>
     </div>
 
-    <!-- Schwebender Aktionsbutton -->
+    <!-- Kalender Seitenleiste (Mobile) -->
+    <div id="calendar-sidebar-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+    </div>
+    <div id="calendar-sidebar"
+        class="fixed top-0 right-0 h-full w-full max-w-sm shadow-xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
+        style="background-color: var(--card-bg);">
+        <div class="p-4 md:p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 w-full flex-shrink-0">
+                <h3 class="text-xl font-bold" style="color: var(--text-color);">Kalender</h3>
+                <button id="close-calendar-sidebar-btn"
+                    class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="calendar-header-mobile" class="flex justify-between items-center mb-4 w-full flex-shrink-0"></div>
+            <div id="calendar-grid-mobile" class="grid grid-cols-7 gap-1 text-center flex-grow"></div>
+            <div class="text-center mt-4 w-full min-h-[40px] flex-shrink-0">
+                <button id="clear-date-filter-btn-mobile"
+                    class="filter-btn hidden px-4 py-2 rounded-lg font-semibold transition">Datumsfilter
+                    zurücksetzen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schwebende Aktionsbuttons -->
+    <button id="fab-open-calendar" title="Kalender anzeigen"
+        class="lg:hidden fixed bottom-24 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+        <i data-lucide="calendar" class="h-7 w-7"></i>
+    </button>
     <button id="fab-add-transaction" title="Neue Transaktion hinzufügen"
         class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -660,34 +698,78 @@
                 nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; updateDashboard(); } });
             }
 
-            // --- CALENDAR LOGIC ---
-            const monthYearHeader = document.getElementById('month-year-header');
-            const calendarGrid = document.getElementById('calendar-grid');
+            // --- KALENDER LOGIC ---
+            const calendarGridDesktop = document.getElementById('calendar-grid-desktop');
+            const calendarHeaderDesktop = document.getElementById('calendar-header-desktop');
+            const calendarGridMobile = document.getElementById('calendar-grid-mobile');
+            const calendarHeaderMobile = document.getElementById('calendar-header-mobile');
+
             function renderCalendar() {
-                calendarGrid.innerHTML = '';
+                const targets = [
+                    { grid: calendarGridDesktop, header: calendarHeaderDesktop },
+                    { grid: calendarGridMobile, header: calendarHeaderMobile }
+                ];
                 const month = calendarDate.getMonth(), year = calendarDate.getFullYear();
-                monthYearHeader.textContent = `${new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate)}`;
-                const firstDayOfMonth = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-                const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-                ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => { const el = document.createElement('div'); el.className = 'font-bold subtle-text text-sm h-9 flex items-center justify-center'; el.textContent = day; calendarGrid.appendChild(el); });
-                for (let i = 0; i < startOffset; i++) { calendarGrid.appendChild(document.createElement('div')); }
+                const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
                 const todayStr = new Date().toISOString().slice(0, 10);
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayEl = document.createElement('div');
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    dayEl.dataset.date = dateStr; dayEl.textContent = day; dayEl.className = 'calendar-day text-sm';
-                    if (transactionDates.has(dateStr)) dayEl.classList.add('has-transactions');
-                    if (dateStr === todayStr) dayEl.classList.add('today');
-                    if (dateStr === selectedDate) dayEl.classList.add('selected');
-                    dayEl.addEventListener('click', handleDateClick);
-                    calendarGrid.appendChild(dayEl);
-                }
+
+                targets.forEach(target => {
+                    if (!target.grid || !target.header) return;
+
+                    target.grid.innerHTML = '';
+                    target.header.innerHTML = `
+                        <button data-action="prev-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                        <h3 class="text-lg font-semibold text-center w-48">${monthName}</h3>
+                        <button data-action="next-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                    `;
+
+                    ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => {
+                        const el = document.createElement('div');
+                        el.className = 'font-bold subtle-text text-sm h-9 flex items-center justify-center';
+                        el.textContent = day;
+                        target.grid.appendChild(el);
+                    });
+
+                    const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+                    for (let i = 0; i < startOffset; i++) {
+                        target.grid.appendChild(document.createElement('div'));
+                    }
+
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dayButton = document.createElement('button');
+                        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        dayButton.dataset.date = dateStr;
+                        dayButton.textContent = day;
+                        dayButton.className = 'calendar-day text-sm';
+                        if (transactionDates.has(dateStr)) dayButton.classList.add('has-transactions');
+                        if (dateStr === todayStr) dayButton.classList.add('today');
+                        if (dateStr === selectedDate) dayButton.classList.add('selected');
+                        dayButton.addEventListener('click', handleDateClick);
+                        target.grid.appendChild(dayButton);
+                    }
+                });
+
+                document.querySelectorAll('[data-action="prev-month"]').forEach(btn => btn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }));
+                document.querySelectorAll('[data-action="next-month"]').forEach(btn => btn.addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }));
+
+                lucide.createIcons();
             }
+
             function handleDateClick(e) {
-                const clickedDate = e.target.dataset.date;
-                currentPage = 1; selectedDate = (selectedDate === clickedDate) ? null : clickedDate;
-                document.getElementById('clear-date-filter-btn').classList.toggle('hidden', !selectedDate);
-                renderCalendar(); updateDashboard();
+                const clickedDate = e.currentTarget.dataset.date;
+                currentPage = 1;
+                selectedDate = (selectedDate === clickedDate) ? null : clickedDate;
+
+                const clearBtnDesktop = document.getElementById('clear-date-filter-btn-desktop');
+                const clearBtnMobile = document.getElementById('clear-date-filter-btn-mobile');
+                clearBtnDesktop.classList.toggle('hidden', !selectedDate);
+                clearBtnMobile.classList.toggle('hidden', !selectedDate);
+
+                renderCalendar();
+                updateDashboard();
+                closeCalendarSidebar();
             }
 
             // --- CSV IMPORT / EXPORT ---
@@ -762,9 +844,18 @@
             document.getElementById('clear-search-btn').addEventListener('click', () => { currentPage = 1; document.getElementById('transaction-search-input').value = ''; searchTerm = ''; document.getElementById('clear-search-btn').classList.add('hidden'); updateDashboard(); });
             document.getElementById('account-filter').addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { currentPage = 1; currentFilter = e.target.dataset.filter; document.querySelectorAll('#account-filter button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); updateDashboard(); } });
             document.querySelectorAll('.table-header-sortable').forEach(header => { header.addEventListener('click', () => { const key = header.dataset.sort; currentPage = 1; sortConfig.direction = (sortConfig.key === key && sortConfig.direction === 'asc') ? 'desc' : 'asc'; sortConfig.key = key; updateDashboard(); }); });
-            document.getElementById('prev-month-btn').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); });
-            document.getElementById('next-month-btn').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); });
-            document.getElementById('clear-date-filter-btn').addEventListener('click', () => { selectedDate = null; currentPage = 1; document.getElementById('clear-date-filter-btn').classList.add('hidden'); renderCalendar(); updateDashboard(); });
+
+            const clearFilterAction = () => {
+                selectedDate = null;
+                currentPage = 1;
+                document.getElementById('clear-date-filter-btn-desktop').classList.add('hidden');
+                document.getElementById('clear-date-filter-btn-mobile').classList.add('hidden');
+                renderCalendar();
+                updateDashboard();
+            };
+            document.getElementById('clear-date-filter-btn-desktop').addEventListener('click', clearFilterAction);
+            document.getElementById('clear-date-filter-btn-mobile').addEventListener('click', clearFilterAction);
+
             document.getElementById('import-csv-btn').addEventListener('click', () => document.getElementById('csv-file-input').click());
             document.getElementById('csv-file-input').addEventListener('change', (e) => { if (e.target.files.length > 0) { importFromCSV(e.target.files[0]); } });
             document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
@@ -813,13 +904,32 @@
             const modalTitle = document.getElementById('modal-title');
             const transArtSelect = document.getElementById('trans-art');
             const transKategorieSelect = document.getElementById('trans-kategorie');
+            const transKontoSelect = document.getElementById('trans-konto');
+            const paymentMethodRadios = document.querySelectorAll('input[name="trans-zahlungsmethode"]');
+
+
+            function handlePaymentMethodChange() {
+                const isCash = document.getElementById('trans-zahlungsmethode-bar').checked;
+                transKontoSelect.disabled = isCash;
+                if (isCash) {
+                    transKontoSelect.value = ''; // Clear selection
+                    transKontoSelect.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    transKontoSelect.required = false;
+                } else {
+                    transKontoSelect.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    transKontoSelect.required = true;
+                    if (!transKontoSelect.value && transKontoSelect.options.length > 0) {
+                        transKontoSelect.value = transKontoSelect.options[0].value;
+                    }
+                }
+            }
+
+            paymentMethodRadios.forEach(radio => radio.addEventListener('change', handlePaymentMethodChange));
 
             function updateCategoryOptions() {
                 const selectedArt = transArtSelect.value;
                 const categories = selectedArt === 'Ausgabe' ? expenseCategories : incomeCategories;
-
-                transKategorieSelect.innerHTML = ''; // Clear existing options
-
+                transKategorieSelect.innerHTML = '';
                 categories.forEach(category => {
                     const option = document.createElement('option');
                     option.value = category;
@@ -835,7 +945,6 @@
                 document.getElementById('trans-zahlungsmethode-karte').checked = true;
 
                 if (transactionId) {
-                    // Edit Mode
                     modalTitle.textContent = "Transaktion bearbeiten";
                     const transaction = allTransactions.find(t => t.id === transactionId);
                     if (transaction) {
@@ -844,28 +953,26 @@
                         document.getElementById('trans-art').value = transaction.Art;
                         document.getElementById('trans-betrag').value = transaction.Betrag;
                         document.getElementById('trans-beschreibung').value = transaction.Beschreibung;
-
-                        updateCategoryOptions(); // Update categories based on transaction type
+                        updateCategoryOptions();
                         document.getElementById('trans-kategorie').value = transaction.Kategorie;
-
                         document.getElementById('trans-konto').value = transaction.Konto;
-
                         if (transaction.Zahlungsmethode === 'Bar') {
                             document.getElementById('trans-zahlungsmethode-bar').checked = true;
                         } else {
                             document.getElementById('trans-zahlungsmethode-karte').checked = true;
                         }
-
                         document.getElementById('trans-wiederkehrend').checked = transaction.Wiederkehrend === 'Ja';
                         document.getElementById('trans-sonstige-infos').value = transaction['Sonstige Infos'] || '';
                     }
                 } else {
-                    // Add Mode
                     modalTitle.textContent = "Neue Transaktion hinzufügen";
                     delete modalForm.dataset.editingId;
                     document.getElementById('trans-datum').value = new Date().toISOString().split('T')[0];
-                    updateCategoryOptions(); // Initial population for new transaction
+                    updateCategoryOptions();
                 }
+
+                handlePaymentMethodChange(); // Setzt den initialen Status des Kontofelds
+
                 modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
                 modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
             }
@@ -891,7 +998,7 @@
                     Betrag: parseFloat(document.getElementById('trans-betrag').value),
                     Beschreibung: document.getElementById('trans-beschreibung').value,
                     Kategorie: document.getElementById('trans-kategorie').value,
-                    Konto: document.getElementById('trans-konto').value,
+                    Konto: document.getElementById('trans-konto').value, // This will be '' if cash is selected
                     Zahlungsmethode: document.querySelector('input[name="trans-zahlungsmethode"]:checked').value,
                     Wiederkehrend: document.getElementById('trans-wiederkehrend').checked ? 'Ja' : 'Nein',
                     parsedDate: parsedDate,
@@ -899,13 +1006,11 @@
                 };
 
                 if (editingId) {
-                    // Update existing transaction
                     const index = allTransactions.findIndex(t => t.id === editingId);
                     if (index !== -1) {
                         allTransactions[index] = { ...allTransactions[index], ...transactionData };
                     }
                 } else {
-                    // Add new transaction
                     allTransactions.push({ ...transactionData, id: crypto.randomUUID() });
                 }
 
@@ -917,11 +1022,32 @@
                 closeModal();
             });
 
+            // --- KALENDER SEITENLEISTE LOGIK (NEU) ---
+            const calendarSidebar = document.getElementById('calendar-sidebar');
+            const calendarSidebarOverlay = document.getElementById('calendar-sidebar-overlay');
+            const openCalendarBtn = document.getElementById('fab-open-calendar');
+            const closeCalendarBtn = document.getElementById('close-calendar-sidebar-btn');
+
+            function openCalendarSidebar() {
+                calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.remove('translate-x-full');
+                lucide.createIcons();
+            }
+
+            function closeCalendarSidebar() {
+                calendarSidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.add('translate-x-full');
+            }
+
+            openCalendarBtn.addEventListener('click', openCalendarSidebar);
+            closeCalendarBtn.addEventListener('click', closeCalendarSidebar);
+            calendarSidebarOverlay.addEventListener('click', closeCalendarSidebar);
+
+
             // --- THEME SYNCHRONISATION ---
             const themeObserver = new MutationObserver((mutations) => {
                 mutations.forEach(mutation => {
                     if (mutation.attributeName === 'data-theme') {
-                        // Update charts on theme change
                         const accountFilteredData = (currentFilter === 'all') ? allTransactions : allTransactions.filter(row => row.Konto === currentFilter);
                         const financialSummary = processData(accountFilteredData);
                         createOrUpdateCharts(financialSummary);
@@ -943,6 +1069,7 @@
             loadTransactions();
             updateDashboard();
             renderCalendar();
+            lucide.createIcons(); // Initial call for any icons outside dynamic components
         });
     </script>
 </body>
