@@ -347,7 +347,8 @@
     </div>
     <div id="transaction-modal"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <div class="card p-6 rounded-xl shadow-lg">
+        <!-- MODIFICATION: Added max-h-[90vh] and overflow-y-auto to make the card scrollable on tall forms -->
+        <div class="card p-6 rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
                 <button id="close-modal-btn"
@@ -391,26 +392,35 @@
                             <option>N26</option>
                             <option>Revolut</option>
                         </select></div>
-                    <div>
-                        <label class="block text-sm font-medium subtle-text mb-1">Zahlungsmethode</label>
-                        <div class="flex items-center gap-x-4 mt-2">
-                            <div class="flex items-center">
-                                <input id="trans-zahlungsmethode-karte" name="trans-zahlungsmethode" type="radio"
-                                    value="Karte" checked class="h-4 w-4" style="border-color: var(--border-color);">
-                                <label for="trans-zahlungsmethode-karte"
-                                    class="ml-2 block text-sm font-medium">Karte</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="trans-zahlungsmethode-bar" name="trans-zahlungsmethode" type="radio"
-                                    value="Bar" class="h-4 w-4" style="border-color: var(--border-color);">
-                                <label for="trans-zahlungsmethode-bar"
-                                    class="ml-2 block text-sm font-medium">Bar</label>
+
+                    <!-- MODIFICATION START: Nested Grid for Payment Method & Recurring -->
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium subtle-text mb-1">Zahlungsmethode</label>
+                            <div class="flex items-center gap-x-4 mt-2">
+                                <div class="flex items-center">
+                                    <input id="trans-zahlungsmethode-karte" name="trans-zahlungsmethode" type="radio"
+                                        value="Karte" checked class="h-4 w-4"
+                                        style="border-color: var(--border-color);">
+                                    <label for="trans-zahlungsmethode-karte"
+                                        class="ml-2 block text-sm font-medium">Karte</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="trans-zahlungsmethode-bar" name="trans-zahlungsmethode" type="radio"
+                                        value="Bar" class="h-4 w-4" style="border-color: var(--border-color);">
+                                    <label for="trans-zahlungsmethode-bar"
+                                        class="ml-2 block text-sm font-medium">Bar</label>
+                                </div>
                             </div>
                         </div>
+                        <div class="flex items-center gap-2 pb-1">
+                            <input type="checkbox" id="trans-wiederkehrend" class="h-4 w-4 rounded"
+                                style="border-color: var(--border-color);"><label for="trans-wiederkehrend"
+                                class="text-sm font-medium">Wiederkehrend</label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="trans-wiederkehrend"
-                            class="h-4 w-4 rounded" style="border-color: var(--border-color);"><label
-                            for="trans-wiederkehrend" class="text-sm font-medium">Wiederkehrend</label></div>
+                    <!-- MODIFICATION END -->
+
                     <div class="md:col-span-2"><label for="trans-sonstige-infos"
                             class="block text-sm font-medium subtle-text mb-1">Sonstige Infos</label><textarea
                             id="trans-sonstige-infos" rows="2" placeholder="Zusätzliche Notizen..."
