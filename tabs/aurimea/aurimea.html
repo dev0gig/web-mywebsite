@@ -50,6 +50,17 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            /* Fügt unten Platz hinzu, um zu verhindern, dass die schwebenden Buttons Inhalte überdecken,
+               insbesondere auf Mobilgeräten. env(safe-area-inset-bottom) berücksichtigt die Home-Leiste auf iOS. */
+            padding-bottom: 8rem;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                /* Setzt Padding für Desktop zurück, da die Buttons hier nicht schweben */
+                padding-bottom: 1.5rem;
+                /* Entspricht p-6 von Tailwind */
+            }
         }
 
         /* --- Benutzerdefinierte Scrollbar-Stile --- */
@@ -206,6 +217,15 @@
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
+        }
+
+        /* Positionierung der schwebenden Aktionsbuttons unter Berücksichtigung der Safe Area */
+        #fab-open-calendar {
+            bottom: calc(6rem + env(safe-area-inset-bottom));
+        }
+
+        #fab-add-transaction {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
     </style>
 </head>
@@ -494,12 +514,10 @@
     </div>
 
     <!-- Schwebende Aktionsbuttons -->
-    <button id="fab-open-calendar" title="Kalender anzeigen"
-        class="lg:hidden fixed bottom-24 right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-open-calendar" title="Kalender anzeigen" class="lg:hidden fixed right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <i data-lucide="calendar" class="h-7 w-7"></i>
     </button>
-    <button id="fab-add-transaction" title="Neue Transaktion hinzufügen"
-        class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-add-transaction" title="Neue Transaktion hinzufügen" class="fixed right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

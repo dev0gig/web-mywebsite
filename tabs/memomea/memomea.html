@@ -309,13 +309,18 @@
         .delete-entry-button {
             color: var(--text-color-light);
         }
+
+        /* Positionierung des schwebenden Kalender-Buttons unter Berücksichtigung der Safe Area */
+        #fab-open-calendar {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom));
+        }
     </style>
 </head>
 
 <body class="transition-colors duration-300">
 
-    <div class="container mx-auto max-w-7xl px-4 py-8">
-
+    <!-- Padding unten (pb-20) hinzugefügt, um Platz für den FAB auf Mobilgeräten zu schaffen -->
+    <div class="container mx-auto max-w-7xl px-4 py-8 pb-20 lg:pb-8">
         <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b gap-4">
             <h1 class="text-3xl font-bold">MemoMea</h1>
             <!-- NEU: Suchfeld -->
@@ -442,8 +447,7 @@
     </div>
 
     <!-- Schwebender Kalender-Button -->
-    <button id="fab-open-calendar" title="Kalender anzeigen"
-        class="lg:hidden fixed bottom-6 right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-open-calendar" title="Kalender anzeigen" class="lg:hidden fixed right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <i data-lucide="calendar" class="h-7 w-7"></i>
     </button>
 

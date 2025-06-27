@@ -36,8 +36,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
-            padding-bottom: 120px;
-            /* Platz für das Dock */
+            padding-bottom: calc(120px + env(safe-area-inset-bottom)); /* Platz für Dock + sicheren Bereich */
         }
 
         /* Subtiler Scrollbalken für den Body */
@@ -212,9 +211,8 @@
 
         #favorites-dock {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            left: 50%; transform: translateX(-50%);
             padding: 0.75rem;
             background-color: var(--dock-bg);
             border: 1px solid var(--dock-border);
