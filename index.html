@@ -110,8 +110,6 @@
             /* Standardmäßig auf mobilen Geräten ausblenden */
             flex-direction: column;
             /* Anordnung in Spalte */
-            justify-content: space-between;
-            /* Elemente oben und unten ausrichten */
         }
 
         @media (min-width: 768px) {
@@ -218,7 +216,7 @@
 
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="p-2">
-        <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
+        <ul id="nav-links" class="space-y-2 mt-2">
             <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
@@ -260,7 +258,7 @@
                     <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/notes.svg exists -->
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
-        <ul class="space-y-2">
+        <ul class="space-y-2 mt-2">
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
