@@ -652,11 +652,9 @@
                     const newPanX = (pointer1.clientX + pointer2.clientX) / 2;
                     const newPanY = (pointer1.clientY + pointer2.clientY) / 2;
 
-                    // Pan
                     canvasWrapper.scrollLeft -= newPanX - lastGesture.pan.x;
                     canvasWrapper.scrollTop -= newPanY - lastGesture.pan.y;
 
-                    // Zoom
                     const wrapperRect = canvasWrapper.getBoundingClientRect();
                     const centerX = newPanX - wrapperRect.left;
                     const centerY = newPanY - wrapperRect.top;
@@ -697,17 +695,28 @@
                             handleStrokeErase(pos);
                             return;
                         }
-                        currentPath.push(pos);
 
-                        // Live drawing with straight lines for performance
-                        ctx.beginPath();
-                        ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
-                        ctx.lineTo(pos.x, pos.y);
+                        // Use coalesced events to get more points for smoother, more responsive lines
+                        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+
+                        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
+                        const strokeStyle = (currentTool === 'pen') ? (isDarkMode ? invertHex(penColor) : penColor) : bgColor;
+
                         ctx.lineCap = 'round';
                         ctx.lineJoin = 'round';
                         ctx.lineWidth = penWidth;
-                        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-                        ctx.strokeStyle = (currentTool === 'pen') ? (isDarkMode ? invertHex(penColor) : penColor) : bgColor;
+                        ctx.strokeStyle = strokeStyle;
+
+                        ctx.beginPath();
+                        if (currentPath.length > 0) {
+                            ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
+                        }
+
+                        for (const event of events) {
+                            const coalescedPos = getCanvasPoint(event);
+                            currentPath.push(coalescedPos);
+                            ctx.lineTo(coalescedPos.x, coalescedPos.y);
+                        }
                         ctx.stroke();
                     }
                 }
