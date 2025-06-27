@@ -300,6 +300,11 @@
         #notification.show {
             transform: translateX(0);
         }
+
+        /* Styling for the delete button */
+        .delete-entry-button {
+            color: var(--text-color-light);
+        }
     </style>
 </head>
 
@@ -330,6 +335,10 @@
                 <button id="export-button"
                     class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                     <i data-lucide="download" class="mr-2 h-4 w-4"></i> Exportieren
+                </button>
+                <button id="delete-all-button" title="Alle Einträge löschen"
+                    class="primary-button inline-flex items-center justify-center p-2 border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 bg-red-600 hover:bg-red-700">
+                    <i data-lucide="trash-2" class="h-4 w-4"></i>
                 </button>
             </div>
         </header>
@@ -420,6 +429,7 @@
             const confirmExportButton = document.getElementById('confirm-export-button');
             const cancelExportButton = document.getElementById('cancel-export-button');
             const startDateInput = document.getElementById('start-date');
+            const deleteAllButton = document.getElementById('delete-all-button');
             const endDateInput = document.getElementById('end-date');
 
             const STORAGE_KEY = 'markdownJournalEntries';
@@ -505,7 +515,24 @@
                 textArea.setAttribute('rows', '8');
 
                 entryDiv.append(header, previewDiv, textArea);
-
+                
+                // Add delete button
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('absolute', 'top-2', 'right-2', 'p-1', 'rounded-full', 'hover:bg-red-100', 'dark:hover:bg-red-900', 'cursor-pointer', 'delete-entry-button');
+                deleteButton.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
+                deleteButton.title = 'Eintrag löschen';
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent triggering the entryDiv click
+                    if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
+                        delete journalEntries[dateString];
+                        saveEntries(journalEntries);
+                        updateAll();
+                        showNotification('Eintrag erfolgreich gelöscht.', 'success');
+                    }
+                });
+                entryDiv.classList.add('relative'); // Make entryDiv a positioning context for absolute delete button
+                entryDiv.appendChild(deleteButton);
+                
                 entryDiv.addEventListener('click', (e) => {
                     if (e.target.classList.contains('tag')) {
                         const tag = e.target.dataset.tag;
@@ -896,6 +923,17 @@
                     });
                 exportModal.classList.add('hidden');
             });
+
+            // Event-Listener für den "Alle löschen"-Button
+            deleteAllButton.addEventListener('click', () => {
+                if (confirm('Möchten Sie WIRKLICH ALLE Einträge unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+                    journalEntries = {}; // Leert das Objekt mit allen Einträgen
+                    saveEntries(journalEntries); // Speichert den leeren Zustand
+                    updateAll(); // Aktualisiert die gesamte Benutzeroberfläche
+                    showNotification('Alle Einträge wurden erfolgreich gelöscht.', 'success');
+                }
+            });
+
 
             updateAll();
         });
