@@ -372,12 +372,6 @@ const appsData = [
         ariaLabel: "WienMobil"
     },
     {
-        id: "Figma",
-        iconUrl: "https://play-lh.googleusercontent.com/hoVBnPBRehmXsCqESLXRH2E3OTxklkwKZlb1psn7imm0VUSobn2nevS9RRFWb9GM4-o=s48-rw",
-        targetUrl: "https://www.figma.com/",
-        ariaLabel: "Figma"
-    },
-    {
         id: "Forem",
         iconUrl: "https://play-lh.googleusercontent.com/dPyTSoRysLKVT9AYYKux8MIoU-i4wT27Vgozy7d6oiJdaqvanXGBk3RCTuVaVE5jsB4=w240-h480-rw",
         targetUrl: "https://www.forem.com/",

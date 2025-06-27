@@ -238,21 +238,26 @@
                     <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">MemoMea</span></a>
             </li>
-            <li><a href="unicorn/work-tools.html" target="_blank" rel="noopener noreferrer"
+            <li><a href="tabs/drawing/drawing.html" data-target="frame-drawing"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/drawing.svg" alt="Drawing Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Drawing</span></a>
+            </li>
+            <li><a href="tabs/unicorn/work-tools.html" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/unicorn.svg" alt="Unicorn Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Unicorn</span></a></li>
             <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0">
+                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/calendar.svg exists -->
                     <span class="sidebar-text font-medium">Google Kalender</span></a></li>
             <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0">
+                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/drive.svg exists -->
                     <span class="sidebar-text font-medium">Google Drive</span></a></li>
             <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
+                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/notes.svg exists -->
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
         <ul class="space-y-2">
@@ -284,7 +289,7 @@
     </nav>
 
     <!-- Iframe Content Area -->
-    <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-20">
+    <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-[4.5rem]">
         <div class="relative w-full h-full">
             <div id="content-loader">
                 <svg class="animate-spin h-12 w-12" style="color: var(--accent-color);"
@@ -300,6 +305,7 @@
             <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"></iframe>
             <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe"></iframe>
             <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe"></iframe>
+            <iframe id="frame-drawing" src="tabs/drawing/drawing.html" class="content-iframe"></iframe>
         </div>
     </main>
 

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digitale Zeichenfläche</title>
+    <!-- Lucide Icons für Symbole -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* General Body & HTML Styling */
+        :root {
+            --bg-color: #f0f2f5;
+            --controls-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #334155;
+            --text-color-light: #64748b;
+            --button-hover-bg: #f1f5f9;
+            /* slate-100 */
+            --button-active-bg: #e2e8f0;
+            /* slate-200 */
+            --canvas-bg: #ffffff;
+            --dropdown-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --red-color: #ef4444;
+            --red-hover-color: #dc2626;
+            --active-ring-color: #2563eb;
+            --scrollbar-thumb-bg: #cbd5e1;
+            --scrollbar-thumb-hover-bg: #94a3b8;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #111827;
+            --controls-bg: #1f2937;
+            --border-color: #374151;
+            --text-color: #d1d5db;
+            --text-color-light: #9ca3af;
+            --button-hover-bg: #374151;
+            --button-active-bg: #4b5563;
+            --canvas-bg: #1e1e1e;
+            --dropdown-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+            --active-ring-color: #3b82f6;
+            --scrollbar-thumb-bg: #4b5563;
+            --scrollbar-thumb-hover-bg: #6b7280;
+        }
+
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            /* Scrollbars on body are disabled */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+        }
+
+        #canvas-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            /* Wrapper provides scrolling for zoomed canvas */
+            position: relative;
+            background-color: var(--bg-color);
+            /* Let the body color show through */
+        }
+
+        /* Subtle Scrollbar Styling */
+        #canvas-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        #canvas-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #canvas-wrapper::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-bg);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        #canvas-wrapper::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover-bg);
+        }
+
+        /* Canvas Styling */
+        canvas {
+            display: block;
+            background-color: var(--canvas-bg);
+            /* Canvas itself has the drawing background color */
+            transform-origin: 0 0;
+            /* Zoom from top-left corner */
+        }
+
+        /* Controls container for buttons */
+        #controls-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--controls-bg);
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        /* Zoom Controls Styling */
+        #zoom-controls {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--controls-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-color);
+            z-index: 100;
+            user-select: none;
+            color: var(--text-color);
+        }
+
+        .zoom-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .zoom-btn:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        #zoom-display {
+            font-size: 0.9rem;
+            min-width: 50px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+
+        /* General Button Styling */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .btn.active {
+            background-color: var(--button-active-bg);
+        }
+
+        #trash-can {
+            background-color: var(--red-color);
+            color: white;
+        }
+
+        #trash-can:hover {
+            background-color: var(--red-hover-color);
+        }
+
+        /* Hiding the default file input */
+        #file-import {
+            display: none;
+        }
+
+        /* Toolbar for drawing tools */
+        .tool-palette {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tool-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-color);
+            margin: 0 0.25rem;
+        }
+
+        /* Color Palette */
+        #color-palette {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--active-ring-color);
+        }
+
+        /* Line Width Slider */
+        #line-width-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #line-width-slider {
+            width: 100px;
+        }
+
+        #line-width-value {
+            font-size: 0.8rem;
+            color: var(--text-color-light);
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Export Dropdown Menu */
+        #export-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background-color: var(--controls-bg);
+            border-radius: 8px;
+            box-shadow: var(--dropdown-shadow);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 200px;
+        }
+
+        #export-menu.hidden {
+            display: none;
+        }
+
+        #export-menu button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            text-align: left;
+            border: none;
+            background-color: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        #export-menu button:hover {
+            background-color: var(--button-hover-bg);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-wrapper">
+        <canvas id="drawing-canvas"></canvas>
+    </div>
+
+    <div id="controls-container">
+        <div class="tool-palette">
+            <div class="tool-row">
+                <button id="pen-tool" class="btn active" title="Stift">
+                    <i data-lucide="pencil"></i>
+                </button>
+                <button id="pixel-eraser-tool" class="btn" title="Radierer">
+                    <i data-lucide="eraser"></i>
+                </button>
+                <button id="stroke-eraser-tool" class="btn" title="Ganze Striche entfernen">
+                    <i data-lucide="zap"></i>
+                </button>
+                <div id="line-width-container">
+                    <input type="range" id="line-width-slider" min="1" max="20" value="5" title="Stiftbreite">
+                    <span id="line-width-value">5</span>
+                </div>
+            </div>
+            <div class="tool-row" id="color-palette">
+                <!-- Color swatches will be added here by JS -->
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div style="position: relative;">
+            <button id="export-btn-main" class="btn" title="Exportieren">
+                <i data-lucide="download"></i>
+            </button>
+            <div id="export-menu" class="hidden">
+                <button id="export-png">
+                    <i data-lucide="image"></i>
+                    <span>Als PNG exportieren</span>
+                </button>
+                <button id="export-drawing">
+                    <i data-lucide="save"></i>
+                    <span>Zeichnung speichern</span>
+                </button>
+            </div>
+        </div>
+
+        <label for="file-import" class="btn" title="Importieren">
+            <i data-lucide="upload"></i>
+        </label>
+        <input type="file" id="file-import" accept=".drawing,image/*">
+
+        <button id="trash-can" class="btn" title="Zeichenfläche leeren">
+            <i data-lucide="trash-2"></i>
+        </button>
+    </div>
+
+    <div id="zoom-controls">
+        <button id="zoom-out-btn" class="zoom-btn" title="Herauszoomen">-</button>
+        <span id="zoom-display">100%</span>
+        <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvasWrapper = document.getElementById('canvas-wrapper');
+            const canvas = document.getElementById('drawing-canvas');
+            const ctx = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
+
+            // --- THEME & STATE MANAGEMENT ---
+            let isDarkMode = false;
+            let paths = [];
+            let backgroundImage = null;
+            let currentPath = [];
+            let isDrawing = false;
+            let currentTool = 'pen';
+            let penColor = '#000000';
+            let penWidth = 5;
+
+            // --- ZOOM & PAN STATE ---
+            let zoom = 1.0;
+            const minZoom = 0.1;
+            const maxZoom = 10.0;
+            let initialPinchDistance = null;
+            let isPanning = false;
+            let lastPanPoint = { x: 0, y: 0 };
+
+
+            // --- UI ELEMENTS ---
+            const penToolBtn = document.getElementById('pen-tool');
+            const pixelEraserBtn = document.getElementById('pixel-eraser-tool');
+            const strokeEraserBtn = document.getElementById('stroke-eraser-tool');
+            const widthSlider = document.getElementById('line-width-slider');
+            const widthValueSpan = document.getElementById('line-width-value');
+            const colorPaletteContainer = document.getElementById('color-palette');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const zoomDisplay = document.getElementById('zoom-display');
+
+
+            // --- CANVAS SIZING & INITIALIZATION ---
+            function initializeCanvas() {
+                canvas.width = 3000;
+                canvas.height = 2200;
+                loadState();
+                updateTransform();
+            }
+
+            // --- THEME LOGIC ---
+            function invertHex(hex) {
+                if (!hex || typeof hex !== 'string') return '#000000';
+                hex = hex.replace('#', '');
+                if (hex.length === 3) {
+                    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+                }
+                if (hex.length !== 6) return '#000000'; // Fallback for invalid hex
+
+                const r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16).padStart(2, '0');
+                const g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16).padStart(2, '0');
+                const b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16).padStart(2, '0');
+                return `#${r}${g}${b}`;
+            }
+
+            window.addEventListener('message', (event) => {
+                if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
+                    const theme = event.data.replace('set-theme-', '');
+                    document.documentElement.dataset.theme = theme;
+                    isDarkMode = theme === 'dark';
+                    redrawAll();
+                    setCustomCursor();
+                }
+            });
+
+            // --- PALETTE SETUP ---
+            const paletteColors = ['#000000', '#808080', '#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+            paletteColors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                if (color === penColor) swatch.classList.add('active');
+                colorPaletteContainer.appendChild(swatch);
+            });
+
+            // --- CORE DRAWING & DATA LOGIC ---
+            function redrawAll() {
+                // Determine background color based on the current mode (dark or light)
+                const bgColor = isDarkMode
+                    ? getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim()
+                    : '#ffffff';
+
+                canvas.style.backgroundColor = bgColor;
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (backgroundImage) {
+                    if (isDarkMode) {
+                        // Temporärer Canvas zum Invertieren des Bildes
+                        const tempCanvas = document.createElement('canvas');
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCanvas.width = backgroundImage.width;
+                        tempCanvas.height = backgroundImage.height;
+                        tempCtx.filter = 'invert(1) hue-rotate(180deg)';
+                        tempCtx.drawImage(backgroundImage, 0, 0);
+                        ctx.drawImage(tempCanvas, 0, 0);
+                    } else {
+                        ctx.drawImage(backgroundImage, 0, 0);
+                    }
+                }
+
+                paths.forEach(path => {
+                    if (path.points.length < 2) return;
+                    ctx.beginPath();
+
+                    if (path.color === 'ERASER') {
+                        ctx.strokeStyle = bgColor;
+                    } else {
+                        ctx.strokeStyle = isDarkMode ? invertHex(path.color) : path.color;
+                    }
+
+                    ctx.lineWidth = path.width;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.moveTo(path.points[0].x, path.points[0].y);
+                    for (let i = 1; i < path.points.length; i++) {
+                        ctx.lineTo(path.points[i].x, path.points[i].y);
+                    }
+                    ctx.stroke();
+                });
+            }
+
+            function saveState() {
+                const state = {
+                    backgroundImageSrc: backgroundImage ? backgroundImage.src : null,
+                    paths: paths
+                };
+                localStorage.setItem('drawingState', JSON.stringify(state));
+            }
+
+            function loadState() {
+                const savedState = localStorage.getItem('drawingState');
+                let state = null;
+                if (savedState) {
+                    try { state = JSON.parse(savedState); }
+                    catch (e) { console.error("Could not parse saved drawing:", e); }
+                }
+
+                paths = (state && Array.isArray(state.paths)) ? state.paths : [];
+                const bgSrc = state ? state.backgroundImageSrc : null;
+
+                const onReady = () => redrawAll();
+
+                if (bgSrc) {
+                    backgroundImage = new Image();
+                    backgroundImage.onload = onReady;
+                    backgroundImage.onerror = () => { backgroundImage = null; onReady(); };
+                    backgroundImage.src = bgSrc;
+                } else {
+                    backgroundImage = null;
+                    onReady();
+                }
+            }
+
+            // --- ZOOM AND PAN LOGIC ---
+            function updateTransform() {
+                canvas.style.transform = `scale(${zoom})`;
+                zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
+            }
+
+            function setZoom(newZoom, centerX, centerY) {
+                const oldZoom = zoom;
+                zoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+
+                // Adjust scroll to keep center point in the same place
+                const scrollX = canvasWrapper.scrollLeft;
+                const scrollY = canvasWrapper.scrollTop;
+
+                const newScrollX = (scrollX + centerX) * (zoom / oldZoom) - centerX;
+                const newScrollY = (scrollY + centerY) * (zoom / oldZoom) - centerY;
+
+                updateTransform();
+
+                canvasWrapper.scrollLeft = newScrollX;
+                canvasWrapper.scrollTop = newScrollY;
+            }
+
+            // --- EVENT HANDLING ---
+            const getCanvasPoint = (e) => {
+                const wrapperRect = canvasWrapper.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const x = (clientX - wrapperRect.left + canvasWrapper.scrollLeft) / zoom;
+                const y = (clientY - wrapperRect.top + canvasWrapper.scrollTop) / zoom;
+                return { x, y };
+            };
+
+            function startDrawing(e) {
+                // Allow middle mouse button to pan
+                if (e.button === 1) {
+                    isPanning = true;
+                    lastPanPoint = { x: e.clientX, y: e.clientY };
+                    canvas.style.cursor = 'grabbing';
+                    e.preventDefault();
+                    return;
+                }
+                if (e.target.closest('#controls-container')) return;
+
+                isDrawing = true;
+                const pos = getCanvasPoint(e);
+
+                if (currentTool === 'stroke-eraser') {
+                    handleStrokeErase(pos);
+                } else {
+                    currentPath = [{ x: pos.x, y: pos.y }];
+                }
+            }
+
+            function draw(e) {
+                if (isPanning) {
+                    const dx = e.clientX - lastPanPoint.x;
+                    const dy = e.clientY - lastPanPoint.y;
+                    canvasWrapper.scrollLeft -= dx;
+                    canvasWrapper.scrollTop -= dy;
+                    lastPanPoint = { x: e.clientX, y: e.clientY };
+                    return;
+                }
+
+                if (!isDrawing) return;
+                const pos = getCanvasPoint(e);
+
+                if (currentTool === 'stroke-eraser') {
+                    handleStrokeErase(pos);
+                    return;
+                }
+
+                currentPath.push({ x: pos.x, y: pos.y });
+
+                ctx.beginPath();
+                ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.lineWidth = penWidth;
+
+                if (currentTool === 'pen') {
+                    ctx.strokeStyle = isDarkMode ? invertHex(penColor) : penColor;
+                } else { // pixel-eraser
+                    const bgColor = isDarkMode
+                        ? getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim()
+                        : '#ffffff';
+                    ctx.strokeStyle = bgColor;
+                }
+                ctx.stroke();
+            }
+
+            function stopDrawing(e) {
+                if (isPanning) {
+                    isPanning = false;
+                    setCustomCursor();
+                }
+                if (!isDrawing) return;
+                isDrawing = false;
+                if (currentTool !== 'stroke-eraser' && currentPath.length > 1) {
+                    paths.push({
+                        points: currentPath,
+                        color: (currentTool === 'pen') ? penColor : 'ERASER',
+                        width: penWidth
+                    });
+                }
+                redrawAll();
+                saveState();
+            }
+
+            // --- TOOLS LOGIC ---
+            function handleStrokeErase(pos) {
+                let didErase = false;
+                for (let i = paths.length - 1; i >= 0; i--) {
+                    const path = paths[i];
+                    if (path.color === 'ERASER') continue;
+
+                    const threshold = path.width / 2 + 5;
+                    for (let j = 0; j < path.points.length - 1; j++) {
+                        if (isPointNearLine(pos, path.points[j], path.points[j + 1], threshold)) {
+                            paths.splice(i, 1);
+                            didErase = true;
+                            break;
+                        }
+                    }
+                    if (didErase) break;
+                }
+                if (didErase) {
+                    redrawAll();
+                    saveState();
+                }
+            }
+
+            function isPointNearLine(p, a, b, threshold) {
+                const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+                if (l2 === 0) return Math.sqrt((p.x - a.x) ** 2 + (p.y - a.y) ** 2) < threshold;
+                let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+                t = Math.max(0, Math.min(1, t));
+                const dx = p.x - (a.x + t * (b.x - a.x));
+                const dy = p.y - (a.y + t * (b.y - a.y));
+                return Math.sqrt(dx ** 2 + dy ** 2) < threshold;
+            }
+
+            function setCustomCursor() {
+                if (isPanning) {
+                    canvas.style.cursor = 'grabbing';
+                    return;
+                }
+                if (currentTool === 'stroke-eraser') {
+                    canvas.style.cursor = 'crosshair';
+                    return;
+                }
+                const size = Math.max(2, penWidth);
+                const halfSize = size / 2;
+                const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" stroke-width="1" stroke="${isDarkMode ? 'white' : 'black'}" fill="none"/></svg>`;
+                canvas.style.cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
+            }
+
+
+            function setActiveTool(tool) {
+                currentTool = tool;
+                penToolBtn.classList.toggle('active', tool === 'pen');
+                pixelEraserBtn.classList.toggle('active', tool === 'pixel-eraser');
+                strokeEraserBtn.classList.toggle('active', tool === 'stroke-eraser');
+                setCustomCursor();
+            }
+
+            penToolBtn.addEventListener('click', () => setActiveTool('pen'));
+            pixelEraserBtn.addEventListener('click', () => setActiveTool('pixel-eraser'));
+            strokeEraserBtn.addEventListener('click', () => setActiveTool('stroke-eraser'));
+
+            colorPaletteContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('color-swatch')) {
+                    penColor = e.target.dataset.color;
+                    setActiveTool('pen');
+                    document.querySelectorAll('.color-swatch').forEach(sw => sw.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+
+            widthSlider.addEventListener('input', (e) => {
+                penWidth = e.target.value;
+                widthValueSpan.textContent = penWidth;
+                setCustomCursor();
+            });
+
+            // --- ZOOM EVENT LISTENERS ---
+            zoomInBtn.addEventListener('click', () => {
+                const centerX = canvasWrapper.clientWidth / 2;
+                const centerY = canvasWrapper.clientHeight / 2;
+                setZoom(zoom * 1.2, centerX, centerY);
+            });
+            zoomOutBtn.addEventListener('click', () => {
+                const centerX = canvasWrapper.clientWidth / 2;
+                const centerY = canvasWrapper.clientHeight / 2;
+                setZoom(zoom / 1.2, centerX, centerY);
+            });
+            canvasWrapper.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const wrapperRect = canvasWrapper.getBoundingClientRect();
+                const centerX = e.clientX - wrapperRect.left;
+                const centerY = e.clientY - wrapperRect.top;
+                const zoomFactor = e.deltaY > 0 ? 1 / 1.1 : 1.1;
+                setZoom(zoom * zoomFactor, centerX, centerY);
+            });
+
+            // --- PINCH TO ZOOM ---
+            function getPinchDistance(e) {
+                return Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            }
+            function getPinchCenter(e) {
+                const wrapperRect = canvasWrapper.getBoundingClientRect();
+                return {
+                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - wrapperRect.left,
+                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - wrapperRect.top,
+                };
+            }
+
+            canvasWrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    isDrawing = false; // Prevent drawing when pinching
+                    initialPinchDistance = getPinchDistance(e);
+                } else {
+                    startDrawing(e);
+                }
+            });
+
+            canvasWrapper.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    if (initialPinchDistance === null) return;
+                    const newDist = getPinchDistance(e);
+                    const zoomFactor = newDist / initialPinchDistance;
+                    const center = getPinchCenter(e);
+                    setZoom(zoom * zoomFactor, center.x, center.y);
+                    initialPinchDistance = newDist;
+                } else if (isDrawing) {
+                    draw(e)
+                }
+            });
+
+            canvasWrapper.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    initialPinchDistance = null;
+                }
+                stopDrawing(e);
+            });
+
+
+            // --- FILE AND CONTROL BUTTONS ---
+            document.getElementById('trash-can').addEventListener('click', () => {
+                if (confirm('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren?')) {
+                    paths = [];
+                    backgroundImage = null;
+                    saveState();
+                    redrawAll();
+                }
+            });
+            document.getElementById('export-btn-main').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('export-menu').classList.toggle('hidden');
+            });
+            window.addEventListener('click', (e) => {
+                const exportMenu = document.getElementById('export-menu');
+                if (!exportMenu.contains(e.target) && !e.target.closest('#export-btn-main')) {
+                    exportMenu.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('export-png').addEventListener('click', () => {
+                const originalThemeIsDark = isDarkMode;
+
+                // If in dark mode, temporarily switch to light mode for export
+                if (originalThemeIsDark) {
+                    isDarkMode = false;
+                    redrawAll();
+                }
+
+                // Export the canvas
+                const link = document.createElement('a');
+                link.download = 'zeichnung.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // If we switched, switch back to dark mode and redraw
+                if (originalThemeIsDark) {
+                    isDarkMode = true;
+                    redrawAll();
+                }
+
+                document.getElementById('export-menu').classList.add('hidden');
+            });
+
+            document.getElementById('export-drawing').addEventListener('click', () => {
+                const state = { backgroundImageSrc: backgroundImage ? backgroundImage.src : null, paths: paths };
+                const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'zeichnung.drawing';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                document.getElementById('export-menu').classList.add('hidden');
+            });
+
+            document.getElementById('file-import').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!confirm('Möchten Sie wirklich eine neue Datei importieren? Ihre aktuelle Zeichnung wird dabei ersetzt.')) {
+                    e.target.value = ''; // Reset the file input if the user cancels
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                if (file.type.startsWith('image/')) {
+                    reader.onload = (event) => {
+                        backgroundImage = new Image();
+                        backgroundImage.onload = () => {
+                            paths = []; // Clear the current drawing
+                            saveState(); // Save the new state (with new bg and cleared paths)
+                            redrawAll();
+                        };
+                        backgroundImage.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.name.endsWith('.drawing')) {
+                    reader.onload = (event) => {
+                        localStorage.setItem('drawingState', event.target.result);
+                        loadState(); // loads and redraws, replacing everything
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('Ungültiger Dateityp. Bitte eine Bild-Datei oder eine .drawing-Datei importieren.');
+                }
+                e.target.value = ''; // Reset input
+            });
+
+
+            // --- MOUSE-BASED EVENT LISTENERS ---
+            canvasWrapper.addEventListener('mousedown', startDrawing);
+            canvasWrapper.addEventListener('mousemove', draw);
+            canvasWrapper.addEventListener('mouseup', stopDrawing);
+            canvasWrapper.addEventListener('mouseleave', stopDrawing);
+
+            // --- FINAL INITIALIZATION ---
+            initializeCanvas();
+            setCustomCursor();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>
