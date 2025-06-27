@@ -482,7 +482,6 @@
                 }
 
                 paths.forEach(path => {
-                    if (path.points.length < 2) return;
                     ctx.beginPath();
                     if (path.color === 'ERASER') {
                         ctx.strokeStyle = bgColor;
@@ -492,8 +491,27 @@
                     ctx.lineWidth = path.width;
                     ctx.lineCap = 'round';
                     ctx.lineJoin = 'round';
-                    ctx.moveTo(path.points[0].x, path.points[0].y);
-                    path.points.forEach(point => ctx.lineTo(point.x, point.y));
+
+                    if (path.points.length < 2) return;
+
+                    if (path.points.length < 3) {
+                        ctx.moveTo(path.points[0].x, path.points[0].y);
+                        ctx.lineTo(path.points[1].x, path.points[1].y);
+                    } else {
+                        ctx.moveTo(path.points[0].x, path.points[0].y);
+                        for (var i = 1; i < path.points.length - 2; i++) {
+                            var xc = (path.points[i].x + path.points[i + 1].x) / 2;
+                            var yc = (path.points[i].y + path.points[i + 1].y) / 2;
+                            ctx.quadraticCurveTo(path.points[i].x, path.points[i].y, xc, yc);
+                        }
+                        // curve through the last two points
+                        ctx.quadraticCurveTo(
+                            path.points[i].x,
+                            path.points[i].y,
+                            path.points[i + 1].x,
+                            path.points[i + 1].y
+                        );
+                    }
                     ctx.stroke();
                 });
 
@@ -504,7 +522,7 @@
 
             function getHandleRects() {
                 if (!imageState.img) return {};
-                const handleSize = 10 / zoom;
+                const handleSize = 16 / zoom; // Larger handle size for easier interaction
                 const halfHandle = handleSize / 2;
                 const { x, y, width, height } = imageState;
                 return {
@@ -581,7 +599,7 @@
                 activePointers.set(e.pointerId, e);
                 canvasWrapper.setPointerCapture(e.pointerId);
 
-                if (activePointers.size === 2 && e.pointerType === 'touch') {
+                if (activePointers.size >= 2 && e.pointerType === 'touch') {
                     isDrawing = false;
                     isGesturing = true;
                     const pointers = Array.from(activePointers.values());
@@ -623,18 +641,16 @@
             function handlePointerMove(e) {
                 if (!activePointers.has(e.pointerId)) return;
 
-                const pos = getCanvasPoint(e);
                 updateCursorStyle(e);
 
-                if (isGesturing && e.pointerType === 'touch' && activePointers.size === 2) {
+                if (isGesturing && e.pointerType === 'touch' && activePointers.size >= 2) {
                     const pointers = Array.from(activePointers.values());
-                    const p1 = pointers.find(p => p.pointerId === e.pointerId);
-                    const p2 = pointers.find(p => p.pointerId !== e.pointerId);
-                    if (p1) Object.assign(p1, e); // Update the moved pointer
+                    const pointer1 = pointers[0];
+                    const pointer2 = pointers[1];
 
-                    const newDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
-                    const newPanX = (p1.clientX + p2.clientX) / 2;
-                    const newPanY = (p1.clientY + p2.clientY) / 2;
+                    const newDist = Math.hypot(pointer1.clientX - pointer2.clientX, pointer1.clientY - pointer2.clientY);
+                    const newPanX = (pointer1.clientX + pointer2.clientX) / 2;
+                    const newPanY = (pointer1.clientY + pointer2.clientY) / 2;
 
                     // Pan
                     canvasWrapper.scrollLeft -= newPanX - lastGesture.pan.x;
@@ -651,14 +667,17 @@
                     lastGesture.pan.y = newPanY;
 
                 } else if (isDrawing) {
-                    const dx = pos.x - interactionState.startX;
-                    const dy = pos.y - interactionState.startY;
+                    const pos = getCanvasPoint(e);
 
                     if (interactionState.type === 'move') {
+                        const dx = pos.x - interactionState.startX;
+                        const dy = pos.y - interactionState.startY;
                         imageState.x = interactionState.startImageX + dx;
                         imageState.y = interactionState.startImageY + dy;
                         redrawAll();
                     } else if (interactionState.type && interactionState.type.startsWith('resize-')) {
+                        const dx = pos.x - interactionState.startX;
+                        const dy = pos.y - interactionState.startY;
                         const handle = interactionState.type.replace('resize-', '');
                         if (handle.includes('r')) imageState.width = Math.max(20, interactionState.startImageWidth + dx);
                         if (handle.includes('b')) imageState.height = Math.max(20, interactionState.startImageHeight + dy);
@@ -679,13 +698,15 @@
                             return;
                         }
                         currentPath.push(pos);
-                        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
+
+                        // Live drawing with straight lines for performance
                         ctx.beginPath();
                         ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
                         ctx.lineTo(pos.x, pos.y);
                         ctx.lineCap = 'round';
                         ctx.lineJoin = 'round';
                         ctx.lineWidth = penWidth;
+                        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
                         ctx.strokeStyle = (currentTool === 'pen') ? (isDarkMode ? invertHex(penColor) : penColor) : bgColor;
                         ctx.stroke();
                     }
@@ -694,7 +715,7 @@
 
             function handlePointerUp(e) {
                 if (isDrawing) {
-                    if (interactionState.type === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
+                    if (interactionState.type === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 0) {
                         paths.push({ points: currentPath, color: (currentTool === 'pen') ? penColor : 'ERASER', width: penWidth });
                         currentPath = [];
                     }
@@ -720,24 +741,29 @@
             function isPointInRect(point, rect) { return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height; }
             function getHandleUnderCursor(pos) { const handles = getHandleRects(); for (const [key, rect] of Object.entries(handles)) { if (isPointInRect(pos, rect)) return key; } return null; }
 
-            function updateCursorStyle(e = {}) {
+            function updateCursorStyle(e) {
                 if (isGesturing) { canvas.style.cursor = 'move'; return; }
-                const pos = getCanvasPoint(e);
-                if (currentTool === 'image' && imageState.img) {
-                    const handle = getHandleUnderCursor(pos);
-                    if (handle) { canvas.style.cursor = getHandleRects()[handle].cursor; }
-                    else if (isPointInRect(pos, imageState)) { canvas.style.cursor = 'move'; }
-                    else { canvas.style.cursor = 'default'; }
-                } else if (currentTool === 'stroke-eraser') {
-                    canvas.style.cursor = 'crosshair';
+
+                let cursor = 'default';
+                if (currentTool === 'stroke-eraser') {
+                    cursor = 'crosshair';
                 } else if (['pen', 'pixel-eraser'].includes(currentTool)) {
                     const size = Math.max(2, penWidth);
                     const halfSize = size / 2;
                     const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" stroke-width="1" stroke="${isDarkMode ? 'white' : 'black'}" fill="none"/></svg>`;
-                    canvas.style.cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
-                } else {
-                    canvas.style.cursor = 'default';
+                    cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
                 }
+
+                if (e && typeof e.clientX === 'number' && currentTool === 'image' && imageState.img) {
+                    const pos = getCanvasPoint(e);
+                    const handle = getHandleUnderCursor(pos);
+                    if (handle) {
+                        cursor = getHandleRects()[handle].cursor;
+                    } else if (isPointInRect(pos, imageState)) {
+                        cursor = 'move';
+                    }
+                }
+                canvas.style.cursor = cursor;
             }
 
             function handleStrokeErase(pos) {
@@ -857,17 +883,15 @@
                 exportCanvas.height = exportHeight;
                 const exportCtx = exportCanvas.getContext('2d');
 
-                // Create a temporary main canvas to draw for export
                 const tempMainCanvas = document.createElement('canvas');
                 tempMainCanvas.width = canvas.width;
                 tempMainCanvas.height = canvas.height;
                 const tempMainCtx = tempMainCanvas.getContext('2d');
-                const originalCtx = ctx; // Keep reference to original context
+                const originalCtx = ctx;
 
-                // Temporarily replace main context with temp context for redraw
                 ctx = tempMainCtx;
-                redrawAll(true); // Redraw in light mode on temp canvas
-                ctx = originalCtx; // Restore original context
+                redrawAll(true);
+                ctx = originalCtx;
 
                 exportCtx.drawImage(tempMainCanvas, bounds.minX - padding, bounds.minY - padding, exportWidth, exportHeight, 0, 0, exportWidth, exportHeight);
 
