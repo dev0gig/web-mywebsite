@@ -130,7 +130,7 @@
             color: var(--text-color);
         }
 
-        #calendar-container {
+        #tag-cloud-container {
             background-color: var(--card-bg);
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
@@ -228,20 +228,26 @@
         .tag {
             background-color: var(--tag-bg);
             color: var(--tag-text);
-            padding: 0.1em 0.5em;
+            padding: 0.25em 0.6em;
             border-radius: 9999px;
             font-size: 0.85em;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .tag.active {
+            background-color: var(--tag-text);
+            color: var(--tag-bg);
+            border-color: var(--tag-bg);
+        }
+
+        html[data-theme='dark'] .tag.active {
+            border-color: var(--tag-text);
         }
 
         /* Tag Cloud Styling */
-        #tag-cloud-container {
-            background-color: var(--card-bg);
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-color);
-        }
-
         .tag-cloud-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -292,13 +298,11 @@
             background-color: #60a5fa;
         }
 
-        /* Notification-Stile */
-        #notification {
-            transition: transform 0.3s ease-in-out;
-        }
-
+        /* Notification-Stile (ANGEPASST) */
         #notification.show {
-            transform: translateX(0);
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         /* Styling for the delete button */
@@ -345,15 +349,17 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2">
-                <div id="filter-header" class="hidden items-center mb-4"></div>
+                <div id="filter-header" class="hidden items-center mb-4 flex-wrap gap-2"></div>
                 <main id="journal-container"></main>
                 <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
             </div>
             <aside class="lg:col-span-1">
                 <div class="sticky top-8 flex flex-col space-y-8" style="height: calc(100vh - 4rem);">
-                    <div id="calendar-container" class="p-4 rounded-lg flex-shrink-0">
+                    <div id="calendar-desktop-wrapper" class="hidden lg:block p-4 rounded-lg flex-shrink-0"
+                        style="background-color: var(--card-bg); box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+                        <div id="calendar-container-desktop"></div>
                     </div>
-                    <div id="tag-cloud-container" class="p-4 rounded-lg flex flex-col min-h-0">
+                    <div id="tag-cloud-container" class="hidden lg:flex p-4 rounded-lg flex-col min-h-0">
                         <h3 class="text-lg font-semibold mb-4 flex-shrink-0" style="color: var(--text-color-heading);">
                             Tag-Wolke</h3>
                         <div id="tag-cloud" class="flex-grow overflow-y-auto pr-2">
@@ -408,17 +414,47 @@
         </div>
     </div>
 
-    <!-- Notification Element -->
+    <!-- Notification Element (ANGEPASST) -->
     <div id="notification"
-        class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-transform transform translate-x-full hidden z-50">
+        class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12 z-50">
         <p id="notification-message"></p>
     </div>
+
+    <!-- Kalender Seitenleiste (Mobile) -->
+    <div id="calendar-sidebar-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+    </div>
+    <div id="calendar-sidebar"
+        class="fixed top-0 right-0 h-full w-full max-w-xs shadow-xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
+        style="background-color: var(--card-bg);">
+        <div class="p-4 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 w-full flex-shrink-0">
+                <h3 class="text-xl font-bold" style="color: var(--text-color-heading);">Kalender</h3>
+                <button id="close-calendar-sidebar-btn"
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="calendar-container-mobile" class="flex flex-col w-full h-full">
+                <!-- Mobile Calendar will be rendered here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Schwebender Kalender-Button -->
+    <button id="fab-open-calendar" title="Kalender anzeigen"
+        class="lg:hidden fixed bottom-6 right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+        <i data-lucide="calendar" class="h-7 w-7"></i>
+    </button>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const journalContainer = document.getElementById('journal-container');
             const paginationControls = document.getElementById('pagination-controls');
-            const calendarContainer = document.getElementById('calendar-container');
+            const calendarContainerDesktop = document.getElementById('calendar-container-desktop');
+            const calendarContainerMobile = document.getElementById('calendar-container-mobile');
+
             const tagCloud = document.getElementById('tag-cloud');
             const filterHeader = document.getElementById('filter-header');
             const searchInput = document.getElementById('search-input');
@@ -432,11 +468,16 @@
             const deleteAllButton = document.getElementById('delete-all-button');
             const endDateInput = document.getElementById('end-date');
 
+            const calendarSidebar = document.getElementById('calendar-sidebar');
+            const calendarSidebarOverlay = document.getElementById('calendar-sidebar-overlay');
+            const openCalendarBtn = document.getElementById('fab-open-calendar');
+            const closeCalendarBtn = document.getElementById('close-calendar-sidebar-btn');
+
             const STORAGE_KEY = 'markdownJournalEntries';
             const ENTRIES_PER_PAGE = 20;
             let currentPage = 1;
             let calendarDate = new Date();
-            let activeTagFilter = null;
+            let activeTagFilters = []; // <-- MODIFIED: From string to array
             let activeSearchTerm = '';
 
             window.addEventListener('message', (event) => {
@@ -458,12 +499,11 @@
                 return new Intl.DateTimeFormat('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(date);
             };
 
-            const showNotification = (message, type = 'success') => {
+            const showNotification = (message, type = 'success', duration = 3000) => {
                 const notification = document.getElementById('notification');
                 const messageEl = document.getElementById('notification-message');
 
-                notification.className = 'fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-transform transform translate-x-full z-50';
-
+                notification.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
                 if (type === 'success') {
                     notification.classList.add('bg-green-500');
                 } else if (type === 'warning') {
@@ -473,16 +513,11 @@
                 }
 
                 messageEl.textContent = message;
-                notification.classList.remove('hidden', 'translate-x-full');
                 notification.classList.add('show');
 
                 setTimeout(() => {
-                    notification.classList.add('translate-x-full');
                     notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.classList.add('hidden');
-                    }, 3000);
-                }, 3000);
+                }, duration);
             };
 
             const parseAndStyleContent = (markdownText) => {
@@ -491,8 +526,29 @@
                     return defaultText;
                 }
                 let html = marked.parse(markdownText);
-                html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, '$1<span class="tag" data-tag="$2">$2</span>');
+                html = html.replace(/(^|\s|>)(#[\wÄäÖöÜüß-]+)/g, (match, p1, p2) => {
+                    const tag = p2.toLowerCase();
+                    const isActive = activeTagFilters.includes(tag) ? ' active' : '';
+                    return `${p1}<span class="tag${isActive}" data-tag="${tag}">${p2}</span>`;
+                });
                 return html;
+            };
+
+            // --- MODIFIED: New helper function for tag clicks
+            const handleTagClick = (tag) => {
+                const normalizedTag = tag.toLowerCase();
+                const index = activeTagFilters.indexOf(normalizedTag);
+
+                if (index > -1) {
+                    activeTagFilters.splice(index, 1); // Remove tag
+                } else {
+                    activeTagFilters.push(normalizedTag); // Add tag
+                }
+
+                activeSearchTerm = '';
+                searchInput.value = '';
+                currentPage = 1;
+                updateAll();
             };
 
             const createEntryElement = (dateString, content) => {
@@ -515,14 +571,13 @@
                 textArea.setAttribute('rows', '8');
 
                 entryDiv.append(header, previewDiv, textArea);
-                
-                // Add delete button
+
                 const deleteButton = document.createElement('button');
                 deleteButton.classList.add('absolute', 'top-2', 'right-2', 'p-1', 'rounded-full', 'hover:bg-red-100', 'dark:hover:bg-red-900', 'cursor-pointer', 'delete-entry-button');
                 deleteButton.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
                 deleteButton.title = 'Eintrag löschen';
                 deleteButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent triggering the entryDiv click
+                    e.stopPropagation();
                     if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
                         delete journalEntries[dateString];
                         saveEntries(journalEntries);
@@ -530,18 +585,15 @@
                         showNotification('Eintrag erfolgreich gelöscht.', 'success');
                     }
                 });
-                entryDiv.classList.add('relative'); // Make entryDiv a positioning context for absolute delete button
+                entryDiv.classList.add('relative');
                 entryDiv.appendChild(deleteButton);
-                
+
                 entryDiv.addEventListener('click', (e) => {
+                    // --- MODIFIED: Use handleTagClick function
                     if (e.target.classList.contains('tag')) {
                         const tag = e.target.dataset.tag;
                         if (tag) {
-                            activeTagFilter = tag;
-                            activeSearchTerm = '';
-                            searchInput.value = '';
-                            currentPage = 1;
-                            updateAll();
+                            handleTagClick(tag);
                         }
                         return;
                     }
@@ -584,7 +636,6 @@
                 });
 
                 const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
-
                 const cloudWrapper = tagCloud.querySelector('.tag-cloud-wrapper') || document.createElement('div');
                 cloudWrapper.className = 'tag-cloud-wrapper';
                 cloudWrapper.innerHTML = '';
@@ -597,93 +648,94 @@
 
                 sortedTags.forEach(([tag, count]) => {
                     const tagEl = document.createElement('span');
-                    tagEl.className = 'tag tag-cloud-tag';
-                    tagEl.textContent = tag;
-                    tagEl.addEventListener('click', () => {
-                        activeTagFilter = tag;
-                        activeSearchTerm = '';
-                        searchInput.value = '';
-                        currentPage = 1;
-                        updateAll();
-                    });
+                    // --- MODIFIED: Add 'active' class if tag is in filter
+                    tagEl.className = `tag tag-cloud-tag ${activeTagFilters.includes(tag) ? 'active' : ''}`;
+                    tagEl.textContent = `${tag} (${count})`;
+                    tagEl.addEventListener('click', () => handleTagClick(tag));
                     cloudWrapper.appendChild(tagEl);
                 });
                 tagCloud.appendChild(cloudWrapper);
             };
 
             const renderCalendar = () => {
+                const containers = [calendarContainerDesktop, calendarContainerMobile];
                 const year = calendarDate.getFullYear();
                 const month = calendarDate.getMonth();
-                calendarContainer.innerHTML = '';
 
-                const header = document.createElement('div');
-                header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
-                const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
-                header.innerHTML = `<button id="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button><h3 class="font-semibold text-lg">${monthName}</h3><button id="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>`;
-                calendarContainer.appendChild(header);
+                containers.forEach(container => {
+                    if (!container) return;
+                    container.innerHTML = '';
 
-                const grid = document.createElement('div');
-                grid.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-center', 'text-sm');
+                    const header = document.createElement('div');
+                    header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
+                    const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
+                    header.innerHTML = `<button data-action="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button><h3 class="font-semibold text-lg">${monthName}</h3><button data-action="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>`;
+                    container.appendChild(header);
 
-                const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-                weekdays.forEach(day => { grid.innerHTML += `<div class="font-medium" style="color: var(--text-color-light)">${day}</div>`; });
+                    const grid = document.createElement('div');
+                    grid.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-center', 'text-sm');
+                    container.appendChild(grid);
 
-                const firstDayOfMonth = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+                    const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+                    weekdays.forEach(day => { grid.innerHTML += `<div class="font-medium" style="color: var(--text-color-light)">${day}</div>`; });
 
-                for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
+                    const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+                    for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
 
-                const todayString = formatDate(new Date());
+                    const todayString = formatDate(new Date());
 
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const currentDate = new Date(Date.UTC(year, month, day));
-                    const dateString = formatDate(currentDate);
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const currentDate = new Date(Date.UTC(year, month, day));
+                        const dateString = formatDate(currentDate);
+                        const dayButton = document.createElement('button');
+                        dayButton.textContent = day;
+                        dayButton.dataset.date = dateString;
+                        dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'dark:hover:bg-neutral-700', 'transition-colors', 'relative');
+                        if (dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
+                        if (journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
+                        dayButton.addEventListener('click', handleDateClick);
+                        grid.appendChild(dayButton);
+                    }
+                });
 
-                    const dayButton = document.createElement('button');
-                    dayButton.textContent = day;
-                    dayButton.dataset.date = dateString;
-                    dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'dark:hover:bg-neutral-700', 'transition-colors');
+                document.querySelectorAll('[data-action="prev-month"]').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }));
+                document.querySelectorAll('[data-action="next-month"]').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }));
 
-                    if (dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
-                    if (journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
-
-                    dayButton.addEventListener('click', () => {
-                        const wasJustCreated = journalEntries[dateString] === undefined;
-                        if (wasJustCreated) {
-                            journalEntries[dateString] = '';
-                            saveEntries(journalEntries);
-                        }
-
-                        const allSortedDates = Object.keys(journalEntries).sort().reverse();
-                        const entryIndex = allSortedDates.findIndex(d => d === dateString);
-
-                        if (entryIndex !== -1) {
-                            currentPage = 1;
-                            updateAll();
-
-                            setTimeout(() => {
-                                const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    if (wasJustCreated) {
-                                        element.click();
-                                    } else {
-                                        element.classList.add('ring-2', 'ring-blue-400');
-                                        setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
-                                    }
-                                }
-                            }, 100);
-                        }
-                    });
-                    grid.appendChild(dayButton);
-                }
-
-                calendarContainer.appendChild(grid);
-                document.getElementById('prev-month').addEventListener('click', () => { calendarDate.setMonth(month - 1); renderCalendar(); });
-                document.getElementById('next-month').addEventListener('click', () => { calendarDate.setMonth(month + 1); renderCalendar(); });
                 lucide.createIcons();
             };
+
+            function handleDateClick(e) {
+                const dateString = e.currentTarget.dataset.date;
+                const wasJustCreated = journalEntries[dateString] === undefined;
+                if (wasJustCreated) {
+                    journalEntries[dateString] = '';
+                    saveEntries(journalEntries);
+                }
+
+                currentPage = 1;
+                activeTagFilters = []; // Clear tag filters when a date is clicked
+                activeSearchTerm = '';
+                searchInput.value = '';
+
+                updateAll();
+
+                closeCalendarSidebar();
+
+                setTimeout(() => {
+                    const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (wasJustCreated) {
+                            element.click();
+                        } else {
+                            element.classList.add('ring-2', 'ring-blue-400');
+                            setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                        }
+                    }
+                }, 100);
+            }
 
             const renderJournal = () => {
                 journalContainer.innerHTML = '';
@@ -691,9 +743,13 @@
 
                 let datesToDisplay = Object.keys(journalEntries).sort().reverse();
 
-                if (activeTagFilter) {
+                // --- MODIFIED: Logic for multiple tag filters
+                if (activeTagFilters.length > 0) {
+                    const tagsHTML = activeTagFilters.map(tag => `<span class="tag active">${tag}</span>`).join('');
                     filterHeader.innerHTML = `
-                        <h2 class="text-xl font-bold" style="color: var(--text-color-heading);">Einträge mit: <span class="tag">${activeTagFilter}</span></h2>
+                        <h2 class="text-xl font-bold flex items-center gap-2" style="color: var(--text-color-heading);">
+                            Einträge mit: ${tagsHTML}
+                        </h2>
                         <button id="clear-filter" class="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                             <i data-lucide="x" class="h-5 w-5"></i>
                         </button>
@@ -701,12 +757,16 @@
                     filterHeader.classList.remove('hidden');
                     filterHeader.classList.add('flex');
                     document.getElementById('clear-filter').addEventListener('click', () => {
-                        activeTagFilter = null;
+                        activeTagFilters = [];
                         currentPage = 1;
                         updateAll();
                     });
 
-                    datesToDisplay = datesToDisplay.filter(date => journalEntries[date].toLowerCase().includes(activeTagFilter));
+                    datesToDisplay = datesToDisplay.filter(date => {
+                        const content = journalEntries[date].toLowerCase();
+                        return activeTagFilters.every(tag => content.includes(tag));
+                    });
+
                 } else if (activeSearchTerm) {
                     filterHeader.innerHTML = `
                         <h2 class="text-xl font-bold" style="color: var(--text-color-heading);">Suchergebnisse für: <span class="italic">'${activeSearchTerm}'</span></h2>
@@ -744,7 +804,7 @@
                 const endIndex = startIndex + ENTRIES_PER_PAGE;
                 const paginatedDates = datesToDisplay.slice(startIndex, endIndex);
 
-                if (paginatedDates.length === 0 && (activeTagFilter || activeSearchTerm)) {
+                if (paginatedDates.length === 0 && (activeTagFilters.length > 0 || activeSearchTerm)) {
                     journalContainer.innerHTML = `<p style="color: var(--text-color-light)">Keine Einträge für diesen Filter gefunden.</p>`;
                 } else {
                     paginatedDates.forEach(dateString => {
@@ -795,7 +855,7 @@
                 const searchTerm = e.target.value;
                 clearSearchBtn.classList.toggle('hidden', !searchTerm);
                 activeSearchTerm = searchTerm;
-                activeTagFilter = null; // Suche überschreibt Tag-Filter
+                activeTagFilters = []; // Suche überschreibt Tag-Filter
                 currentPage = 1;
                 updateAll();
             });
@@ -924,16 +984,30 @@
                 exportModal.classList.add('hidden');
             });
 
-            // Event-Listener für den "Alle löschen"-Button
             deleteAllButton.addEventListener('click', () => {
                 if (confirm('Möchten Sie WIRKLICH ALLE Einträge unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) {
-                    journalEntries = {}; // Leert das Objekt mit allen Einträgen
-                    saveEntries(journalEntries); // Speichert den leeren Zustand
-                    updateAll(); // Aktualisiert die gesamte Benutzeroberfläche
+                    journalEntries = {};
+                    saveEntries(journalEntries);
+                    updateAll();
                     showNotification('Alle Einträge wurden erfolgreich gelöscht.', 'success');
                 }
             });
 
+            // --- KALENDER SEITENLEISTE LOGIK (NEU) ---
+            function openCalendarSidebar() {
+                calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.remove('translate-x-full');
+                lucide.createIcons();
+            }
+
+            function closeCalendarSidebar() {
+                calendarSidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.add('translate-x-full');
+            }
+
+            openCalendarBtn.addEventListener('click', openCalendarSidebar);
+            closeCalendarBtn.addEventListener('click', closeCalendarSidebar);
+            calendarSidebarOverlay.addEventListener('click', closeCalendarSidebar);
 
             updateAll();
         });

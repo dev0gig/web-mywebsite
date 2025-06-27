@@ -219,8 +219,9 @@
     <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
+            <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
-                    class="sidebar-link flex items-center p-3 rounded-lg active">
+                    class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Appdrawer</span></a>
             <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
@@ -294,10 +295,11 @@
                     </path>
                 </svg>
             </div>
-            <iframe id="frame-appdrawer" src="appdrawer/appdrawer.html" class="content-iframe active"></iframe>
-            <iframe id="frame-widgets" src="widgets/widgets-iframe.html" class="content-iframe"></iframe>
-            <iframe id="frame-aurimea" src="aurimea/aurimea.html" class="content-iframe"></iframe>
-            <iframe id="frame-memomea" src="memomea/memomea.html" class="content-iframe"></iframe>
+            <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
+            <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"></iframe>
+            <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"></iframe>
+            <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe"></iframe>
+            <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe"></iframe>
         </div>
     </main>
 
@@ -376,18 +378,21 @@
 
                 // If the link is meant to open in a new tab, allow default behavior
                 if (target.target === '_blank') {
-                    // No need to preventDefault() or handle iframe logic
-                    if (mobileMenu.classList.contains('open')) closeMobileMenu(); // Close mobile menu if open
+                    if (mobileMenu.classList.contains('open')) closeMobileMenu();
                     return;
                 }
 
-                if (target.id.includes('settings-btn')) {
-                    e.preventDefault();
+                // Prevent default for all other cases (iframe links, settings)
+                e.preventDefault();
+
+                if (target.closest('li').querySelector('#settings-btn')) {
                     openSettingsModal();
                 } else {
-                    e.preventDefault();
                     const targetFrameId = target.dataset.target;
                     if (!targetFrameId) return;
+
+                    // Save the active tab to localStorage
+                    localStorage.setItem('lastActiveTab', targetFrameId);
 
                     const targetFrame = document.getElementById(targetFrameId);
 
@@ -417,14 +422,12 @@
             document.querySelectorAll('#nav-links .sidebar-link').forEach(link => {
                 const li = document.createElement('li');
                 const newLink = link.cloneNode(true);
-                // Entfernen Sie die 'sidebar-text' Klasse, da sie nur für Desktop-Hover-Effekte relevant ist
                 const sidebarTextSpan = newLink.querySelector('.sidebar-text');
                 if (sidebarTextSpan) {
-                    // For mobile, we want the text to be visible immediately.
                     sidebarTextSpan.style.opacity = 1;
                     sidebarTextSpan.style.maxWidth = '150px';
                     sidebarTextSpan.classList.remove('sidebar-text');
-                    sidebarTextSpan.classList.add('ml-3'); // Add margin for mobile icons
+                    sidebarTextSpan.classList.add('ml-3');
                 }
                 newLink.classList.add('w-full');
                 li.appendChild(newLink);
@@ -436,17 +439,18 @@
             const desktopSettingsLi = document.querySelector('#sidebar ul:last-child li');
             if (desktopSettingsLi) {
                 const mobileSettingsLi = desktopSettingsLi.cloneNode(true);
-                const mobileSettingsBtn = mobileSettingsLi.querySelector('#settings-btn'); // Get the button inside the cloned li
+                const mobileSettingsBtn = mobileSettingsLi.querySelector('#settings-btn');
                 const mobileSettingsTextSpan = mobileSettingsBtn.querySelector('.sidebar-text');
                 if (mobileSettingsTextSpan) {
                     mobileSettingsTextSpan.classList.remove('sidebar-text');
-                    mobileSettingsTextSpan.classList.add('ml-3'); // Add margin for mobile icons
+                    mobileSettingsTextSpan.classList.add('ml-3');
                 }
                 document.getElementById('mobile-bottom-nav-links').appendChild(mobileSettingsLi);
                 mobileSettingsBtn.addEventListener('click', handleNavLinkClick);
             }
 
             desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
+            document.getElementById('settings-btn').addEventListener('click', handleNavLinkClick);
 
             hamburgerBtn.addEventListener('click', openMobileMenu);
             closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
@@ -487,7 +491,7 @@
                 if (savedTheme === 'system') applyTheme('system');
             });
 
-            // --- Iframe Loading and Initial State ---
+            // --- Iframe Loading ---
             let loadedFrames = 0;
             const totalFrames = contentFrames.length;
 
@@ -512,19 +516,39 @@
                 contentLoader.classList.add('hidden');
             }
 
-            // Initialen Status setzen
+            // --- Initialen Status setzen ---
+            // 1. Theme setzen
             const savedTheme = localStorage.getItem('theme') || 'system';
             const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
             if (themeRadio) themeRadio.checked = true;
             applyTheme(savedTheme);
 
-            const initialActiveLink = document.querySelector('#nav-links a.active');
-            if (initialActiveLink) {
-                mobileHeaderTitle.textContent = initialActiveLink.querySelector('span').textContent;
+            // 2. Aktiven Tab setzen
+            const lastActiveTabId = localStorage.getItem('lastActiveTab') || 'frame-appdrawer';
+            const targetFrame = document.getElementById(lastActiveTabId);
+            const targetLink = document.querySelector(`a[data-target="${lastActiveTabId}"]`);
+
+            if (targetFrame && targetLink) {
+                // Alle 'active' Klassen entfernen, um einen sauberen Start zu gewährleisten
+                document.querySelectorAll('.content-iframe.active').forEach(f => f.classList.remove('active'));
+                document.querySelectorAll('.sidebar-link.active').forEach(l => l.classList.remove('active'));
+
+                // Den gespeicherten/Standard-Frame und Link aktivieren
+                targetFrame.classList.add('active');
+                document.querySelectorAll(`a[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
+
+                // Titel im mobilen Header aktualisieren
+                const activeLinkText = targetLink.querySelector('span')?.textContent || 'Appdrawer';
+                mobileHeaderTitle.textContent = activeLinkText;
+            } else {
+                // Fallback, falls der gespeicherte Tab ungültig ist
+                localStorage.removeItem('lastActiveTab'); // Ungültigen Wert entfernen
+                document.getElementById('frame-appdrawer').classList.add('active');
+                document.querySelector('a[data-target="frame-appdrawer"]').classList.add('active');
+                mobileHeaderTitle.textContent = 'Appdrawer';
             }
         });
     </script>
-</body>
 </body>
 
 </html>
