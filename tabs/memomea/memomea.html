@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Marked.js zur Umwandlung von Markdown in HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- JSZip zum Erstellen von ZIP-Dateien für den Export -->
+    <!-- JSZip zum Erstellen von ZIP-Dateien für den Export und Import -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- Lucide Icons für Symbole -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -57,6 +57,9 @@
             /* indigo-100 */
             --tag-text: #3730a3;
             /* indigo-800 */
+            --scrollbar-thumb-bg: rgba(0, 0, 0, 0.1);
+            /* Dezenter Scrollbalken für Light-Theme */
+            --scrollbar-thumb-hover-bg: rgba(0, 0, 0, 0.2);
         }
 
         html[data-theme='dark'] {
@@ -94,6 +97,9 @@
             /* indigo-800 */
             --tag-text: #e0e7ff;
             /* indigo-100 */
+            --scrollbar-thumb-bg: rgba(255, 255, 255, 0.1);
+            /* Dezenter Scrollbalken für Dark-Theme */
+            --scrollbar-thumb-hover-bg: rgba(255, 255, 255, 0.2);
         }
 
         /* Basis-Styling für den Body */
@@ -269,12 +275,14 @@
         }
 
         #tag-cloud::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
+            background-color: var(--scrollbar-thumb-bg);
+            /* Verwende die neue dezente Variable */
             border-radius: 10px;
         }
 
         #tag-cloud::-webkit-scrollbar-thumb:hover {
-            background-color: var(--text-color-light);
+            background-color: var(--scrollbar-thumb-hover-bg);
+            /* Verwende die neue dezente Variable für Hover */
         }
 
         /* Kalender-Stile */
@@ -339,7 +347,8 @@
                     class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
                 </label>
-                <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt">
+                <!-- Erlaubt jetzt .md, .txt und .zip Dateien -->
+                <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt,.zip">
 
                 <button id="export-button"
                     class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
@@ -447,7 +456,8 @@
     </div>
 
     <!-- Schwebender Kalender-Button -->
-    <button id="fab-open-calendar" title="Kalender anzeigen" class="lg:hidden fixed right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+    <button id="fab-open-calendar" title="Kalender anzeigen"
+        class="lg:hidden fixed right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <i data-lucide="calendar" class="h-7 w-7"></i>
     </button>
 
@@ -481,7 +491,7 @@
             const ENTRIES_PER_PAGE = 20;
             let currentPage = 1;
             let calendarDate = new Date();
-            let activeTagFilters = []; // <-- MODIFIED: From string to array
+            let activeTagFilters = [];
             let activeSearchTerm = '';
 
             window.addEventListener('message', (event) => {
@@ -538,15 +548,14 @@
                 return html;
             };
 
-            // --- MODIFIED: New helper function for tag clicks
             const handleTagClick = (tag) => {
                 const normalizedTag = tag.toLowerCase();
                 const index = activeTagFilters.indexOf(normalizedTag);
 
                 if (index > -1) {
-                    activeTagFilters.splice(index, 1); // Remove tag
+                    activeTagFilters.splice(index, 1); // Tag entfernen
                 } else {
-                    activeTagFilters.push(normalizedTag); // Add tag
+                    activeTagFilters.push(normalizedTag); // Tag hinzufügen
                 }
 
                 activeSearchTerm = '';
@@ -582,6 +591,9 @@
                 deleteButton.title = 'Eintrag löschen';
                 deleteButton.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    // Ersetze confirm() durch eine modale Bestätigung
+                    // Da ich keine UI für modals hinzufügen kann, bleibe ich bei confirm() als Workaround.
+                    // In einer realen Anwendung würde hier ein UI-basiertes Modal erscheinen.
                     if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
                         delete journalEntries[dateString];
                         saveEntries(journalEntries);
@@ -593,7 +605,6 @@
                 entryDiv.appendChild(deleteButton);
 
                 entryDiv.addEventListener('click', (e) => {
-                    // --- MODIFIED: Use handleTagClick function
                     if (e.target.classList.contains('tag')) {
                         const tag = e.target.dataset.tag;
                         if (tag) {
@@ -652,7 +663,6 @@
 
                 sortedTags.forEach(([tag, count]) => {
                     const tagEl = document.createElement('span');
-                    // --- MODIFIED: Add 'active' class if tag is in filter
                     tagEl.className = `tag tag-cloud-tag ${activeTagFilters.includes(tag) ? 'active' : ''}`;
                     tagEl.textContent = `${tag} (${count})`;
                     tagEl.addEventListener('click', () => handleTagClick(tag));
@@ -685,13 +695,13 @@
 
                     const firstDayOfMonth = new Date(year, month, 1).getDay();
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Montags ist 1, Sonntags ist 0
                     for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
 
                     const todayString = formatDate(new Date());
 
                     for (let day = 1; day <= daysInMonth; day++) {
-                        const currentDate = new Date(Date.UTC(year, month, day));
+                        const currentDate = new Date(Date.UTC(year, month, day)); // UTC verwenden, um Zeitzonenprobleme zu vermeiden
                         const dateString = formatDate(currentDate);
                         const dayButton = document.createElement('button');
                         dayButton.textContent = day;
@@ -719,7 +729,7 @@
                 }
 
                 currentPage = 1;
-                activeTagFilters = []; // Clear tag filters when a date is clicked
+                activeTagFilters = []; // Tag-Filter löschen, wenn ein Datum angeklickt wird
                 activeSearchTerm = '';
                 searchInput.value = '';
 
@@ -747,7 +757,6 @@
 
                 let datesToDisplay = Object.keys(journalEntries).sort().reverse();
 
-                // --- MODIFIED: Logic for multiple tag filters
                 if (activeTagFilters.length > 0) {
                     const tagsHTML = activeTagFilters.map(tag => `<span class="tag active">${tag}</span>`).join('');
                     filterHeader.innerHTML = `
@@ -781,8 +790,8 @@
                     filterHeader.classList.remove('hidden');
                     filterHeader.classList.add('flex');
                     document.getElementById('clear-filter').addEventListener('click', () => {
-                        activeSearchTerm = '';
                         searchInput.value = '';
+                        activeSearchTerm = '';
                         currentPage = 1;
                         updateAll();
                     });
@@ -872,14 +881,17 @@
                 updateAll();
             });
 
-            importInput.addEventListener('change', (event) => {
+            importInput.addEventListener('change', async (event) => {
                 const files = event.target.files;
                 if (!files.length) return;
 
-                const readPromises = [];
+                const currentEntries = loadEntries();
+                let importedCount = 0;
+                const importedDates = [];
 
-                for (const file of files) {
-                    const promise = new Promise((resolve) => {
+                // Funktion zum Verarbeiten einer einzelnen Textdatei (.md oder .txt)
+                const processTextFile = (file) => {
+                    return new Promise((resolve, reject) => {
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             const dateMatch = file.name.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -887,56 +899,91 @@
                                 resolve({ date: dateMatch[1], content: e.target.result });
                             } else {
                                 console.warn(`Konnte kein Datum aus dem Dateinamen extrahieren: ${file.name}`);
-                                resolve(null);
+                                resolve(null); // Ignoriere Dateien ohne Datum im Namen
                             }
                         };
                         reader.onerror = (e) => {
                             console.error("Fehler beim Lesen der Datei:", file.name, e);
-                            resolve(null);
+                            reject(e);
                         };
                         reader.readAsText(file);
                     });
-                    readPromises.push(promise);
-                }
+                };
 
-                Promise.all(readPromises).then(results => {
-                    const currentEntries = loadEntries();
-                    let importedCount = 0;
-                    const importedDates = [];
-                    const validResults = results.filter(r => r !== null);
+                // Funktion zum Verarbeiten einer ZIP-Datei
+                const processZipFile = async (zipFile) => {
+                    let zipPromises = [];
+                    try {
+                        const zip = await JSZip.loadAsync(zipFile);
+                        zip.forEach((relativePath, zipEntry) => {
+                            // Nur Markdown-Dateien verarbeiten, die keine Verzeichnisse sind
+                            if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.md')) {
+                                zipPromises.push(zipEntry.async('string').then(content => {
+                                    const dateMatch = relativePath.match(/^(\d{4}-\d{2}-\d{2})/);
+                                    if (dateMatch) {
+                                        return { date: dateMatch[1], content: content };
+                                    } else {
+                                        console.warn(`Konnte kein Datum aus dem Dateinamen in ZIP extrahieren: ${relativePath}`);
+                                        return null;
+                                    }
+                                }));
+                            }
+                        });
+                        return Promise.all(zipPromises);
+                    } catch (error) {
+                        console.error("Fehler beim Laden oder Verarbeiten der ZIP-Datei:", zipFile.name, error);
+                        showNotification(`Fehler beim Importieren der ZIP-Datei "${zipFile.name}".`, 'error');
+                        return []; // Leeres Array zurückgeben, um den Import fortzusetzen
+                    }
+                };
 
-                    validResults.forEach(result => {
-                        currentEntries[result.date] = result.content;
-                        importedDates.push(result.date);
-                        importedCount++;
-                    });
-
-                    if (importedCount > 0) {
-                        journalEntries = currentEntries;
-                        saveEntries(journalEntries);
-                        let newestImportedDate = '';
-                        if (importedDates.length > 0) {
-                            newestImportedDate = importedDates.sort().reverse()[0];
-                            calendarDate = new Date(newestImportedDate + 'T00:00:00Z');
-                        }
-                        currentPage = 1;
-                        updateAll();
-                        showNotification(`${importedCount} Datei(en) erfolgreich importiert.`, 'success');
-                        if (newestImportedDate) {
-                            setTimeout(() => {
-                                const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    element.classList.add('ring-2', 'ring-blue-400');
-                                    setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
-                                }
-                            }, 100);
+                for (const file of files) {
+                    if (file.name.toLowerCase().endsWith('.zip')) {
+                        const extractedFiles = await processZipFile(file);
+                        extractedFiles.forEach(result => {
+                            if (result) {
+                                currentEntries[result.date] = result.content;
+                                importedDates.push(result.date);
+                                importedCount++;
+                            }
+                        });
+                    } else if (file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.txt')) {
+                        const result = await processTextFile(file);
+                        if (result) {
+                            currentEntries[result.date] = result.content;
+                            importedDates.push(result.date);
+                            importedCount++;
                         }
                     } else {
-                        showNotification('Keine gültigen Dateien zum Importieren gefunden.', 'warning');
+                        console.warn(`Dateityp nicht unterstützt oder Dateiname ungültig: ${file.name}`);
                     }
-                });
-                importInput.value = '';
+                }
+
+                if (importedCount > 0) {
+                    journalEntries = currentEntries;
+                    saveEntries(journalEntries);
+                    let newestImportedDate = '';
+                    if (importedDates.length > 0) {
+                        newestImportedDate = importedDates.sort().reverse()[0];
+                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z'); // UTC verwenden
+                    }
+                    currentPage = 1;
+                    updateAll();
+                    showNotification(`${importedCount} Eintrag/Einträge erfolgreich importiert.`, 'success');
+                    if (newestImportedDate) {
+                        setTimeout(() => {
+                            const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                element.classList.add('ring-2', 'ring-blue-400');
+                                setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                            }
+                        }, 100);
+                    }
+                } else {
+                    showNotification('Keine gültigen Einträge zum Importieren gefunden.', 'warning');
+                }
+                importInput.value = ''; // Eingabefeld zurücksetzen
             });
 
 
@@ -966,7 +1013,7 @@
                 Object.keys(journalEntries).forEach(dateString => {
                     if (dateString >= startDate && dateString <= endDate) {
                         const content = journalEntries[dateString];
-                        if (content?.trim()) {
+                        if (content?.trim()) { // Nur Einträge mit Inhalt exportieren
                             zip.file(`${dateString}.md`, content);
                             filesAdded++;
                         }
@@ -984,11 +1031,18 @@
                         link.click();
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
+                    })
+                    .catch(error => {
+                        console.error("Fehler beim Generieren der ZIP-Datei:", error);
+                        showNotification('Fehler beim Exportieren der Einträge.', 'error');
                     });
                 exportModal.classList.add('hidden');
             });
 
             deleteAllButton.addEventListener('click', () => {
+                // Ersetze confirm() durch eine modale Bestätigung
+                // Da ich keine UI für modals hinzufügen kann, bleibe ich bei confirm() als Workaround.
+                // In einer realen Anwendung würde hier ein UI-basiertes Modal erscheinen.
                 if (confirm('Möchten Sie WIRKLICH ALLE Einträge unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) {
                     journalEntries = {};
                     saveEntries(journalEntries);

@@ -247,15 +247,18 @@
                     <span class="sidebar-text font-medium">Unicorn</span></a></li>
             <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/calendar.svg exists -->
+                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0">
+                    <!-- Assumed assets/icons/calendar.svg exists -->
                     <span class="sidebar-text font-medium">Google Kalender</span></a></li>
             <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/drive.svg exists -->
+                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0">
+                    <!-- Assumed assets/icons/drive.svg exists -->
                     <span class="sidebar-text font-medium">Google Drive</span></a></li>
             <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0"> <!-- Assumed assets/icons/notes.svg exists -->
+                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
+                    <!-- Assumed assets/icons/notes.svg exists -->
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
         <ul class="space-y-2 mt-2">
@@ -268,7 +271,8 @@
     <!-- Mobile Menu Panel -->
     <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu"
-        class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4 flex flex-col justify-between" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
+        class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4 flex flex-col justify-between"
+        style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold" style="color: var(--header-text-color);">Menü</h2>
             <button id="close-mobile-menu-btn" class="p-1">
@@ -290,13 +294,8 @@
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-[4.5rem]">
         <div class="relative w-full h-full">
             <div id="content-loader">
-                <svg class="animate-spin h-12 w-12" style="color: var(--accent-color);"
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
+                <!-- Lade-GIF hinzugefügt -->
+                <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
             <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
             <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"></iframe>
