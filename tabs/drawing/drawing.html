@@ -16,9 +16,7 @@
             --text-color: #334155;
             --text-color-light: #64748b;
             --button-hover-bg: #f1f5f9;
-            /* slate-100 */
             --button-active-bg: #e2e8f0;
-            /* slate-200 */
             --canvas-bg: #ffffff;
             --dropdown-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             --red-color: #ef4444;
@@ -52,7 +50,6 @@
             height: 100%;
             background-color: var(--bg-color);
             overflow: hidden;
-            /* Scrollbars on body are disabled */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-color);
         }
@@ -61,17 +58,13 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            /* Wrapper provides scrolling for zoomed canvas */
             position: relative;
             background-color: var(--bg-color);
-            /* Let the body color show through */
             touch-action: none;
-            /* Disable browser default touch actions like pull-to-refresh */
             scrollbar-color: var(--scrollbar-thumb-bg) transparent;
             scrollbar-width: thin;
         }
 
-        /* Subtle Scrollbar Styling */
         #canvas-wrapper::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -92,16 +85,12 @@
             background-color: var(--scrollbar-thumb-hover-bg);
         }
 
-        /* Canvas Styling */
         canvas {
             display: block;
             background-color: var(--canvas-bg);
-            /* Canvas itself has the drawing background color */
             transform-origin: 0 0;
-            /* Zoom from top-left corner */
         }
 
-        /* Controls container for buttons */
         #controls-container {
             position: fixed;
             top: 1rem;
@@ -117,7 +106,6 @@
             z-index: 100;
         }
 
-        /* Zoom Controls Styling */
         #zoom-controls {
             position: fixed;
             bottom: 1rem;
@@ -162,7 +150,6 @@
         }
 
 
-        /* General Button Styling */
         .btn {
             display: flex;
             align-items: center;
@@ -200,12 +187,10 @@
             background-color: var(--red-hover-color);
         }
 
-        /* Hiding the default file input */
         #file-import {
             display: none;
         }
 
-        /* Toolbar for drawing tools */
         .tool-palette {
             display: flex;
             flex-direction: column;
@@ -225,7 +210,6 @@
             margin: 0 0.25rem;
         }
 
-        /* Color Palette */
         #color-palette {
             display: flex;
             gap: 0.5rem;
@@ -248,7 +232,6 @@
             border-color: var(--active-ring-color);
         }
 
-        /* Line Width Slider */
         #line-width-container {
             display: flex;
             align-items: center;
@@ -266,7 +249,6 @@
             text-align: center;
         }
 
-        /* Export Dropdown Menu */
         #export-menu {
             position: absolute;
             top: calc(100% + 0.5rem);
@@ -305,6 +287,30 @@
         #export-menu button:hover {
             background-color: var(--button-hover-bg);
         }
+
+        #back-to-content-btn {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--controls-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #back-to-content-btn.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(200%);
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -334,7 +340,6 @@
                 </div>
             </div>
             <div class="tool-row" id="color-palette">
-                <!-- Color swatches will be added here by JS -->
             </div>
         </div>
 
@@ -372,6 +377,8 @@
         <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
     </div>
 
+    <button id="back-to-content-btn" class="hidden">Zurück zur Zeichnung</button>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const canvasWrapper = document.getElementById('canvas-wrapper');
@@ -392,18 +399,15 @@
 
             // --- INTERACTION STATE ---
             let interactionState = {
-                type: null, // 'move', 'resize-br', etc.
-                startX: 0,
-                startY: 0,
-                startImageX: 0,
-                startImageY: 0,
-                startImageWidth: 0,
-                startImageHeight: 0
+                type: null,
+                startX: 0, startY: 0,
+                startImageX: 0, startImageY: 0,
+                startImageWidth: 0, startImageHeight: 0
             };
 
             // --- POINTER & GESTURE STATE ---
             const activePointers = new Map();
-            let isGesturing = false; // For touch pan/pinch
+            let isGesturing = false;
             let lastGesture = { dist: 0, center: null, pan: { x: 0, y: 0 } };
 
             // --- UI ELEMENTS ---
@@ -417,8 +421,8 @@
             const zoomInBtn = document.getElementById('zoom-in-btn');
             const zoomOutBtn = document.getElementById('zoom-out-btn');
             const zoomDisplay = document.getElementById('zoom-display');
+            const backToContentBtn = document.getElementById('back-to-content-btn');
 
-            // --- CANVAS SIZING & INITIALIZATION ---
             function initializeCanvas() {
                 canvas.width = 3000;
                 canvas.height = 2200;
@@ -426,7 +430,6 @@
                 updateTransform();
             }
 
-            // --- THEME LOGIC ---
             function invertHex(hex) {
                 if (!hex || typeof hex !== 'string') return '#000000';
                 hex = hex.replace('#', '');
@@ -448,7 +451,6 @@
                 }
             });
 
-            // --- PALETTE SETUP ---
             const paletteColors = ['#000000', '#808080', '#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
             paletteColors.forEach(color => {
                 const swatch = document.createElement('div');
@@ -459,7 +461,6 @@
                 colorPaletteContainer.appendChild(swatch);
             });
 
-            // --- CORE DRAWING & DATA LOGIC ---
             function redrawAll(forExport = false) {
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
@@ -504,13 +505,7 @@
                             var yc = (path.points[i].y + path.points[i + 1].y) / 2;
                             ctx.quadraticCurveTo(path.points[i].x, path.points[i].y, xc, yc);
                         }
-                        // curve through the last two points
-                        ctx.quadraticCurveTo(
-                            path.points[i].x,
-                            path.points[i].y,
-                            path.points[i + 1].x,
-                            path.points[i + 1].y
-                        );
+                        ctx.quadraticCurveTo(path.points[i].x, path.points[i].y, path.points[i + 1].x, path.points[i + 1].y);
                     }
                     ctx.stroke();
                 });
@@ -522,7 +517,7 @@
 
             function getHandleRects() {
                 if (!imageState.img) return {};
-                const handleSize = 16 / zoom; // Larger handle size for easier interaction
+                const handleSize = 16 / zoom;
                 const halfHandle = handleSize / 2;
                 const { x, y, width, height } = imageState;
                 return {
@@ -571,9 +566,9 @@
                     imageToolBtn.classList.add('disabled');
                 }
                 redrawAll();
+                checkContentInView();
             }
 
-            // --- ZOOM AND PAN LOGIC ---
             function updateTransform() {
                 canvas.style.transform = `scale(${zoom})`;
                 zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
@@ -593,20 +588,26 @@
                 redrawAll();
             }
 
-            // --- POINTER EVENT HANDLING ---
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
-                activePointers.set(e.pointerId, e);
-                canvasWrapper.setPointerCapture(e.pointerId);
 
-                if (activePointers.size >= 2 && e.pointerType === 'touch') {
+                // Allow gesture start with multiple fingers
+                if (e.pointerType === 'touch' && activePointers.size >= 1) {
+                    activePointers.set(e.pointerId, e);
                     isDrawing = false;
                     isGesturing = true;
                     const pointers = Array.from(activePointers.values());
                     lastGesture.dist = Math.hypot(pointers[0].clientX - pointers[1].clientX, pointers[0].clientY - pointers[1].clientY);
                     lastGesture.pan.x = (pointers[0].clientX + pointers[1].clientX) / 2;
                     lastGesture.pan.y = (pointers[0].clientY + pointers[1].clientY) / 2;
-                } else if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && e.button === 0)) {
+                    return;
+                }
+
+                activePointers.set(e.pointerId, e);
+                canvasWrapper.setPointerCapture(e.pointerId);
+
+                // Start drawing ONLY with pen or mouse
+                if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && e.button === 0)) {
                     isDrawing = true;
                     isGesturing = false;
                     const pos = getCanvasPoint(e);
@@ -641,9 +642,11 @@
             function handlePointerMove(e) {
                 if (!activePointers.has(e.pointerId)) return;
 
+                // Update pointer position in map
+                activePointers.set(e.pointerId, e);
                 updateCursorStyle(e);
 
-                if (isGesturing && e.pointerType === 'touch' && activePointers.size >= 2) {
+                if (isGesturing && activePointers.size >= 2) {
                     const pointers = Array.from(activePointers.values());
                     const pointer1 = pointers[0];
                     const pointer2 = pointers[1];
@@ -695,10 +698,7 @@
                             handleStrokeErase(pos);
                             return;
                         }
-
-                        // Use coalesced events to get more points for smoother, more responsive lines
                         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
-
                         const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
                         const strokeStyle = (currentTool === 'pen') ? (isDarkMode ? invertHex(penColor) : penColor) : bgColor;
 
@@ -708,9 +708,7 @@
                         ctx.strokeStyle = strokeStyle;
 
                         ctx.beginPath();
-                        if (currentPath.length > 0) {
-                            ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
-                        }
+                        ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
 
                         for (const event of events) {
                             const coalescedPos = getCanvasPoint(event);
@@ -733,14 +731,13 @@
                 }
 
                 isDrawing = false;
+                activePointers.delete(e.pointerId);
                 if (activePointers.size < 2) isGesturing = false;
 
-                activePointers.delete(e.pointerId);
                 canvasWrapper.releasePointerCapture(e.pointerId);
                 updateCursorStyle(e);
             }
 
-            // --- TOOLS & CURSOR LOGIC ---
             const getCanvasPoint = (e) => {
                 const wrapperRect = canvasWrapper.getBoundingClientRect();
                 const x = (e.clientX - wrapperRect.left + canvasWrapper.scrollLeft) / zoom;
@@ -832,7 +829,6 @@
                 }
             });
 
-            // --- ZOOM BUTTONS & WHEEL ---
             zoomInBtn.addEventListener('click', () => setZoom(zoom * 1.2, canvasWrapper.clientWidth / 2, canvasWrapper.clientHeight / 2));
             zoomOutBtn.addEventListener('click', () => setZoom(zoom / 1.2, canvasWrapper.clientWidth / 2, canvasWrapper.clientHeight / 2));
             canvasWrapper.addEventListener('wheel', (e) => {
@@ -844,7 +840,6 @@
                 setZoom(zoom * zoomFactor, centerX, centerY);
             });
 
-            // --- FILE AND CONTROL BUTTONS ---
             function calculateContentBounds() {
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                 if (imageState.img) {
@@ -861,6 +856,30 @@
                 return { minX, minY, maxX, maxY };
             }
 
+            let scrollCheckTimeout;
+            function checkContentInView() {
+                const bounds = calculateContentBounds();
+                if (!bounds) {
+                    backToContentBtn.classList.add('hidden');
+                    return;
+                }
+                const viewport = {
+                    left: canvasWrapper.scrollLeft / zoom,
+                    top: canvasWrapper.scrollTop / zoom,
+                    right: (canvasWrapper.scrollLeft + canvasWrapper.clientWidth) / zoom,
+                    bottom: (canvasWrapper.scrollTop + canvasWrapper.clientHeight) / zoom
+                };
+
+                const contentIsVisible = (
+                    bounds.minX < viewport.right &&
+                    bounds.maxX > viewport.left &&
+                    bounds.minY < viewport.bottom &&
+                    bounds.maxY > viewport.top
+                );
+
+                backToContentBtn.classList.toggle('hidden', contentIsVisible);
+            }
+
             document.getElementById('trash-can').addEventListener('click', () => {
                 if (confirm('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?')) {
                     paths = [];
@@ -869,17 +888,11 @@
                     setActiveTool('pen');
                     saveState();
                     redrawAll();
+                    checkContentInView();
                 }
             });
-            document.getElementById('export-btn-main').addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.getElementById('export-menu').classList.toggle('hidden');
-            });
-            window.addEventListener('click', (e) => {
-                if (!document.getElementById('export-menu').contains(e.target) && !e.target.closest('#export-btn-main')) {
-                    document.getElementById('export-menu').classList.add('hidden');
-                }
-            });
+            document.getElementById('export-btn-main').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('export-menu').classList.toggle('hidden'); });
+            window.addEventListener('click', (e) => { if (!document.getElementById('export-menu').contains(e.target) && !e.target.closest('#export-btn-main')) { document.getElementById('export-menu').classList.add('hidden'); } });
 
             document.getElementById('export-png').addEventListener('click', () => {
                 const bounds = calculateContentBounds();
@@ -943,6 +956,7 @@
                             setActiveTool('image');
                             saveState();
                             redrawAll();
+                            checkContentInView();
                         };
                         img.src = event.target.result;
                     };
@@ -956,14 +970,30 @@
                 e.target.value = '';
             });
 
-            // --- POINTER EVENT LISTENERS ---
+            backToContentBtn.addEventListener('click', () => {
+                const bounds = calculateContentBounds();
+                if (!bounds) return;
+                const contentCenterX = (bounds.minX + bounds.maxX) / 2;
+                const contentCenterY = (bounds.minY + bounds.maxY) / 2;
+
+                canvasWrapper.scrollTo({
+                    left: contentCenterX * zoom - canvasWrapper.clientWidth / 2,
+                    top: contentCenterY * zoom - canvasWrapper.clientHeight / 2,
+                    behavior: 'smooth'
+                });
+            });
+
+            canvasWrapper.addEventListener('scroll', () => {
+                clearTimeout(scrollCheckTimeout);
+                scrollCheckTimeout = setTimeout(checkContentInView, 150);
+            });
+
             canvasWrapper.addEventListener('pointerdown', handlePointerDown);
             canvasWrapper.addEventListener('pointermove', handlePointerMove);
             canvasWrapper.addEventListener('pointerup', handlePointerUp);
             canvasWrapper.addEventListener('pointerleave', handlePointerUp);
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
 
-            // --- FINAL INITIALIZATION ---
             initializeCanvas();
             lucide.createIcons();
         });
