@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Hinzufügen einer serifen Schriftart für den Lesemodus -->
+    <link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     <style>
         /* Color variables for theme consistency */
         :root {
@@ -22,6 +26,8 @@
             --accent-color-hover: #8b5cf6;
             --favorite-color: #facc15;
             /* yellow-400 */
+            --reader-font-size: 20px;
+            /* Default font size for reader mode, now 20px */
         }
 
         html[data-theme='dark'] {
@@ -91,12 +97,19 @@
         }
 
         .sidebar-item-active span,
-        .sidebar-item-active svg {
+        .sidebar-item-active i[data-lucide] {
             color: white !important;
             font-weight: 600;
         }
 
         /* Reader mode content styling */
+        #reader-body {
+            font-size: var(--reader-font-size);
+            /* Apply custom font size */
+            font-family: 'Georgia', serif;
+            /* Apply serif font for readability */
+        }
+
         #reader-body p {
             margin-bottom: 1rem;
             line-height: 1.7;
@@ -159,19 +172,28 @@
         }
 
         /* Favorite button styling */
-        .favorite-btn svg {
-            color: var(--text-color-light);
+        .favorite-btn i[data-lucide] {
+            color: var(--favorite-color);
+            /* Star icon is always yellow (outline by default) */
             transition: color 0.2s, transform 0.2s;
         }
 
-        .favorite-btn:hover svg {
-            color: var(--favorite-color);
+        .favorite-btn:hover i[data-lucide] {
             transform: scale(1.1);
         }
 
+        /* When the button is a favorite, target the SVG and its path to modify stroke and fill */
         .favorite-btn.is-favorite svg {
             fill: var(--favorite-color);
             color: var(--favorite-color);
+            /* Fallback/consistency for currentColor */
+        }
+
+        .favorite-btn.is-favorite svg path {
+            fill: var(--favorite-color);
+            /* Explicitly fill the path */
+            stroke: none;
+            /* Remove the stroke/outline */
         }
 
         /* Mobile Sidebar Transition */
@@ -246,10 +268,7 @@
     <button id="fab-open-sidebar"
         class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20"
         style="background-color: var(--accent-color);">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <i data-lucide="menu" class="h-7 w-7"></i>
     </button>
 
     <!-- Reader Mode Modal -->
@@ -275,33 +294,52 @@
                 </svg>
             </button>
 
-            <header class="flex-shrink-0 flex justify-between items-center p-4 border-b"
-                style="border-color: var(--border-color);">
-                <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate pr-4"
-                    style="color: var(--text-color);"></h3>
-                <div class="flex items-center gap-2">
-                    <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
-                        title="Originalartikel öffnen"
-                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                        style="color: var(--text-color-light);">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                    </a>
-                    <button id="reader-close-btn" title="Schließen"
-                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                        style="color: var(--text-color-light);">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+            <header class="flex-shrink-0 p-4 border-b" style="border-color: var(--border-color);">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center gap-2 max-w-[calc(100%-180px)]">
+                        <img id="reader-favicon" src="" alt="Favicon" class="w-6 h-6 rounded hidden flex-shrink-0"
+                            onerror="this.classList.add('hidden')">
+                        <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate"
+                            style="color: var(--text-color);"></h3>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <!-- Font Size Controls -->
+                        <div class="flex items-center space-x-1">
+                            <button id="font-size-decrease" title="Schriftgröße verkleinern"
+                                class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                                style="color: var(--text-color-light);">
+                                <i data-lucide="minus" class="h-5 w-5"></i>
+                            </button>
+                            <button id="font-size-increase" title="Schriftgröße vergrößern"
+                                class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                                style="color: var(--text-color-light);">
+                                <i data-lucide="plus" class="h-5 w-5"></i>
+                            </button>
+                        </div>
+                        <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
+                            title="Originalartikel öffnen"
+                            class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                            style="color: var(--text-color-light);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                        <button id="reader-close-btn" title="Schließen"
+                            class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                            style="color: var(--text-color-light);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+                <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
             </header>
             <div id="reader-body" class="p-6 overflow-y-auto" style="color: var(--text-color);">
-                <!-- Article content goes here -->
+                <!-- Article content and image go here -->
             </div>
         </div>
     </div>
@@ -346,12 +384,21 @@
         window.addEventListener('message', (event) => {
             if (event.data === 'set-theme-dark') {
                 document.documentElement.dataset.theme = 'dark';
+                lucide.createIcons(); // Re-render Lucide icons for theme change
             } else if (event.data === 'set-theme-light') {
                 document.documentElement.dataset.theme = 'light';
+                lucide.createIcons(); // Re-render Lucide icons for theme change
             }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons for all static content
+            lucide.createIcons({
+                attributes: {
+                    'stroke-width': 2
+                }
+            });
+
             // --- DOM ELEMENT SELECTORS ---
             const feedContainer = document.getElementById('feed-container');
             const urlInput = document.getElementById('rss-url-input');
@@ -367,11 +414,18 @@
             const readerModal = document.getElementById('reader-modal');
             const readerModalContent = document.getElementById('reader-modal-content');
             const readerTitle = document.getElementById('reader-title');
+            const readerSourceTitle = document.getElementById('reader-source-title'); // Source title element
             const readerBody = document.getElementById('reader-body');
             const readerCloseBtn = document.getElementById('reader-close-btn');
             const readerOriginalLink = document.getElementById('reader-original-link');
             const readerPrevBtn = document.getElementById('reader-prev-btn');
             const readerNextBtn = document.getElementById('reader-next-btn');
+            const readerFavicon = document.getElementById('reader-favicon'); // Reader favicon element
+
+
+            // Font size controls
+            const fontSizeDecreaseBtn = document.getElementById('font-size-decrease');
+            const fontSizeIncreaseBtn = document.getElementById('font-size-increase');
 
             // --- HELPER FUNCTIONS (EARLY) ---
             const getFaviconUrl = (url) => { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch (e) { return placeholderFavicon; } };
@@ -380,6 +434,7 @@
             const feedsStorageKey = 'savedRssFeeds';
             const visitedLinksKey = 'rssVisitedLinks';
             const favoritesKey = 'rssFavoriteLinks';
+            const readerFontSizeKey = 'readerFontSize'; // Key for font size
             const placeholderFavicon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6' /%3E%3C/svg%3E`;
 
             const defaultFeeds = [
@@ -408,11 +463,14 @@
             let articlesToDisplay = [];
             let currentArticleIndex = -1;
             let currentFilter = 'unread';
+            // Load saved font size or default to 20.0 (representing 20px)
+            let currentReaderFontSize = parseFloat(localStorage.getItem(readerFontSizeKey) || 20.0);
 
             // --- HELPER FUNCTIONS ---
             const saveFeeds = () => localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
             const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
             const saveFavoriteLinks = () => localStorage.setItem(favoritesKey, JSON.stringify(Array.from(favoriteLinks)));
+            const saveReaderFontSize = () => localStorage.setItem(readerFontSizeKey, currentReaderFontSize.toString()); // Save font size
             const showLoading = () => { feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`; };
             const showMessage = (message, isError = false) => { const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);'; feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`; };
 
@@ -468,19 +526,19 @@
                     <div class="flex justify-between items-center mb-2">
                         <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
                         <div class="flex space-x-1">
-                            <button class="import-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds importieren" style="color: var(--text-color-light);"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></button>
-                            <button class="export-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds exportieren" style="color: var(--text-color-light);"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
+                            <button class="import-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds importieren" style="color: var(--text-color-light);"><i data-lucide="download" class="h-6 w-6"></i></button>
+                            <button class="export-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds exportieren" style="color: var(--text-color-light);"><i data-lucide="upload" class="h-6 w-6"></i></button>
                         </div>
                     </div>
                     <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
-                        <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--text-color-light);"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
-                        <button class="show-favorites-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--text-color-light);"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span id="favorites-count">0</span>)</span></button>
+                        <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="book-open" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
+                        <button class="show-favorites-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="star" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span id="favorites-count">0</span>)</span></button>
                     </div>
                     <div class="max-h-[50vh] overflow-y-auto pr-2">
                         ${savedFeeds.length === 0 ? `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>` :
                         savedFeeds.map((feed, index) => {
                             const isDefault = defaultFeedUrls.has(feed.url);
-                            const deleteButtonHtml = isDefault ? '' : `<button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg></button>`;
+                            const deleteButtonHtml = isDefault ? '' : `<button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="trash-2" class="h-5 w-5"></i></button>`;
                             return `
                             <div class="flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group sidebar-item" data-url="${feed.url}">
                                 <div class="flex items-center gap-3 truncate"><img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'"><span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span></div>
@@ -491,6 +549,16 @@
 
                 desktopSidebarContent.innerHTML = sidebarHtml;
                 mobileSidebar.innerHTML = sidebarHtml;
+
+                // Re-create icons after injecting HTML
+                lucide.createIcons({
+                    container: desktopSidebarContent,
+                    attributes: { 'stroke-width': 2 }
+                });
+                lucide.createIcons({
+                    container: mobileSidebar,
+                    attributes: { 'stroke-width': 2 }
+                });
 
                 addSidebarEventListeners();
                 updateSidebarCounts();
@@ -553,7 +621,8 @@
                 let pubDate = new Date(item.pubDate).toLocaleString('de-DE');
                 const metaHtml = `<p class="text-sm mt-1 mb-3" style="color: var(--text-color-light);">${pubDate}</p><p class="line-clamp-2" style="color: var(--text-color);">${sanitizedDescription}</p>`;
                 const sourceHtml = item.sourceTitle ? `<div class="flex items-center gap-2 mt-3 text-xs" style="color: var(--text-color-light);"><img src="${item.sourceFavicon}" class="w-4 h-4 rounded" onerror="this.src='${placeholderFavicon}'"/><span>${item.sourceTitle}</span></div>` : '';
-                const favoriteBtnHtml = `<button class="favorite-btn p-2 rounded-full absolute top-3 right-2 z-10 ${isFavorite ? 'is-favorite' : ''}" data-link="${item.link}" title="Als Favorit markieren"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></button>`;
+                // Use <i data-lucide="star"></i> for the favorite button
+                const favoriteBtnHtml = `<button class="favorite-btn p-2 rounded-full absolute top-3 right-2 z-10 ${isFavorite ? 'is-favorite' : ''}" data-link="${item.link}" title="Als Favorit markieren"><i data-lucide="star" class="w-6 h-6"></i></button>`;
 
                 let imageContainerHtml = '';
                 if (imageUrl) {
@@ -564,6 +633,7 @@
 
                 const textContentHtml = `<div class="sm:w-2/3 flex flex-col"><div class="article-item-content flex-1 cursor-pointer" data-index="${index}">${titleHtml}${metaHtml}${sourceHtml}</div></div>`;
 
+                // Swapped the order of imageContainerHtml and textContentHtml for left alignment
                 return `<div class="flex flex-col sm:flex-row gap-5 relative group/item">${favoriteBtnHtml}${imageContainerHtml}${textContentHtml}</div>`;
             };
 
@@ -584,6 +654,13 @@
                     if (activeUrl === 'favorites') message = 'Du hast noch keine Favoriten markiert.';
                     articlesWrapper.innerHTML = `<p class="text-center py-4" style="color: var(--text-color-light);">${message}</p>`;
                 }
+
+                // Re-create icons after injecting HTML
+                lucide.createIcons({
+                    container: articlesWrapper,
+                    attributes: { 'stroke-width': 2 }
+                });
+
 
                 document.querySelectorAll('.article-image-container').forEach(async (container) => {
                     const link = container.dataset.link;
@@ -639,6 +716,21 @@
             };
 
             // --- READER MODAL LOGIC ---
+            const applyReaderFontSize = () => {
+                document.documentElement.style.setProperty('--reader-font-size', `${currentReaderFontSize}px`);
+            };
+
+            const adjustReaderFontSize = (increment) => {
+                const minFontSize = 12; // Minimum font size in pixels
+                const maxFontSize = 24; // Maximum font size in pixels
+                let newSize = currentReaderFontSize + increment;
+                if (newSize < minFontSize) newSize = minFontSize;
+                if (newSize > maxFontSize) newSize = maxFontSize;
+                currentReaderFontSize = newSize;
+                applyReaderFontSize();
+                saveReaderFontSize();
+            };
+
             const openReaderMode = (index) => {
                 if (index < 0 || index >= articlesToDisplay.length) return;
 
@@ -646,9 +738,52 @@
                 const item = articlesToDisplay[currentArticleIndex];
 
                 readerTitle.textContent = item.title;
-                readerBody.innerHTML = item.content || item.description;
+                readerBody.innerHTML = ''; // Clear existing content first
+
+                // Set source title
+                if (item.sourceTitle) {
+                    readerSourceTitle.textContent = item.sourceTitle;
+                    readerSourceTitle.classList.remove('hidden');
+                } else {
+                    readerSourceTitle.classList.add('hidden');
+                }
+
+                // Create a temporary image element for the reader body content
+                const tempImageElement = document.createElement('img');
+                tempImageElement.id = 'reader-body-image'; // Give it a unique ID for styling within the body
+                tempImageElement.alt = 'Artikelbild';
+                tempImageElement.className = 'w-full h-auto mb-4 rounded-lg'; // Apply existing styling
+                tempImageElement.onerror = function () { this.classList.add('hidden'); }; // Hide on error
+
+                // Add article content first
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = item.content || item.description;
+                readerBody.appendChild(contentDiv); // Append the actual article content
+
+                // Add image if available, AFTER the text content
+                const articleImageUrl = findImageInFeedItem(item);
+                if (articleImageUrl) {
+                    tempImageElement.src = articleImageUrl;
+                    tempImageElement.classList.remove('hidden');
+                    readerBody.appendChild(tempImageElement); // Append the image element after the text
+                } else {
+                    tempImageElement.classList.add('hidden');
+                }
+
+
                 readerBody.scrollTop = 0;
                 readerOriginalLink.href = item.link;
+
+                // Set favicon if available
+                if (item.sourceFavicon) {
+                    readerFavicon.src = item.sourceFavicon;
+                    readerFavicon.classList.remove('hidden');
+                } else {
+                    readerFavicon.classList.add('hidden');
+                }
+
+                // Apply the saved font size when opening the reader mode
+                applyReaderFontSize();
 
                 if (!visitedLinks.has(item.link)) {
                     visitedLinks.add(item.link);
@@ -662,6 +797,11 @@
                     readerModal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                 }
+                // Re-create lucide icons for font size buttons
+                lucide.createIcons({
+                    container: readerModalContent,
+                    attributes: { 'stroke-width': 2 }
+                });
             };
 
             const showNextArticle = () => {
@@ -685,7 +825,11 @@
 
             const fetchAllArticles = async () => {
                 if (savedFeeds.length === 0) return [];
-                const fetchPromises = savedFeeds.map(feed => fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`).then(response => response.json()));
+                const fetchPromises = savedFeeds.map(feed => {
+                    // Add a cache-busting parameter to ensure fresh data
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&_=${new Date().getTime()}`;
+                    return fetch(apiUrl).then(response => response.json());
+                });
                 const results = await Promise.allSettled(fetchPromises);
                 let allItems = [];
                 results.forEach((result, index) => {
@@ -694,6 +838,8 @@
                         if (!feedInfo) return;
                         const itemsWithSource = result.value.items.map(item => ({ ...item, sourceTitle: feedInfo.title, sourceFavicon: feedInfo.favicon, sourceUrl: feedInfo.url }));
                         allItems.push(...itemsWithSource);
+                    } else {
+                        console.error(`Error fetching feed ${savedFeeds[index]?.url || 'unknown'}:`, result.reason);
                     }
                 });
                 return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate)).slice(0, 100);
@@ -723,9 +869,15 @@
                 setActiveSidebarItem('all');
                 showLoading();
                 currentArticles = await fetchAllArticles();
-                const allFeedsIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--accent-color);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`;
+                // Use <i data-lucide="book-open"></i> for the icon
+                const allFeedsIcon = `<i data-lucide="book-open" class="h-8 w-8" style="color: var(--accent-color);"></i>`;
                 renderFeedLayout('Alle Feeds (Neueste zuerst)', allFeedsIcon);
                 rerenderArticleList();
+                // Re-create icon in title
+                lucide.createIcons({
+                    container: feedContainer.querySelector('.flex.items.center.gap-4'),
+                    attributes: { 'stroke-width': 2 }
+                });
             };
 
             const loadFavorites = async () => {
@@ -738,9 +890,15 @@
 
                 const allArticles = await fetchAllArticles();
                 currentArticles = allArticles.filter(item => favoriteLinks.has(item.link));
-                const favIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--favorite-color);" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`;
+                // Use <i data-lucide="star"></i> for the icon
+                const favIcon = `<i data-lucide="star" class="h-8 w-8" style="color: var(--favorite-color);"></i>`;
                 renderFeedLayout('Favoriten', favIcon, false);
                 rerenderArticleList();
+                // Re-create icon in title
+                lucide.createIcons({
+                    container: feedContainer.querySelector('.flex.items.center.gap-4'),
+                    attributes: { 'stroke-width': 2 }
+                });
             };
 
             const loadFeed = (rssUrl) => {
@@ -754,11 +912,12 @@
                     setActiveSidebarItem(rssUrl);
                     showLoading();
 
-                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+                    // Add a cache-busting parameter to ensure fresh data
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&_=${new Date().getTime()}`;
                     fetch(apiUrl).then(response => response.json()).then(data => {
                         if (data.status === 'ok') {
                             const iconHtml = `<img src="${getFaviconUrl(data.feed.url || rssUrl)}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">`;
-                            currentArticles = (data.items || []).map(item => ({ ...item, sourceUrl: rssUrl }));
+                            currentArticles = (data.items || []).map(item => ({ ...item, sourceTitle: data.feed.title, sourceFavicon: getFaviconUrl(data.feed.url || rssUrl), sourceUrl: rssUrl }));
 
                             renderFeedLayout(data.feed.title, iconHtml);
                             rerenderArticleList();
@@ -852,6 +1011,9 @@
             readerCloseBtn.addEventListener('click', closeReaderMode);
             readerPrevBtn.addEventListener('click', showPreviousArticle);
             readerNextBtn.addEventListener('click', showNextArticle);
+            fontSizeDecreaseBtn.addEventListener('click', () => adjustReaderFontSize(-1)); // Decrease by 1px
+            fontSizeIncreaseBtn.addEventListener('click', () => adjustReaderFontSize(1)); // Increase by 1px
+
             document.addEventListener('keydown', (e) => { if (!readerModal.classList.contains('hidden')) { if (e.key === 'ArrowRight') showNextArticle(); if (e.key === 'ArrowLeft') showPreviousArticle(); if (e.key === 'Escape') closeReaderMode(); } });
 
             let touchStartX = 0;
@@ -865,6 +1027,8 @@
             document.getElementById('cancel-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); });
 
             // --- INITIALIZATION ---
+            // Set initial font size from localStorage
+            applyReaderFontSize();
             renderSidebar();
             loadAllFeeds(); // Load "Alle Feeds" view by default
         });

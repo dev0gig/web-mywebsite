@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Einbindung von Lucide Icons für den Kalender -->
+    <!-- Einbindung von Lucide Icons für den Kalender und andere Symbole -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* Farben-Schema für Konsistenz */
@@ -368,34 +368,21 @@
                 <div class="flex items-center gap-2 flex-wrap">
                     <h2 class="text-xl font-bold">Transaktionen</h2>
                     <button id="add-transaction-btn" title="Neue Transaktion hinzufügen"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                                clip-rule="evenodd" />
-                        </svg><span>Neu</span></button>
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                        <i data-lucide="plus" class="h-4 w-4"></i><span>Neu</span>
+                    </button>
                     <button id="import-csv-btn" title="Transaktionen aus CSV-Datei importieren"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3v11.25" />
-                        </svg><span>Importieren</span></button>
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                        <i data-lucide="file-down" class="h-4 w-4"></i><span>Importieren</span>
+                    </button>
                     <input type="file" id="csv-file-input" accept=".csv" class="hidden">
                     <button id="export-csv-btn" title="Alle Transaktionen als CSV-Datei exportieren"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg><span>Exportieren</span></button>
+                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                        <i data-lucide="file-up" class="h-4 w-4"></i><span>Exportieren</span>
+                    </button>
                     <button id="delete-all-transactions-btn" title="Alle Transaktionen löschen"
                         class="filter-btn p-2 rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.927a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.679-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.14-2.006-2.293a1.5 1.5 0 00-1.482 0L9.5 3.251A2.25 2.25 0 007.25 2.25h-.916c-1.18 0-2.14.91-2.293 2.006a1.5 1.5 0 000 1.482l.916.293m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
+                        <i data-lucide="trash-2" class="h-4 w-4"></i>
                     </button>
                 </div>
                 <div class="relative">
@@ -583,10 +570,7 @@
     </button>
     <button id="fab-add-transaction" title="Neue Transaktion hinzufügen"
         class="fixed right-6 bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
+        <i data-lucide="plus" class="h-8 w-8"></i>
     </button>
 
 
