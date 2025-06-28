@@ -201,6 +201,19 @@
             flex-grow: 1;
         }
 
+        /* Ensure description text in main cards is truncated with ellipsis */
+        .link-card .content-container p {
+            max-height: 4.5em;
+            /* Approximately 3 lines of text (assuming 1.5em line-height) */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            /* Limit to 3 lines */
+            -webkit-box-orient: vertical;
+        }
+
+
         /* Mobile specific adjustments for link cards within modals */
         @media (min-width: 768px) {
             .link-card {
@@ -245,6 +258,87 @@
             /* red-500 for hover to delete */
             color: white;
             /* Ensure text is visible on red background */
+        }
+
+        /* Specific styles for the live preview link card */
+        .link-card--preview {
+            height: auto;
+            max-height: 12rem;
+            /* Reduced max-height for overall preview card */
+            overflow: hidden;
+            flex-direction: row;
+            /* Changed to row for landscape */
+        }
+
+        .link-card--preview .image-container {
+            width: 10rem;
+            /* Fixed width for the image */
+            height: 100%;
+            /* Image container takes full height of the preview card */
+            flex-shrink: 0;
+        }
+
+        .link-card--preview .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Ensure image covers the space */
+        }
+
+        .link-card--preview .content-container {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            /* Keep content column layout */
+            flex-grow: 1;
+        }
+
+        .link-card--preview .content-container h2 {
+            font-size: 0.9rem;
+            /* Further slightly smaller title */
+            margin-bottom: 0.25rem;
+            /* Reduced margin */
+            white-space: nowrap;
+            /* Prevent title wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .link-card--preview .content-container p {
+            font-size: 0.75rem;
+            /* Further smaller description text */
+            margin-bottom: 0.25rem;
+            /* Reduced margin */
+            max-height: 4.5em;
+            /* Increased max-height for preview description (approx 3 lines) */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            /* Limit to 3 lines */
+            -webkit-box-orient: vertical;
+        }
+
+        .link-card--preview .content-container .flex.items-center {
+            font-size: 0.65rem;
+            /* Even smaller domain text */
+            margin-bottom: 0.25rem;
+        }
+
+        .link-card--preview .content-container .flex-wrap.gap-2 {
+            margin-top: auto;
+            /* Push tags to the bottom */
+            padding-top: 0.25rem;
+            /* Small padding top */
+            border-top: 1px solid #262626;
+            /* Lighter border for tags section */
+        }
+
+        .link-card--preview .content-container .flex-wrap.gap-2 span {
+            padding: 0.1rem 0.4rem;
+            /* Smaller tag padding */
+            font-size: 0.6rem;
+            /* Smaller tag font size */
         }
     </style>
 </head>
@@ -370,7 +464,7 @@
     <!-- New Link Group Modal -->
     <div id="link-group-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
     <div id="link-group-modal"
-        class="w-11/12 max-w-4xl bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto">
+        class="w-11/12 max-w-4xl bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-50% -translate-x-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h3 id="link-group-modal-title" class="text-xl font-bold text-white"></h3>
             <button id="link-group-modal-close-btn" class="text-neutral-400 hover:text-white transition">
@@ -388,7 +482,7 @@
     <!-- New Add Tags Modal -->
     <div id="add-tags-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
     <div id="add-tags-modal"
-        class="w-11/12 max-w-md bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        class="w-11/12 max-w-md bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-50% -translate-x-1/2 -translate-y-1/2">
         <h3 class="text-xl font-bold mb-4">Tags bearbeiten</h3>
         <div id="current-tags-container" class="flex flex-wrap gap-2 mb-4">
             <!-- Current tags will be loaded here -->
@@ -544,6 +638,34 @@
                 addTagsModal.classList.add('modal-hidden');
             };
 
+            // Function to save tags
+            const saveTags = () => {
+                if (currentEditLinkId === null) return;
+                const linkIndex = links.findIndex(l => l.id === currentEditLinkId);
+                if (linkIndex !== -1) {
+                    // Get tags currently displayed in the modal (after removals)
+                    const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.tag-item')).map(span => span.dataset.tag);
+                    // Get new tags from the input field
+                    const newTagsFromInput = addTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
+
+                    // Combine and deduplicate tags
+                    const combinedTags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
+
+                    links[linkIndex].tags = combinedTags;
+                    saveLinks();
+                    render(); // Re-render the main view
+                    showToast('Tags gespeichert.', 'success');
+
+                    // If the link group modal is open, update its content too
+                    if (!linkGroupModal.classList.contains('modal-hidden')) {
+                        const currentHostnameInModal = linkGroupModalTitle.textContent;
+                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
+                            .sort((a, b) => b.id - a.id);
+                        openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
+                    }
+                }
+                closeAddTagsModal();
+            };
 
             const getHostname = (url) => {
                 try {
@@ -734,8 +856,8 @@
                     return;
                 }
                 const previewElement = document.createElement('div');
-                // Use the new link-card styling for preview as well
-                previewElement.className = 'link-card h-full';
+                // Apply the new class for preview-specific styling
+                previewElement.className = 'link-card link-card--preview h-full';
                 previewElement.innerHTML = renderLinkCard(data, true);
                 livePreviewContainer.innerHTML = '';
                 livePreviewContainer.appendChild(previewElement);
@@ -923,32 +1045,14 @@
             // Add Tags Modal Event Listeners
             addTagsCancelBtn.addEventListener('click', closeAddTagsModal);
             addTagsModalOverlay.addEventListener('click', closeAddTagsModal);
-            addTagsSaveBtn.addEventListener('click', () => {
-                if (currentEditLinkId === null) return;
-                const linkIndex = links.findIndex(l => l.id === currentEditLinkId);
-                if (linkIndex !== -1) {
-                    // Get tags currently displayed in the modal (after removals)
-                    const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.tag-item')).map(span => span.dataset.tag);
-                    // Get new tags from the input field
-                    const newTagsFromInput = addTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
+            addTagsSaveBtn.addEventListener('click', saveTags); // Use the new saveTags function
 
-                    // Combine and deduplicate tags
-                    const combinedTags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
-
-                    links[linkIndex].tags = combinedTags;
-                    saveLinks();
-                    render(); // Re-render the main view
-                    showToast('Tags gespeichert.', 'success');
-
-                    // If the link group modal is open, update its content too
-                    if (!linkGroupModal.classList.contains('modal-hidden')) {
-                        const currentHostnameInModal = linkGroupModalTitle.textContent;
-                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
-                            .sort((a, b) => b.id - a.id);
-                        openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
-                    }
+            // Add event listener for 'Enter' key on the addTagsInput
+            addTagsInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent default Enter behavior (e.g., new line in input)
+                    saveTags(); // Call the saveTags function
                 }
-                closeAddTagsModal();
             });
 
 
