@@ -8,8 +8,6 @@
     <link rel="icon" href="https://img.icons8.com/color/512/color-widgets.png" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN (kann jetzt entfernt werden, da Icons nicht mehr verwendet werden) -->
-    <!-- <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script> -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,6 +20,13 @@
             /* Mittlerer Text für Light Mode */
             --bg-color: #f9fafb;
             /* Angepasst an --bg-color aus readlater.html */
+            --sidebar-bg-color: #ffffff;
+            /* Hintergrundfarbe der Sidebar im Light Mode */
+            --sidebar-text-color: #111827;
+            --scrollbar-thumb-color-light: #cbd5e1; /* Helles Grau für Scrollbalken im Light Mode */
+            --scrollbar-track-color-light: #f1f5f9; /* Noch helleres Grau für Scrollbalken-Hintergrund */
+            --accent-color: #8B5CF6; /* Haupt-Akzentfarbe: Violett */
+            --accent-color-hover: #7C3AED; /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
         }
 
         html[data-theme='dark'] {
@@ -31,6 +36,13 @@
             /* Mittlerer Text für Dark Mode */
             --bg-color: #171717;
             /* Angepasst an --bg-color aus readlater.html */
+            --sidebar-bg-color: #262626;
+            /* Hintergrundfarbe der Sidebar im Dark Mode */
+            --sidebar-text-color: #fafafa;
+            --scrollbar-thumb-color-dark: #475569; /* Dunkles Grau für Scrollbalken im Dark Mode */
+            --scrollbar-track-color-dark: #1f2937; /* Noch dunkleres Grau für Scrollbalken-Hintergrund */
+            --accent-color: #8B5CF6; /* Haupt-Akzentfarbe: Violett */
+            --accent-color-hover: #7C3AED; /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
         }
 
         /* Custom font for a better look */
@@ -38,7 +50,40 @@
             font-family: 'Inter', sans-serif;
             background-color: transparent;
             /* Hintergrund transparent gemacht */
-            /* padding-top wird jetzt dynamisch per JavaScript gesetzt, um den fixierten Header zu berücksichtigen */
+            /* Benutzerdefinierte Scrollbar-Styles */
+            scrollbar-width: thin; /* Für Firefox */
+            scrollbar-color: var(--scrollbar-thumb-color-light) var(--scrollbar-track-color-light); /* Für Firefox */
+        }
+
+        /* Webkit (Chrome, Safari, Edge) Scrollbar-Styles */
+        body::-webkit-scrollbar {
+            width: 8px; /* Breite des vertikalen Scrollbalkens */
+            height: 8px; /* Höhe des horizontalen Scrollbalkens */
+        }
+
+        body::-webkit-scrollbar-track {
+            background: var(--scrollbar-track-color-light); /* Farbe des Scrollbalken-Hintergrunds */
+            border-radius: 10px;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-color-light); /* Farbe des Scrollbalken-Griffs */
+            border-radius: 10px;
+            border: 2px solid var(--scrollbar-track-color-light); /* Rand um den Griff */
+        }
+
+        /* Dark Mode Scrollbar-Styles */
+        html[data-theme='dark'] body {
+            scrollbar-color: var(--scrollbar-thumb-color-dark) var(--scrollbar-track-color-dark); /* Für Firefox */
+        }
+
+        html[data-theme='dark'] body::-webkit-scrollbar-track {
+            background: var(--scrollbar-track-color-dark);
+        }
+
+        html[data-theme='dark'] body::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-color-dark);
+            border: 2px solid var(--scrollbar-track-color-dark);
         }
 
         /* Specific iframe styling for border, matching original dashed style */
@@ -46,7 +91,6 @@
             /* Rahmen entfernt */
             background-color: transparent;
             /* Hintergrund des Containers transparent gemacht */
-            /* scroll-margin-top wurde entfernt, da das Scrollen jetzt per JavaScript genauer gesteuert wird */
         }
 
         /* Stile für Überschrift und Text, die die CSS-Variablen verwenden */
@@ -99,40 +143,100 @@
             /* Even darker gray on hover in dark mode */
         }
 
-        /* Fixed header for the navigation */
+        /* Fixed header ist jetzt vollständig ausgeblendet, da die Sidebar für alle Ansichten verwendet wird */
         .fixed-header {
+            display: none;
+        }
+
+        /* Sidebar-Styles (für alle Bildschirmgrößen) */
+        .sidebar {
             position: fixed;
-            /* Fixierte Position, um es oben zu halten */
+            right: -300px;
+            /* Startposition außerhalb des Bildschirms */
             top: 0;
-            /* Oben am Viewport ausrichten */
-            left: 0;
-            /* Links am Viewport ausrichten */
+            width: 300px;
+            height: 100%;
+            background-color: var(--sidebar-bg-color);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: right 0.3s ease-in-out;
+            padding: 1rem;
+            display: flex;
+            /* Immer flex */
+            flex-direction: column;
+            color: var(--sidebar-text-color);
+        }
+
+        .sidebar.open {
+            right: 0;
+            /* Endposition auf dem Bildschirm */
+        }
+
+        /* Sidebar-Toggle-Button (für alle Bildschirmgrößen) */
+        .sidebar-toggle-button {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--accent-color); /* Akzentfarbe für den Button */
+            color: white;
+            border-radius: 9999px;
+            /* Macht den Button rund */
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 110;
+            transition: background-color 0.2s;
+            /* Immer anzeigen */
+        }
+
+        .sidebar-toggle-button:hover {
+            background-color: var(--accent-color-hover); /* Dunklere Akzentfarbe für Hover */
+        }
+
+        .sidebar-close-button {
+            background: none;
+            border: none;
+            color: var(--sidebar-text-color);
+            font-size: 1.5rem;
+            align-self: flex-end;
+            cursor: pointer;
+        }
+
+        .sidebar-nav-list .widget-nav-button {
             width: 100%;
-            /* Volle Breite einnehmen */
-            z-index: 50;
-            /* Sicherstellen, dass es über anderen Inhalten liegt */
-            background-color: var(--bg-color);
-            /* Hintergrundfarbe des Themes verwenden */
-            padding: 1rem 0;
-            /* Etwas Polsterung hinzufügen */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Dezenter Schatten */
+            text-align: left;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
 
 <body class="min-h-screen">
-    <!-- Fixierter Header für die Navigationsschaltflächen -->
-    <div class="fixed-header">
-        <div class="container mx-auto px-4">
-            <h1 class="text-3xl font-bold mb-4 text-center main-header">Ihre Widgets</h1>
-            <div id="widget-nav-list" class="flex flex-row flex-wrap justify-center gap-2">
-                <!-- Links werden per JavaScript eingefügt -->
-            </div>
+    <!-- Sidebar für alle Bildschirmgrößen -->
+    <div id="sidebar" class="sidebar">
+        <button class="sidebar-close-button" id="sidebar-close-button">&times;</button>
+        <h2 class="text-2xl font-bold mb-4 text-center main-header">Widgets</h2>
+        <div id="widget-nav-list-sidebar" class="flex flex-col gap-2 overflow-y-auto">
+            <!-- Links werden per JavaScript eingefügt -->
         </div>
     </div>
 
-    <!-- Hauptinhaltsbereich, der durch das padding-top im Body nach unten verschoben wird -->
+    <!-- Button zum Öffnen der Sidebar (für alle Bildschirmgrößen sichtbar) -->
+    <button class="sidebar-toggle-button" id="sidebar-toggle-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-menu">
+            <line x1="4" x2="20" y1="12" y2="12"></line>
+            <line x1="4" x2="20" y1="6" y2="6"></line>
+            <line x1="4" x2="20" y1="18" y2="18"></line>
+        </svg>
+    </button>
+
+
+    <!-- Hauptinhaltsbereich -->
     <div class="container mx-auto p-4 flex flex-col lg:flex-row lg:gap-8 lg:items-start">
         <!-- Widget-Gitter -->
         <div class="flex-grow">
@@ -159,7 +263,7 @@
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
                     <iframe id="widget-capital-city-eu" src="capital-city-EU.html" title="Europäische Hauptstädte Quiz"
-                        class="w-full h-[700px]" frameborder="0"></iframe>
+                        frameborder="0"></iframe>
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
                     <iframe id="widget-weather" src="weather.html" title="Wetter Widget" class="w-full h-[700px]"
@@ -179,52 +283,72 @@
                 }
             });
 
-            const widgetNavList = document.getElementById('widget-nav-list');
-            const fixedHeader = document.querySelector('.fixed-header');
-            const iframes = document.querySelectorAll('.grid iframe'); // Wählt Iframes innerhalb des Gitters aus
+            const iframes = document.querySelectorAll('.grid iframe');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggleButton = document.getElementById('sidebar-toggle-button');
+            const sidebarCloseButton = document.getElementById('sidebar-close-button');
+            const widgetNavListSidebar = document.getElementById('widget-nav-list-sidebar');
 
-            // Passt den oberen Abstand des Bodys an die Höhe des fixierten Headers an
-            function adjustBodyPadding() {
-                const headerHeight = fixedHeader.offsetHeight;
-                document.body.style.paddingTop = `${headerHeight + 20}px`; // Fügt 20px extra Puffer hinzu
-            }
-
-            // Ruft die Funktion auf, um den Abstand beim Laden und bei Größenänderung anzupassen
-            adjustBodyPadding();
-            window.addEventListener('resize', adjustBodyPadding);
-
-            iframes.forEach(iframe => {
+            // Funktion zum Erstellen der Navigationsbuttons
+            function createNavButton(iframe, targetList) {
                 const title = iframe.title;
-                const id = iframe.id; // Verwendet die bereits zugewiesene ID
+                const id = iframe.id;
 
                 if (title && id) {
                     const button = document.createElement('button');
-                    // Flexbox-Klassen für die Zentrierung des Textes im Button
                     button.className = 'widget-nav-button flex items-center justify-center';
-                    button.dataset.targetId = id; // Speichert die ID des Ziel-Iframes
-
-                    // Fügt den Text des Buttons hinzu (Icons wurden entfernt)
+                    button.dataset.targetId = id;
                     button.textContent = title;
 
                     button.addEventListener('click', () => {
                         const targetIframe = document.getElementById(button.dataset.targetId);
                         if (targetIframe) {
-                            const headerHeight = fixedHeader.offsetHeight;
-                            // Scrollt manuell zur Position des Iframes abzüglich der Headerhöhe und des Puffers
+                            // Scrollt manuell zur Position des Iframes
                             window.scrollTo({
-                                top: targetIframe.offsetTop - headerHeight - 20, // 20px extra Puffer
+                                top: targetIframe.offsetTop,
                                 behavior: 'smooth'
                             });
+                            // Sidebar schließen, nachdem ein Button in der Sidebar geklickt wurde
+                            if (sidebar.classList.contains('open')) {
+                                sidebar.classList.remove('open');
+                            }
                         }
                     });
-                    widgetNavList.appendChild(button);
+                    targetList.appendChild(button);
+                }
+            }
+
+            // Buttons für die Sidebar-Navigation generieren
+            iframes.forEach(iframe => {
+                createNavButton(iframe, widgetNavListSidebar);
+            });
+
+            // Sidebar-Funktionalität
+            sidebarToggleButton.addEventListener('click', () => {
+                sidebar.classList.add('open');
+            });
+
+            sidebarCloseButton.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+            });
+
+            // Schließen der Sidebar, wenn außerhalb geklickt wird
+            document.addEventListener('click', (event) => {
+                if (sidebar.classList.contains('open') &&
+                    !sidebar.contains(event.target) &&
+                    !sidebarToggleButton.contains(event.target)) {
+                    sidebar.classList.remove('open');
                 }
             });
 
-            // Der Aufruf von lucide.createIcons() ist nicht mehr notwendig, da keine Icons mehr verwendet werden.
-            // setTimeout(() => {
-            //     lucide.createIcons();
-            // }, 100);
+            // Verhindert das Scrollen des Bodys, wenn die Sidebar geöffnet ist
+            sidebar.addEventListener('transitionend', () => {
+                if (sidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
         });
     </script>
 </body>
