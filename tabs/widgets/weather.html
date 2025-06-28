@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modernes Wetter-Widget</title>
-    
+
     <!-- Einbindung von Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Einbindung von Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,25 +16,29 @@
 
     <style>
         body {
-            overflow: hidden; /* Verhindert Scrollen */
+            overflow: hidden;
+            /* Verhindert Scrollen */
             font-family: 'Inter', sans-serif;
             background-color: transparent;
         }
+
         /* Dynamische Hintergrundfarbe und Textfarbe basierend auf CSS-Variablen */
         .weather-card {
             background-color: var(--bg-color, #4A5568);
             color: var(--text-color, #FFFFFF);
             transition: background-color 0.5s ease, color 0.5s ease;
         }
+
         .forecast-day.selected {
             background-color: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div class="weather-card rounded-2xl w-full max-w-lg p-6">
-        
+
         <!-- Lade- und Fehleranzeige -->
         <div id="loader" class="text-center py-10">
             <p>Ermittle Standort und lade Wetterdaten...</p>
@@ -47,30 +52,31 @@
             <!-- Aktuelles Wetter -->
             <div class="current-weather flex flex-col items-center">
                 <h1 id="location" class="text-3xl font-bold">Wien</h1>
-                <p id="current-description" class="text-xl opacity-80 h-8">Sonnig</p> <!-- Feste Höhe -->
+                <p id="current-description" class="text-xl opacity-80 h-8"></p> <!-- Feste Höhe -->
                 <div class="flex items-center my-4">
                     <div id="current-icon" class="w-24 h-24"></div>
-                    <div id="current-temp" class="text-5xl font-bold w-56 text-center flex items-baseline justify-center gap-1"></div>
+                    <div id="current-temp"
+                        class="text-5xl font-bold w-56 text-center flex items-baseline justify-center gap-1"></div>
                 </div>
-                
+
                 <!-- Container für Details mit fester Höhe, um Sprünge zu vermeiden -->
                 <div class="h-16 flex items-center justify-center">
                     <div id="current-details" class="grid grid-cols-4 gap-x-4 text-sm w-full max-w-lg mx-auto">
                         <div class="text-center">
                             <p class="font-semibold">Gefühlt</p>
-                            <p id="feels-like" class="opacity-80">26°</p>
+                            <p id="feels-like" class="opacity-80"></p>
                         </div>
                         <div class="text-center">
                             <p class="font-semibold">Wind</p>
-                            <p id="wind-speed" class="opacity-80">10 km/h</p>
+                            <p id="wind-speed" class="opacity-80"></p>
                         </div>
                         <div class="text-center">
                             <p class="font-semibold">Feuchtigkeit</p>
-                            <p id="humidity" class="opacity-80">40%</p>
+                            <p id="humidity" class="opacity-80"></p>
                         </div>
                         <div class="text-center">
                             <p class="font-semibold">Regen</p>
-                            <p id="rain-chance" class="opacity-80">10%</p>
+                            <p id="rain-chance" class="opacity-80"></p>
                         </div>
                     </div>
                 </div>
@@ -93,20 +99,20 @@
                 this.loader = document.getElementById('loader');
                 this.errorMessage = document.getElementById('error-message');
                 this.weatherContent = document.getElementById('weather-content');
-                
+
                 this.locationEl = document.getElementById('location');
                 this.currentDescEl = document.getElementById('current-description');
                 this.currentIconEl = document.getElementById('current-icon');
                 this.currentTempEl = document.getElementById('current-temp');
                 this.currentDetailsEl = document.getElementById('current-details');
-                
+
                 this.feelsLikeEl = document.getElementById('feels-like');
                 this.windSpeedEl = document.getElementById('wind-speed');
                 this.humidityEl = document.getElementById('humidity');
                 this.rainChanceEl = document.getElementById('rain-chance');
 
                 this.forecastGridEl = document.getElementById('forecast-grid');
-                
+
                 // Datenspeicher
                 this.currentData = null;
                 this.dailyData = null;
@@ -122,47 +128,52 @@
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => this.fetchWeatherData(position.coords.latitude, position.coords.longitude),
+                        // Fallback, wenn Geolocation fehlschlägt
                         () => this.fetchWeatherData(this.defaultCoords.latitude, this.defaultCoords.longitude, this.defaultCoords.name, true)
                     );
                 } else {
+                    // Fallback, wenn Geolocation nicht unterstützt wird
                     this.fetchWeatherData(this.defaultCoords.latitude, this.defaultCoords.longitude, this.defaultCoords.name, true);
                 }
             }
-            
+
             async fetchWeatherData(lat, lon, knownCityName = null, isErrorCase = false) {
-                if(isErrorCase) this.showError(true);
+                if (isErrorCase) this.showError(true);
 
                 try {
                     let cityName = knownCityName;
                     if (!cityName) {
+                        // Reverse Geocoding, um den Stadtnamen anhand der Koordinaten zu erhalten
                         const geoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=de`);
                         const geoData = await geoResponse.json();
                         cityName = geoData?.address?.city || geoData?.address?.town || geoData?.address?.village || "Unbekannter Ort";
                     }
-                    
+
+                    // Wetterdaten von Open-Meteo abrufen
                     const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,wind_speed_10m_max,precipitation_probability_max&forecast_days=4&timezone=auto`);
                     const weatherData = await weatherResponse.json();
 
                     this.currentData = weatherData.current;
                     this.dailyData = weatherData.daily;
                     this.locationEl.textContent = cityName;
-                    
+
                     this.renderForecast();
                     this.displayDayDetails(0); // Zeigt initial das heutige Wetter an
-                    
+
                 } catch (error) {
                     this.showError(true, "Wetterdaten konnten nicht geladen werden.");
+                    console.error("Fehler beim Abrufen der Wetterdaten:", error);
                 } finally {
                     this.showLoading(false);
                 }
             }
-            
+
             renderForecast() {
                 this.forecastGridEl.innerHTML = '';
                 for (let i = 0; i < 4; i++) {
                     const day = new Date(this.dailyData.time[i]);
                     const dayName = i === 0 ? 'Heute' : day.toLocaleDateString('de-DE', { weekday: 'short' });
-                    
+
                     const dayEl = document.createElement('div');
                     dayEl.className = 'forecast-day text-center p-2 rounded-lg bg-white/10 cursor-pointer transition-colors';
                     dayEl.dataset.dayIndex = i;
@@ -177,6 +188,7 @@
             }
 
             displayDayDetails(index) {
+                // Entfernt die 'selected'-Klasse von allen Tagen und fügt sie dem ausgewählten Tag hinzu
                 document.querySelectorAll('.forecast-day').forEach(el => {
                     el.classList.toggle('selected', parseInt(el.dataset.dayIndex) === index);
                 });
@@ -188,7 +200,7 @@
                 this.currentIconEl.innerHTML = icon;
                 this.card.style.setProperty('--bg-color', color);
                 this.card.style.setProperty('--text-color', textColor);
-                
+
                 if (index === 0) {
                     // Zeige Min/Max für "Heute" und aktuelle Details
                     const maxTemp = Math.round(this.dailyData.temperature_2m_max[index]);
@@ -210,41 +222,42 @@
                 }
             }
 
-
             getWeatherDetails(code) {
-                if ([0, 1].includes(code)) return { description: 'Sonnig', icon: this.getIcon('sunny'), color: '#4A90E2', textColor: '#FFFFFF' };
-                if ([2].includes(code)) return { description: 'Teils bewölkt', icon: this.getIcon('partly-cloudy'), color: '#5472d3', textColor: '#FFFFFF' };
-                if ([3].includes(code)) return { description: 'Bedeckt', icon: this.getIcon('cloudy'), color: '#7E8B99', textColor: '#FFFFFF' };
-                if ([45, 48].includes(code)) return { description: 'Nebel', icon: this.getIcon('fog'), color: '#B0BEC5', textColor: '#263238' };
-                if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { description: 'Regen', icon: this.getIcon('rain'), color: '#0288D1', textColor: '#FFFFFF' };
-                if ([71, 73, 75, 85, 86].includes(code)) return { description: 'Schnee', icon: this.getIcon('snow'), color: '#FFFFFF', textColor: '#37474F' };
-                if ([95, 96, 99].includes(code)) return { description: 'Gewitter', icon: this.getIcon('thunderstorm'), color: '#455A64', textColor: '#FFFFFF' };
-                return { description: 'Unbekannt', icon: this.getIcon('cloudy'), color: '#7E8B99', textColor: '#FFFFFF' };
-            }
+                // Diese Funktion ordnet Wettercodes Beschreibungen, Icons, Hintergrundfarben und Textfarben zu.
+                // Die Icons werden nun als <img>-Tags mit dem angegebenen Pfad zurückgegeben.
+                const iconPath = '../../assets/weather-icons/'; // Basis-Pfad zu den Icons
 
-            getIcon(name) {
-                const icons = {
-                    'sunny': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 5C8.13 5 5 8.13 5 12s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM5.64 5.64l2.12 2.12 1.41-1.41-2.12-2.12L5.64 5.64zm12.72 12.72l2.12 2.12 1.41-1.41-2.12-2.12-1.41 1.41zM5.64 18.36l-1.41 1.41 2.12 2.12 1.41-1.41-2.12-2.12zM18.36 5.64l1.41-1.41 2.12 2.12-1.41 1.41-2.12-2.12z"/></svg>`,
-                    'partly-cloudy': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17C6.48 3.73 3.18 4.5 1.5 7.5c-1.07 1.93-1.07 4.07 0 6 .78 1.4 2.1 2.54 3.64 3.14C6.45 18.43 9.05 20 12 20c4.42 0 8-3.58 8-8 0-1.4-.37-2.71-.99-3.82.93-.65 1.6-1.67 1.8-2.8.25-1.39-.04-2.83-.84-3.99-.2-.29-.43-.56-.69-.81z"/></svg>`,
-                    'cloudy': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`,
-                    'rain': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM7 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm4 2c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm4-2c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`,
-                    'snow': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 10.5V8h-4.5l-2-4-2 4H7v2.5L3.5 12 7 13.5V16h4.5l2 4 2-4H20v-2.5L23.5 12 20 10.5zM12 13.2l-1.4-1.4-1.4 1.4L7.8 12l1.4-1.4-1.4-1.4L9.2 8l1.4 1.4 1.4-1.4L13.4 8l-1.4 1.4 1.4 1.4L14.8 12l-1.4 1.4 1.4 1.4L13.4 16l-1.4-1.4-1.4 1.4z"/></svg>`,
-                    'thunderstorm': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM13 19h-2v-5H9l4-7v5h2l-4 7z"/></svg>`,
-                    'fog': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 7H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2zm0 6H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2z"/></svg>`
+                // Hilfsfunktion zur Erstellung des <img>-Tags
+                const createIconTag = (filename, altText) => {
+                    // Der onerror-Handler zeigt ein Platzhalterbild an, falls das Icon nicht gefunden wird.
+                    // Der CSS-Filter 'invert(100%)' kehrt die Farben des Icons um.
+                    return `<img src="${iconPath}${filename}" alt="${altText}" onerror="this.src='https://placehold.co/40x40/cccccc/ffffff?text=X'" class="w-full h-full object-contain" style="filter: invert(100%);">`;
                 };
-                return icons[name] || icons['cloudy'];
+
+                // Mapping der Wettercodes zu Icon-Dateinamen und Stile
+                if ([0, 1].includes(code)) return { description: 'Sonnig', icon: createIconTag('sunny.svg', 'Sonnig'), color: '#4A90E2', textColor: '#FFFFFF' };
+                if ([2].includes(code)) return { description: 'Teils bewölkt', icon: createIconTag('partly-cloudy.svg', 'Teils bewölkt'), color: '#5472d3', textColor: '#FFFFFF' };
+                if ([3].includes(code)) return { description: 'Bedeckt', icon: createIconTag('cloudy.svg', 'Bedeckt'), color: '#7E8B99', textColor: '#FFFFFF' };
+                if ([45, 48].includes(code)) return { description: 'Nebel', icon: createIconTag('fog.svg', 'Nebel'), color: '#B0BEC5', textColor: '#263238' };
+                if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { description: 'Regen', icon: createIconTag('rain.svg', 'Regen'), color: '#0288D1', textColor: '#FFFFFF' };
+                if ([71, 73, 75, 85, 86].includes(code)) return { description: 'Schnee', icon: createIconTag('snow.svg', 'Schnee'), color: '#FFFFFF', textColor: '#37474F' };
+                if ([95, 96, 99].includes(code)) return { description: 'Gewitter', icon: createIconTag('thunderstorm.svg', 'Gewitter'), color: '#455A64', textColor: '#FFFFFF' };
+                // Standard-Rückgabe für unbekannte Codes
+                // Stellen Sie sicher, dass Sie eine 'unknown.svg' Datei im Verzeichnis haben,
+                // oder passen Sie den Fallback-Text an.
+                return { description: 'Unbekannt', icon: createIconTag('unknown.svg', 'Unbekannt'), color: '#7E8B99', textColor: '#FFFFFF' };
             }
 
             showLoading(isLoading) {
                 this.loader.style.display = isLoading ? 'block' : 'none';
                 this.weatherContent.style.display = isLoading ? 'none' : 'block';
-                 if (isLoading) {
+                if (isLoading) {
                     this.errorMessage.classList.add('hidden');
                 }
             }
-            
+
             showError(isError, message = "Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.") {
-                 if (isError) {
+                if (isError) {
                     this.errorMessage.querySelector('p').textContent = message;
                     this.errorMessage.classList.remove('hidden');
                 } else {
@@ -259,4 +272,5 @@
         });
     </script>
 </body>
+
 </html>
