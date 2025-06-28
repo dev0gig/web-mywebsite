@@ -210,7 +210,8 @@
             background-color: var(--button-active-bg);
         }
 
-        #image-tool.btn.disabled {
+        .btn.disabled,
+        .btn:disabled {
             color: var(--text-color-light);
             cursor: not-allowed;
             opacity: 0.5;
@@ -410,8 +411,8 @@
             }
         }
 
-        #export-menu.hidden {
-            display: none;
+        .hidden {
+            display: none !important;
         }
 
         #export-menu button {
@@ -622,8 +623,14 @@
         <div id="controls-container">
             <div class="tool-palette">
                 <div class="tool-row">
+                    <button id="undo-btn" class="btn" title="Rückgängig" disabled>
+                        <i data-lucide="undo-2"></i>
+                    </button>
                     <button id="image-tool" class="btn disabled" title="Bild transformieren">
                         <i data-lucide="move"></i>
+                    </button>
+                    <button id="lock-aspect-ratio-btn" class="btn hidden" title="Seitenverhältnis sperren">
+                        <i data-lucide="lock"></i>
                     </button>
                     <button id="pen-tool" class="btn active" title="Stift">
                         <i data-lucide="pencil"></i>
@@ -705,12 +712,14 @@
 
             // --- STATE MANAGEMENT ---
             let isDarkMode = false;
-            let paths = [];
-            let imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
+            let history = [];
+            let historyIndex = -1;
+            let imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
+            let isAspectRatioLocked = true;
             let currentPath = [];
             let isDrawing = false;
             let currentTool = 'pen';
-            let previousTool = 'pen'; // Speichert das Werkzeug vor dem Wechsel zum Bild-Werkzeug
+            let previousTool = 'pen';
             let penColor = '#000000';
 
             const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
@@ -722,7 +731,7 @@
             let isMovingSelection = false;
             let moveStartPoint = null;
 
-            // --- PC Pan State ---
+            // --- Pan State ---
             let isPanningWithMouse = false;
             let lastPanPoint = { x: 0, y: 0 };
 
@@ -741,7 +750,9 @@
             let lastGesture = { dist: 0, center: null, pan: { x: 0, y: 0 } };
 
             // --- UI ELEMENTS ---
+            const undoBtn = document.getElementById('undo-btn');
             const imageToolBtn = document.getElementById('image-tool');
+            const lockAspectRatioBtn = document.getElementById('lock-aspect-ratio-btn');
             const penToolBtn = document.getElementById('pen-tool');
             const pixelEraserBtn = document.getElementById('pixel-eraser-tool');
             const strokeEraserBtn = document.getElementById('stroke-eraser-tool');
@@ -759,11 +770,10 @@
             const modalConfirmBtn = document.getElementById('modal-confirm-btn');
             const modalCancelBtn = document.getElementById('modal-cancel-btn');
 
-
             function initializeCanvas() {
                 canvas.width = 3000;
                 canvas.height = 2200;
-                loadState();
+                loadStateFromLocalStorage();
                 updateTransform();
             }
 
@@ -791,8 +801,71 @@
                 if (color === penColor) swatch.classList.add('active');
                 colorPaletteContainer.appendChild(swatch);
             });
+            
+            // Deep copy helper
+            const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
+
+            function recordState() {
+                // Remove any future states if we've undone and then drawn something new
+                if (historyIndex < history.length - 1) {
+                    history = history.slice(0, historyIndex + 1);
+                }
+                
+                const currentState = {
+                    paths: deepCopy(paths),
+                    imageState: deepCopy(imageState)
+                };
+                history.push(currentState);
+                historyIndex++;
+
+                // Limit history size
+                if (history.length > 50) {
+                    history.shift();
+                    historyIndex--;
+                }
+                
+                updateUndoButton();
+                saveStateToLocalStorage();
+            }
+
+            function undo() {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    const previousState = deepCopy(history[historyIndex]);
+                    paths = previousState.paths;
+                    
+                    const oldImageSrc = imageState.src;
+                    imageState = previousState.imageState;
+
+                    // If image source changed, we need to reload the image object
+                    if (imageState.src && imageState.src !== oldImageSrc) {
+                         const img = new Image();
+                         img.onload = () => {
+                             imageState.img = img;
+                             redrawAll();
+                         };
+                         img.src = imageState.src;
+                    } else if (oldImageSrc && !imageState.src) {
+                        imageState.img = null;
+                        redrawAll();
+                    }
+                    else {
+                       redrawAll();
+                    }
+                    
+                    updateUndoButton();
+                }
+            }
+
+            function updateUndoButton() {
+                undoBtn.disabled = historyIndex <= 0;
+            }
+
 
             function redrawAll(forExport = false, targetCtx = ctx) {
+                const currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
+                const currentImageState = (history[historyIndex] && history[historyIndex].imageState) || { img: null };
+
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
 
@@ -803,7 +876,7 @@
                     targetCtx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
                 }
 
-                paths.forEach(path => {
+                currentPaths.forEach(path => {
                     targetCtx.beginPath();
                     if (path.color === 'ERASER') {
                         targetCtx.strokeStyle = bgColor;
@@ -868,17 +941,17 @@
                     drawSelectionUI();
                 }
             }
-
+            
             function getHandleRects() {
                 if (!imageState.img) return {};
                 const handleSize = 16 / zoom;
                 const halfHandle = handleSize / 2;
                 const { x, y, width, height } = imageState;
                 return {
-                    'tl': { x: x - halfHandle, y: y - halfHandle, w: handleSize, h: handleSize, cursor: 'nwse-resize' },
-                    'tr': { x: x + width - halfHandle, y: y - halfHandle, w: handleSize, h: handleSize, cursor: 'nesw-resize' },
-                    'bl': { x: x - halfHandle, y: y + height - halfHandle, w: handleSize, h: handleSize, cursor: 'nesw-resize' },
-                    'br': { x: x + width - halfHandle, y: y + height - halfHandle, w: handleSize, h: handleSize, cursor: 'nwse-resize' },
+                    'tl': { x: x - halfHandle, y: y - halfHandle, width: handleSize, height: handleSize, cursor: 'nwse-resize' },
+                    'tr': { x: x + width - halfHandle, y: y - halfHandle, width: handleSize, height: handleSize, cursor: 'nesw-resize' },
+                    'bl': { x: x - halfHandle, y: y + height - halfHandle, width: handleSize, height: handleSize, cursor: 'nesw-resize' },
+                    'br': { x: x + width - halfHandle, y: y + height - halfHandle, width: handleSize, height: handleSize, cursor: 'nwse-resize' },
                 };
             }
 
@@ -891,34 +964,40 @@
                 const handles = getHandleRects();
                 ctx.fillStyle = ctx.strokeStyle;
                 Object.values(handles).forEach(handle => {
-                    ctx.fillRect(handle.x, handle.y, handle.w, handle.h);
+                    ctx.fillRect(handle.x, handle.y, handle.width, handle.height);
                 });
             }
 
-            function saveState() {
-                const stateToSave = {
-                    paths: paths,
-                    imageState: { src: imageState.src, x: imageState.x, y: imageState.y, width: imageState.width, height: imageState.height, }
-                };
-                localStorage.setItem('drawingState', JSON.stringify(stateToSave));
+            function saveStateToLocalStorage() {
+                if(history.length > 0) {
+                   localStorage.setItem('drawingState', JSON.stringify(history[historyIndex]));
+                }
             }
 
-            function loadState() {
+            function loadStateFromLocalStorage() {
                 const savedStateJSON = localStorage.getItem('drawingState');
-                if (!savedStateJSON) { redrawAll(); return; }
-                const savedState = JSON.parse(savedStateJSON);
-                paths = savedState.paths || [];
-                const savedImgState = savedState.imageState;
-                if (savedImgState && savedImgState.src) {
-                    imageState = { ...savedImgState, img: new Image() };
-                    imageState.img.onload = () => redrawAll();
-                    imageState.img.onerror = () => { imageState.img = null; redrawAll(); };
-                    imageState.img.src = savedImgState.src;
-                    imageToolBtn.classList.remove('disabled');
+                let initialState;
+                if (savedStateJSON) {
+                    initialState = JSON.parse(savedStateJSON);
+                    paths = initialState.paths || [];
+                    const savedImgState = initialState.imageState;
+                    if (savedImgState && savedImgState.src) {
+                        imageState = { ...savedImgState, img: new Image() };
+                        imageState.img.onload = () => redrawAll();
+                        imageState.img.onerror = () => { imageState.img = null; redrawAll(); };
+                        imageState.img.src = savedImgState.src;
+                    } else {
+                       imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
+                    }
                 } else {
-                    imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
-                    imageToolBtn.classList.add('disabled');
+                     paths = [];
+                     imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
                 }
+
+                history = [deepCopy({paths, imageState})];
+                historyIndex = 0;
+                
+                updateUndoButton();
                 redrawAll();
                 checkContentInView();
             }
@@ -945,16 +1024,14 @@
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
 
-                // Logik, um das Bild zu "platzieren", wenn man daneben klickt
                 if (currentTool === 'image') {
                     const pos = getCanvasPoint(e);
                     const handle = getHandleUnderCursor(pos);
                     const isInImage = isPointInRect(pos, imageState);
 
                     if (!handle && !isInImage) {
-                        // Klick ausserhalb des Bildes -> platziert es und wechselt zum vorherigen Werkzeug
                         setActiveTool(previousTool || 'pen');
-                        return; // Verhindert, dass eine neue Linie gezeichnet wird
+                        return;
                     }
                 }
 
@@ -1085,26 +1162,7 @@
                         imageState.y = interactionState.startImageY + dy;
                         redrawAll();
                     } else if (interactionState.type && interactionState.type.startsWith('resize-')) {
-                        const dx = pos.x - interactionState.startX;
-                        const dy = pos.y - interactionState.startY;
-                        const handle = interactionState.type.replace('resize-', '');
-
-                        if (handle.includes('l')) {
-                            const newWidth = Math.max(20, interactionState.startImageWidth - dx);
-                            imageState.x = interactionState.startImageX + interactionState.startImageWidth - newWidth;
-                            imageState.width = newWidth;
-                        }
-                        if (handle.includes('r')) {
-                            imageState.width = Math.max(20, interactionState.startImageWidth + dx);
-                        }
-                        if (handle.includes('t')) {
-                            const newHeight = Math.max(20, interactionState.startImageHeight - dy);
-                            imageState.y = interactionState.startImageY + interactionState.startImageHeight - newHeight;
-                            imageState.height = newHeight;
-                        }
-                        if (handle.includes('b')) {
-                            imageState.height = Math.max(20, interactionState.startImageHeight + dy);
-                        }
+                        handleImageResize(pos);
                         redrawAll();
                     } else if (interactionState.type === 'draw') {
                         if (currentTool === 'stroke-eraser') {
@@ -1143,45 +1201,82 @@
                 }
             }
 
-            // ==================================================================
-            // === FINALE KORREKTUR / FINAL FIX (Version 3) ===
-            // ==================================================================
+            function handleImageResize(pos) {
+                const dx = pos.x - interactionState.startX;
+                const dy = pos.y - interactionState.startY;
+                const handle = interactionState.type.replace('resize-', '');
+                let newX = imageState.x, newY = imageState.y, newWidth = imageState.width, newHeight = imageState.height;
+
+                if (handle.includes('l')) {
+                    newWidth = Math.max(20, interactionState.startImageWidth - dx);
+                    newX = interactionState.startImageX + interactionState.startImageWidth - newWidth;
+                }
+                if (handle.includes('r')) {
+                    newWidth = Math.max(20, interactionState.startImageWidth + dx);
+                }
+                if (handle.includes('t')) {
+                    newHeight = Math.max(20, interactionState.startImageHeight - dy);
+                    newY = interactionState.startImageY + interactionState.startImageHeight - newHeight;
+                }
+                if (handle.includes('b')) {
+                    newHeight = Math.max(20, interactionState.startImageHeight + dy);
+                }
+                
+                if (isAspectRatioLocked) {
+                    const aspectRatio = imageState.aspectRatio;
+                    if (handle.includes('l') || handle.includes('r')) {
+                         newHeight = newWidth / aspectRatio;
+                         if (handle.includes('t')) {
+                            newY = (interactionState.startImageY + interactionState.startImageHeight) - newHeight;
+                         }
+                    } else if (handle.includes('t') || handle.includes('b')) {
+                        newWidth = newHeight * aspectRatio;
+                        if(handle.includes('l')) {
+                           newX = (interactionState.startImageX + interactionState.startImageWidth) - newWidth;
+                        }
+                    }
+                }
+
+                imageState.x = newX;
+                imageState.y = newY;
+                imageState.width = newWidth;
+                imageState.height = newHeight;
+            }
+
+
             function handlePointerUp(e) {
                 if (!activePointers.has(e.pointerId)) return;
 
-                // Behalten Sie eine Referenz auf den Interaktionstyp, bevor er zurückgesetzt wird.
                 const finishedInteractionType = interactionState.type;
-                const wasImageInteraction = finishedInteractionType === 'move' || finishedInteractionType?.startsWith('resize-');
 
-                // Beenden Sie den Zeichen-/Bewegungszustand.
                 isDrawing = false;
+                
+                if (finishedInteractionType) {
+                     recordState();
+                }
 
-                // Beenden Sie spezifische Werkzeug-Aktionen
                 if (currentTool === 'lasso') {
                     if (isMovingSelection) {
                         isMovingSelection = false;
                         moveStartPoint = null;
                         lassoPath = getSelectionBoundsPoly();
-                    } else if (finishedInteractionType) { // Nur wenn eine neue Auswahl gezeichnet wurde
+                    } else if (lassoPath.length > 0) {
                         selectPathsInLasso();
                     }
                 }
 
-                // Finalisieren Sie den gezeichneten Pfad
                 if (finishedInteractionType === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
-                    paths.push({ points: currentPath, color: (currentTool === 'pen') ? penColor : 'ERASER', width: penWidth });
+                    paths.push({
+                        points: currentPath,
+                        color: (currentTool === 'pen') ? penColor : 'ERASER',
+                        width: penWidth
+                    });
+                     recordState();
                 }
-
-                // Speichern Sie den Zustand nach JEDER abgeschlossenen Aktion.
-                if (finishedInteractionType) {
-                    saveState();
-                }
-
-                // Setzen Sie die Zustände für die nächste Interaktion zurück.
+                
                 currentPath = [];
                 interactionState.type = null;
 
-                // Pointer-Verwaltung.
                 activePointers.delete(e.pointerId);
                 if (canvasWrapper.hasPointerCapture(e.pointerId)) {
                     canvasWrapper.releasePointerCapture(e.pointerId);
@@ -1189,50 +1284,34 @@
 
                 if (activePointers.size === 0) {
                     isGesturing = false;
-                    // Wenn die letzte Aktion eine Bildinteraktion war, wechseln Sie jetzt das Werkzeug.
-                    // Dies geschieht NACHDEM alle Zustände bereinigt wurden.
-                    if (wasImageInteraction) {
-                        setActiveTool(previousTool || 'pen');
-                    }
                 }
 
-                // Zeichnen Sie die Leinwand neu, um den endgültigen Zustand anzuzeigen.
                 redrawAll();
                 updateCursorStyle(e);
             }
-
 
             function handleContextMenu(e) {
                 e.preventDefault();
                 const pos = getCanvasPoint(e);
 
-                // Fall 1: Lasso-Auswahl ist aktiv und der Rechtsklick ist darin
                 if (currentTool === 'lasso' && selectedPathIndices.length > 0 && isPointInSelectionBounds(pos)) {
                     showModal('Möchten Sie die ausgewählten Linien löschen?', () => {
-                        // Linien aus dem Array entfernen
                         paths = paths.filter((_, index) => !selectedPathIndices.includes(index));
-
-                        // Lasso-Status zurücksetzen
                         selectedPathIndices = [];
                         lassoPath = [];
-
-                        saveState();
+                        recordState();
                         redrawAll();
                     });
                     return;
                 }
 
-                // Fall 2: Ein Bild ist vorhanden und der Rechtsklick ist darin
                 if (imageState.img && isPointInRect(pos, imageState)) {
                     showModal('Möchten Sie das Bild löschen?', () => {
-                        imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
-                        imageToolBtn.classList.add('disabled');
-
+                        imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
                         if (currentTool === 'image') {
                             setActiveTool(previousTool || 'pen');
                         }
-
-                        saveState();
+                        recordState();
                         redrawAll();
                     });
                     return;
@@ -1246,7 +1325,9 @@
                 const y = (e.clientY - wrapperRect.top + canvasWrapper.scrollTop) / zoom;
                 return { x, y };
             };
+            
             function isPointInRect(point, rect) { return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height; }
+            
             function getHandleUnderCursor(pos) { const handles = getHandleRects(); for (const [key, rect] of Object.entries(handles)) { if (isPointInRect(pos, rect)) return key; } return null; }
 
             function updateCursorStyle(e) {
@@ -1305,8 +1386,8 @@
                     }
                 }
                 if (didErase) {
+                    recordState();
                     redrawAll();
-                    saveState();
                 }
             }
 
@@ -1386,8 +1467,6 @@
                 return isInside;
             }
 
-
-            // MODIFIZIERT: Speichert das vorherige Werkzeug
             function setActiveTool(tool) {
                 if (tool === 'image' && !imageState.img) return;
 
@@ -1406,12 +1485,23 @@
                 pixelEraserBtn.classList.toggle('active', tool === 'pixel-eraser');
                 strokeEraserBtn.classList.toggle('active', tool === 'stroke-eraser');
                 lassoToolBtn.classList.toggle('active', tool === 'lasso');
+                
+                lockAspectRatioBtn.classList.toggle('hidden', tool !== 'image');
+
                 updateCursorStyle();
                 redrawAll();
             }
 
             [penToolBtn, pixelEraserBtn, strokeEraserBtn, imageToolBtn, lassoToolBtn].forEach(btn => {
                 btn.addEventListener('click', () => setActiveTool(btn.id.replace('-tool', '')));
+            });
+
+            undoBtn.addEventListener('click', undo);
+
+            lockAspectRatioBtn.addEventListener('click', () => {
+                isAspectRatioLocked = !isAspectRatioLocked;
+                lockAspectRatioBtn.innerHTML = isAspectRatioLocked ? '<i data-lucide="lock"></i>' : '<i data-lucide="unlock"></i>';
+                lucide.createIcons();
             });
 
             widthSlider.addEventListener('input', (e) => {
@@ -1441,14 +1531,17 @@
             });
 
             function calculateContentBounds() {
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                if (paths.length === 0 && !imageState.img) return null;
+                 const currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
+                const currentImageState = (history[historyIndex] && history[historyIndex].imageState) || { img: null };
 
-                if (imageState.img) {
-                    minX = Math.min(minX, imageState.x); minY = Math.min(minY, imageState.y);
-                    maxX = Math.max(maxX, imageState.x + imageState.width); maxY = Math.max(maxY, imageState.y + imageState.height);
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                if (currentPaths.length === 0 && !currentImageState.img) return null;
+
+                if (currentImageState.img) {
+                    minX = Math.min(minX, currentImageState.x); minY = Math.min(minY, currentImageState.y);
+                    maxX = Math.max(maxX, currentImageState.x + currentImageState.width); maxY = Math.max(maxY, currentImageState.y + currentImageState.height);
                 }
-                paths.forEach(path => {
+                currentPaths.forEach(path => {
                     path.points.forEach(point => {
                         minX = Math.min(minX, point.x); minY = Math.min(minY, point.y);
                         maxX = Math.max(maxX, point.x); maxY = Math.max(maxY, point.y);
@@ -1514,12 +1607,11 @@
             document.getElementById('trash-can').addEventListener('click', () => {
                 showModal('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?', () => {
                     paths = [];
-                    imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
+                    imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
                     selectedPathIndices = [];
                     lassoPath = [];
-                    imageToolBtn.classList.add('disabled');
                     setActiveTool('pen');
-                    saveState();
+                    recordState();
                     redrawAll();
                     checkContentInView();
                 });
@@ -1560,7 +1652,7 @@
             });
 
             document.getElementById('export-drawing').addEventListener('click', () => {
-                saveState();
+                saveStateToLocalStorage();
                 const stateString = localStorage.getItem('drawingState') || '{}';
                 const blob = new Blob([stateString], { type: 'application/octet-stream' });
                 const url = URL.createObjectURL(blob);
@@ -1587,11 +1679,12 @@
                                 imageState = {
                                     img: img, src: event.target.result,
                                     x: (canvas.width - img.width) / 2, y: (canvas.height - img.height) / 2,
-                                    width: img.width, height: img.height
+                                    width: img.width, height: img.height,
+                                    aspectRatio: img.width / img.height
                                 };
                                 imageToolBtn.classList.remove('disabled');
                                 setActiveTool('image');
-                                saveState();
+                                recordState();
                                 redrawAll();
                                 checkContentInView();
                             };
@@ -1610,8 +1703,9 @@
                 else if (file.name.endsWith('.drawing')) {
                     const loadDrawing = () => {
                         reader.onload = (event) => {
-                            localStorage.setItem('drawingState', event.target.result);
-                            loadState();
+                           const stateToLoad = JSON.parse(event.target.result);
+                           localStorage.setItem('drawingState', JSON.stringify(stateToLoad));
+                           loadStateFromLocalStorage();
                         };
                         reader.readAsText(file);
                         e.target.value = '';
