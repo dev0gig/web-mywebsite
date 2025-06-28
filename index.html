@@ -242,6 +242,11 @@
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/readlater.svg" alt="ReadlateR Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">ReadlateR</span></a></li>
+            <!-- NEUER RSS READER TAB -->
+            <li><a href="tabs/rss/rss-reader.html" data-target="frame-rss"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="assets/icons/rss.svg" alt="RSS Reader Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">RSS Reader</span></a></li>
             <li><a href="aurimea/aurimea.html" data-target="frame-aurimea"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
@@ -301,6 +306,8 @@
             <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"></iframe>
             <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"></iframe>
             <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe"></iframe>
+            <!-- NEUES RSS READER IFRAME -->
+            <iframe id="frame-rss" src="tabs/rss/rss-reader.html" class="content-iframe"></iframe>
             <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe"></iframe>
             <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe"></iframe>
         </div>
@@ -337,6 +344,7 @@
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const contentLoader = document.getElementById('content-loader');
+            // Stelle sicher, dass diese Abfrage alle iframes im DOM erfasst.
             const contentFrames = document.querySelectorAll('.content-iframe');
 
             // --- Desktop Sidebar ---
@@ -378,13 +386,13 @@
             function handleNavLinkClick(e) {
                 const target = e.currentTarget;
 
-                // If the link is meant to open in a new tab, allow default behavior
+                // Wenn der Link in einem neuen Tab geöffnet werden soll, das Standardverhalten zulassen
                 if (target.target === '_blank') {
                     if (mobileMenu.classList.contains('open')) closeMobileMenu();
                     return;
                 }
 
-                // Prevent default for all other cases (iframe links, settings)
+                // Standardverhalten für alle anderen Fälle (iframe-Links, Einstellungen) verhindern
                 e.preventDefault();
 
                 if (target.closest('li').querySelector('#settings-btn')) {
@@ -393,25 +401,25 @@
                     const targetFrameId = target.dataset.target;
                     if (!targetFrameId) return;
 
-                    // Save the active tab to localStorage
+                    // Aktiven Tab im localStorage speichern
                     localStorage.setItem('lastActiveTab', targetFrameId);
 
                     const targetFrame = document.getElementById(targetFrameId);
 
                     if (targetFrame && !targetFrame.classList.contains('active')) {
-                        // Deactivate the currently active frame
+                        // Aktiven Frame deaktivieren
                         const activeFrame = document.querySelector('.content-iframe.active');
                         if (activeFrame) {
                             activeFrame.classList.remove('active');
                         }
-                        // Activate the new frame
+                        // Neuen Frame aktivieren
                         targetFrame.classList.add('active');
 
-                        // Update active state for all links
+                        // Aktiven Zustand für alle Links aktualisieren
                         document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => l.classList.remove('active'));
                         document.querySelectorAll(`a[data-target="${targetFrameId}"]`).forEach(l => l.classList.add('active'));
 
-                        // Update mobile header title
+                        // Titel im mobilen Header aktualisieren
                         const activeLinkText = target.querySelector('span')?.textContent || 'Appdrawer';
                         mobileHeaderTitle.textContent = activeLinkText;
                     }
@@ -437,7 +445,7 @@
                 newLink.addEventListener('click', handleNavLinkClick);
             });
 
-            // Clone and append settings button to mobile menu bottom
+            // Einstellungen-Button für das mobile Menü klonen und anhängen
             const desktopSettingsLi = document.querySelector('#sidebar ul:last-child li');
             if (desktopSettingsLi) {
                 const mobileSettingsLi = desktopSettingsLi.cloneNode(true);
@@ -447,7 +455,6 @@
                     mobileSettingsTextSpan.classList.remove('sidebar-text');
                     mobileSettingsTextSpan.classList.add('ml-3');
                 }
-                // Append to mobileNavLinksContainer instead of mobile-bottom-nav-links
                 mobileNavLinksContainer.appendChild(mobileSettingsLi);
                 mobileSettingsBtn.addEventListener('click', handleNavLinkClick);
             }
@@ -479,7 +486,7 @@
                         if (frame.contentWindow) {
                             frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
                         }
-                    } catch (e) { /* ignore cross-origin errors */ }
+                    } catch (e) { /* cross-origin errors ignorieren */ }
                 });
             }
             function handleThemeChange(event) {
@@ -496,6 +503,7 @@
 
             // --- Iframe Loading ---
             let loadedFrames = 0;
+            // Wichtig: totalFrames sollte die korrekte Anzahl der initial vorhandenen iframes widerspiegeln.
             const totalFrames = contentFrames.length;
 
             if (totalFrames > 0) {
@@ -508,7 +516,7 @@
                             if (frame.contentWindow) {
                                 frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
                             }
-                        } catch (e) { /* ignore */ }
+                        } catch (e) { /* ignorieren */ }
 
                         if (loadedFrames >= totalFrames) {
                             contentLoader.classList.add('hidden');

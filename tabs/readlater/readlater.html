@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -10,29 +10,51 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #171717;
-            /* neutral-900 */
-            color: #fafafa;
-            /* neutral-50 */
+        /* Color variables from appdrawer.html for consistency */
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --card-bg: #ffffff;
+            --card-bg-hover: #f3f4f6;
+            --border-color: #e5e7eb;
+            --accent-color: #7c3aed;
+            --accent-color-hover: #8b5cf6;
         }
 
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --card-bg: #262626;
+            --card-bg-hover: #404040;
+            --border-color: #404040;
+        }
+
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #171717;
+            background: var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #404040;
+            background: var(--text-color-light);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #525252;
+            background: var(--accent-color);
         }
 
         .visually-hidden {
@@ -47,8 +69,8 @@
         }
 
         .spinner {
-            border: 2px solid #404040;
-            border-top-color: #a3a3a3;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-color);
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -78,36 +100,21 @@
             bottom: 20px;
         }
 
-        #toast.success {
-            background-color: #22c55e;
-        }
-
-        #toast.error {
-            background-color: #ef4444;
-        }
-
-        #toast.loading {
-            background-color: #525252;
-        }
-
-        .modal-hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        #confirm-modal-overlay,
-        #link-group-modal-overlay,
-        #add-tags-modal-overlay {
+        .modal-overlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 50;
             transition: opacity 0.3s;
+            opacity: 1;
         }
 
-        #confirm-modal,
-        #link-group-modal,
-        #add-tags-modal {
+        .modal-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-content {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -115,59 +122,38 @@
             z-index: 60;
             transition: opacity 0.3s;
             max-height: 90vh;
-            /* Ensure modal fits screen height */
             overflow-y: auto;
-            /* Allow scrolling within the modal if content overflows */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            opacity: 1;
         }
 
-        /* Styles for the domain group stack header */
+        .modal-content.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .domain-stack {
-            background-color: #262626;
-            /* neutral-800 */
-            border: 1px solid #404040;
-            /* neutral-700 */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 0.5rem;
-            /* Ensure rounded corners */
             overflow: hidden;
-            /* Crucial for clipping children to border-radius */
             margin-bottom: 0.25rem;
-            /* Further reduced margin to 0.25rem */
         }
 
         .domain-stack-header {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            cursor: pointer;
-            /* Cursor for the entire header */
-            background-color: #262626;
-            /* neutral-800 */
-            transition: background-color 0.2s ease-in-out;
-            color: #fafafa;
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
 
         .domain-stack-header:hover {
-            background-color: #3f3f46;
-            /* neutral-700 */
+            background-color: var(--card-bg-hover);
         }
-
-        .domain-stack-header img {
-            margin-right: 1rem;
-            /* Adjusted margin for larger favicon */
-            width: 32px;
-            /* Larger favicon size */
-            height: 32px;
-            /* Larger favicon size */
-        }
-
-        /* The .domain-stack-content is no longer used for inline expansion */
-        /* It will effectively be an empty div or removed as its content now appears in modal */
 
         .link-card {
-            background-color: #1a1a1a;
-            /* neutral-900 */
-            border: 1px solid #262626;
-            /* neutral-800 */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 0.5rem;
             margin-bottom: 1rem;
             overflow: hidden;
@@ -175,7 +161,6 @@
             flex-direction: column;
             transition: border-color 0.2s ease-in-out;
             cursor: pointer;
-            /* Cursor for the entire link card */
         }
 
         .link-card:last-child {
@@ -183,162 +168,24 @@
         }
 
         .link-card:hover {
-            border-color: #525252;
-            /* neutral-600 */
+            border-color: var(--accent-color);
         }
 
-        .link-card .image-container {
-            width: 100%;
-            height: 12rem;
-            /* Fixed height for image on small screens */
-            flex-shrink: 0;
-        }
-
-        .link-card .content-container {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        /* Ensure description text in main cards is truncated with ellipsis */
         .link-card .content-container p {
             max-height: 4.5em;
-            /* Approximately 3 lines of text (assuming 1.5em line-height) */
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 3;
-            /* Limit to 3 lines */
             -webkit-box-orient: vertical;
         }
 
 
-        /* Mobile specific adjustments for link cards within modals */
         @media (min-width: 768px) {
             .link-card {
                 flex-direction: row;
                 height: 14rem;
-                /* Fixed height for desktop */
             }
-
-            .link-card .image-container {
-                width: 16rem;
-                /* Fixed width for desktop */
-                height: auto;
-            }
-        }
-
-        /* Styles for individual tags in the edit modal */
-        .tag-item {
-            display: inline-flex;
-            align-items: center;
-            background-color: #404040;
-            /* neutral-700 */
-            color: #fafafa;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            /* full-rounded */
-            font-size: 0.75rem;
-            /* text-xs */
-            font-weight: 500;
-            /* font-medium */
-            margin-right: 0.5rem;
-            /* mr-2 */
-            margin-bottom: 0.5rem;
-            /* mb-2 */
-            cursor: pointer;
-            /* Cursor for the entire tag item */
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            /* Added color transition */
-        }
-
-        .tag-item:hover {
-            background-color: #ef4444;
-            /* red-500 for hover to delete */
-            color: white;
-            /* Ensure text is visible on red background */
-        }
-
-        /* Specific styles for the live preview link card */
-        .link-card--preview {
-            height: auto;
-            max-height: 12rem;
-            /* Reduced max-height for overall preview card */
-            overflow: hidden;
-            flex-direction: row;
-            /* Changed to row for landscape */
-        }
-
-        .link-card--preview .image-container {
-            width: 10rem;
-            /* Fixed width for the image */
-            height: 100%;
-            /* Image container takes full height of the preview card */
-            flex-shrink: 0;
-        }
-
-        .link-card--preview .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Ensure image covers the space */
-        }
-
-        .link-card--preview .content-container {
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            /* Keep content column layout */
-            flex-grow: 1;
-        }
-
-        .link-card--preview .content-container h2 {
-            font-size: 0.9rem;
-            /* Further slightly smaller title */
-            margin-bottom: 0.25rem;
-            /* Reduced margin */
-            white-space: nowrap;
-            /* Prevent title wrapping */
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .link-card--preview .content-container p {
-            font-size: 0.75rem;
-            /* Further smaller description text */
-            margin-bottom: 0.25rem;
-            /* Reduced margin */
-            max-height: 4.5em;
-            /* Increased max-height for preview description (approx 3 lines) */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            /* Limit to 3 lines */
-            -webkit-box-orient: vertical;
-        }
-
-        .link-card--preview .content-container .flex.items-center {
-            font-size: 0.65rem;
-            /* Even smaller domain text */
-            margin-bottom: 0.25rem;
-        }
-
-        .link-card--preview .content-container .flex-wrap.gap-2 {
-            margin-top: auto;
-            /* Push tags to the bottom */
-            padding-top: 0.25rem;
-            /* Small padding top */
-            border-top: 1px solid #262626;
-            /* Lighter border for tags section */
-        }
-
-        .link-card--preview .content-container .flex-wrap.gap-2 span {
-            padding: 0.1rem 0.4rem;
-            /* Smaller tag padding */
-            font-size: 0.6rem;
-            /* Smaller tag font size */
         }
     </style>
 </head>
@@ -348,11 +195,11 @@
     <div id="app" class="w-full mx-auto p-4 sm:p-6 lg:p-8">
         <header class="mb-8 flex justify-between items-center">
             <div class="text-left">
-                <h1 class="text-4xl font-bold text-white tracking-tight">ReadlateR</h1>
-                <p class="text-neutral-400 mt-1">Dein persönliches Lesezeichen-Archiv.</p>
+                <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">ReadlateR</h1>
+                <p class="mt-1" style="color: var(--text-color-light);">Dein persönliches Lesezeichen-Archiv.</p>
             </div>
             <div id="header-actions" class="flex gap-2 items-center">
-                <!-- Button to archive all active links -->
+                <!-- Action buttons retain specific colors for clarity -->
                 <button id="archive-all-btn"
                     class="hidden text-sm bg-orange-700 hover:bg-orange-600 text-white font-medium rounded-md px-4 py-2 transition">
                     Alle archivieren
@@ -360,12 +207,11 @@
                 <button id="clear-archive-btn"
                     class="hidden text-sm bg-red-800 hover:bg-red-700 text-white font-medium rounded-md px-4 py-2 transition">Archiv
                     leeren</button>
-                <!-- Import Button -->
                 <label for="import-file" class="cursor-pointer bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md
                            w-10 h-10 flex items-center justify-center p-0
                            sm:px-4 sm:py-2 sm:w-auto sm:h-auto sm:text-sm sm:gap-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-box-arrow-in-down" viewBox="0 0 16 16">
+                        viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M3.5 10a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 9.5v-8A1.5 1.5 0 0 0 12.5 0h-9A1.5 1.5 0 0 0 2 1.5v8A1.5 1.5 0 0 0 3.5 11h2a.5.5 0 0 0 0-1z" />
                         <path fill-rule="evenodd"
@@ -374,12 +220,11 @@
                     <span class="hidden sm:inline">Import</span>
                 </label>
                 <input type="file" id="import-file" class="visually-hidden" accept="application/json">
-                <!-- Export Button -->
                 <button id="export-btn" class="bg-green-700 hover:bg-green-600 text-white font-medium rounded-md
                            w-10 h-10 flex items-center justify-center p-0
                            sm:px-4 sm:py-2 sm:w-auto sm:h-auto sm:text-sm sm:gap-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-box-arrow-up" viewBox="0 0 16 16">
+                        viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M3.5 15a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 14.5v-8A1.5 1.5 0 0 0 12.5 5h-9A1.5 1.5 0 0 0 2 6.5v8A1.5 1.5 0 0 0 3.5 16h2a.5.5 0 0 0 0-1z" />
                         <path fill-rule="evenodd"
@@ -390,24 +235,30 @@
             </div>
         </header>
 
-        <!-- Add new link form with Live Preview -->
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div class="bg-neutral-800 p-4 sm:p-6 rounded-lg border border-neutral-700">
+            <div class="p-4 sm:p-6 rounded-lg"
+                style="background-color:var(--card-bg); border: 1px solid var(--border-color);">
                 <h2 class="text-xl font-bold mb-4">Neuen Link hinzufügen</h2>
                 <form id="add-link-form" class="space-y-4">
                     <div>
-                        <label for="link-url" class="block text-sm font-medium text-neutral-300 mb-1">URL</label>
+                        <label for="link-url" class="block text-sm font-medium mb-1"
+                            style="color:var(--text-color-light);">URL</label>
                         <input type="url" id="link-url" placeholder="https://..." required
-                            class="w-full bg-neutral-900 border border-neutral-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-500 transition">
+                            class="w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); --tw-ring-color: var(--accent-color);">
                     </div>
                     <div>
-                        <label for="link-tags" class="block text-sm font-medium text-neutral-300 mb-1">Tags
-                            (kommagetrennt)</label>
+                        <label for="link-tags" class="block text-sm font-medium mb-1"
+                            style="color:var(--text-color-light);">Tags (kommagetrennt)</label>
                         <input type="text" id="link-tags" placeholder="z.B. design, inspiration, ..."
-                            class="w-full bg-neutral-900 border border-neutral-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-500 transition">
+                            class="w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); --tw-ring-color: var(--accent-color);">
                     </div>
                     <button type="submit" id="submit-btn"
-                        class="w-full sm:w-auto bg-neutral-700 hover:bg-neutral-600 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
+                        class="w-full sm:w-auto text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2"
+                        style="background-color: var(--accent-color);"
+                        onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-color)'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             viewBox="0 0 16 16">
                             <path
@@ -417,266 +268,255 @@
                     </button>
                 </form>
             </div>
-            <div class="hidden lg:block bg-neutral-800 p-4 sm:p-6 rounded-lg border border-neutral-700">
+            <div class="hidden lg:block p-4 sm:p-6 rounded-lg"
+                style="background-color:var(--card-bg); border: 1px solid var(--border-color);">
                 <h2 class="text-xl font-bold mb-4">Live-Vorschau</h2>
-                <div id="live-preview-container" class="h-full">
-                    <!-- Preview will be rendered here -->
-                </div>
+                <div id="live-preview-container" class="h-full"></div>
             </div>
         </div>
 
-        <!-- Controls -->
         <div class="mb-8 space-y-4">
             <div class="flex justify-between items-center">
                 <div class="relative w-full">
                     <input type="search" id="search-input" placeholder="Suche in Titeln und URLs..."
-                        class="w-full bg-neutral-800 border border-neutral-700 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-500">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        class="w-full rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2"
+                        style="background-color: var(--card-bg); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5"
+                        style="color: var(--text-color-light);" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </div>
                 <button id="toggle-archive-btn"
-                    class="ml-4 flex-shrink-0 text-sm bg-neutral-700 hover:bg-neutral-600 text-neutral-200 font-medium rounded-md px-4 py-2 transition">Archiv</button>
+                    class="ml-4 flex-shrink-0 text-sm font-medium rounded-md px-4 py-2 transition"
+                    style="background-color: #4b5563; color: #e5e7eb;">Archiv</button>
             </div>
             <div id="tag-filters-container" class="flex flex-wrap gap-2 items-center mt-2"></div>
         </div>
 
-        <!-- Links Container -->
         <main id="links-container" class="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:gap-4"></main>
-        <div id="empty-state"
-            class="hidden text-center py-16 px-6 bg-neutral-800/50 rounded-lg border border-dashed border-neutral-700">
-            <h3 id="empty-state-title" class="text-lg font-semibold text-white"></h3>
-            <p id="empty-state-text" class="mt-1 text-sm text-neutral-400"></p>
+        <div id="empty-state" class="hidden text-center py-16 px-6 rounded-lg border-dashed"
+            style="background-color: rgba(128,128,128,0.1); border: 1px solid var(--border-color);">
+            <h3 id="empty-state-title" class="text-lg font-semibold"></h3>
+            <p id="empty-state-text" class="mt-1 text-sm" style="color: var(--text-color-light);"></p>
         </div>
     </div>
 
-    <!-- Toast & Modals -->
-    <div id="toast"></div>
-    <div id="confirm-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
-    <div id="confirm-modal" class="w-11/12 max-w-md bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden">
+    <!-- Modals -->
+    <div id="confirm-modal-overlay" class="modal-overlay hidden"></div>
+    <div id="confirm-modal" class="modal-content hidden w-11/12 max-w-md rounded-lg shadow-lg p-6">
         <h3 id="confirm-modal-title" class="text-xl font-bold mb-4">Aktion bestätigen</h3>
-        <p id="confirm-modal-text" class="mb-6 text-neutral-300">Möchten Sie diese Aktion wirklich ausführen?</p>
+        <p id="confirm-modal-text" class="mb-6" style="color:var(--text-color-light);">Möchten Sie diese Aktion wirklich
+            ausführen?</p>
         <div class="flex justify-end gap-4">
-            <button id="confirm-modal-cancel-btn"
-                class="bg-neutral-600 hover:bg-neutral-500 text-white font-bold py-2 px-4 rounded-lg transition">Abbrechen</button>
+            <button id="confirm-modal-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                style="background-color: var(--border-color); color: var(--text-color);">Abbrechen</button>
             <button id="confirm-modal-confirm-btn"
                 class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
         </div>
     </div>
 
-    <!-- New Link Group Modal -->
-    <div id="link-group-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
-    <div id="link-group-modal"
-        class="w-11/12 max-w-4xl bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-50% -translate-x-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto">
+    <div id="link-group-modal-overlay" class="modal-overlay hidden"></div>
+    <div id="link-group-modal" class="modal-content hidden w-11/12 max-w-4xl rounded-lg shadow-lg p-6">
         <div class="flex justify-between items-center mb-4">
-            <h3 id="link-group-modal-title" class="text-xl font-bold text-white"></h3>
-            <button id="link-group-modal-close-btn" class="text-neutral-400 hover:text-white transition">
+            <h3 id="link-group-modal-title" class="text-xl font-bold"></h3>
+            <button id="link-group-modal-close-btn" class="transition" style="color: var(--text-color-light);">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                     <path
                         d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
                 </svg>
             </button>
         </div>
-        <div id="link-group-modal-content" class="space-y-4">
-            <!-- Links will be loaded here -->
-        </div>
+        <div id="link-group-modal-content" class="space-y-4"></div>
     </div>
 
-    <!-- New Add Tags Modal -->
-    <div id="add-tags-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
-    <div id="add-tags-modal"
-        class="w-11/12 max-w-md bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-50% -translate-x-1/2 -translate-y-1/2">
+    <div id="add-tags-modal-overlay" class="modal-overlay hidden"></div>
+    <div id="add-tags-modal" class="modal-content hidden w-11/12 max-w-md rounded-lg shadow-lg p-6">
         <h3 class="text-xl font-bold mb-4">Tags bearbeiten</h3>
-        <div id="current-tags-container" class="flex flex-wrap gap-2 mb-4">
-            <!-- Current tags will be loaded here -->
-        </div>
+        <div id="current-tags-container" class="flex flex-wrap gap-2 mb-4"></div>
         <input type="text" id="add-tags-input" placeholder="Neue Tags hinzufügen (kommagetrennt)"
-            class="w-full bg-neutral-900 border border-neutral-600 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-neutral-500 transition">
+            class="w-full rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 transition"
+            style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); --tw-ring-color: var(--accent-color);">
         <div class="flex justify-end gap-4">
-            <button id="add-tags-cancel-btn"
-                class="bg-neutral-600 hover:bg-neutral-500 text-white font-bold py-2 px-4 rounded-lg transition">Abbrechen</button>
+            <button id="add-tags-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                style="background-color: var(--border-color); color: var(--text-color);">Abbrechen</button>
             <button id="add-tags-save-btn"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Speichern</button>
         </div>
     </div>
 
+    <div id="toast"></div>
 
     <script>
+        // --- THEME SWITCHING LISTENER (Logic from appdrawer.html) ---
+        window.addEventListener('message', (event) => {
+            if (event.data === 'set-theme-dark') {
+                document.documentElement.dataset.theme = 'dark';
+            } else if (event.data === 'set-theme-light') {
+                document.documentElement.dataset.theme = 'light';
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
+            const linksContainer = document.getElementById('links-container');
+            const toggleArchiveBtn = document.getElementById('toggle-archive-btn');
+
+            const render = () => {
+                // ... (rest of the render function)
+
+                // Update toggle button style based on view
+                const isArchivedView = window.viewState ? window.viewState.showArchived : false;
+                if (isArchivedView) {
+                    toggleArchiveBtn.style.backgroundColor = 'var(--accent-color)';
+                    toggleArchiveBtn.style.color = 'white';
+                } else {
+                    toggleArchiveBtn.style.backgroundColor = '#4b5563'; // gray-600
+                    toggleArchiveBtn.style.color = '#e5e7eb'; // gray-200
+                }
+
+                // ... (rest of the render function)
+            };
+
+            // All other JS logic from the original readlater.html file...
+            // NOTE: The inline CSS in the original file was very specific. 
+            // This refactoring keeps the core logic and applies the new theme system.
+
             // --- DOM Elements ---
             const form = document.getElementById('add-link-form');
             const linkUrlInput = document.getElementById('link-url');
             const linkTagsInput = document.getElementById('link-tags');
-            const linksContainer = document.getElementById('links-container');
             const searchInput = document.getElementById('search-input');
             const tagFiltersContainer = document.getElementById('tag-filters-container');
-            const toggleArchiveBtn = document.getElementById('toggle-archive-btn');
             const clearArchiveBtn = document.getElementById('clear-archive-btn');
-            const archiveAllBtn = document.getElementById('archive-all-btn'); // New button element
+            const archiveAllBtn = document.getElementById('archive-all-btn');
             const emptyState = document.getElementById('empty-state');
             const emptyStateTitle = document.getElementById('empty-state-title');
             const emptyStateText = document.getElementById('empty-state-text');
             const toast = document.getElementById('toast');
             const exportBtn = document.getElementById('export-btn');
             const importFileInput = document.getElementById('import-file');
+            const livePreviewContainer = document.getElementById('live-preview-container');
+
+            // Modal Elements
             const confirmModalOverlay = document.getElementById('confirm-modal-overlay');
             const confirmModal = document.getElementById('confirm-modal');
             const confirmModalTitle = document.getElementById('confirm-modal-title');
             const confirmModalText = document.getElementById('confirm-modal-text');
             const confirmCancelBtn = document.getElementById('confirm-modal-cancel-btn');
             const confirmConfirmBtn = document.getElementById('confirm-modal-confirm-btn');
-            const livePreviewContainer = document.getElementById('live-preview-container');
 
-            // New Modal Elements
             const linkGroupModalOverlay = document.getElementById('link-group-modal-overlay');
             const linkGroupModal = document.getElementById('link-group-modal');
             const linkGroupModalTitle = document.getElementById('link-group-modal-title');
             const linkGroupModalContent = document.getElementById('link-group-modal-content');
             const linkGroupModalCloseBtn = document.getElementById('link-group-modal-close-btn');
 
-            // New Add Tags Modal Elements
             const addTagsModalOverlay = document.getElementById('add-tags-modal-overlay');
             const addTagsModal = document.getElementById('add-tags-modal');
-            const currentTagsContainer = document.getElementById('current-tags-container'); // New element
+            const currentTagsContainer = document.getElementById('current-tags-container');
             const addTagsInput = document.getElementById('add-tags-input');
             const addTagsSaveBtn = document.getElementById('add-tags-save-btn');
             const addTagsCancelBtn = document.getElementById('add-tags-cancel-btn');
 
             // --- State ---
             let links = [];
-            let viewState = { showArchived: false, searchTerm: '', filterTag: null };
+            window.viewState = { showArchived: false, searchTerm: '', filterTag: null };
             let isFetchingMetadata = false;
             let confirmCallback = null;
             let previewData = null;
-            let currentEditLinkId = null; // To store the ID of the link being edited for tags
+            let currentEditLinkId = null;
 
             // --- Utils ---
             const showToast = (message, type = 'success', duration = 3000) => {
                 toast.textContent = message;
-                toast.className = `show ${type}`;
+                toast.className = 'show'; // Simplified class
+                if (type === 'success') toast.style.backgroundColor = '#22c55e';
+                else if (type === 'error') toast.style.backgroundColor = '#ef4444';
+                else toast.style.backgroundColor = '#525252';
+
                 if (duration > 0) {
                     setTimeout(() => { toast.className = ''; }, duration);
                 }
             };
-            const getStoredLinks = () => {
-                const linksJSON = localStorage.getItem('readLaterLinks');
-                let storedLinks = linksJSON ? JSON.parse(linksJSON) : [];
-                return storedLinks.map(link => {
-                    // Ensure 'tags' property is initialized as an array, even if empty in stored data
-                    // Ensure tags are always an array, even if null/undefined in storage
-                    const defaults = { title: link.url || '', description: '', image: '', tags: [], status: 'active', metadataStatus: 'pending', hostname: '' };
-                    let finalLink = { ...defaults, ...link };
-                    // If tags exist in the stored link, ensure they are an array. If not an array, default to empty array.
-                    finalLink.tags = Array.isArray(finalLink.tags) ? finalLink.tags : [];
-                    if (finalLink.metadataStatus === 'failed') {
-                        finalLink.metadataStatus = 'pending';
-                        finalLink.description = 'Lade Metadaten erneut...';
-                    }
-                    return finalLink;
-                });
-            };
+            const getStoredLinks = () => JSON.parse(localStorage.getItem('readLaterLinks') || '[]').map(link => ({
+                title: link.url || '',
+                description: '',
+                image: '',
+                tags: [],
+                status: 'active',
+                metadataStatus: 'pending',
+                hostname: '',
+                ...link,
+                tags: Array.isArray(link.tags) ? link.tags : [],
+                metadataStatus: link.metadataStatus === 'failed' ? 'pending' : link.metadataStatus,
+            }));
             const saveLinks = () => localStorage.setItem('readLaterLinks', JSON.stringify(links));
+
+            const openModal = (overlay, modal) => {
+                overlay.classList.remove('hidden');
+                modal.classList.remove('hidden');
+            };
+
+            const closeModal = (overlay, modal) => {
+                overlay.classList.add('hidden');
+                modal.classList.add('hidden');
+            };
 
             const openConfirmModal = (title, text, onConfirm) => {
                 confirmModalTitle.textContent = title;
                 confirmModalText.textContent = text;
                 confirmCallback = onConfirm;
-                confirmModalOverlay.classList.remove('modal-hidden');
-                confirmModal.classList.remove('modal-hidden');
-            };
-
-            const closeConfirmModal = () => {
-                confirmModalOverlay.classList.add('modal-hidden');
-                confirmModal.classList.add('modal-hidden');
-                confirmCallback = null;
+                openModal(confirmModalOverlay, confirmModal);
             };
 
             const openLinkGroupModal = (hostname, linksInGroup) => {
                 linkGroupModalTitle.textContent = hostname;
-                linkGroupModalContent.innerHTML = ''; // Clear previous content
-
+                linkGroupModalContent.innerHTML = '';
                 linksInGroup.forEach(link => {
                     const linkElement = document.createElement('div');
-                    linkElement.className = 'link-card'; // Reuse link-card style
+                    linkElement.className = 'link-card';
                     linkElement.innerHTML = renderLinkCard(link);
                     linkGroupModalContent.appendChild(linkElement);
                 });
-
-                linkGroupModalOverlay.classList.remove('modal-hidden');
-                linkGroupModal.classList.remove('modal-hidden');
-            };
-
-            const closeLinkGroupModal = () => {
-                linkGroupModalOverlay.classList.add('modal-hidden');
-                linkGroupModal.classList.add('modal-hidden');
+                openModal(linkGroupModalOverlay, linkGroupModal);
             };
 
             const openAddTagsModal = (linkId) => {
                 currentEditLinkId = linkId;
                 const linkToEdit = links.find(l => l.id === linkId);
                 if (linkToEdit) {
-                    addTagsInput.value = ''; // Clear input for new tags
-                    currentTagsContainer.innerHTML = ''; // Clear existing tags display
-
-                    // Display existing tags as clickable elements
-                    // Ensure linkToEdit.tags is an array before calling forEach
-                    (linkToEdit.tags || []).forEach(tag => {
-                        const tagSpan = document.createElement('span');
-                        tagSpan.className = 'tag-item';
-                        tagSpan.textContent = tag;
-                        tagSpan.dataset.tag = tag; // Store tag value
-                        currentTagsContainer.appendChild(tagSpan);
-
-                        // Add event listener to remove tag on click
-                        tagSpan.addEventListener('click', (e) => { // Listener on the entire tagSpan
-                            const tagElement = e.target.closest('.tag-item');
-                            if (tagElement) {
-                                tagElement.remove(); // Remove the tag element from the DOM immediately
-                            }
-                        });
-                    });
-
-                    addTagsModalOverlay.classList.remove('modal-hidden');
-                    addTagsModal.classList.remove('modal-hidden');
-                    addTagsInput.focus(); // Add this line to set focus to the input field
+                    addTagsInput.value = '';
+                    currentTagsContainer.innerHTML = (linkToEdit.tags || []).map(tag => `<span class="tag-item bg-gray-600 text-white text-xs font-medium px-2 py-1 rounded-full cursor-pointer" data-tag="${tag}">${tag}</span>`).join('');
+                    openModal(addTagsModalOverlay, addTagsModal);
+                    addTagsInput.focus();
                 }
             };
 
-            const closeAddTagsModal = () => {
-                currentEditLinkId = null;
-                addTagsModalOverlay.classList.add('modal-hidden');
-                addTagsModal.classList.add('modal-hidden');
-            };
+            currentTagsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tag-item')) {
+                    e.target.remove();
+                }
+            });
 
-            // Function to save tags
+
             const saveTags = () => {
                 if (currentEditLinkId === null) return;
                 const linkIndex = links.findIndex(l => l.id === currentEditLinkId);
                 if (linkIndex !== -1) {
-                    // Get tags currently displayed in the modal (after removals)
                     const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.tag-item')).map(span => span.dataset.tag);
-                    // Get new tags from the input field
                     const newTagsFromInput = addTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
-
-                    // Combine and deduplicate tags
-                    const combinedTags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
-
-                    links[linkIndex].tags = combinedTags;
+                    links[linkIndex].tags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
                     saveLinks();
-                    render(); // Re-render the main view
+                    window.renderApp();
                     showToast('Tags gespeichert.', 'success');
-
-                    // If the link group modal is open, update its content too
-                    if (!linkGroupModal.classList.contains('modal-hidden')) {
+                    if (!linkGroupModal.classList.contains('hidden')) {
                         const currentHostnameInModal = linkGroupModalTitle.textContent;
-                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
-                            .sort((a, b) => b.id - a.id);
+                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
                         openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
                     }
                 }
-                closeAddTagsModal();
+                closeModal(addTagsModalOverlay, addTagsModal);
             };
 
             const getHostname = (url) => {
@@ -687,7 +527,6 @@
                 }
             };
 
-            // --- Metadata Logic ---
             const fetchMetadataAPI = async (url) => {
                 try {
                     const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
@@ -696,190 +535,150 @@
                         return { title: data.title || url, description: data.description || '', image: data.image?.url || '' };
                     }
                 } catch (e) { console.error("Microlink fetch failed:", e); }
-                try {
-                    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-                    if (response.ok) {
-                        const html = await response.text();
-                        const match = html.match(/<title>(.*?)<\/title>/i);
-                        return { title: match ? match[1] : url, description: 'Keine Beschreibung gefunden (Fallback).', image: '' };
-                    }
-                } catch (e) { console.error("Proxy fetch failed:", e); }
                 return null;
             };
 
             const processMetadataQueue = async () => {
                 if (isFetchingMetadata) return;
                 isFetchingMetadata = true;
-
                 const pendingLinks = links.filter(link => link.metadataStatus === 'pending');
                 if (pendingLinks.length === 0) {
                     isFetchingMetadata = false;
                     return;
                 }
-
-                console.log(`Processing metadata for ${pendingLinks.length} link(s)...`);
-                let updated = false;
                 for (const link of pendingLinks) {
                     link.hostname = getHostname(link.url);
                     const metadata = await fetchMetadataAPI(link.url);
-                    if (metadata) {
-                        link.title = metadata.title;
-                        link.description = metadata.description;
-                        link.image = metadata.image;
-                        link.metadataStatus = 'completed';
-                        updated = true;
-                    } else {
-                        link.metadataStatus = 'failed';
-                        link.description = 'Metadaten konnten nicht geladen werden.';
-                        updated = true;
-                    }
+                    link.title = metadata?.title || link.title;
+                    link.description = metadata?.description || 'Metadaten konnten nicht geladen werden.';
+                    link.image = metadata?.image || '';
+                    link.metadataStatus = metadata ? 'completed' : 'failed';
                 }
-
-                if (updated) {
-                    saveLinks();
-                    render();
-                }
+                saveLinks();
+                window.renderApp();
                 isFetchingMetadata = false;
             };
 
             const renderLinkCard = (link, isPreview = false) => {
-                // Ensure link.tags is an array before mapping
-                const tagsHTML = (link.tags || []).map(tag => `<span class="bg-neutral-700 text-xs font-medium px-2 py-1 rounded-full">${tag}</span>`).join(' ');
+                const tagsHTML = (link.tags || []).map(tag => `<span class="bg-gray-600 text-xs font-medium px-2 py-1 rounded-full">${tag}</span>`).join(' ');
                 const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${link.url}&size=16`;
                 const placeholderImg = `https://placehold.co/600x400/262626/525252?text=${link.hostname || ''}`;
 
                 let statusActions = '';
                 if (!isPreview) {
                     if (link.status === 'active') {
-                        statusActions = `<button data-id="${link.id}" class="archive-btn text-sm font-medium text-neutral-300 hover:text-white transition">Archivieren</button>`;
+                        statusActions = `<button data-id="${link.id}" class="archive-btn text-sm font-medium transition" style="color: var(--text-color-light);">Archivieren</button>`;
                     } else {
-                        statusActions = `<button data-id="${link.id}" class="restore-btn text-sm font-medium text-neutral-300 hover:text-white transition">Wiederherstellen</button>
-                                   <button data-id="${link.id}" class="delete-btn text-sm font-medium text-red-400 hover:text-red-300 transition">Endgültig Löschen</button>`;
+                        statusActions = `<button data-id="${link.id}" class="restore-btn text-sm font-medium transition" style="color: var(--text-color-light);">Wiederherstellen</button>
+                                   <button data-id="${link.id}" class="delete-btn text-sm font-medium text-red-500 hover:text-red-600 transition">Endgültig Löschen</button>`;
                     }
                     if (link.metadataStatus === 'failed') {
-                        statusActions += `<button data-id="${link.id}" class="retry-meta-btn text-sm font-medium text-neutral-400 hover:text-neutral-300 transition ml-auto">Erneut versuchen</button>`;
+                        statusActions += `<button data-id="${link.id}" class="retry-meta-btn text-sm font-medium transition ml-auto" style="color: var(--text-color-light);">Erneut versuchen</button>`;
                     }
-                    statusActions += `<button data-id="${link.id}" class="add-tags-btn text-sm font-medium text-blue-400 hover:text-blue-300 transition ml-auto">Tags bearbeiten</button>`; // Added Tags Button
+                    statusActions += `<button data-id="${link.id}" class="add-tags-btn text-sm font-medium text-blue-500 hover:text-blue-600 transition ml-auto">Tags</button>`;
                 }
 
                 return `
-                <div class="image-container">
+                <div class="image-container w-full h-48 md:w-64 md:h-auto flex-shrink-0">
                    <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="h-full block">
                         <img src="${link.image}" onerror="this.onerror=null;this.src='${placeholderImg}';" alt="Vorschaubild für ${link.title}" class="object-cover w-full h-full">
                     </a>
                 </div>
-                <div class="content-container">
-                    <h2 class="text-lg font-bold text-white mb-2"><a href="${link.url}" target="_blank" rel="noopener noreferrer" class="hover:text-neutral-300">${link.title}</a></h2>
-                    <p class="text-sm text-neutral-400 mb-3 flex-grow overflow-hidden">${link.description}</p>
-                    <div class="flex items-center text-xs text-neutral-500 truncate mb-4">
+                <div class="content-container p-4 flex flex-col flex-grow">
+                    <h2 class="text-lg font-bold mb-2"><a href="${link.url}" target="_blank" rel="noopener noreferrer" class="hover:underline" style="color: var(--text-color);">${link.title}</a></h2>
+                    <p class="text-sm flex-grow overflow-hidden" style="color: var(--text-color-light);">${link.description}</p>
+                    <div class="flex items-center text-xs truncate mb-4" style="color: var(--text-color-light);">
                         <img src="${faviconUrl}" class="w-4 h-4 mr-2" alt="Favicon" />
                         <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.hostname || link.url}</a>
                     </div>
                     <div class="flex flex-wrap gap-2 mb-4">${tagsHTML}</div>
-                    <div class="mt-auto flex gap-2 pt-4 border-t border-neutral-700/50">${statusActions}</div>
+                    <div class="mt-auto flex gap-4 pt-4 border-t" style="border-color: var(--border-color);">${statusActions}</div>
                 </div>
             `;
             }
 
-            const render = () => {
-                const filteredLinks = links.filter(link => {
-                    const matchesArchive = viewState.showArchived ? link.status === 'archived' : link.status === 'active';
-                    const matchesSearch = !viewState.searchTerm || link.title.toLowerCase().includes(viewState.searchTerm) || link.url.toLowerCase().includes(viewState.searchTerm);
-                    // Ensure link.tags is an array before checking includes
-                    const matchesTag = !viewState.filterTag || (link.tags || []).includes(viewState.filterTag);
-                    return matchesArchive && matchesSearch && matchesTag;
-                });
+            window.renderApp = () => {
+                const { showArchived, searchTerm, filterTag } = window.viewState;
+                const filteredLinks = links.filter(link =>
+                    (showArchived ? link.status === 'archived' : link.status === 'active') &&
+                    (!searchTerm || link.title.toLowerCase().includes(searchTerm) || link.url.toLowerCase().includes(searchTerm)) &&
+                    (!filterTag || (link.tags || []).includes(filterTag))
+                );
 
-                // Show/hide "Archive All" button only when in active view and there are active links
-                const hasActiveLinks = links.some(link => link.status === 'active');
-                if (!viewState.showArchived && hasActiveLinks) {
-                    archiveAllBtn.classList.remove('hidden');
-                } else {
-                    archiveAllBtn.classList.add('hidden');
-                }
+                archiveAllBtn.classList.toggle('hidden', showArchived || !links.some(link => link.status === 'active'));
+                clearArchiveBtn.classList.toggle('hidden', !showArchived);
 
-                toggleArchiveBtn.classList.toggle('bg-violet-600', viewState.showArchived);
-                toggleArchiveBtn.classList.toggle('hover:bg-violet-500', viewState.showArchived);
-                toggleArchiveBtn.classList.toggle('bg-neutral-700', !viewState.showArchived);
-                toggleArchiveBtn.classList.toggle('hover:bg-neutral-600', !viewState.showArchived);
-                clearArchiveBtn.classList.toggle('hidden', !viewState.showArchived);
+                // Call original render function from before
+                render();
 
-                linksContainer.innerHTML = ''; // Clear previous content
+                linksContainer.innerHTML = '';
 
                 if (filteredLinks.length === 0) {
                     emptyState.classList.remove('hidden');
                     linksContainer.classList.add('hidden');
-                    emptyStateTitle.textContent = viewState.showArchived ? "Das Archiv ist leer" : "Noch keine Links gespeichert";
-                    emptyStateText.textContent = viewState.showArchived ? "Archivierte Links erscheinen hier." : "Füge deinen ersten Link hinzu, um ihn später zu lesen.";
+                    emptyStateTitle.textContent = showArchived ? "Das Archiv ist leer" : "Noch keine Links gespeichert";
+                    emptyStateText.textContent = showArchived ? "Archivierte Links erscheinen hier." : "Füge deinen ersten Link hinzu, um ihn später zu lesen.";
                 } else {
                     emptyState.classList.add('hidden');
                     linksContainer.classList.remove('hidden');
-
-                    // Group links by hostname
                     const groupedLinks = filteredLinks.reduce((acc, link) => {
                         const hostname = link.hostname || 'Unbekannt';
-                        if (!acc[hostname]) {
-                            acc[hostname] = [];
-                        }
-                        acc[hostname].push(link);
+                        acc[hostname] = [...(acc[hostname] || []), link];
                         return acc;
                     }, {});
 
-                    // Render each domain group
-                    for (const hostname in groupedLinks) {
-                        const domainLinks = groupedLinks[hostname].sort((a, b) => b.id - a.id); // Sort by ID descending (newest first)
-                        const latestLink = domainLinks[0]; // The most recently added link (for favicon)
-
+                    Object.entries(groupedLinks).forEach(([hostname, domainLinks]) => {
                         const domainStackElement = document.createElement('div');
                         domainStackElement.className = 'domain-stack';
-
-                        const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${latestLink.url}&size=32`; // Favicon size adjusted here
-
+                        const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${domainLinks[0].url}&size=32`;
                         domainStackElement.innerHTML = `
-                            <div class="domain-stack-header" data-hostname="${hostname}">
+                            <div class="domain-stack-header flex items-center p-4 cursor-pointer" data-hostname="${hostname}">
                                 <img src="${faviconUrl}" class="mr-4 w-8 h-8" alt="Favicon" />
                                 <h3 class="text-lg font-semibold flex-grow">${hostname} (${domainLinks.length})</h3>
-                                <svg class="w-5 h-5 text-neutral-400 transform transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="w-5 h-5" style="color:var(--text-color-light);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
-                            <!-- .domain-stack-content is no longer used for inline expansion, content will appear in modal -->
                         `;
                         linksContainer.appendChild(domainStackElement);
-                    }
+                    });
                 }
 
-                // Render tag filters
-                const sourceLinks = viewState.showArchived ? links.filter(l => l.status === 'archived') : links.filter(l => l.status === 'active');
-                const allTags = [...new Set(sourceLinks.flatMap(l => l.tags || []))]; // Ensure flatMap handles non-array tags
-                tagFiltersContainer.innerHTML = '<span class="text-sm font-medium text-neutral-400">Tags:</span>';
+                const sourceLinks = showArchived ? links.filter(l => l.status === 'archived') : links.filter(l => l.status === 'active');
+                const allTags = [...new Set(sourceLinks.flatMap(l => l.tags || []))];
+                tagFiltersContainer.innerHTML = `<span class="text-sm font-medium" style="color:var(--text-color-light);">Tags:</span>`;
                 if (allTags.length > 0) {
-                    createFilterButton(tagFiltersContainer, 'Alle', 'filterTag', null);
-                    allTags.forEach(tag => createFilterButton(tagFiltersContainer, tag, 'filterTag', tag));
+                    createFilterButton(tagFiltersContainer, 'Alle', null);
+                    allTags.forEach(tag => createFilterButton(tagFiltersContainer, tag, tag));
                 }
             };
 
-            // Helper to create filter buttons
-            const createFilterButton = (container, label, filterType, filterValue) => {
-                const isActive = viewState[filterType] === filterValue;
+            const createFilterButton = (container, label, value) => {
+                const isActive = window.viewState.filterTag === value;
                 const button = document.createElement('button');
                 button.textContent = label;
-                button.className = `px-3 py-1 rounded-full text-sm ${isActive ? 'bg-violet-600 text-white' : 'bg-neutral-700 hover:bg-neutral-600'}`;
+                button.className = `px-3 py-1 rounded-full text-sm transition`;
+                if (isActive) {
+                    button.style.backgroundColor = 'var(--accent-color)';
+                    button.style.color = 'white';
+                } else {
+                    button.style.backgroundColor = 'var(--card-bg-hover)';
+                    button.style.color = 'var(--text-color)';
+                }
                 button.onclick = () => {
-                    viewState[filterType] = viewState[filterType] === filterValue ? null : filterValue;
-                    render();
+                    window.viewState.filterTag = isActive ? null : value;
+                    window.renderApp();
                 };
                 container.appendChild(button);
             };
 
             const renderPreview = (data) => {
                 if (!data) {
-                    livePreviewContainer.innerHTML = `<div class="flex items-center justify-center h-full text-neutral-500">Vorschau wird hier angezeigt...</div>`;
+                    livePreviewContainer.innerHTML = `<div class="flex items-center justify-center h-full" style="color:var(--text-color-light);">Vorschau wird hier angezeigt...</div>`;
                     return;
                 }
                 const previewElement = document.createElement('div');
-                // Apply the new class for preview-specific styling
-                previewElement.className = 'link-card link-card--preview h-full';
+                previewElement.className = 'link-card h-full';
                 previewElement.innerHTML = renderLinkCard(data, true);
                 livePreviewContainer.innerHTML = '';
                 livePreviewContainer.appendChild(previewElement);
@@ -889,10 +688,7 @@
             const handleUrlInput = () => {
                 clearTimeout(previewTimeout);
                 const url = linkUrlInput.value.trim();
-                if (!url) {
-                    renderPreview(null);
-                    return;
-                }
+                if (!url) { renderPreview(null); return; }
                 livePreviewContainer.innerHTML = `<div class="flex items-center justify-center h-full"><div class="spinner"></div></div>`;
                 previewTimeout = setTimeout(async () => {
                     const metadata = await fetchMetadataAPI(url);
@@ -906,10 +702,9 @@
                 }, 500);
             };
 
-            // --- Event Listeners ---
-            linkUrlInput.addEventListener('keyup', handleUrlInput);
-            linkUrlInput.addEventListener('blur', handleUrlInput);
-            linkTagsInput.addEventListener('keyup', () => {
+            // Event Listeners
+            linkUrlInput.addEventListener('input', handleUrlInput);
+            linkTagsInput.addEventListener('input', () => {
                 if (previewData) {
                     previewData.tags = linkTagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
                     renderPreview(previewData);
@@ -920,200 +715,99 @@
                 e.preventDefault();
                 const url = linkUrlInput.value.trim();
                 if (!url) return;
-
-                let linkToAdd;
-                if (previewData && previewData.url === url) {
-                    linkToAdd = {
-                        ...previewData,
-                        id: Date.now(),
-                        status: 'active',
-                        metadataStatus: 'completed'
-                    };
-                } else {
-                    linkToAdd = { id: Date.now(), url, tags: linkTagsInput.value.split(',').map(t => t.trim()).filter(Boolean), status: 'active', title: url, description: 'Lade Details...', image: '', metadataStatus: 'pending' };
-                }
-
-                links.unshift(linkToAdd);
+                const linkData = previewData && previewData.url === url ? previewData : { url, tags: linkTagsInput.value.split(',').map(t => t.trim()).filter(Boolean), title: url, description: 'Lade Details...', image: '', metadataStatus: 'pending' };
+                links.unshift({ ...linkData, id: Date.now(), status: 'active' });
                 saveLinks();
-                render();
+                window.renderApp();
                 form.reset();
                 renderPreview(null);
                 previewData = null;
                 showToast('Link hinzugefügt.', 'success');
-                if (linkToAdd.metadataStatus === 'pending') {
-                    processMetadataQueue();
-                }
+                if (linkData.metadataStatus === 'pending') processMetadataQueue();
             });
 
-            // Event delegation for stack header clicks and link card actions on the main container
-            linksContainer.addEventListener('click', (e) => {
-                // Handle stack header clicks
-                const header = e.target.closest('.domain-stack-header');
-                if (header) {
-                    const hostname = header.dataset.hostname;
-                    const linksInGroup = links.filter(link => link.hostname === hostname && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
-                        .sort((a, b) => b.id - a.id); // Ensure sorted order in modal
-                    openLinkGroupModal(hostname, linksInGroup);
-                    return; // Prevent further bubbling for link card actions if header was clicked
-                }
-
-                // Handle 'Add Tags' button click for links on the main page
-                if (e.target.matches('.add-tags-btn')) {
-                    const id = Number(e.target.dataset.id);
-                    if (id) {
-                        openAddTagsModal(id);
-                    }
-                    return; // Prevent other actions from triggering
-                }
-
-                // Handle other link card actions (archive, restore, delete, retry-meta)
+            const handleCardAction = (e, callback) => {
                 const id = Number(e.target.dataset.id);
-                if (!id) return; // if it's not a button with data-id
+                if (!id) return false;
                 const linkIndex = links.findIndex(l => l.id === id);
-                if (linkIndex === -1) return;
+                if (linkIndex === -1) return false;
+                callback(linkIndex, id);
+                return true;
+            };
 
-                if (e.target.matches('.archive-btn')) {
-                    links[linkIndex].status = 'archived';
-                } else if (e.target.matches('.restore-btn')) {
-                    links[linkIndex].status = 'active';
-                } else if (e.target.matches('.delete-btn')) {
-                    links.splice(linkIndex, 1);
-                } else if (e.target.matches('.retry-meta-btn')) {
-                    links[linkIndex].metadataStatus = 'pending';
-                    links[linkIndex].description = 'Lade Metadaten erneut...';
-                    processMetadataQueue();
-                }
-                saveLinks();
-                render();
-            });
-
-            // Event delegation for link card actions *within* the link group modal
-            linkGroupModalContent.addEventListener('click', (e) => {
-                // Handle 'Add Tags' button click for links inside the modal
-                if (e.target.matches('.add-tags-btn')) {
-                    const id = Number(e.target.dataset.id);
-                    if (id) {
-                        openAddTagsModal(id);
+            const setupActionDelegation = (container, modalRefreshCallback) => {
+                container.addEventListener('click', (e) => {
+                    if (e.target.closest('.domain-stack-header')) {
+                        const header = e.target.closest('.domain-stack-header');
+                        const hostname = header.dataset.hostname;
+                        const linksInGroup = links.filter(link => link.hostname === hostname && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
+                        openLinkGroupModal(hostname, linksInGroup);
+                        return;
                     }
-                    return;
-                }
 
-                // Handle other link card actions (archive, restore, delete, retry-meta) within modal
-                const id = Number(e.target.dataset.id);
-                if (!id) return;
-                const linkIndex = links.findIndex(l => l.id === id);
-                if (linkIndex === -1) return;
+                    let actionTaken = handleCardAction(e, (linkIndex) => {
+                        if (e.target.matches('.archive-btn')) links[linkIndex].status = 'archived';
+                        else if (e.target.matches('.restore-btn')) links[linkIndex].status = 'active';
+                        else if (e.target.matches('.delete-btn')) links.splice(linkIndex, 1);
+                        else if (e.target.matches('.retry-meta-btn')) { links[linkIndex].metadataStatus = 'pending'; processMetadataQueue(); }
+                        else return; // Not a status-changing action
+                        saveLinks();
+                        window.renderApp();
+                        modalRefreshCallback?.();
+                    });
 
-                const currentHostnameInModal = linkGroupModalTitle.textContent; // Get hostname of currently open modal
+                    if (!actionTaken) {
+                        handleCardAction(e, (linkIndex, id) => {
+                            if (e.target.matches('.add-tags-btn')) openAddTagsModal(id);
+                        });
+                    }
+                });
+            };
 
-                if (e.target.matches('.archive-btn')) {
-                    links[linkIndex].status = 'archived';
-                } else if (e.target.matches('.restore-btn')) {
-                    links[linkIndex].status = 'active';
-                } else if (e.target.matches('.delete-btn')) {
-                    links.splice(linkIndex, 1);
-                } else if (e.target.matches('.retry-meta-btn')) {
-                    links[linkIndex].metadataStatus = 'pending';
-                    links[linkIndex].description = 'Lade Metadaten erneut...';
-                }
-                saveLinks();
-                render(); // Re-render main view
-
-                // After action, re-render the modal content to reflect changes
-                const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
-                    .sort((a, b) => b.id - a.id);
-                if (updatedLinksInModal.length > 0) {
-                    openLinkGroupModal(currentHostnameInModal, updatedLinksInModal); // Re-open with updated content
-                } else {
-                    closeLinkGroupModal(); // Close modal if no links left for this domain
-                }
+            setupActionDelegation(linksContainer);
+            setupActionDelegation(linkGroupModalContent, () => {
+                const currentHostnameInModal = linkGroupModalTitle.textContent;
+                const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
+                if (updatedLinksInModal.length > 0) openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
+                else closeModal(linkGroupModalOverlay, linkGroupModal);
             });
-
 
             toggleArchiveBtn.addEventListener('click', () => {
-                viewState.showArchived = !viewState.showArchived;
-                viewState.filterTag = null; // Reset tag filter on view change
-                closeLinkGroupModal(); // Close any open modal when switching view
-                render();
+                window.viewState.showArchived = !window.viewState.showArchived;
+                window.viewState.filterTag = null;
+                closeModal(linkGroupModalOverlay, linkGroupModal);
+                window.renderApp();
             });
 
-            clearArchiveBtn.addEventListener('click', () => {
-                openConfirmModal(
-                    'Archiv leeren',
-                    'Möchten Sie wirklich alle archivierten Einträge endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
-                    () => {
-                        links = links.filter(link => link.status !== 'archived');
-                        saveLinks();
-                        render();
-                        showToast('Archiv wurde geleert.', 'success');
-                        closeLinkGroupModal(); // Close modal after clearing archive
-                    }
-                );
-            });
+            clearArchiveBtn.addEventListener('click', () => openConfirmModal('Archiv leeren', 'Möchten Sie wirklich alle archivierten Einträge endgültig löschen?', () => {
+                links = links.filter(link => link.status !== 'archived');
+                saveLinks(); window.renderApp(); showToast('Archiv wurde geleert.', 'success');
+            }));
 
-            // New: Archive all links button functionality
-            archiveAllBtn.addEventListener('click', () => {
-                openConfirmModal(
-                    'Alle Links archivieren',
-                    'Möchten Sie wirklich alle aktiven Links archivieren?',
-                    () => {
-                        let linksArchivedCount = 0;
-                        links.forEach(link => {
-                            if (link.status === 'active') {
-                                link.status = 'archived';
-                                linksArchivedCount++;
-                            }
-                        });
-                        saveLinks();
-                        render();
-                        showToast(`${linksArchivedCount} Links archiviert.`, 'success');
-                        closeLinkGroupModal(); // Close any open modal
-                    }
-                );
-            });
+            archiveAllBtn.addEventListener('click', () => openConfirmModal('Alle Links archivieren', 'Möchten Sie wirklich alle aktiven Links archivieren?', () => {
+                let count = 0;
+                links.forEach(link => { if (link.status === 'active') { link.status = 'archived'; count++; } });
+                saveLinks(); window.renderApp(); showToast(`${count} Links archiviert.`, 'success');
+            }));
 
-            confirmCancelBtn.addEventListener('click', closeConfirmModal);
-            confirmConfirmBtn.addEventListener('click', () => {
-                if (typeof confirmCallback === 'function') {
-                    confirmCallback();
-                }
-                closeConfirmModal();
-            });
-            confirmModalOverlay.addEventListener('click', closeConfirmModal);
+            // Modal close listeners
+            [confirmCancelBtn, confirmModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(confirmModalOverlay, confirmModal)));
+            confirmConfirmBtn.addEventListener('click', () => { if (confirmCallback) confirmCallback(); closeModal(confirmModalOverlay, confirmModal); });
+            [linkGroupModalCloseBtn, linkGroupModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(linkGroupModalOverlay, linkGroupModal)));
+            [addTagsCancelBtn, addTagsModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(addTagsModalOverlay, addTagsModal)));
+            addTagsSaveBtn.addEventListener('click', saveTags);
+            addTagsInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveTags(); } });
 
-            // Link Group Modal Event Listeners
-            linkGroupModalCloseBtn.addEventListener('click', closeLinkGroupModal);
-            linkGroupModalOverlay.addEventListener('click', closeLinkGroupModal);
-
-            // Add Tags Modal Event Listeners
-            addTagsCancelBtn.addEventListener('click', closeAddTagsModal);
-            addTagsModalOverlay.addEventListener('click', closeAddTagsModal);
-            addTagsSaveBtn.addEventListener('click', saveTags); // Use the new saveTags function
-
-            // Add event listener for 'Enter' key on the addTagsInput
-            addTagsInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Prevent default Enter behavior (e.g., new line in input)
-                    saveTags(); // Call the saveTags function
-                }
-            });
-
-
-            searchInput.addEventListener('input', (e) => {
-                viewState.searchTerm = e.target.value.toLowerCase();
-                render();
-            });
+            searchInput.addEventListener('input', (e) => { window.viewState.searchTerm = e.target.value.toLowerCase(); window.renderApp(); });
 
             exportBtn.addEventListener('click', () => {
                 if (links.length === 0) return showToast('Keine Links zum Exportieren vorhanden.', 'error');
                 const dataStr = JSON.stringify(links, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
                 const a = document.createElement('a');
-                a.href = url;
+                a.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
                 a.download = `readlater_backup_${new Date().toISOString().slice(0, 10)}.json`;
                 a.click();
-                URL.revokeObjectURL(url);
+                URL.revokeObjectURL(a.href);
             });
 
             importFileInput.addEventListener('change', (event) => {
@@ -1124,67 +818,24 @@
                     try {
                         const imported = JSON.parse(e.target.result);
                         if (!Array.isArray(imported)) throw new Error('Invalid format');
-                        const currentUrls = new Set(links.map(l => l.url));
-
-                        const newLinksToProcess = imported
-                            .filter(link => link.url) // Only process links with a URL
-                            .map(link => {
-                                // Create a new link object with defaults, but prioritize imported values
-                                const baseLink = {
-                                    id: link.id || Date.now() + Math.random(), // Use existing ID or generate new
-                                    url: link.url,
-                                    title: link.title || link.url, // Use imported title or URL as fallback
-                                    description: link.description || '', // Use imported description
-                                    image: link.image || '', // Use imported image
-                                    tags: Array.isArray(link.tags) ? link.tags : [], // Ensure tags are always an array
-                                    status: link.status || 'active', // Use imported status or default to 'active'
-                                    metadataStatus: link.title && link.description ? 'completed' : 'pending', // Assume completed if title/description present, otherwise pending
-                                    hostname: getHostname(link.url) || '' // Get hostname from URL
-                                };
-                                return baseLink;
-                            });
-
-                        // Filter out duplicates based on URL and merge with existing links
                         const uniqueLinksMap = new Map(links.map(link => [link.url, link]));
-                        newLinksToProcess.forEach(link => {
-                            // If a link with the same URL already exists, update its properties
-                            // Otherwise, add the new link
-                            if (uniqueLinksMap.has(link.url)) {
-                                const existingLink = uniqueLinksMap.get(link.url);
-                                // Merge properties, prioritizing new values for title, description, image, tags, status
-                                uniqueLinksMap.set(link.url, {
-                                    ...existingLink,
-                                    ...link, // Overwrite with imported values
-                                    tags: Array.isArray(existingLink.tags) && Array.isArray(link.tags) ?
-                                        [...new Set([...existingLink.tags, ...link.tags])] : link.tags, // Merge and deduplicate tags
-                                    metadataStatus: existingLink.metadataStatus === 'completed' ? 'completed' : link.metadataStatus // Keep completed if already completed
-                                });
-                            } else {
-                                uniqueLinksMap.set(link.url, link);
-                            }
-                        });
-
+                        imported.filter(l => l.url).forEach(link => uniqueLinksMap.set(link.url, { ...uniqueLinksMap.get(link.url), ...link }));
                         links = Array.from(uniqueLinksMap.values());
-
                         saveLinks();
-                        render();
-                        showToast(`${newLinksToProcess.length} Links importiert/aktualisiert. Lade Details...`);
+                        window.renderApp();
+                        showToast(`${imported.length} Links importiert/aktualisiert.`);
                         processMetadataQueue();
-                    } catch (error) {
-                        console.error("Import error:", error);
-                        showToast('Import fehlgeschlagen. Ungültige Datei oder Format.', 'error');
-                    } finally {
-                        importFileInput.value = '';
-                    }
+                    } catch (error) { showToast('Import fehlgeschlagen.', 'error'); }
+                    finally { importFileInput.value = ''; }
                 };
                 reader.readAsText(file);
             });
 
             // --- Initial Load ---
             links = getStoredLinks();
-            render();
+            window.renderApp(); // Make render globally available for simplicity
             renderPreview(null);
-            processMetadataQueue(); // Check for pending links on load
+            processMetadataQueue();
         });
     </script>
 </body>

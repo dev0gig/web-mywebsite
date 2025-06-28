@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Reader</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Color variables from appdrawer.html for consistency */
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --accent-color: #7c3aed;
+            --accent-color-hover: #8b5cf6;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --card-bg: #262626;
+            --border-color: #404040;
+        }
+
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Simple animation for loading spinner */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader {
+            border: 4px solid rgba(124, 58, 237, 0.2);
+            border-left-color: var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-color-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        /* Style for visited links */
+        .visited-title {
+            color: var(--text-color-light);
+            opacity: 0.7;
+        }
+
+        .visited-title:hover {
+            color: var(--accent-color);
+            opacity: 1;
+        }
+
+        /* Style for active sidebar item */
+        .sidebar-item-active {
+            background-color: var(--accent-color);
+        }
+
+        .sidebar-item-active span {
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .sidebar-item-active svg {
+            color: white !important;
+        }
+
+        /* Style for article thumbnails */
+        .article-thumbnail {
+            width: 100%;
+            height: 125px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="min-h-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <header class="mb-8">
+                <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">RSS Reader</h1>
+                <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
+                    neuesten Beiträge anzuzeigen.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content Area -->
+                <div class="lg:col-span-2">
+                    <!-- Input Section -->
+                    <div class="mb-8 p-4 rounded-lg"
+                        style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="flex gap-2">
+                            <input type="url" id="rss-url-input"
+                                class="flex-grow block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
+                                style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
+                                placeholder="https://example.com/feed.xml">
+                            <button id="load-feed-btn"
+                                class="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-white rounded-md shadow-sm transition-colors whitespace-nowrap"
+                                style="background-color: var(--accent-color); border-color: transparent;"
+                                onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
+                                onmouseout="this.style.backgroundColor='var(--accent-color)'">
+                                Feed laden
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Feed Content Section -->
+                    <main id="feed-container">
+                        <div class="text-center p-6 rounded-lg"
+                            style="color: var(--text-color-light); background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                            <p>Bitte gib oben eine RSS-Feed-URL ein oder wähle einen gespeicherten Feed aus der Liste.
+                            </p>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="p-4 rounded-lg sticky top-8"
+                        style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
+                            <div class="flex space-x-2">
+                                <button id="import-btn" title="Feeds importieren"
+                                    class="p-2 rounded-md hover:bg-gray-100" style="color: var(--text-color-light);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </button>
+                                <button id="export-btn" title="Feeds exportieren"
+                                    class="p-2 rounded-md hover:bg-gray-100" style="color: var(--text-color-light);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
+                            <button id="show-all-btn"
+                                class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                                    style="color: var(--text-color-light);">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                <span class="font-medium group-hover:text-violet-600"
+                                    style="color: var(--text-color);">Alle Feeds anzeigen</span>
+                            </button>
+                        </div>
+                        <div id="sidebar-list" class="max-h-[55vh] overflow-y-auto pr-2">
+                            <!-- Sidebar content will be injected here -->
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Confirmation Modal -->
+    <div id="import-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50"
+        aria-hidden="true">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
+                style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-yellow-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Feeds überschreiben?</h3>
+                    <p class="text-sm mt-2" style="color: var(--text-color-light);">
+                        Möchtest du wirklich eine neue Feed-Liste importieren? Alle deine aktuell gespeicherten Feeds
+                        werden dabei permanent gelöscht.
+                    </p>
+                </div>
+                <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
+                    <button id="confirm-import-btn" type="button"
+                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Überschreiben
+                    </button>
+                    <button id="cancel-import-btn" type="button"
+                        class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
+                        style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- THEME SWITCHING LISTENER (Logic from appdrawer.html) ---
+        window.addEventListener('message', (event) => {
+            if (event.data === 'set-theme-dark') {
+                document.documentElement.dataset.theme = 'dark';
+            } else if (event.data === 'set-theme-light') {
+                document.documentElement.dataset.theme = 'light';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- RSS READER LOGIC ---
+            const feedContainer = document.getElementById('feed-container');
+            const urlInput = document.getElementById('rss-url-input');
+            const loadBtn = document.getElementById('load-feed-btn');
+            const sidebarList = document.getElementById('sidebar-list');
+            const importBtn = document.getElementById('import-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const showAllBtn = document.getElementById('show-all-btn');
+            const importModal = document.getElementById('import-modal');
+            const confirmImportBtn = document.getElementById('confirm-import-btn');
+            const cancelImportBtn = document.getElementById('cancel-import-btn');
+
+            const feedsStorageKey = 'savedRssFeeds';
+            const visitedLinksKey = 'rssVisitedLinks';
+            const placeholderFavicon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6' /%3E%3C/svg%3E`;
+
+            let savedFeeds = JSON.parse(localStorage.getItem(feedsStorageKey)) || [];
+            let visitedLinks = new Set(JSON.parse(localStorage.getItem(visitedLinksKey)) || []);
+            let activeUrl = null;
+
+            const getFaviconUrl = (url) => {
+                try {
+                    const domain = new URL(url).hostname;
+                    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                } catch (e) { return placeholderFavicon; }
+            };
+
+            const findImage = (item) => {
+                if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) return item.thumbnail;
+                if (item.enclosure && item.enclosure.type && item.enclosure.type.startsWith('image')) return item.enclosure.link;
+                const content = item.description || item.content || '';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const firstImage = tempDiv.querySelector('img');
+                return firstImage ? firstImage.src : null;
+            };
+
+            const saveFeeds = () => localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
+            const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
+
+            const setActiveSidebarItem = (url) => {
+                activeUrl = url;
+                document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-item-active'));
+                const activeItem = document.querySelector(`.sidebar-item[data-url="${url}"]`);
+                if (activeItem) activeItem.classList.add('sidebar-item-active');
+            };
+
+            const renderSidebar = () => {
+                sidebarList.innerHTML = '';
+                if (savedFeeds.length === 0) {
+                    sidebarList.innerHTML = `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>`;
+                    return;
+                }
+                savedFeeds.forEach((feed, index) => {
+                    const feedItem = document.createElement('div');
+                    feedItem.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group sidebar-item';
+                    feedItem.dataset.url = feed.url;
+                    feedItem.innerHTML = `
+                        <div class="flex items-center gap-3 truncate">
+                            <img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">
+                            <span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span>
+                        </div>
+                        <button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                        </button>
+                    `;
+                    sidebarList.appendChild(feedItem);
+                });
+                setActiveSidebarItem(activeUrl);
+            };
+
+            const showLoading = () => {
+                feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`;
+            };
+
+            const showMessage = (message, isError = false) => {
+                const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444;' : 'background-color: rgba(59, 130, 246, 0.1); color: #3b82f6;';
+                feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`;
+            };
+
+            const createArticleHtml = (item) => {
+                const imageUrl = findImage(item);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = item.description;
+                const sanitizedDescription = tempDiv.textContent || tempDiv.innerText || "";
+                let pubDate = new Date(item.pubDate).toLocaleString('de-DE');
+                const isVisited = visitedLinks.has(item.link);
+
+                const titleHtml = `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block article-link"><h3 class="text-xl font-semibold transition-colors ${isVisited ? 'visited-title' : ''}" style="color: var(--text-color);">${item.title}</h3></a>`;
+                const metaHtml = `<p class="text-sm mt-1 mb-3" style="color: var(--text-color-light);">${pubDate}</p><p class="line-clamp-2" style="color: var(--text-color);">${sanitizedDescription}</p>`;
+                const sourceHtml = item.sourceTitle ? `<div class="flex items-center gap-2 mt-3 text-xs" style="color: var(--text-color-light);"><img src="${item.sourceFavicon}" class="w-4 h-4 rounded" onerror="this.src='${placeholderFavicon}'"/><span>${item.sourceTitle}</span></div>` : '';
+
+                if (imageUrl) {
+                    return `<div class="flex flex-col sm:flex-row gap-5">
+                                <div class="sm:w-1/3 flex-shrink-0">
+                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer"><img src="${imageUrl}" class="article-thumbnail" alt="Artikelbild" onerror="this.style.display='none'"></a>
+                                </div>
+                                <div class="sm:w-2/3">${titleHtml}${metaHtml}${sourceHtml}</div>
+                            </div>`;
+                }
+                return `<div>${titleHtml}${metaHtml}${sourceHtml}</div>`;
+            };
+
+            const renderFeed = (data, faviconUrl) => {
+                feedContainer.innerHTML = '';
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-6 rounded-lg';
+                wrapper.style.backgroundColor = 'var(--card-bg)';
+                wrapper.style.border = '1px solid var(--border-color)';
+
+                const titleWrapper = document.createElement('div');
+                titleWrapper.className = 'flex items-center gap-4 mb-4 pb-4 border-b';
+                titleWrapper.style.borderColor = 'var(--border-color)';
+                titleWrapper.innerHTML = `<img src="${faviconUrl}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'"><h2 class="text-2xl font-bold" style="color: var(--text-color);">${data.feed.title}</h2>`;
+                wrapper.appendChild(titleWrapper);
+
+                const articlesWrapper = document.createElement('div');
+                articlesWrapper.className = 'space-y-6';
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const article = document.createElement('article');
+                        article.className = 'border-b pb-6 last:border-b-0 last:pb-0';
+                        article.style.borderColor = 'var(--border-color)';
+                        article.innerHTML = createArticleHtml(item);
+                        articlesWrapper.appendChild(article);
+                    });
+                } else {
+                    articlesWrapper.innerHTML = `<p style="color: var(--text-color-light);">Dieser Feed enthält keine Einträge.</p>`;
+                }
+
+                wrapper.appendChild(articlesWrapper);
+                feedContainer.appendChild(wrapper);
+
+                feedContainer.querySelectorAll('.article-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.currentTarget.querySelector('h3')?.classList.add('visited-title');
+                        visitedLinks.add(link.href);
+                        saveVisitedLinks();
+                    });
+                });
+            };
+
+            const renderAllFeeds = (articles) => {
+                feedContainer.innerHTML = '';
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-6 rounded-lg';
+                wrapper.style.backgroundColor = 'var(--card-bg)';
+                wrapper.style.border = '1px solid var(--border-color)';
+
+                const titleWrapper = document.createElement('div');
+                titleWrapper.className = 'flex items-center gap-4 mb-4 pb-4 border-b';
+                titleWrapper.style.borderColor = 'var(--border-color)';
+                titleWrapper.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--accent-color);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg><h2 class="text-2xl font-bold" style="color: var(--text-color);">Alle Feeds (Neueste zuerst)</h2>`;
+                wrapper.appendChild(titleWrapper);
+
+                const articlesWrapper = document.createElement('div');
+                articlesWrapper.className = 'space-y-6';
+
+                if (articles.length > 0) {
+                    articles.forEach(item => {
+                        const article = document.createElement('article');
+                        article.className = 'border-b pb-6 last:border-b-0 last:pb-0';
+                        article.style.borderColor = 'var(--border-color)';
+                        article.innerHTML = createArticleHtml(item);
+                        articlesWrapper.appendChild(article);
+                    });
+                } else {
+                    articlesWrapper.innerHTML = `<p style="color: var(--text-color-light);">Keine Artikel in den gespeicherten Feeds gefunden.</p>`;
+                }
+
+                wrapper.appendChild(articlesWrapper);
+                feedContainer.appendChild(wrapper);
+
+                feedContainer.querySelectorAll('.article-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.currentTarget.querySelector('h3')?.classList.add('visited-title');
+                        visitedLinks.add(link.href);
+                        saveVisitedLinks();
+                    });
+                });
+            };
+
+            const loadAllFeeds = async () => {
+                if (savedFeeds.length === 0) {
+                    showMessage('Es sind keine Feeds zum Anzeigen gespeichert.'); return;
+                }
+                setActiveSidebarItem('all');
+                showLoading();
+                const fetchPromises = savedFeeds.map(feed =>
+                    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`).then(response => response.json()).then(data => ({ ...data, sourceFeed: feed }))
+                );
+                const results = await Promise.allSettled(fetchPromises);
+                let allItems = [];
+                results.forEach(result => {
+                    if (result.status === 'fulfilled' && result.value.status === 'ok') {
+                        const itemsWithSource = result.value.items.map(item => ({ ...item, sourceTitle: result.value.sourceFeed.title, sourceFavicon: result.value.sourceFeed.favicon }));
+                        allItems.push(...itemsWithSource);
+                    }
+                });
+                allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+                renderAllFeeds(allItems);
+            };
+
+            const loadFeed = (rssUrl) => {
+                if (!rssUrl || !rssUrl.trim()) {
+                    showMessage('Bitte gib eine gültige URL ein.', true); return;
+                }
+                setActiveSidebarItem(rssUrl);
+                showLoading();
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            const faviconUrl = getFaviconUrl(data.feed.url || rssUrl);
+                            renderFeed(data, faviconUrl);
+                            urlInput.value = '';
+                            if (!savedFeeds.some(feed => feed.url === rssUrl)) {
+                                savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: faviconUrl });
+                                saveFeeds();
+                                renderSidebar();
+                            }
+                        } else {
+                            showMessage(`Fehler beim Laden des Feeds: ${data.message}`, true);
+                        }
+                    })
+                    .catch(error => { showMessage(`Ein Fehler ist aufgetreten: ${error.message}. Überprüfe die URL.`, true); });
+            };
+
+            const handleExport = () => {
+                if (savedFeeds.length === 0) { showMessage('Keine Feeds zum Exportieren vorhanden.', false); return; }
+                const dataStr = JSON.stringify(savedFeeds.map(({ url, title }) => ({ url, title })), null, 2);
+                const dataBlob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'rss_feeds.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            };
+
+            const triggerImport = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            if (!Array.isArray(importedData) || !importedData.every(f => f && f.url && f.title)) throw new Error('Ungültiges Format oder unvollständige Daten.');
+                            savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
+                            saveFeeds();
+                            renderSidebar();
+                            showMessage(`${savedFeeds.length} Feed(s) importiert.`, false);
+                        } catch (error) { showMessage(`Import fehlgeschlagen: ${error.message}`, true); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            };
+
+            loadBtn.addEventListener('click', () => loadFeed(urlInput.value));
+            urlInput.addEventListener('keypress', e => e.key === 'Enter' && loadFeed(urlInput.value));
+            exportBtn.addEventListener('click', handleExport);
+            showAllBtn.addEventListener('click', loadAllFeeds);
+            importBtn.addEventListener('click', () => importModal.classList.remove('hidden'));
+            cancelImportBtn.addEventListener('click', () => importModal.classList.add('hidden'));
+            confirmImportBtn.addEventListener('click', () => {
+                importModal.classList.add('hidden');
+                triggerImport();
+            });
+            sidebarList.addEventListener('click', (e) => {
+                const deleteButton = e.target.closest('.delete-btn');
+                if (deleteButton) {
+                    e.stopPropagation();
+                    const index = parseInt(deleteButton.dataset.index, 10);
+                    savedFeeds.splice(index, 1);
+                    saveFeeds();
+                    renderSidebar();
+                    return;
+                }
+                const feedItem = e.target.closest('[data-url]');
+                if (feedItem) loadFeed(feedItem.dataset.url);
+            });
+
+            renderSidebar();
+        });
+    </script>
+</body>
+
+</html>
