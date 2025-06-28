@@ -52,28 +52,22 @@
             height: 100%;
             background-color: var(--bg-color);
             overflow: hidden;
-            /* Prevents body scrolling, managed by app-container */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-color);
         }
 
-        /* Neuer Container für Flexbox-Layout */
         #app-container {
             display: flex;
             flex-direction: column;
-            /* Stack canvas and controls vertically */
             height: 100%;
             width: 100%;
             overflow: hidden;
-            /* Contain scrolling within children */
         }
 
         #canvas-wrapper {
             width: 100%;
             flex-grow: 1;
-            /* Canvas takes up remaining space */
             overflow: auto;
-            /* Allow canvas content to scroll */
             position: relative;
             background-color: var(--bg-color);
             touch-action: none;
@@ -109,7 +103,6 @@
 
         #controls-container {
             position: fixed;
-            /* Fixed position for desktop */
             top: 1rem;
             right: 1rem;
             display: flex;
@@ -122,42 +115,50 @@
             border: 1px solid var(--border-color);
             z-index: 100;
             flex-shrink: 0;
-            /* Prevents shrinking on app-container */
+        }
 
+        .tool-palette {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex: 1;
+            /* Allow palette to grow */
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        #color-palette {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            /* Allow colors to wrap */
+        }
+
+        @media (max-width: 768px) {
+            #controls-container {
                 position: static;
-                /* Nicht mehr fixed, passt sich dem normalen Fluss an */
-                top: auto;
-                bottom: auto;
-                left: auto;
-                right: auto;
                 width: 100%;
-                /* Volle Breite */
                 box-sizing: border-box;
-                /* Padding wird in der Breite berücksichtigt */
                 border-radius: 0;
-                /* Keine abgerundeten Ecken am Rand */
                 border: none;
-                /* Kein Rand, da es sich an den Bildschirm anpasst */
                 border-top: 1px solid var(--border-color);
-                /* Nur obere Linie für Trennung */
                 box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
-                /* Schatten nur oben */
-
                 flex-direction: row;
-                /* Hauptabschnitte nebeneinander */
                 flex-wrap: wrap;
-                /* Erlaubt Umbruch der Hauptabschnitte */
                 justify-content: space-around;
-                /* Verteilt Hauptabschnitte gleichmäßig */
                 align-items: flex-start;
-                /* Hauptabschnitte oben ausrichten, falls sie umbrechen */
                 padding: 0.5rem;
-                /* Standard-Padding */
                 gap: 0.5rem;
-                /* Standard-Abstand zwischen Abschnitten */
+            }
+
+            .tool-palette {
+                flex-direction: row;
+                justify-content: center;
+                width: auto;
+                gap: 0.25rem;
+            }
+
+            #color-palette {
+                justify-content: center;
+                gap: 0.2rem;
             }
         }
 
@@ -230,92 +231,44 @@
             display: none;
         }
 
-        .tool-palette {
-            display: flex;
-            flex-direction: column;
-            /* Desktop: Spaltenlayout */
-            gap: 0.75rem;
-
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
-                flex-direction: row;
-                /* Mobile: Reihenlayout */
-                flex-wrap: wrap;
-                /* Werkzeuge können umbrechen */
-                justify-content: center;
-                /* Werkzeuge zentrieren */
-                width: auto;
-                /* Breite passt sich dem Inhalt an */
-                gap: 0.25rem;
-                /* Kleinerer Abstand zwischen Werkzeugreihen */
-            }
-        }
-
         .tool-row {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            .tool-row {
                 flex-wrap: nowrap;
-                /* Einzelne Buttons sollen nicht umbrechen, sondern die Reihe selbst */
                 justify-content: center;
                 width: auto;
                 gap: 0.25rem;
-                /* Kleinerer Abstand zwischen Buttons */
             }
         }
 
         .separator {
             width: 1px;
-            height: 88px;
+            height: auto;
+            align-self: stretch;
             background-color: var(--border-color);
             margin: 0 0.25rem;
-
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
-                width: 90%;
-                /* Breite Trennlinie */
-                height: 1px;
-                /* Horizontale Trennlinie */
-                margin: 0.5rem 0;
-                /* Weniger Abstand oben und unten */
-            }
         }
 
-        #color-palette {
-            display: flex;
-            gap: 0.5rem;
-            max-width: 350px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding-bottom: 8px;
-
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
-                max-width: 100%;
-                /* Volle Breite */
-                flex-wrap: wrap;
-                /* Farben können umbrechen */
-                justify-content: center;
-                /* Farbfelder zentrieren */
-                overflow-x: hidden;
-                /* Kein horizontaler Scrollbalken */
-                padding-bottom: 0;
-                /* Kein Padding unten */
-                gap: 0.2rem;
-                /* Sehr kleiner Abstand für Farbfelder */
+        @media (max-width: 768px) {
+            .separator {
+                width: 90%;
+                height: 1px;
+                margin: 0.5rem 0;
             }
         }
 
         #color-palette::-webkit-scrollbar {
             height: 6px;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #color-palette::-webkit-scrollbar {
                 display: none;
-                /* Scrollbalken auf Mobilgeräten ausblenden */
             }
         }
 
@@ -352,25 +305,23 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #line-width-container {
                 width: 100%;
-                /* Volle Breite */
                 justify-content: center;
-                /* Slider zentrieren */
                 gap: 0.25rem;
-                /* Kleinerer Abstand */
             }
         }
 
         #line-width-slider {
             width: 100px;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #line-width-slider {
                 width: 70%;
-                /* Slider kompakter machen */
             }
         }
 
@@ -395,19 +346,15 @@
             flex-direction: column;
             gap: 0.5rem;
             width: 200px;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #export-menu {
                 top: auto;
-                /* Entfernt 'top' */
                 bottom: calc(100% + 0.25rem);
-                /* Positioniert es über dem Button, angepasst an neues Padding */
                 right: auto;
-                /* Entfernt 'right' */
                 left: 0;
-                /* Richtet es links aus */
                 width: 100%;
-                /* Volle Breite */
             }
         }
 
@@ -461,38 +408,34 @@
         #right-controls {
             display: flex;
             flex-direction: column;
-            /* Desktop: Spaltenlayout */
             gap: 0.5rem;
             align-items: center;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #right-controls {
                 flex-direction: row;
-                /* Mobile: Reihenlayout */
                 flex-wrap: wrap;
-                /* Elemente können umbrechen */
                 justify-content: center;
                 width: auto;
-                /* Breite passt sich dem Inhalt an */
                 gap: 0.25rem;
-                /* Kleinerer Abstand */
             }
         }
+
 
         #file-controls {
             display: flex;
             gap: 0.5rem;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #file-controls {
                 width: auto;
-                /* Breite passt sich dem Inhalt an */
                 justify-content: center;
-                /* Dateisteuerelemente zentrieren */
                 gap: 0.25rem;
-                /* Kleinerer Abstand zwischen Buttons */
             }
         }
+
 
         #zoom-controls-integrated {
             display: flex;
@@ -503,17 +446,14 @@
             border-radius: 6px;
             padding: 0.25rem;
             width: 100%;
+        }
 
-            /* Mobile Anpassungen */
-            @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            #zoom-controls-integrated {
                 width: auto;
-                /* Breite passt sich dem Inhalt an */
                 min-width: 150px;
-                /* Reduzierte Mindestbreite für Zoom-Steuerung */
                 padding: 0.15rem;
-                /* Reduziertes Padding */
                 gap: 0.25rem;
-                /* Reduzierter Abstand */
             }
         }
 
@@ -712,6 +652,7 @@
 
             // --- STATE MANAGEMENT ---
             let isDarkMode = false;
+            let paths = [];
             let history = [];
             let historyIndex = -1;
             let imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
@@ -734,7 +675,6 @@
             // --- Pan State ---
             let isPanningWithMouse = false;
             let lastPanPoint = { x: 0, y: 0 };
-
 
             // --- INTERACTION STATE ---
             let interactionState = {
@@ -801,16 +741,14 @@
                 if (color === penColor) swatch.classList.add('active');
                 colorPaletteContainer.appendChild(swatch);
             });
-            
-            // Deep copy helper
+
             const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
 
             function recordState() {
-                // Remove any future states if we've undone and then drawn something new
                 if (historyIndex < history.length - 1) {
                     history = history.slice(0, historyIndex + 1);
                 }
-                
+
                 const currentState = {
                     paths: deepCopy(paths),
                     imageState: deepCopy(imageState)
@@ -818,12 +756,11 @@
                 history.push(currentState);
                 historyIndex++;
 
-                // Limit history size
                 if (history.length > 50) {
                     history.shift();
                     historyIndex--;
                 }
-                
+
                 updateUndoButton();
                 saveStateToLocalStorage();
             }
@@ -833,27 +770,27 @@
                     historyIndex--;
                     const previousState = deepCopy(history[historyIndex]);
                     paths = previousState.paths;
-                    
+
                     const oldImageSrc = imageState.src;
                     imageState = previousState.imageState;
 
-                    // If image source changed, we need to reload the image object
                     if (imageState.src && imageState.src !== oldImageSrc) {
-                         const img = new Image();
-                         img.onload = () => {
-                             imageState.img = img;
-                             redrawAll();
-                         };
-                         img.src = imageState.src;
+                        const img = new Image();
+                        img.onload = () => {
+                            imageState.img = img;
+                            redrawAll();
+                        };
+                        img.src = imageState.src;
                     } else if (oldImageSrc && !imageState.src) {
                         imageState.img = null;
                         redrawAll();
                     }
                     else {
-                       redrawAll();
+                        redrawAll();
                     }
-                    
+
                     updateUndoButton();
+                    saveStateToLocalStorage();
                 }
             }
 
@@ -861,87 +798,114 @@
                 undoBtn.disabled = historyIndex <= 0;
             }
 
-
             function redrawAll(forExport = false, targetCtx = ctx) {
-                const currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
-                const currentImageState = (history[historyIndex] && history[historyIndex].imageState) || { img: null };
+                const mainCanvas = targetCtx.canvas;
+                const mainCtx = targetCtx;
 
+                // Use the committed paths from history, not the live global `paths` array.
+                let currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
 
-                targetCtx.fillStyle = bgColor;
-                targetCtx.fillRect(0, 0, targetCtx.canvas.width, targetCtx.canvas.height);
-
-                if (imageState.img) {
-                    targetCtx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
+                // Include the path being actively drawn for live preview
+                const allPaths = [...currentPaths];
+                if (isDrawing && currentPath.length > 0 && (currentTool === 'pen' || currentTool === 'pixel-eraser')) {
+                    allPaths.push({
+                        points: currentPath,
+                        color: (currentTool === 'pen') ? penColor : 'ERASER',
+                        width: penWidth
+                    });
                 }
 
-                currentPaths.forEach(path => {
-                    targetCtx.beginPath();
+                // Create a temporary off-screen canvas to draw only the paths.
+                const pathCanvas = document.createElement('canvas');
+                pathCanvas.width = mainCanvas.width;
+                pathCanvas.height = mainCanvas.height;
+                const pathCtx = pathCanvas.getContext('2d');
+
+                // 1. Draw all paths onto the off-screen canvas.
+                allPaths.forEach(path => {
+                    pathCtx.beginPath();
+                    pathCtx.lineWidth = path.width;
+                    pathCtx.lineCap = 'round';
+                    pathCtx.lineJoin = 'round';
+
                     if (path.color === 'ERASER') {
-                        targetCtx.strokeStyle = bgColor;
+                        pathCtx.globalCompositeOperation = 'destination-out';
+                        pathCtx.strokeStyle = 'rgba(0,0,0,1)';
                     } else {
+                        pathCtx.globalCompositeOperation = 'source-over';
                         if (isCurrentlyDark && path.color === '#000000') {
-                            targetCtx.strokeStyle = '#ffffff';
+                            pathCtx.strokeStyle = '#ffffff';
                         } else {
-                            targetCtx.strokeStyle = path.color;
+                            pathCtx.strokeStyle = path.color;
                         }
                     }
-                    targetCtx.lineWidth = path.width;
-                    targetCtx.lineCap = 'round';
-                    targetCtx.lineJoin = 'round';
 
                     if (path.points.length < 2) return;
-
                     if (path.points.length < 3) {
-                        targetCtx.moveTo(path.points[0].x, path.points[0].y);
-                        targetCtx.lineTo(path.points[1].x, path.points[1].y);
+                        pathCtx.moveTo(path.points[0].x, path.points[0].y);
+                        pathCtx.lineTo(path.points[1].x, path.points[1].y);
                     } else {
-                        targetCtx.moveTo(path.points[0].x, path.points[0].y);
+                        pathCtx.moveTo(path.points[0].x, path.points[0].y);
                         for (var i = 1; i < path.points.length - 2; i++) {
                             var xc = (path.points[i].x + path.points[i + 1].x) / 2;
                             var yc = (path.points[i].y + path.points[i + 1].y) / 2;
-                            targetCtx.quadraticCurveTo(path.points[i].x, path.points[i].y, xc, yc);
+                            pathCtx.quadraticCurveTo(path.points[i].x, path.points[i].y, xc, yc);
                         }
-                        targetCtx.quadraticCurveTo(path.points[i].x, path.points[i].y, path.points[i + 1].x, path.points[i + 1].y);
+                        pathCtx.quadraticCurveTo(path.points[i].x, path.points[i].y, path.points[i + 1].x, path.points[i + 1].y);
                     }
-                    targetCtx.stroke();
+                    pathCtx.stroke();
                 });
 
-                if (forExport || targetCtx !== ctx) return;
+                // 2. Clear the main canvas and draw the final composition.
+                mainCtx.globalCompositeOperation = 'source-over';
+                mainCtx.fillStyle = bgColor;
+                mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+                // 3. Draw the background image onto the main canvas.
+                if (imageState.img) {
+                    mainCtx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
+                }
+
+                // 4. Draw the off-screen canvas (with all paths) on top.
+                mainCtx.drawImage(pathCanvas, 0, 0);
+
+                // --- UI drawing logic ---
+                if (forExport || mainCtx !== ctx) return;
 
                 if (selectedPathIndices.length > 0 && lassoPath.length > 0) {
-                    targetCtx.strokeStyle = isDarkMode ? '#3b82f6' : '#2563eb';
-                    targetCtx.lineWidth = 1 / zoom;
-                    targetCtx.setLineDash([4 / zoom, 4 / zoom]);
-                    targetCtx.beginPath();
-                    targetCtx.moveTo(lassoPath[0].x, lassoPath[0].y);
+                    mainCtx.strokeStyle = isDarkMode ? '#3b82f6' : '#2563eb';
+                    mainCtx.lineWidth = 1 / zoom;
+                    mainCtx.setLineDash([4 / zoom, 4 / zoom]);
+                    mainCtx.beginPath();
+                    mainCtx.moveTo(lassoPath[0].x, lassoPath[0].y);
                     for (let i = 1; i < lassoPath.length; i++) {
-                        targetCtx.lineTo(lassoPath[i].x, lassoPath[i].y);
+                        mainCtx.lineTo(lassoPath[i].x, lassoPath[i].y);
                     }
-                    targetCtx.closePath();
-                    targetCtx.stroke();
-                    targetCtx.setLineDash([]);
+                    mainCtx.closePath();
+                    mainCtx.stroke();
+                    mainCtx.setLineDash([]);
                 }
 
                 if (isDrawing && currentTool === 'lasso' && lassoPath.length > 1) {
-                    targetCtx.strokeStyle = isDarkMode ? '#a5b4fc' : '#4f46e5';
-                    targetCtx.lineWidth = 1 / zoom;
-                    targetCtx.setLineDash([4 / zoom, 4 / zoom]);
-                    targetCtx.beginPath();
-                    targetCtx.moveTo(lassoPath[0].x, lassoPath[0].y);
+                    mainCtx.strokeStyle = isDarkMode ? '#a5b4fc' : '#4f46e5';
+                    mainCtx.lineWidth = 1 / zoom;
+                    mainCtx.setLineDash([4 / zoom, 4 / zoom]);
+                    mainCtx.beginPath();
+                    mainCtx.moveTo(lassoPath[0].x, lassoPath[0].y);
                     for (let i = 1; i < lassoPath.length; i++) {
-                        targetCtx.lineTo(lassoPath[i].x, lassoPath[i].y);
+                        mainCtx.lineTo(lassoPath[i].x, lassoPath[i].y);
                     }
-                    targetCtx.stroke();
-                    targetCtx.setLineDash([]);
+                    mainCtx.stroke();
+                    mainCtx.setLineDash([]);
                 }
 
                 if (currentTool === 'image' && imageState.img) {
                     drawSelectionUI();
                 }
             }
-            
+
             function getHandleRects() {
                 if (!imageState.img) return {};
                 const handleSize = 16 / zoom;
@@ -969,8 +933,10 @@
             }
 
             function saveStateToLocalStorage() {
-                if(history.length > 0) {
-                   localStorage.setItem('drawingState', JSON.stringify(history[historyIndex]));
+                if (history.length > 0 && historyIndex >= 0) {
+                    localStorage.setItem('drawingState', JSON.stringify(history[historyIndex]));
+                } else {
+                    localStorage.removeItem('drawingState');
                 }
             }
 
@@ -987,16 +953,16 @@
                         imageState.img.onerror = () => { imageState.img = null; redrawAll(); };
                         imageState.img.src = savedImgState.src;
                     } else {
-                       imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
+                        imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
                     }
                 } else {
-                     paths = [];
-                     imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
+                    paths = [];
+                    imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 };
                 }
 
-                history = [deepCopy({paths, imageState})];
+                history = [deepCopy({ paths, imageState })];
                 historyIndex = 0;
-                
+
                 updateUndoButton();
                 redrawAll();
                 checkContentInView();
@@ -1035,6 +1001,10 @@
                     }
                 }
 
+                if (currentTool === 'stroke-eraser') {
+                    handleStrokeErase(getCanvasPoint(e));
+                    return;
+                }
 
                 activePointers.set(e.pointerId, e);
                 canvasWrapper.setPointerCapture(e.pointerId);
@@ -1070,7 +1040,7 @@
                             selectedPathIndices = [];
                             lassoPath = [pos];
                         }
-                        redrawAll();
+                        // No redraw here, pointermove will handle it
                         return;
                     }
 
@@ -1093,11 +1063,7 @@
                         }
                     } else {
                         interactionState.type = 'draw';
-                        if (currentTool === 'stroke-eraser') {
-                            handleStrokeErase(pos);
-                        } else {
-                            currentPath = [pos];
-                        }
+                        currentPath = [pos];
                     }
                 }
                 updateCursorStyle(e);
@@ -1147,57 +1113,22 @@
                         lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
                     }
                 } else if (isDrawing) {
-                    const pos = getCanvasPoint(e);
-
-                    if (currentTool === 'lasso') {
-                        lassoPath.push(pos);
-                        redrawAll();
-                        return;
-                    }
-
                     if (interactionState.type === 'move') {
+                        const pos = getCanvasPoint(e);
                         const dx = pos.x - interactionState.startX;
                         const dy = pos.y - interactionState.startY;
                         imageState.x = interactionState.startImageX + dx;
                         imageState.y = interactionState.startImageY + dy;
-                        redrawAll();
                     } else if (interactionState.type && interactionState.type.startsWith('resize-')) {
-                        handleImageResize(pos);
-                        redrawAll();
+                        handleImageResize(getCanvasPoint(e));
                     } else if (interactionState.type === 'draw') {
-                        if (currentTool === 'stroke-eraser') {
-                            handleStrokeErase(pos);
-                            return;
-                        }
                         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
-                        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-
-                        let strokeStyle;
-                        if (currentTool === 'pen') {
-                            if (isDarkMode && penColor === '#000000') {
-                                strokeStyle = '#ffffff';
-                            } else {
-                                strokeStyle = penColor;
-                            }
-                        } else {
-                            strokeStyle = bgColor;
-                        }
-
-                        ctx.lineCap = 'round';
-                        ctx.lineJoin = 'round';
-                        ctx.lineWidth = penWidth;
-                        ctx.strokeStyle = strokeStyle;
-
-                        ctx.beginPath();
-                        ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
-
                         for (const event of events) {
                             const coalescedPos = getCanvasPoint(event);
                             currentPath.push(coalescedPos);
-                            ctx.lineTo(coalescedPos.x, coalescedPos.y);
                         }
-                        ctx.stroke();
                     }
+                    redrawAll();
                 }
             }
 
@@ -1221,18 +1152,18 @@
                 if (handle.includes('b')) {
                     newHeight = Math.max(20, interactionState.startImageHeight + dy);
                 }
-                
+
                 if (isAspectRatioLocked) {
                     const aspectRatio = imageState.aspectRatio;
                     if (handle.includes('l') || handle.includes('r')) {
-                         newHeight = newWidth / aspectRatio;
-                         if (handle.includes('t')) {
+                        newHeight = newWidth / aspectRatio;
+                        if (handle.includes('t')) {
                             newY = (interactionState.startImageY + interactionState.startImageHeight) - newHeight;
-                         }
+                        }
                     } else if (handle.includes('t') || handle.includes('b')) {
                         newWidth = newHeight * aspectRatio;
-                        if(handle.includes('l')) {
-                           newX = (interactionState.startImageX + interactionState.startImageWidth) - newWidth;
+                        if (handle.includes('l')) {
+                            newX = (interactionState.startImageX + interactionState.startImageWidth) - newWidth;
                         }
                     }
                 }
@@ -1243,16 +1174,22 @@
                 imageState.height = newHeight;
             }
 
-
             function handlePointerUp(e) {
                 if (!activePointers.has(e.pointerId)) return;
 
                 const finishedInteractionType = interactionState.type;
-
                 isDrawing = false;
-                
-                if (finishedInteractionType) {
-                     recordState();
+
+                if (finishedInteractionType === 'draw' && (currentTool === 'pen' || currentTool === 'pixel-eraser') && currentPath.length > 1) {
+                    paths.push({
+                        points: currentPath,
+                        color: (currentTool === 'pen') ? penColor : 'ERASER',
+                        width: penWidth
+                    });
+                    recordState();
+                }
+                else if (finishedInteractionType && (finishedInteractionType.startsWith('resize-') || finishedInteractionType === 'move')) {
+                    recordState();
                 }
 
                 if (currentTool === 'lasso') {
@@ -1260,20 +1197,12 @@
                         isMovingSelection = false;
                         moveStartPoint = null;
                         lassoPath = getSelectionBoundsPoly();
+                        recordState();
                     } else if (lassoPath.length > 0) {
                         selectPathsInLasso();
                     }
                 }
 
-                if (finishedInteractionType === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
-                    paths.push({
-                        points: currentPath,
-                        color: (currentTool === 'pen') ? penColor : 'ERASER',
-                        width: penWidth
-                    });
-                     recordState();
-                }
-                
                 currentPath = [];
                 interactionState.type = null;
 
@@ -1325,9 +1254,9 @@
                 const y = (e.clientY - wrapperRect.top + canvasWrapper.scrollTop) / zoom;
                 return { x, y };
             };
-            
+
             function isPointInRect(point, rect) { return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height; }
-            
+
             function getHandleUnderCursor(pos) { const handles = getHandleRects(); for (const [key, rect] of Object.entries(handles)) { if (isPointInRect(pos, rect)) return key; } return null; }
 
             function updateCursorStyle(e) {
@@ -1384,6 +1313,7 @@
                             break;
                         }
                     }
+                    if (didErase) break;
                 }
                 if (didErase) {
                     recordState();
@@ -1451,6 +1381,7 @@
                 } else {
                     lassoPath = [];
                 }
+                redrawAll();
             }
 
             function isPointInPolygon(point, polygon) {
@@ -1485,7 +1416,7 @@
                 pixelEraserBtn.classList.toggle('active', tool === 'pixel-eraser');
                 strokeEraserBtn.classList.toggle('active', tool === 'stroke-eraser');
                 lassoToolBtn.classList.toggle('active', tool === 'lasso');
-                
+
                 lockAspectRatioBtn.classList.toggle('hidden', tool !== 'image');
 
                 updateCursorStyle();
@@ -1531,25 +1462,30 @@
             });
 
             function calculateContentBounds() {
-                 const currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
-                const currentImageState = (history[historyIndex] && history[historyIndex].imageState) || { img: null };
-
+                const currentPaths = (history[historyIndex] && history[historyIndex].paths) || [];
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                if (currentPaths.length === 0 && !currentImageState.img) return null;
+                let hasContent = false;
 
-                if (currentImageState.img) {
-                    minX = Math.min(minX, currentImageState.x); minY = Math.min(minY, currentImageState.y);
-                    maxX = Math.max(maxX, currentImageState.x + currentImageState.width); maxY = Math.max(maxY, currentImageState.y + currentImageState.height);
+                if (imageState.img) {
+                    minX = Math.min(minX, imageState.x);
+                    minY = Math.min(minY, imageState.y);
+                    maxX = Math.max(maxX, imageState.x + imageState.width);
+                    maxY = Math.max(maxY, imageState.y + imageState.height);
+                    hasContent = true;
                 }
                 currentPaths.forEach(path => {
+                    hasContent = true;
                     path.points.forEach(point => {
-                        minX = Math.min(minX, point.x); minY = Math.min(minY, point.y);
-                        maxX = Math.max(maxX, point.x); maxY = Math.max(maxY, point.y);
+                        minX = Math.min(minX, point.x);
+                        minY = Math.min(minY, point.y);
+                        maxX = Math.max(maxX, point.x);
+                        maxY = Math.max(maxY, point.y);
                     });
                 });
-                if (minX === Infinity) return null;
+                if (!hasContent) return null;
                 return { minX, minY, maxX, maxY };
             }
+
             let scrollCheckTimeout;
             function checkContentInView() {
                 const bounds = calculateContentBounds();
@@ -1703,9 +1639,17 @@
                 else if (file.name.endsWith('.drawing')) {
                     const loadDrawing = () => {
                         reader.onload = (event) => {
-                           const stateToLoad = JSON.parse(event.target.result);
-                           localStorage.setItem('drawingState', JSON.stringify(stateToLoad));
-                           loadStateFromLocalStorage();
+                            try {
+                                const stateToLoad = JSON.parse(event.target.result);
+                                if (stateToLoad && typeof stateToLoad.paths !== 'undefined') {
+                                    localStorage.setItem('drawingState', JSON.stringify(stateToLoad));
+                                    loadStateFromLocalStorage();
+                                } else {
+                                    showNotification('Ungültige Zeichnungsdatei.');
+                                }
+                            } catch (err) {
+                                showNotification('Fehler beim Lesen der Datei.');
+                            }
                         };
                         reader.readAsText(file);
                         e.target.value = '';
@@ -1722,7 +1666,7 @@
                 const bounds = calculateContentBounds();
                 if (!bounds) return;
                 const contentCenterX = (bounds.minX + bounds.maxX) / 2;
-                const contentCenterY = (bounds.minY + maxY) / 2;
+                const contentCenterY = (bounds.minY + bounds.maxY) / 2;
 
                 canvasWrapper.scrollTo({
                     left: contentCenterX * zoom - canvasWrapper.clientWidth / 2,
@@ -1743,9 +1687,9 @@
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
             canvasWrapper.addEventListener('contextmenu', handleContextMenu); // Listener für Rechtsklick
 
-            // Event Listeners für das Verschieben mit der mittleren Maustaste
+            // Event Listeners for panning with middle mouse button
             canvasWrapper.addEventListener('mousedown', (e) => {
-                if (e.button === 1) {
+                if (e.button === 1) { // Middle mouse button
                     e.preventDefault();
                     isPanningWithMouse = true;
                     lastPanPoint = { x: e.clientX, y: e.clientY };
