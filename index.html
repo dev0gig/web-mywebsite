@@ -8,9 +8,12 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- JSZip for creating zip files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
             --bg-color: #f9fafb;
+            --text-color: #111827;
             --text-color-light: #6b7280;
             --header-text-color: #111827;
             --sidebar-bg: #f3f4f6cc;
@@ -23,25 +26,17 @@
 
         html[data-theme='dark'] {
             --bg-color: #171717;
+            --text-color: #fafafa;
             --text-color-light: #a3a3a3;
             --header-text-color: #fafafa;
             --sidebar-bg: #262626cc;
             --sidebar-border: #404040;
             --modal-bg: #262626;
-            --accent-color: #7c3aed;
-            --accent-color-hover: #8b5cf6;
-            --sidebar-link-active-bg: #7c3aed;
         }
 
-        /* Mobile Menu Icons im Dark Mode invertieren und zentrieren */
-        html[data-theme='dark'] #mobile-menu img {
-            filter: invert(1) brightness(1.5) contrast(1.2);
-        }
-
-        /* Bilder im Dark Mode invertieren (z.B. schwarze Icons zu weißen Icons) */
+        html[data-theme='dark'] #mobile-menu img,
         html[data-theme='dark'] #sidebar img {
             filter: invert(1) brightness(1.5) contrast(1.2);
-            /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
         }
 
         html,
@@ -49,31 +44,25 @@
             height: 100%;
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color-light);
+            color: var(--text-color);
             overflow: hidden;
         }
 
-        /* Haupt-Inhaltsbereich relativ positioniert für den Loader */
         #main-content {
             position: relative;
-            /* MODIFIZIERT: top: 4rem; für mobilen Header berücksichtigen */
             top: 4rem;
             height: calc(100% - 4rem);
-            /* Höhe anpassen, um den Header zu kompensieren */
         }
 
-        /* Nur für Desktop, mobile Anpassungen werden direkt im HTML überschrieben */
         @media (min-width: 768px) {
             #main-content {
                 padding-top: 0;
-                /* Kein Padding auf Desktop */
                 top: 0;
                 height: 100%;
+                margin-left: 4.5rem;
             }
         }
 
-
-        /* Lade-Abdeckung für den Iframe-Wechsel */
         #content-loader {
             position: absolute;
             inset: 0;
@@ -82,7 +71,6 @@
             opacity: 1;
             transition: opacity 0.3s ease-in-out;
             pointer-events: none;
-            /* Klicks durchlassen, wenn unsichtbar */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,7 +97,6 @@
             pointer-events: auto;
         }
 
-        /* Desktop Sidebar: Bleibt fixiert, Hover-Effekt wie bisher */
         #sidebar {
             position: fixed;
             top: 0;
@@ -122,14 +109,10 @@
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
             display: none;
-            /* Standardmäßig auf mobilen Geräten ausblenden */
             flex-direction: column;
-            /* Anordnung in Spalte */
         }
 
         @media (min-width: 768px) {
-
-            /* Tailwind's 'md' breakpoint */
             #sidebar {
                 display: flex;
             }
@@ -167,14 +150,12 @@
             color: #ffffff;
         }
 
-        /* Mobile Header */
         #mobile-header {
             background-color: var(--sidebar-bg);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--sidebar-border);
         }
 
-        /* Mobile Menu Panel */
         #mobile-menu {
             background-color: var(--bg-color);
             border-right: 1px solid var(--sidebar-border);
@@ -209,6 +190,24 @@
         .theme-radio-peer:checked~.theme-radio-label:hover {
             background-color: var(--sidebar-border);
         }
+
+        /* Notification Toast */
+        #notification-toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: bottom 0.5s ease-in-out;
+            z-index: 200;
+        }
+
+        #notification-toast.show {
+            bottom: 20px;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -228,31 +227,30 @@
         </button>
     </header>
 
-    <nav id="sidebar" class="p-2">
+    <nav id="sidebar" class="p-2 flex flex-col">
         <ul id="nav-links" class="space-y-2 mt-2">
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Appdrawer</span></a>
+            </li>
             <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/widgets.svg" alt="Widgets Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="tabs/readlater/readlater.html" data-target="frame-readlater"
+            <li><a href="readlater.html" data-target="frame-readlater"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/readlater.svg" alt="ReadlateR Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">ReadlateR</span></a></li>
-            <!-- NEUER RSS READER TAB -->
-            <li><a href="tabs/rss/rss-reader.html" data-target="frame-rss"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
+            <li><a href="rss-reader.html" data-target="frame-rss" class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/rss.svg" alt="RSS Reader Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">RSS Reader</span></a></li>
-            <li><a href="aurimea/aurimea.html" data-target="frame-aurimea"
+            <li><a href="aurimea.html" data-target="frame-aurimea"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
-            <li><a href="memomea/memomea.html" data-target="frame-memomea"
+            <li><a href="memomea.html" data-target="frame-memomea"
                     class="sidebar-link flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">MemoMea</span></a>
@@ -274,7 +272,7 @@
                     <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
-        <ul class="space-y-2 mt-2">
+        <ul class="space-y-2 mt-auto pb-4">
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
@@ -294,22 +292,22 @@
                 </svg>
             </button>
         </div>
-        <ul id="mobile-nav-links" class="space-y-2">
+        <ul id="mobile-nav-links" class="space-y-2 overflow-y-auto">
         </ul>
     </nav>
 
-    <main id="main-content" class="h-full md:ml-[4.5rem]">
+    <main id="main-content" class="h-full">
         <div class="relative w-full h-full">
             <div id="content-loader">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"></iframe>
-            <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"></iframe>
-            <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe"></iframe>
-            <!-- NEUES RSS READER IFRAME -->
-            <iframe id="frame-rss" src="tabs/rss/rss-reader.html" class="content-iframe"></iframe>
-            <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe"></iframe>
-            <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe"></iframe>
+            <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
+            <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"
+                data-key="widgets"></iframe>
+            <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe" data-key="readlater"></iframe>
+            <iframe id="frame-rss" src="tabs/rss/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
+            <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
+            <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe" data-key="memomea"></iframe>
         </div>
     </main>
 
@@ -321,205 +319,292 @@
             <button id="close-modal-btn" class="hover:text-white text-2xl"
                 style="color: var(--text-color-light);">&times;</button>
         </div>
-        <div>
-            <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
-            <fieldset class="space-y-3">
-                <legend class="sr-only">Theme selection</legend>
-                <div><input type="radio" name="theme" id="theme-light" value="light"
-                        class="theme-radio-peer hidden"><label for="theme-light"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
+                <fieldset class="space-y-3">
+                    <legend class="sr-only">Theme selection</legend>
+                    <div><input type="radio" name="theme" id="theme-light" value="light"
+                            class="theme-radio-peer hidden"><label for="theme-light"
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
+                    </div>
+                    <div><input type="radio" name="theme" id="theme-dark" value="dark"
+                            class="theme-radio-peer hidden"><label for="theme-dark"
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
+                    </div>
+                    <div><input type="radio" name="theme" id="theme-system" value="system"
+                            class="theme-radio-peer hidden"><label for="theme-system"
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
+                    </div>
+                </fieldset>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Daten-Backup</h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="backup-all-btn"
+                        class="flex-1 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2"
+                        style="background-color: var(--accent-color);"
+                        onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
+                        onmouseout="this.style.backgroundColor='var(--accent-color)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                        </svg>
+                        Alles Sichern
+                    </button>
+                    <label for="restore-all-input"
+                        class="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.5 2.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3.4a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3.4a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                        </svg>
+                        Alles Wiederherstellen
+                    </label>
+                    <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                 </div>
-                <div><input type="radio" name="theme" id="theme-dark" value="dark"
-                        class="theme-radio-peer hidden"><label for="theme-dark"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
-                </div>
-                <div><input type="radio" name="theme" id="theme-system" value="system"
-                        class="theme-radio-peer hidden"><label for="theme-system"
-                        class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
-                </div>
-            </fieldset>
+            </div>
         </div>
     </div>
+
+    <div id="notification-toast"></div>
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const contentLoader = document.getElementById('content-loader');
-            // Stelle sicher, dass diese Abfrage alle iframes im DOM erfasst.
             const contentFrames = document.querySelectorAll('.content-iframe');
-
-            // --- Desktop Sidebar ---
-            const desktopNavLinks = document.querySelectorAll('#sidebar .sidebar-link');
-
-            // --- Mobile Menu ---
+            const desktopNavLinks = document.querySelectorAll('#sidebar #nav-links .sidebar-link');
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
             const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
             const mobileNavLinksContainer = document.getElementById('mobile-nav-links');
             const mobileHeaderTitle = document.getElementById('mobile-header-title');
-
-            // --- Settings Modal ---
             const settingsModal = document.getElementById('settings-modal');
             const modalOverlay = document.getElementById('modal-overlay');
             const closeModalBtn = document.getElementById('close-modal-btn');
+            const notificationToast = document.getElementById('notification-toast');
 
-            const openMobileMenu = () => {
-                mobileMenu.classList.add('open');
-                mobileMenuOverlay.classList.remove('hidden');
+            // --- Backup & Restore ---
+            const backupAllBtn = document.getElementById('backup-all-btn');
+            const restoreAllInput = document.getElementById('restore-all-input');
+            let backupData = {};
+            // Filter to only include frames that should be backed up
+            const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key !== 'widgets');
+            let expectedResponses = 0;
+            let receivedResponses = 0;
+
+            const showToast = (message, type = 'success', duration = 3000) => {
+                notificationToast.textContent = message;
+                notificationToast.className = 'show';
+                if (type === 'success') notificationToast.style.backgroundColor = '#22c55e';
+                else if (type === 'error') notificationToast.style.backgroundColor = '#ef4444';
+                else notificationToast.style.backgroundColor = '#525252';
+
+                if (duration > 0) {
+                    setTimeout(() => { notificationToast.className = ''; }, duration);
+                }
             };
 
-            const closeMobileMenu = () => {
-                mobileMenu.classList.remove('open');
-                mobileMenuOverlay.classList.add('hidden');
+            const backupAllData = () => {
+                backupData = {};
+                expectedResponses = backupFrames.length;
+                receivedResponses = 0;
+
+                if (expectedResponses === 0) {
+                    showToast('Keine Apps zum Sichern gefunden.', 'info');
+                    return;
+                }
+
+                showToast('Backup wird gestartet...', 'info', 0);
+
+                backupFrames.forEach(frame => {
+                    frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*');
+                });
+
+                setTimeout(() => {
+                    if (receivedResponses < expectedResponses && receivedResponses > 0) {
+                        showToast('Backup-Timeout: Nicht alle Tabs haben geantwortet. Teil-Backup wird erstellt.', 'error');
+                        createAndDownloadZip();
+                    } else if (receivedResponses === 0) {
+                        showToast('Backup-Fehler: Keine App hat geantwortet.', 'error');
+                    }
+                }, 10000);
             };
 
-            const openSettingsModal = () => {
-                settingsModal.classList.remove('hidden');
-                modalOverlay.classList.remove('hidden');
+            const createAndDownloadZip = () => {
+                const zip = new JSZip();
+                let filesAdded = 0;
+                for (const key in backupData) {
+                    if (backupData[key] && ((Array.isArray(backupData[key]) && backupData[key].length > 0) || (typeof backupData[key] === 'object' && Object.keys(backupData[key]).length > 0))) {
+                        zip.file(`${key}.json`, JSON.stringify(backupData[key], null, 2));
+                        filesAdded++;
+                    }
+                }
+
+                if (filesAdded === 0) {
+                    showToast('Keine Daten zum Sichern gefunden.', 'info');
+                    return;
+                }
+
+                zip.generateAsync({ type: "blob" })
+                    .then(content => {
+                        const link = document.createElement('a');
+                        const date = new Date().toISOString().slice(0, 10);
+                        link.href = URL.createObjectURL(content);
+                        link.download = `dashboard-backup-${date}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        showToast('Backup erfolgreich heruntergeladen!', 'success');
+                    })
+                    .catch(err => {
+                        console.error('Zip generation failed:', err);
+                        showToast('Backup-Erstellung fehlgeschlagen.', 'error');
+                    });
+            }
+
+            const restoreAllData = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const zip = await JSZip.loadAsync(e.target.result);
+                        let restoredCount = 0;
+
+                        for (const filename in zip.files) {
+                            if (filename.endsWith('.json')) {
+                                const key = filename.replace('.json', '');
+                                const frame = document.querySelector(`.content-iframe[data-key="${key}"]`);
+                                if (frame && frame.contentWindow) {
+                                    const content = await zip.file(filename).async('string');
+                                    frame.contentWindow.postMessage({
+                                        type: 'restoreBackupData',
+                                        data: JSON.parse(content)
+                                    }, '*');
+                                    restoredCount++;
+                                }
+                            }
+                        }
+                        showToast(`${restoredCount} App(s) erfolgreich wiederhergestellt. Die Seiten werden neu geladen.`, 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+
+                    } catch (err) {
+                        console.error('Restore failed:', err);
+                        showToast('Wiederherstellung fehlgeschlagen. Ist es eine gültige Backup-Datei?', 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+                restoreAllInput.value = '';
             };
 
-            const closeSettingsModal = () => {
-                settingsModal.classList.add('hidden');
-                modalOverlay.classList.add('hidden');
-            };
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'backupDataResponse') {
+                    const { key, data } = event.data;
+                    if (key && data) {
+                        backupData[key] = data;
+                    }
+                    receivedResponses++;
+
+                    if (receivedResponses === expectedResponses) {
+                        createAndDownloadZip();
+                    }
+                } else if (event.data && event.data.startsWith('set-theme-')) {
+                    const theme = event.data.substring('set-theme-'.length);
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            });
+
+            backupAllBtn.addEventListener('click', backupAllData);
+            restoreAllInput.addEventListener('change', restoreAllData);
+
+            const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
+            const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };
+            const openSettingsModal = () => { settingsModal.classList.remove('hidden'); modalOverlay.classList.remove('hidden'); };
+            const closeSettingsModal = () => { settingsModal.classList.add('hidden'); modalOverlay.classList.add('hidden'); };
 
             function handleNavLinkClick(e) {
                 const target = e.currentTarget;
 
-                // Wenn der Link in einem neuen Tab geöffnet werden soll, das Standardverhalten zulassen
-                if (target.target === '_blank') {
-                    if (mobileMenu.classList.contains('open')) closeMobileMenu();
-                    return;
-                }
-
-                // Standardverhalten für alle anderen Fälle (iframe-Links, Einstellungen) verhindern
-                e.preventDefault();
-
-                if (target.closest('li').querySelector('#settings-btn')) {
+                if (target.closest('#settings-btn')) {
+                    e.preventDefault();
                     openSettingsModal();
+                } else if (target.target === '_blank') {
+                    // Let the browser handle it
                 } else {
+                    e.preventDefault();
                     const targetFrameId = target.dataset.target;
                     if (!targetFrameId) return;
-
-                    // Aktiven Tab im localStorage speichern
                     localStorage.setItem('lastActiveTab', targetFrameId);
-
                     const targetFrame = document.getElementById(targetFrameId);
-
                     if (targetFrame && !targetFrame.classList.contains('active')) {
-                        // Aktiven Frame deaktivieren
-                        const activeFrame = document.querySelector('.content-iframe.active');
-                        if (activeFrame) {
-                            activeFrame.classList.remove('active');
-                        }
-                        // Neuen Frame aktivieren
+                        document.querySelector('.content-iframe.active')?.classList.remove('active');
                         targetFrame.classList.add('active');
-
-                        // Aktiven Zustand für alle Links aktualisieren
-                        document.querySelectorAll('#nav-links a, #mobile-nav-links a').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll('#nav-links .sidebar-link, #mobile-nav-links .sidebar-link').forEach(l => l.classList.remove('active'));
                         document.querySelectorAll(`a[data-target="${targetFrameId}"]`).forEach(l => l.classList.add('active'));
-
-                        // Titel im mobilen Header aktualisieren
-                        const activeLinkText = target.querySelector('span')?.textContent || 'Appdrawer';
-                        mobileHeaderTitle.textContent = activeLinkText;
+                        mobileHeaderTitle.textContent = target.querySelector('.sidebar-text')?.textContent || 'Dashboard';
                     }
                 }
-
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
             }
 
-            // Nur die Haupt-Navigationslinks für den oberen Teil des Mobile-Menüs klonen
-            document.querySelectorAll('#nav-links .sidebar-link').forEach(link => {
-                const li = document.createElement('li');
-                const newLink = link.cloneNode(true);
-                const sidebarTextSpan = newLink.querySelector('.sidebar-text');
+            // Clone all nav items for mobile menu
+            document.querySelectorAll('#sidebar > ul > li').forEach(li => {
+                const newLi = li.cloneNode(true);
+                const linkOrButton = newLi.querySelector('a, button');
+                const sidebarTextSpan = linkOrButton.querySelector('.sidebar-text');
                 if (sidebarTextSpan) {
                     sidebarTextSpan.style.opacity = 1;
                     sidebarTextSpan.style.maxWidth = '150px';
                     sidebarTextSpan.classList.remove('sidebar-text');
                     sidebarTextSpan.classList.add('ml-3');
                 }
-                newLink.classList.add('w-full');
-                li.appendChild(newLink);
-                mobileNavLinksContainer.appendChild(li);
-                newLink.addEventListener('click', handleNavLinkClick);
+                linkOrButton.classList.add('w-full');
+                mobileNavLinksContainer.appendChild(newLi);
+                linkOrButton.addEventListener('click', handleNavLinkClick);
             });
-
-            // Einstellungen-Button für das mobile Menü klonen und anhängen
-            const desktopSettingsLi = document.querySelector('#sidebar ul:last-child li');
-            if (desktopSettingsLi) {
-                const mobileSettingsLi = desktopSettingsLi.cloneNode(true);
-                const mobileSettingsBtn = mobileSettingsLi.querySelector('#settings-btn');
-                const mobileSettingsTextSpan = mobileSettingsBtn.querySelector('.sidebar-text');
-                if (mobileSettingsTextSpan) {
-                    mobileSettingsTextSpan.classList.remove('sidebar-text');
-                    mobileSettingsTextSpan.classList.add('ml-3');
-                }
-                mobileNavLinksContainer.appendChild(mobileSettingsLi);
-                mobileSettingsBtn.addEventListener('click', handleNavLinkClick);
-            }
 
             desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
             document.getElementById('settings-btn').addEventListener('click', handleNavLinkClick);
-
             hamburgerBtn.addEventListener('click', openMobileMenu);
             closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
             mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
             closeModalBtn.addEventListener('click', closeSettingsModal);
-            modalOverlay.addEventListener('click', (e) => {
-                if (!settingsModal.classList.contains('hidden')) closeSettingsModal();
-            });
+            modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
 
-            // --- Theme Wechsler ---
             const themeRadios = document.querySelectorAll('input[name="theme"]');
             function applyTheme(theme) {
-                let effectiveTheme;
-                if (theme === 'system') {
-                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                } else {
-                    effectiveTheme = theme;
-                }
-                document.documentElement.dataset.theme = effectiveTheme;
+                let effectiveTheme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
                 contentFrames.forEach(frame => {
-                    try {
-                        if (frame.contentWindow) {
-                            frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
-                        }
-                    } catch (e) { /* cross-origin errors ignorieren */ }
+                    frame.contentWindow?.postMessage(`set-theme-${effectiveTheme}`, '*');
                 });
             }
-            function handleThemeChange(event) {
-                const selectedTheme = event.target.value;
+            themeRadios.forEach(radio => radio.addEventListener('change', (e) => {
+                const selectedTheme = e.target.value;
                 localStorage.setItem('theme', selectedTheme);
                 applyTheme(selectedTheme);
-            }
+            }));
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('theme') === 'system') applyTheme('system'); });
 
-            themeRadios.forEach(radio => radio.addEventListener('change', handleThemeChange));
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                const savedTheme = localStorage.getItem('theme') || 'system';
-                if (savedTheme === 'system') applyTheme('system');
-            });
-
-            // --- Iframe Loading ---
             let loadedFrames = 0;
-            // Wichtig: totalFrames sollte die korrekte Anzahl der initial vorhandenen iframes widerspiegeln.
             const totalFrames = contentFrames.length;
-
             if (totalFrames > 0) {
                 contentFrames.forEach(frame => {
                     frame.addEventListener('load', () => {
                         loadedFrames++;
                         const savedTheme = localStorage.getItem('theme') || 'system';
-                        let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
-                        try {
-                            if (frame.contentWindow) {
-                                frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
-                            }
-                        } catch (e) { /* ignorieren */ }
-
+                        applyTheme(savedTheme);
                         if (loadedFrames >= totalFrames) {
-                            contentLoader.classList.add('hidden');
+                            setTimeout(() => contentLoader.classList.add('hidden'), 200);
                         }
                     });
                 });
@@ -527,35 +612,21 @@
                 contentLoader.classList.add('hidden');
             }
 
-            // --- Initialen Status setzen ---
-            // 1. Theme setzen
             const savedTheme = localStorage.getItem('theme') || 'system';
-            const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
-            if (themeRadio) themeRadio.checked = true;
+            document.querySelector(`input[name="theme"][value="${savedTheme}"]`)?.setAttribute('checked', 'true');
             applyTheme(savedTheme);
 
-            // 2. Aktiven Tab setzen
             const lastActiveTabId = localStorage.getItem('lastActiveTab') || 'frame-appdrawer';
             const targetFrame = document.getElementById(lastActiveTabId);
             const targetLink = document.querySelector(`a[data-target="${lastActiveTabId}"]`);
-
             if (targetFrame && targetLink) {
-                // Alle 'active' Klassen entfernen, um einen sauberen Start zu gewährleisten
-                document.querySelectorAll('.content-iframe.active').forEach(f => f.classList.remove('active'));
-                document.querySelectorAll('.sidebar-link.active').forEach(l => l.classList.remove('active'));
-
-                // Den gespeicherten/Standard-Frame und Link aktivieren
                 targetFrame.classList.add('active');
                 document.querySelectorAll(`a[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
-
-                // Titel im mobilen Header aktualisieren
-                const activeLinkText = targetLink.querySelector('span')?.textContent || 'Appdrawer';
-                mobileHeaderTitle.textContent = activeLinkText;
+                mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || 'Dashboard';
             } else {
-                // Fallback, falls der gespeicherte Tab ungültig ist
-                localStorage.removeItem('lastActiveTab'); // Ungültigen Wert entfernen
-                document.getElementById('frame-appdrawer').classList.add('active');
-                document.querySelector('a[data-target="frame-appdrawer"]').classList.add('active');
+                localStorage.removeItem('lastActiveTab');
+                document.getElementById('frame-appdrawer')?.classList.add('active');
+                document.querySelector('a[data-target="frame-appdrawer"]')?.classList.add('active');
                 mobileHeaderTitle.textContent = 'Appdrawer';
             }
         });

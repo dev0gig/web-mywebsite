@@ -36,7 +36,8 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
-            padding-bottom: calc(120px + env(safe-area-inset-bottom)); /* Platz für Dock + sicheren Bereich */
+            padding-bottom: calc(120px + env(safe-area-inset-bottom));
+            /* Platz für Dock + sicheren Bereich */
         }
 
         /* Subtiler Scrollbalken für den Body */
@@ -212,7 +213,8 @@
         #favorites-dock {
             position: fixed;
             bottom: calc(20px + env(safe-area-inset-bottom));
-            left: 50%; transform: translateX(-50%);
+            left: 50%;
+            transform: translateX(-50%);
             padding: 0.75rem;
             background-color: var(--dock-bg);
             border: 1px solid var(--dock-border);
@@ -338,8 +340,10 @@
 
             #app-grid {
                 padding: 1.5rem 1rem;
-                grid-template-columns: repeat(3, 1fr); /* 3 Apps pro Reihe */
-                gap: 1rem; /* Reduzierter Abstand für mobile Ansicht */
+                grid-template-columns: repeat(3, 1fr);
+                /* 3 Apps pro Reihe */
+                gap: 1rem;
+                /* Reduzierter Abstand für mobile Ansicht */
             }
 
             #favorites-dock {
@@ -612,5 +616,44 @@
         });
     </script>
 </body>
+
+<script>
+    window.addEventListener('message', (event) => {
+        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        if (event.source !== window.parent) {
+            return;
+        }
+
+        const message = event.data;
+
+        if (message && message.type === 'getBackupData') {
+            // Sammle die Daten, die du sichern möchtest.
+            // In diesem Fall die favorisierten Apps aus dem localStorage.
+            const favoritesData = localStorage.getItem('favoriteApps');
+
+            // Sende die Daten zurück an das Hauptfenster (index.html).
+            // Der 'key' muss mit dem 'data-key' des iframes übereinstimmen.
+            window.parent.postMessage({
+                type: 'backupDataResponse',
+                key: 'appdrawer',
+                data: JSON.parse(favoritesData || '[]') // Stelle sicher, dass du gültiges JSON sendest
+            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+        }
+
+        if (message && message.type === 'restoreBackupData') {
+            // Empfange die wiederherzustellenden Daten.
+            const restoredFavorites = message.data;
+
+            if (Array.isArray(restoredFavorites)) {
+                // Speichere die wiederhergestellten Daten im localStorage.
+                localStorage.setItem('favoriteApps', JSON.stringify(restoredFavorites));
+
+                // Lade die Seite neu oder rufe deine Render-Funktion erneut auf,
+                // damit die Änderungen sichtbar werden.
+                window.location.reload();
+            }
+        }
+    });
+</script>
 
 </html>

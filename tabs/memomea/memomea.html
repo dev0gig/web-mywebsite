@@ -1166,4 +1166,42 @@
     </script>
 </body>
 
+<script>
+    window.addEventListener('message', (event) => {
+        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        if (event.source !== window.parent) {
+            return;
+        }
+
+        const message = event.data;
+
+        if (message && message.type === 'getBackupData') {
+            // Sammle die Journaleinträge aus dem localStorage.
+            const journalData = localStorage.getItem('markdownJournalEntries');
+
+            // Sende die Daten zurück an das Hauptfenster (index.html).
+            // Der 'key' muss mit dem 'data-key' des iframes übereinstimmen.
+            window.parent.postMessage({
+                type: 'backupDataResponse',
+                key: 'memomea',
+                data: JSON.parse(journalData || '{}') // Stelle sicher, dass gültiges JSON gesendet wird (ein Objekt).
+            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+        }
+
+        if (message && message.type === 'restoreBackupData') {
+            // Empfange die wiederherzustellenden Daten.
+            const restoredEntries = message.data;
+
+            // Überprüfe, ob die wiederhergestellten Daten ein Objekt sind.
+            if (typeof restoredEntries === 'object' && restoredEntries !== null) {
+                // Speichere die wiederhergestellten Daten im localStorage.
+                localStorage.setItem('markdownJournalEntries', JSON.stringify(restoredEntries));
+
+                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                window.location.reload();
+            }
+        }
+    });
+</script>
+
 </html>
