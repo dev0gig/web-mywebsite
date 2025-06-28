@@ -202,7 +202,6 @@
 
 <body data-theme="system">
 
-    <!-- Mobile Header (wird auf md und grösser versteckt) -->
     <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4">
         <span id="mobile-header-title" class="font-bold text-lg text-center"
             style="color: var(--header-text-color);">Appdrawer</span>
@@ -214,10 +213,8 @@
         </button>
     </header>
 
-    <!-- Sidebar Navigation (wird auf kleinen Bildschirmen versteckt) -->
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2">
-            <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
             <li><a href="appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
@@ -252,17 +249,14 @@
             <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0">
-                    <!-- Assumed assets/icons/calendar.svg exists -->
                     <span class="sidebar-text font-medium">Google Kalender</span></a></li>
             <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0">
-                    <!-- Assumed assets/icons/drive.svg exists -->
                     <span class="sidebar-text font-medium">Google Drive</span></a></li>
             <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
-                    <!-- Assumed assets/icons/notes.svg exists -->
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
         </ul>
         <ul class="space-y-2 mt-2">
@@ -272,7 +266,6 @@
         </ul>
     </nav>
 
-    <!-- Mobile Menu Panel -->
     <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu"
         class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-4 flex flex-col justify-between"
@@ -287,21 +280,14 @@
             </button>
         </div>
         <ul id="mobile-nav-links" class="space-y-2">
-            <!-- Mobile links werden hier via JS eingefügt -->
-        </ul>
-        <ul id="mobile-bottom-nav-links" class="space-y-2">
-            <!-- Mobile links werden hier via JS eingefügt -->
         </ul>
     </nav>
 
-    <!-- Iframe Content Area -->
     <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-[4.5rem]">
         <div class="relative w-full h-full">
             <div id="content-loader">
-                <!-- Lade-GIF hinzugefügt -->
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <!-- Die 'active' Klasse wird nun durch JS gesetzt -->
             <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"></iframe>
             <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"></iframe>
             <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe"></iframe>
@@ -311,7 +297,6 @@
         </div>
     </main>
 
-    <!-- Settings Modal -->
     <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50"></div>
     <div id="settings-modal"
         class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6 z-[60]">
@@ -453,7 +438,8 @@
                     mobileSettingsTextSpan.classList.remove('sidebar-text');
                     mobileSettingsTextSpan.classList.add('ml-3');
                 }
-                document.getElementById('mobile-bottom-nav-links').appendChild(mobileSettingsLi);
+                // Append to mobileNavLinksContainer instead of mobile-bottom-nav-links
+                mobileNavLinksContainer.appendChild(mobileSettingsLi);
                 mobileSettingsBtn.addEventListener('click', handleNavLinkClick);
             }
 

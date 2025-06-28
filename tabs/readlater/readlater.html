@@ -95,7 +95,9 @@
             pointer-events: none;
         }
 
-        #confirm-modal-overlay {
+        #confirm-modal-overlay,
+        #link-group-modal-overlay,
+        #add-tags-modal-overlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.7);
@@ -103,13 +105,146 @@
             transition: opacity 0.3s;
         }
 
-        #confirm-modal {
+        #confirm-modal,
+        #link-group-modal,
+        #add-tags-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 60;
             transition: opacity 0.3s;
+            max-height: 90vh;
+            /* Ensure modal fits screen height */
+            overflow-y: auto;
+            /* Allow scrolling within the modal if content overflows */
+        }
+
+        /* Styles for the domain group stack header */
+        .domain-stack {
+            background-color: #262626;
+            /* neutral-800 */
+            border: 1px solid #404040;
+            /* neutral-700 */
+            border-radius: 0.5rem;
+            /* Ensure rounded corners */
+            overflow: hidden;
+            /* Crucial for clipping children to border-radius */
+            margin-bottom: 0.25rem;
+            /* Further reduced margin to 0.25rem */
+        }
+
+        .domain-stack-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            cursor: pointer;
+            /* Cursor for the entire header */
+            background-color: #262626;
+            /* neutral-800 */
+            transition: background-color 0.2s ease-in-out;
+            color: #fafafa;
+        }
+
+        .domain-stack-header:hover {
+            background-color: #3f3f46;
+            /* neutral-700 */
+        }
+
+        .domain-stack-header img {
+            margin-right: 1rem;
+            /* Adjusted margin for larger favicon */
+            width: 32px;
+            /* Larger favicon size */
+            height: 32px;
+            /* Larger favicon size */
+        }
+
+        /* The .domain-stack-content is no longer used for inline expansion */
+        /* It will effectively be an empty div or removed as its content now appears in modal */
+
+        .link-card {
+            background-color: #1a1a1a;
+            /* neutral-900 */
+            border: 1px solid #262626;
+            /* neutral-800 */
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.2s ease-in-out;
+            cursor: pointer;
+            /* Cursor for the entire link card */
+        }
+
+        .link-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-card:hover {
+            border-color: #525252;
+            /* neutral-600 */
+        }
+
+        .link-card .image-container {
+            width: 100%;
+            height: 12rem;
+            /* Fixed height for image on small screens */
+            flex-shrink: 0;
+        }
+
+        .link-card .content-container {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        /* Mobile specific adjustments for link cards within modals */
+        @media (min-width: 768px) {
+            .link-card {
+                flex-direction: row;
+                height: 14rem;
+                /* Fixed height for desktop */
+            }
+
+            .link-card .image-container {
+                width: 16rem;
+                /* Fixed width for desktop */
+                height: auto;
+            }
+        }
+
+        /* Styles for individual tags in the edit modal */
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            background-color: #404040;
+            /* neutral-700 */
+            color: #fafafa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            /* full-rounded */
+            font-size: 0.75rem;
+            /* text-xs */
+            font-weight: 500;
+            /* font-medium */
+            margin-right: 0.5rem;
+            /* mr-2 */
+            margin-bottom: 0.5rem;
+            /* mb-2 */
+            cursor: pointer;
+            /* Cursor for the entire tag item */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            /* Added color transition */
+        }
+
+        .tag-item:hover {
+            background-color: #ef4444;
+            /* red-500 for hover to delete */
+            color: white;
+            /* Ensure text is visible on red background */
         }
     </style>
 </head>
@@ -202,12 +337,11 @@
                 <button id="toggle-archive-btn"
                     class="ml-4 flex-shrink-0 text-sm bg-neutral-700 hover:bg-neutral-600 text-neutral-200 font-medium rounded-md px-4 py-2 transition">Archiv</button>
             </div>
-            <div id="domain-filters-container" class="flex flex-wrap gap-2 items-center"></div>
             <div id="tag-filters-container" class="flex flex-wrap gap-2 items-center mt-2"></div>
         </div>
 
         <!-- Links Container -->
-        <main id="links-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></main>
+        <main id="links-container" class="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:gap-4"></main>
         <div id="empty-state"
             class="hidden text-center py-16 px-6 bg-neutral-800/50 rounded-lg border border-dashed border-neutral-700">
             <h3 id="empty-state-title" class="text-lg font-semibold text-white"></h3>
@@ -229,6 +363,42 @@
         </div>
     </div>
 
+    <!-- New Link Group Modal -->
+    <div id="link-group-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
+    <div id="link-group-modal"
+        class="w-11/12 max-w-4xl bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h3 id="link-group-modal-title" class="text-xl font-bold text-white"></h3>
+            <button id="link-group-modal-close-btn" class="text-neutral-400 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                </svg>
+            </button>
+        </div>
+        <div id="link-group-modal-content" class="space-y-4">
+            <!-- Links will be loaded here -->
+        </div>
+    </div>
+
+    <!-- New Add Tags Modal -->
+    <div id="add-tags-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 modal-hidden"></div>
+    <div id="add-tags-modal"
+        class="w-11/12 max-w-md bg-neutral-800 rounded-lg shadow-lg p-6 modal-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <h3 class="text-xl font-bold mb-4">Tags bearbeiten</h3>
+        <div id="current-tags-container" class="flex flex-wrap gap-2 mb-4">
+            <!-- Current tags will be loaded here -->
+        </div>
+        <input type="text" id="add-tags-input" placeholder="Neue Tags hinzufügen (kommagetrennt)"
+            class="w-full bg-neutral-900 border border-neutral-600 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-neutral-500 transition">
+        <div class="flex justify-end gap-4">
+            <button id="add-tags-cancel-btn"
+                class="bg-neutral-600 hover:bg-neutral-500 text-white font-bold py-2 px-4 rounded-lg transition">Abbrechen</button>
+            <button id="add-tags-save-btn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Speichern</button>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -238,7 +408,6 @@
             const linkTagsInput = document.getElementById('link-tags');
             const linksContainer = document.getElementById('links-container');
             const searchInput = document.getElementById('search-input');
-            const domainFiltersContainer = document.getElementById('domain-filters-container');
             const tagFiltersContainer = document.getElementById('tag-filters-container');
             const toggleArchiveBtn = document.getElementById('toggle-archive-btn');
             const clearArchiveBtn = document.getElementById('clear-archive-btn');
@@ -256,12 +425,28 @@
             const confirmConfirmBtn = document.getElementById('confirm-modal-confirm-btn');
             const livePreviewContainer = document.getElementById('live-preview-container');
 
+            // New Modal Elements
+            const linkGroupModalOverlay = document.getElementById('link-group-modal-overlay');
+            const linkGroupModal = document.getElementById('link-group-modal');
+            const linkGroupModalTitle = document.getElementById('link-group-modal-title');
+            const linkGroupModalContent = document.getElementById('link-group-modal-content');
+            const linkGroupModalCloseBtn = document.getElementById('link-group-modal-close-btn');
+
+            // New Add Tags Modal Elements
+            const addTagsModalOverlay = document.getElementById('add-tags-modal-overlay');
+            const addTagsModal = document.getElementById('add-tags-modal');
+            const currentTagsContainer = document.getElementById('current-tags-container'); // New element
+            const addTagsInput = document.getElementById('add-tags-input');
+            const addTagsSaveBtn = document.getElementById('add-tags-save-btn');
+            const addTagsCancelBtn = document.getElementById('add-tags-cancel-btn');
+
             // --- State ---
             let links = [];
-            let viewState = { showArchived: false, searchTerm: '', filterTag: null, filterDomain: null };
+            let viewState = { showArchived: false, searchTerm: '', filterTag: null };
             let isFetchingMetadata = false;
             let confirmCallback = null;
-            let previewData = null; // To hold fetched preview data
+            let previewData = null;
+            let currentEditLinkId = null; // To store the ID of the link being edited for tags
 
             // --- Utils ---
             const showToast = (message, type = 'success', duration = 3000) => {
@@ -299,6 +484,62 @@
                 confirmModal.classList.add('modal-hidden');
                 confirmCallback = null;
             };
+
+            const openLinkGroupModal = (hostname, linksInGroup) => {
+                linkGroupModalTitle.textContent = hostname;
+                linkGroupModalContent.innerHTML = ''; // Clear previous content
+
+                linksInGroup.forEach(link => {
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'link-card'; // Reuse link-card style
+                    linkElement.innerHTML = renderLinkCard(link);
+                    linkGroupModalContent.appendChild(linkElement);
+                });
+
+                linkGroupModalOverlay.classList.remove('modal-hidden');
+                linkGroupModal.classList.remove('modal-hidden');
+            };
+
+            const closeLinkGroupModal = () => {
+                linkGroupModalOverlay.classList.add('modal-hidden');
+                linkGroupModal.classList.add('modal-hidden');
+            };
+
+            const openAddTagsModal = (linkId) => {
+                currentEditLinkId = linkId;
+                const linkToEdit = links.find(l => l.id === linkId);
+                if (linkToEdit) {
+                    addTagsInput.value = ''; // Clear input for new tags
+                    currentTagsContainer.innerHTML = ''; // Clear existing tags display
+
+                    // Display existing tags as clickable elements
+                    (linkToEdit.tags || []).forEach(tag => {
+                        const tagSpan = document.createElement('span');
+                        tagSpan.className = 'tag-item';
+                        tagSpan.textContent = tag;
+                        tagSpan.dataset.tag = tag; // Store tag value
+                        currentTagsContainer.appendChild(tagSpan);
+
+                        // Add event listener to remove tag on click
+                        tagSpan.addEventListener('click', (e) => { // Listener on the entire tagSpan
+                            const tagElement = e.target.closest('.tag-item');
+                            if (tagElement) {
+                                tagElement.remove(); // Remove the tag element from the DOM immediately
+                            }
+                        });
+                    });
+
+                    addTagsModalOverlay.classList.remove('modal-hidden');
+                    addTagsModal.classList.remove('modal-hidden');
+                }
+            };
+
+            const closeAddTagsModal = () => {
+                currentEditLinkId = null;
+                addTagsModalOverlay.classList.add('modal-hidden');
+                addTagsModal.classList.add('modal-hidden');
+            };
+
 
             const getHostname = (url) => {
                 try {
@@ -379,15 +620,16 @@
                     if (link.metadataStatus === 'failed') {
                         statusActions += `<button data-id="${link.id}" class="retry-meta-btn text-sm font-medium text-neutral-400 hover:text-neutral-300 transition ml-auto">Erneut versuchen</button>`;
                     }
+                    statusActions += `<button data-id="${link.id}" class="add-tags-btn text-sm font-medium text-blue-400 hover:text-blue-300 transition ml-auto">Tags bearbeiten</button>`; // Added Tags Button
                 }
 
                 return `
-                <div class="md:w-64 lg:w-80 flex-shrink-0 h-48 md:h-full">
+                <div class="image-container">
                    <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="h-full block">
                         <img src="${link.image}" onerror="this.onerror=null;this.src='${placeholderImg}';" alt="Vorschaubild für ${link.title}" class="object-cover w-full h-full">
                     </a>
                 </div>
-                <div class="p-4 flex flex-col flex-grow overflow-hidden">
+                <div class="content-container">
                     <h2 class="text-lg font-bold text-white mb-2"><a href="${link.url}" target="_blank" rel="noopener noreferrer" class="hover:text-neutral-300">${link.title}</a></h2>
                     <p class="text-sm text-neutral-400 mb-3 flex-grow overflow-hidden">${link.description}</p>
                     <div class="flex items-center text-xs text-neutral-500 truncate mb-4">
@@ -405,8 +647,7 @@
                     const matchesArchive = viewState.showArchived ? link.status === 'archived' : link.status === 'active';
                     const matchesSearch = !viewState.searchTerm || link.title.toLowerCase().includes(viewState.searchTerm) || link.url.toLowerCase().includes(viewState.searchTerm);
                     const matchesTag = !viewState.filterTag || link.tags.includes(viewState.filterTag);
-                    const matchesDomain = !viewState.filterDomain || link.hostname === viewState.filterDomain;
-                    return matchesArchive && matchesSearch && matchesTag && matchesDomain;
+                    return matchesArchive && matchesSearch && matchesTag;
                 });
 
                 toggleArchiveBtn.classList.toggle('bg-violet-600', viewState.showArchived);
@@ -415,51 +656,72 @@
                 toggleArchiveBtn.classList.toggle('hover:bg-neutral-600', !viewState.showArchived);
                 clearArchiveBtn.classList.toggle('hidden', !viewState.showArchived);
 
-                emptyState.classList.toggle('hidden', filteredLinks.length > 0);
-                linksContainer.classList.toggle('hidden', filteredLinks.length === 0);
+                linksContainer.innerHTML = ''; // Clear previous content
 
-                if (filteredLinks.length > 0) {
-                    linksContainer.innerHTML = '';
-                    filteredLinks.forEach(link => {
-                        const linkElement = document.createElement('div');
-                        linkElement.className = 'bg-neutral-800 rounded-lg border border-neutral-700 overflow-hidden flex flex-col md:flex-row md:h-56 transition hover:border-neutral-600';
-                        linkElement.innerHTML = renderLinkCard(link);
-                        linksContainer.appendChild(linkElement);
-                    });
-                } else {
+                if (filteredLinks.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    linksContainer.classList.add('hidden');
                     emptyStateTitle.textContent = viewState.showArchived ? "Das Archiv ist leer" : "Noch keine Links gespeichert";
                     emptyStateText.textContent = viewState.showArchived ? "Archivierte Links erscheinen hier." : "Füge deinen ersten Link hinzu, um ihn später zu lesen.";
+                } else {
+                    emptyState.classList.add('hidden');
+                    linksContainer.classList.remove('hidden');
+
+                    // Group links by hostname
+                    const groupedLinks = filteredLinks.reduce((acc, link) => {
+                        const hostname = link.hostname || 'Unbekannt';
+                        if (!acc[hostname]) {
+                            acc[hostname] = [];
+                        }
+                        acc[hostname].push(link);
+                        return acc;
+                    }, {});
+
+                    // Render each domain group
+                    for (const hostname in groupedLinks) {
+                        const domainLinks = groupedLinks[hostname].sort((a, b) => b.id - a.id); // Sort by ID descending (newest first)
+                        const latestLink = domainLinks[0]; // The most recently added link (for favicon)
+
+                        const domainStackElement = document.createElement('div');
+                        domainStackElement.className = 'domain-stack';
+
+                        const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${latestLink.url}&size=32`; // Favicon size adjusted here
+
+                        domainStackElement.innerHTML = `
+                            <div class="domain-stack-header" data-hostname="${hostname}">
+                                <img src="${faviconUrl}" class="mr-4 w-8 h-8" alt="Favicon" />
+                                <h3 class="text-lg font-semibold flex-grow">${hostname} (${domainLinks.length})</h3>
+                                <svg class="w-5 h-5 text-neutral-400 transform transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                            <!-- .domain-stack-content is no longer used for inline expansion, content will appear in modal -->
+                        `;
+                        linksContainer.appendChild(domainStackElement);
+                    }
                 }
 
-                const createFilterButton = (container, label, filterType, filterValue) => {
-                    const isActive = viewState[filterType] === filterValue;
-                    const button = document.createElement('button');
-                    button.textContent = label;
-                    button.className = `px-3 py-1 rounded-full text-sm ${isActive ? 'bg-violet-600 text-white' : 'bg-neutral-700 hover:bg-neutral-600'}`;
-                    button.onclick = () => {
-                        viewState[filterType] = viewState[filterType] === filterValue ? null : filterValue;
-                        render();
-                    };
-                    container.appendChild(button);
-                };
-
+                // Render tag filters
                 const sourceLinks = viewState.showArchived ? links.filter(l => l.status === 'archived') : links.filter(l => l.status === 'active');
-
-                const domainsSource = sourceLinks;
-                const allDomains = [...new Set(domainsSource.map(l => l.hostname).filter(Boolean))];
-                domainFiltersContainer.innerHTML = '<span class="text-sm font-medium text-neutral-400">Websites:</span>';
-                if (allDomains.length > 0) {
-                    createFilterButton(domainFiltersContainer, 'Alle', 'filterDomain', null);
-                    allDomains.forEach(domain => createFilterButton(domainFiltersContainer, domain, 'filterDomain', domain));
-                }
-
-                const tagsSource = sourceLinks;
-                const allTags = [...new Set(tagsSource.flatMap(l => l.tags))];
+                const allTags = [...new Set(sourceLinks.flatMap(l => l.tags))];
                 tagFiltersContainer.innerHTML = '<span class="text-sm font-medium text-neutral-400">Tags:</span>';
                 if (allTags.length > 0) {
                     createFilterButton(tagFiltersContainer, 'Alle', 'filterTag', null);
                     allTags.forEach(tag => createFilterButton(tagFiltersContainer, tag, 'filterTag', tag));
                 }
+            };
+
+            // Helper to create filter buttons
+            const createFilterButton = (container, label, filterType, filterValue) => {
+                const isActive = viewState[filterType] === filterValue;
+                const button = document.createElement('button');
+                button.textContent = label;
+                button.className = `px-3 py-1 rounded-full text-sm ${isActive ? 'bg-violet-600 text-white' : 'bg-neutral-700 hover:bg-neutral-600'}`;
+                button.onclick = () => {
+                    viewState[filterType] = viewState[filterType] === filterValue ? null : filterValue;
+                    render();
+                };
+                container.appendChild(button);
             };
 
             const renderPreview = (data) => {
@@ -468,7 +730,8 @@
                     return;
                 }
                 const previewElement = document.createElement('div');
-                previewElement.className = 'bg-neutral-800 rounded-lg border border-neutral-700 overflow-hidden flex flex-col md:flex-row md:h-56 h-full';
+                // Use the new link-card styling for preview as well
+                previewElement.className = 'link-card h-full';
                 previewElement.innerHTML = renderLinkCard(data, true);
                 livePreviewContainer.innerHTML = '';
                 livePreviewContainer.appendChild(previewElement);
@@ -534,9 +797,30 @@
                 }
             });
 
+            // Event delegation for stack header clicks and link card actions on the main container
             linksContainer.addEventListener('click', (e) => {
+                // Handle stack header clicks
+                const header = e.target.closest('.domain-stack-header');
+                if (header) {
+                    const hostname = header.dataset.hostname;
+                    const linksInGroup = links.filter(link => link.hostname === hostname && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
+                        .sort((a, b) => b.id - a.id); // Ensure sorted order in modal
+                    openLinkGroupModal(hostname, linksInGroup);
+                    return; // Prevent further bubbling for link card actions if header was clicked
+                }
+
+                // Handle 'Add Tags' button click for links on the main page
+                if (e.target.matches('.add-tags-btn')) {
+                    const id = Number(e.target.dataset.id);
+                    if (id) {
+                        openAddTagsModal(id);
+                    }
+                    return; // Prevent other actions from triggering
+                }
+
+                // Handle other link card actions (archive, restore, delete, retry-meta)
                 const id = Number(e.target.dataset.id);
-                if (!id) return;
+                if (!id) return; // if it's not a button with data-id
                 const linkIndex = links.findIndex(l => l.id === id);
                 if (linkIndex === -1) return;
 
@@ -555,10 +839,53 @@
                 render();
             });
 
+            // Event delegation for link card actions *within* the link group modal
+            linkGroupModalContent.addEventListener('click', (e) => {
+                // Handle 'Add Tags' button click for links inside the modal
+                if (e.target.matches('.add-tags-btn')) {
+                    const id = Number(e.target.dataset.id);
+                    if (id) {
+                        openAddTagsModal(id);
+                    }
+                    return;
+                }
+
+                // Handle other link card actions (archive, restore, delete, retry-meta) within modal
+                const id = Number(e.target.dataset.id);
+                if (!id) return;
+                const linkIndex = links.findIndex(l => l.id === id);
+                if (linkIndex === -1) return;
+
+                const currentHostnameInModal = linkGroupModalTitle.textContent; // Get hostname of currently open modal
+
+                if (e.target.matches('.archive-btn')) {
+                    links[linkIndex].status = 'archived';
+                } else if (e.target.matches('.restore-btn')) {
+                    links[linkIndex].status = 'active';
+                } else if (e.target.matches('.delete-btn')) {
+                    links.splice(linkIndex, 1);
+                } else if (e.target.matches('.retry-meta-btn')) {
+                    links[linkIndex].metadataStatus = 'pending';
+                    links[linkIndex].description = 'Lade Metadaten erneut...';
+                }
+                saveLinks();
+                render(); // Re-render main view
+
+                // After action, re-render the modal content to reflect changes
+                const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
+                    .sort((a, b) => b.id - a.id);
+                if (updatedLinksInModal.length > 0) {
+                    openLinkGroupModal(currentHostnameInModal, updatedLinksInModal); // Re-open with updated content
+                } else {
+                    closeLinkGroupModal(); // Close modal if no links left for this domain
+                }
+            });
+
+
             toggleArchiveBtn.addEventListener('click', () => {
                 viewState.showArchived = !viewState.showArchived;
-                viewState.filterTag = null;
-                viewState.filterDomain = null;
+                viewState.filterTag = null; // Reset tag filter on view change
+                closeLinkGroupModal(); // Close any open modal when switching view
                 render();
             });
 
@@ -571,6 +898,7 @@
                         saveLinks();
                         render();
                         showToast('Archiv wurde geleert.', 'success');
+                        closeLinkGroupModal(); // Close modal after clearing archive
                     }
                 );
             });
@@ -584,8 +912,47 @@
             });
             confirmModalOverlay.addEventListener('click', closeConfirmModal);
 
+            // Link Group Modal Event Listeners
+            linkGroupModalCloseBtn.addEventListener('click', closeLinkGroupModal);
+            linkGroupModalOverlay.addEventListener('click', closeLinkGroupModal);
 
-            searchInput.addEventListener('input', (e) => { viewState.searchTerm = e.target.value.toLowerCase(); render(); });
+            // Add Tags Modal Event Listeners
+            addTagsCancelBtn.addEventListener('click', closeAddTagsModal);
+            addTagsModalOverlay.addEventListener('click', closeAddTagsModal);
+            addTagsSaveBtn.addEventListener('click', () => {
+                if (currentEditLinkId === null) return;
+                const linkIndex = links.findIndex(l => l.id === currentEditLinkId);
+                if (linkIndex !== -1) {
+                    // Get tags currently displayed in the modal (after removals)
+                    const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.tag-item')).map(span => span.dataset.tag);
+                    // Get new tags from the input field
+                    const newTagsFromInput = addTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
+
+                    // Combine and deduplicate tags
+                    const combinedTags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
+
+                    links[linkIndex].tags = combinedTags;
+                    saveLinks();
+                    render(); // Re-render the main view
+                    showToast('Tags gespeichert.', 'success');
+
+                    // If the link group modal is open, update its content too
+                    if (!linkGroupModal.classList.contains('modal-hidden')) {
+                        const currentHostnameInModal = linkGroupModalTitle.textContent;
+                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (viewState.showArchived ? link.status === 'archived' : link.status === 'active'))
+                            .sort((a, b) => b.id - a.id);
+                        openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
+                    }
+                }
+                closeAddTagsModal();
+            });
+
+
+            searchInput.addEventListener('input', (e) => {
+                viewState.searchTerm = e.target.value.toLowerCase();
+                render();
+            });
+
             exportBtn.addEventListener('click', () => {
                 if (links.length === 0) return showToast('Keine Links zum Exportieren vorhanden.', 'error');
                 const dataStr = JSON.stringify(links, null, 2);
