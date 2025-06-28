@@ -261,8 +261,10 @@
                 <button id="clear-archive-btn"
                     class="hidden text-sm bg-red-800 hover:bg-red-700 text-white font-medium rounded-md px-4 py-2 transition">Archiv
                     leeren</button>
-                <label for="import-file"
-                    class="cursor-pointer text-sm bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md px-4 py-2 transition flex items-center gap-2">
+                <!-- Import Button -->
+                <label for="import-file" class="cursor-pointer bg-blue-700 hover:bg-blue-600 text-white font-medium rounded-md
+                           w-10 h-10 flex items-center justify-center p-0
+                           sm:px-4 sm:py-2 sm:w-auto sm:h-auto sm:text-sm sm:gap-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-box-arrow-in-down" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -270,11 +272,13 @@
                         <path fill-rule="evenodd"
                             d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708z" />
                     </svg>
-                    <span>Import</span>
+                    <span class="hidden sm:inline">Import</span>
                 </label>
                 <input type="file" id="import-file" class="visually-hidden" accept="application/json">
-                <button id="export-btn"
-                    class="text-sm bg-green-700 hover:bg-green-600 text-white font-medium rounded-md px-4 py-2 transition flex items-center gap-2">
+                <!-- Export Button -->
+                <button id="export-btn" class="bg-green-700 hover:bg-green-600 text-white font-medium rounded-md
+                           w-10 h-10 flex items-center justify-center p-0
+                           sm:px-4 sm:py-2 sm:w-auto sm:h-auto sm:text-sm sm:gap-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-box-arrow-up" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -282,7 +286,7 @@
                         <path fill-rule="evenodd"
                             d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708-.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z" />
                     </svg>
-                    <span>Export</span>
+                    <span class="hidden sm:inline">Export</span>
                 </button>
             </div>
         </header>

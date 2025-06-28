@@ -52,14 +52,28 @@
             height: 100%;
             background-color: var(--bg-color);
             overflow: hidden;
+            /* Prevents body scrolling, managed by app-container */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-color);
         }
 
+        /* Neuer Container für Flexbox-Layout */
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            /* Stack canvas and controls vertically */
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            /* Contain scrolling within children */
+        }
+
         #canvas-wrapper {
             width: 100%;
-            height: 100%;
+            flex-grow: 1;
+            /* Canvas takes up remaining space */
             overflow: auto;
+            /* Allow canvas content to scroll */
             position: relative;
             background-color: var(--bg-color);
             touch-action: none;
@@ -95,6 +109,7 @@
 
         #controls-container {
             position: fixed;
+            /* Fixed position for desktop */
             top: 1rem;
             right: 1rem;
             display: flex;
@@ -106,6 +121,44 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border-color);
             z-index: 100;
+            flex-shrink: 0;
+            /* Prevents shrinking on app-container */
+
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                position: static;
+                /* Nicht mehr fixed, passt sich dem normalen Fluss an */
+                top: auto;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                width: 100%;
+                /* Volle Breite */
+                box-sizing: border-box;
+                /* Padding wird in der Breite berücksichtigt */
+                border-radius: 0;
+                /* Keine abgerundeten Ecken am Rand */
+                border: none;
+                /* Kein Rand, da es sich an den Bildschirm anpasst */
+                border-top: 1px solid var(--border-color);
+                /* Nur obere Linie für Trennung */
+                box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+                /* Schatten nur oben */
+
+                flex-direction: row;
+                /* Hauptabschnitte nebeneinander */
+                flex-wrap: wrap;
+                /* Erlaubt Umbruch der Hauptabschnitte */
+                justify-content: space-around;
+                /* Verteilt Hauptabschnitte gleichmäßig */
+                align-items: flex-start;
+                /* Hauptabschnitte oben ausrichten, falls sie umbrechen */
+                padding: 0.5rem;
+                /* Standard-Padding */
+                gap: 0.5rem;
+                /* Standard-Abstand zwischen Abschnitten */
+            }
         }
 
         .zoom-btn {
@@ -179,13 +232,38 @@
         .tool-palette {
             display: flex;
             flex-direction: column;
+            /* Desktop: Spaltenlayout */
             gap: 0.75rem;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                flex-direction: row;
+                /* Mobile: Reihenlayout */
+                flex-wrap: wrap;
+                /* Werkzeuge können umbrechen */
+                justify-content: center;
+                /* Werkzeuge zentrieren */
+                width: auto;
+                /* Breite passt sich dem Inhalt an */
+                gap: 0.25rem;
+                /* Kleinerer Abstand zwischen Werkzeugreihen */
+            }
         }
 
         .tool-row {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                flex-wrap: nowrap;
+                /* Einzelne Buttons sollen nicht umbrechen, sondern die Reihe selbst */
+                justify-content: center;
+                width: auto;
+                gap: 0.25rem;
+                /* Kleinerer Abstand zwischen Buttons */
+            }
         }
 
         .separator {
@@ -193,19 +271,51 @@
             height: 88px;
             background-color: var(--border-color);
             margin: 0 0.25rem;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                width: 90%;
+                /* Breite Trennlinie */
+                height: 1px;
+                /* Horizontale Trennlinie */
+                margin: 0.5rem 0;
+                /* Weniger Abstand oben und unten */
+            }
         }
-        
+
         #color-palette {
             display: flex;
             gap: 0.5rem;
             max-width: 350px;
-            flex-wrap: nowrap; 
-            overflow-x: auto;  
+            flex-wrap: nowrap;
+            overflow-x: auto;
             padding-bottom: 8px;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                max-width: 100%;
+                /* Volle Breite */
+                flex-wrap: wrap;
+                /* Farben können umbrechen */
+                justify-content: center;
+                /* Farbfelder zentrieren */
+                overflow-x: hidden;
+                /* Kein horizontaler Scrollbalken */
+                padding-bottom: 0;
+                /* Kein Padding unten */
+                gap: 0.2rem;
+                /* Sehr kleiner Abstand für Farbfelder */
+            }
         }
 
         #color-palette::-webkit-scrollbar {
             height: 6px;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                display: none;
+                /* Scrollbalken auf Mobilgeräten ausblenden */
+            }
         }
 
         #color-palette::-webkit-scrollbar-track {
@@ -229,10 +339,10 @@
             cursor: pointer;
             border: 2px solid transparent;
             transition: border-color 0.2s;
-            box-sizing: border-box; 
-            flex-shrink: 0; 
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
-        
+
         .color-swatch.active {
             border-color: var(--active-ring-color);
         }
@@ -241,10 +351,26 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                width: 100%;
+                /* Volle Breite */
+                justify-content: center;
+                /* Slider zentrieren */
+                gap: 0.25rem;
+                /* Kleinerer Abstand */
+            }
         }
 
         #line-width-slider {
             width: 100px;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                width: 70%;
+                /* Slider kompakter machen */
+            }
         }
 
         #line-width-value {
@@ -268,6 +394,20 @@
             flex-direction: column;
             gap: 0.5rem;
             width: 200px;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                top: auto;
+                /* Entfernt 'top' */
+                bottom: calc(100% + 0.25rem);
+                /* Positioniert es über dem Button, angepasst an neues Padding */
+                right: auto;
+                /* Entfernt 'right' */
+                left: 0;
+                /* Richtet es links aus */
+                width: 100%;
+                /* Volle Breite */
+            }
         }
 
         #export-menu.hidden {
@@ -320,13 +460,37 @@
         #right-controls {
             display: flex;
             flex-direction: column;
+            /* Desktop: Spaltenlayout */
             gap: 0.5rem;
             align-items: center;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                flex-direction: row;
+                /* Mobile: Reihenlayout */
+                flex-wrap: wrap;
+                /* Elemente können umbrechen */
+                justify-content: center;
+                width: auto;
+                /* Breite passt sich dem Inhalt an */
+                gap: 0.25rem;
+                /* Kleinerer Abstand */
+            }
         }
 
         #file-controls {
             display: flex;
             gap: 0.5rem;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                width: auto;
+                /* Breite passt sich dem Inhalt an */
+                justify-content: center;
+                /* Dateisteuerelemente zentrieren */
+                gap: 0.25rem;
+                /* Kleinerer Abstand zwischen Buttons */
+            }
         }
 
         #zoom-controls-integrated {
@@ -338,6 +502,18 @@
             border-radius: 6px;
             padding: 0.25rem;
             width: 100%;
+
+            /* Mobile Anpassungen */
+            @media (max-width: 768px) {
+                width: auto;
+                /* Breite passt sich dem Inhalt an */
+                min-width: 150px;
+                /* Reduzierte Mindestbreite für Zoom-Steuerung */
+                padding: 0.15rem;
+                /* Reduziertes Padding */
+                gap: 0.25rem;
+                /* Reduzierter Abstand */
+            }
         }
 
         #modal-overlay {
@@ -372,7 +548,7 @@
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
-        
+
         #modal-overlay.visible #modal-box {
             transform: scale(1);
         }
@@ -397,11 +573,12 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
-        
+
         #modal-confirm-btn {
             background-color: var(--red-color);
             color: white;
         }
+
         #modal-confirm-btn:hover {
             background-color: var(--red-hover-color);
         }
@@ -410,6 +587,7 @@
             background-color: var(--button-active-bg);
             color: var(--text-color);
         }
+
         #modal-cancel-btn:hover {
             background-color: var(--border-color);
         }
@@ -423,84 +601,85 @@
             color: var(--text-color);
             padding: 0.75rem 1.5rem;
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border-color);
             z-index: 250;
             transition: bottom 0.5s ease-in-out;
         }
-        
+
         #notification-bar.visible {
             bottom: 20px;
         }
-
     </style>
 </head>
 
 <body>
-    <div id="canvas-wrapper">
-        <canvas id="drawing-canvas"></canvas>
-    </div>
-
-    <div id="controls-container">
-        <div class="tool-palette">
-            <div class="tool-row">
-                <button id="image-tool" class="btn disabled" title="Bild transformieren">
-                    <i data-lucide="move"></i>
-                </button>
-                <button id="pen-tool" class="btn active" title="Stift">
-                    <i data-lucide="pencil"></i>
-                </button>
-                <button id="pixel-eraser-tool" class="btn" title="Radierer">
-                    <i data-lucide="eraser"></i>
-                </button>
-                <button id="lasso-tool" class="btn" title="Lasso Auswahl">
-                    <i data-lucide="crop"></i>
-                </button>
-                <button id="stroke-eraser-tool" class="btn" title="Ganze Striche entfernen">
-                    <i data-lucide="zap"></i>
-                </button>
-                <div id="line-width-container">
-                    <input type="range" id="line-width-slider" min="1" max="10" value="5" title="Stiftbreite">
-                    <span id="line-width-value">9</span>
-                </div>
-            </div>
-            <div class="tool-row" id="color-palette">
-            </div>
+    <div id="app-container">
+        <div id="canvas-wrapper">
+            <canvas id="drawing-canvas"></canvas>
         </div>
 
-        <div class="separator"></div>
-
-        <div id="right-controls">
-            <div id="file-controls">
-                <div style="position: relative;">
-                    <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
-                    <button id="export-btn-main" class="btn" title="Exportieren">
-                        <i data-lucide="download"></i>
+        <div id="controls-container">
+            <div class="tool-palette">
+                <div class="tool-row">
+                    <button id="image-tool" class="btn disabled" title="Bild transformieren">
+                        <i data-lucide="move"></i>
                     </button>
-                    <div id="export-menu" class="hidden">
-                        <button id="export-png">
-                            <i data-lucide="image"></i>
-                            <span>Als PNG exportieren</span>
-                        </button>
-                        <button id="export-drawing">
-                            <i data-lucide="save"></i>
-                            <span>Zeichnung speichern</span>
-                        </button>
+                    <button id="pen-tool" class="btn active" title="Stift">
+                        <i data-lucide="pencil"></i>
+                    </button>
+                    <button id="pixel-eraser-tool" class="btn" title="Radierer">
+                        <i data-lucide="eraser"></i>
+                    </button>
+                    <button id="lasso-tool" class="btn" title="Lasso Auswahl">
+                        <i data-lucide="crop"></i>
+                    </button>
+                    <button id="stroke-eraser-tool" class="btn" title="Ganze Striche entfernen">
+                        <i data-lucide="zap"></i>
+                    </button>
+                    <div id="line-width-container">
+                        <input type="range" id="line-width-slider" min="1" max="10" value="5" title="Stiftbreite">
+                        <span id="line-width-value">9</span>
                     </div>
                 </div>
-                <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
-                <label for="file-import" class="btn" title="Importieren">
-                    <i data-lucide="upload"></i>
-                </label>
-                <input type="file" id="file-import" accept=".drawing,image/*">
-                <button id="trash-can" class="btn" title="Zeichenfläche leeren">
-                    <i data-lucide="trash-2"></i>
-                </button>
+                <div class="tool-row" id="color-palette">
+                </div>
             </div>
-            <div id="zoom-controls-integrated">
-                <button id="zoom-out-btn" class="zoom-btn" title="Herauszoomen">-</button>
-                <span id="zoom-display">100%</span>
-                <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
+
+            <div class="separator"></div>
+
+            <div id="right-controls">
+                <div id="file-controls">
+                    <div style="position: relative;">
+                        <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
+                        <button id="export-btn-main" class="btn" title="Exportieren">
+                            <i data-lucide="download"></i>
+                        </button>
+                        <div id="export-menu" class="hidden">
+                            <button id="export-png">
+                                <i data-lucide="image"></i>
+                                <span>Als PNG exportieren</span>
+                            </button>
+                            <button id="export-drawing">
+                                <i data-lucide="save"></i>
+                                <span>Zeichnung speichern</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
+                    <label for="file-import" class="btn" title="Importieren">
+                        <i data-lucide="upload"></i>
+                    </label>
+                    <input type="file" id="file-import" accept=".drawing,image/*">
+                    <button id="trash-can" class="btn" title="Zeichenfläche leeren">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div id="zoom-controls-integrated">
+                    <button id="zoom-out-btn" class="zoom-btn" title="Herauszoomen">-</button>
+                    <span id="zoom-display">100%</span>
+                    <button id="zoom-in-btn" class="zoom-btn" title="Hineinzoomen">+</button>
+                </div>
             </div>
         </div>
     </div>
@@ -534,7 +713,7 @@
             let isDrawing = false;
             let currentTool = 'pen';
             let penColor = '#000000';
-            
+
             const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
             let penWidth = penWidthSteps[4];
 
@@ -543,7 +722,7 @@
             let selectedPathIndices = [];
             let isMovingSelection = false;
             let moveStartPoint = null;
-            
+
             // --- PC Pan State ---
             let isPanningWithMouse = false;
             let lastPanPoint = { x: 0, y: 0 };
@@ -559,7 +738,7 @@
 
             // --- POINTER & GESTURE STATE ---
             const activePointers = new Map();
-            let isGesturing = false; 
+            let isGesturing = false;
             let lastGesture = { dist: 0, center: null, pan: { x: 0, y: 0 } };
 
             // --- UI ELEMENTS ---
@@ -602,7 +781,7 @@
             // MODIFIZIERT: Farben logisch sortiert
             const paletteColors = [
                 '#000000', '#808080', '#8B4513', '#a16207', '#ef4444', '#f97316',
-                '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', 
+                '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6',
                 '#6366f1', '#8b5cf6', '#f472b6'
             ];
 
@@ -614,18 +793,18 @@
                 if (color === penColor) swatch.classList.add('active');
                 colorPaletteContainer.appendChild(swatch);
             });
-            
+
             function redrawAll(forExport = false, targetCtx = ctx) {
                 const isCurrentlyDark = forExport ? false : isDarkMode;
                 const bgColor = isCurrentlyDark ? '#1e1e1e' : '#ffffff';
 
                 targetCtx.fillStyle = bgColor;
                 targetCtx.fillRect(0, 0, targetCtx.canvas.width, targetCtx.canvas.height);
-                
+
                 if (imageState.img) {
                     targetCtx.drawImage(imageState.img, imageState.x, imageState.y, imageState.width, imageState.height);
                 }
-                
+
                 paths.forEach(path => {
                     targetCtx.beginPath();
                     if (path.color === 'ERASER') {
@@ -673,7 +852,7 @@
                     targetCtx.stroke();
                     targetCtx.setLineDash([]);
                 }
-                
+
                 if (isDrawing && currentTool === 'lasso' && lassoPath.length > 1) {
                     targetCtx.strokeStyle = isDarkMode ? '#a5b4fc' : '#4f46e5';
                     targetCtx.lineWidth = 1 / zoom;
@@ -764,7 +943,7 @@
                 canvasWrapper.scrollTop = newScrollY;
                 redrawAll();
             }
-            
+
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
 
@@ -773,9 +952,9 @@
 
                 if (e.pointerType === 'touch') {
                     isGesturing = true;
-                    isDrawing = false; 
+                    isDrawing = false;
                     const pointers = Array.from(activePointers.values());
-                    if (pointers.length === 1) { 
+                    if (pointers.length === 1) {
                         interactionState.type = 'pan';
                         lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
                     } else if (pointers.length >= 2) {
@@ -803,13 +982,13 @@
                             lassoPath = [pos];
                         }
                         redrawAll();
-                        return; 
+                        return;
                     }
-                    
-                    isDrawing = true; 
+
+                    isDrawing = true;
                     interactionState.startX = pos.x;
                     interactionState.startY = pos.y;
-                    
+
                     if (currentTool === 'image') {
                         const handle = getHandleUnderCursor(pos);
                         if (handle) {
@@ -834,16 +1013,16 @@
                 }
                 updateCursorStyle(e);
             }
-            
+
             function handlePointerMove(e) {
                 if (!activePointers.has(e.pointerId)) return;
                 activePointers.set(e.pointerId, e);
-                
+
                 if (isMovingSelection && currentTool === 'lasso') {
                     const pos = getCanvasPoint(e);
                     const dx = pos.x - moveStartPoint.x;
                     const dy = pos.y - moveStartPoint.y;
-                    
+
                     selectedPathIndices.forEach(pathIndex => {
                         paths[pathIndex].points.forEach(p => {
                             p.x += dx;
@@ -851,15 +1030,15 @@
                         });
                     });
                     lassoPath.forEach(p => {
-                       p.x += dx;
-                       p.y += dy;
+                        p.x += dx;
+                        p.y += dy;
                     });
 
                     moveStartPoint = pos;
                     redrawAll();
-                    return; 
+                    return;
                 }
-                
+
                 updateCursorStyle(e);
 
                 if (isGesturing) {
@@ -880,13 +1059,13 @@
                     }
                 } else if (isDrawing) {
                     const pos = getCanvasPoint(e);
-                    
+
                     if (currentTool === 'lasso') {
                         lassoPath.push(pos);
                         redrawAll();
                         return;
                     }
-                    
+
                     if (interactionState.type === 'move') {
                         const dx = pos.x - interactionState.startX;
                         const dy = pos.y - interactionState.startY;
@@ -900,7 +1079,7 @@
                         if (handle.includes('r')) imageState.width = Math.max(20, interactionState.startImageWidth + dx);
                         if (handle.includes('b')) imageState.height = Math.max(20, interactionState.startImageHeight + dy);
                         if (handle.includes('l')) {
-                            const newWidth = Math.max(20, interactionState.startImageWidth - dx);
+                            const newWidth = Math.max(20, interactionState.startImageHeight - dx); /* Corrected: newWidth should be based on dx and original width */
                             imageState.x = interactionState.startImageX + interactionState.startImageWidth - newWidth;
                             imageState.width = newWidth;
                         }
@@ -917,16 +1096,16 @@
                         }
                         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
                         const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-                        
+
                         let strokeStyle;
                         if (currentTool === 'pen') {
-                           if (isDarkMode && penColor === '#000000') {
-                               strokeStyle = '#ffffff';
-                           } else {
-                               strokeStyle = penColor;
-                           }
-                        } else { 
-                           strokeStyle = bgColor;
+                            if (isDarkMode && penColor === '#000000') {
+                                strokeStyle = '#ffffff';
+                            } else {
+                                strokeStyle = penColor;
+                            }
+                        } else {
+                            strokeStyle = bgColor;
                         }
 
                         ctx.lineCap = 'round';
@@ -975,7 +1154,7 @@
                     isDrawing = false;
                     isGesturing = false;
                     interactionState.type = null;
-                } 
+                }
                 else if (activePointers.size === 1) {
                     const pointers = Array.from(activePointers.values());
                     if (pointers[0].pointerType === 'touch') {
@@ -983,7 +1162,7 @@
                         lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
                     }
                 }
-                
+
                 canvasWrapper.releasePointerCapture(e.pointerId);
                 updateCursorStyle(e);
             }
@@ -1007,7 +1186,7 @@
                 let cursor = 'default';
                 if (currentTool === 'lasso') {
                     cursor = 'crosshair';
-                     if (e && selectedPathIndices.length > 0) {
+                    if (e && selectedPathIndices.length > 0) {
                         const pos = getCanvasPoint(e);
                         if (isPointInSelectionBounds(pos)) {
                             cursor = 'move';
@@ -1016,7 +1195,7 @@
                 } else if (currentTool === 'stroke-eraser') {
                     cursor = 'crosshair';
                 } else if (['pen', 'pixel-eraser'].includes(currentTool)) {
-                    const size = Math.max(2, penWidth * zoom); 
+                    const size = Math.max(2, penWidth * zoom);
                     const halfSize = size / 2;
                     const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" stroke-width="1" stroke="${isDarkMode ? 'white' : 'black'}" fill="none"/></svg>`;
                     cursor = `url('data:image/svg+xml;utf8,${encodeURIComponent(svg)}') ${halfSize} ${halfSize}, auto`;
@@ -1045,16 +1224,16 @@
                             paths.splice(i, 1);
                             didErase = true;
                             const selectionIndex = selectedPathIndices.indexOf(i);
-                            if(selectionIndex > -1) {
+                            if (selectionIndex > -1) {
                                 selectedPathIndices.splice(selectionIndex, 1);
                             }
-                            break; 
+                            break;
                         }
                     }
                 }
-                if (didErase) { 
-                    redrawAll(); 
-                    saveState(); 
+                if (didErase) {
+                    redrawAll();
+                    saveState();
                 }
             }
 
@@ -1067,7 +1246,7 @@
                 const dy = p.y - (a.y + t * (b.y - a.y));
                 return Math.hypot(dx, dy) < threshold;
             }
-            
+
             function getSelectionBounds() {
                 if (selectedPathIndices.length === 0) return null;
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -1081,15 +1260,15 @@
                 });
                 return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
             }
-            
+
             function getSelectionBoundsPoly() {
                 const bounds = getSelectionBounds();
                 if (!bounds) return [];
                 return [
-                    {x: bounds.x, y: bounds.y},
-                    {x: bounds.x + bounds.width, y: bounds.y},
-                    {x: bounds.x + bounds.width, y: bounds.y + bounds.height},
-                    {x: bounds.x, y: bounds.y + bounds.height}
+                    { x: bounds.x, y: bounds.y },
+                    { x: bounds.x + bounds.width, y: bounds.y },
+                    { x: bounds.x + bounds.width, y: bounds.y + bounds.height },
+                    { x: bounds.x, y: bounds.y + bounds.height }
                 ];
             }
 
@@ -1098,7 +1277,7 @@
                 if (!bounds) return false;
                 return isPointInRect(pos, bounds);
             }
-            
+
             function selectPathsInLasso() {
                 selectedPathIndices = [];
                 if (lassoPath.length < 3) {
@@ -1114,9 +1293,9 @@
                 });
 
                 if (selectedPathIndices.length > 0) {
-                     lassoPath = getSelectionBoundsPoly();
+                    lassoPath = getSelectionBoundsPoly();
                 } else {
-                     lassoPath = [];
+                    lassoPath = [];
                 }
             }
 
@@ -1185,7 +1364,7 @@
 
             function calculateContentBounds() {
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                if(paths.length === 0 && !imageState.img) return null;
+                if (paths.length === 0 && !imageState.img) return null;
 
                 if (imageState.img) {
                     minX = Math.min(minX, imageState.x); minY = Math.min(minY, imageState.y);
@@ -1245,7 +1424,7 @@
                 modalOverlay.classList.remove('visible');
                 confirmCallback = null;
             }
-            
+
             modalConfirmBtn.addEventListener('click', () => {
                 if (typeof confirmCallback === 'function') {
                     confirmCallback();
@@ -1255,7 +1434,7 @@
             modalCancelBtn.addEventListener('click', hideModal);
 
             document.getElementById('trash-can').addEventListener('click', () => {
-                 showModal('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?', () => {
+                showModal('Möchten Sie die gesamte Zeichenfläche wirklich unwiderruflich leeren (inklusive Bild)?', () => {
                     paths = [];
                     imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
                     selectedPathIndices = [];
@@ -1265,17 +1444,17 @@
                     saveState();
                     redrawAll();
                     checkContentInView();
-                 });
+                });
             });
 
             document.getElementById('export-btn-main').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('export-menu').classList.toggle('hidden'); });
             window.addEventListener('click', (e) => { if (!document.getElementById('export-menu').contains(e.target) && !e.target.closest('#export-btn-main')) { document.getElementById('export-menu').classList.add('hidden'); } });
-            
-            document.getElementById('export-png').addEventListener('click', () => { 
+
+            document.getElementById('export-png').addEventListener('click', () => {
                 const bounds = calculateContentBounds();
-                if (!bounds) { 
-                    showNotification("Die Zeichenfläche ist leer."); 
-                    return; 
+                if (!bounds) {
+                    showNotification("Die Zeichenfläche ist leer.");
+                    return;
                 }
                 const padding = 20;
                 const exportWidth = bounds.maxX - bounds.minX + padding * 2;
@@ -1284,12 +1463,12 @@
                 exportCanvas.width = exportWidth;
                 exportCanvas.height = exportHeight;
                 const exportCtx = exportCanvas.getContext('2d');
-                
+
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = canvas.width;
                 tempCanvas.height = canvas.height;
                 const tempCtx = tempCanvas.getContext('2d');
-                
+
                 redrawAll(true, tempCtx);
 
                 exportCtx.drawImage(tempCanvas, bounds.minX - padding, bounds.minY - padding, exportWidth, exportHeight, 0, 0, exportWidth, exportHeight);
@@ -1300,9 +1479,9 @@
                 link.click();
                 document.getElementById('export-menu').classList.add('hidden');
                 showNotification("Bild wird exportiert...");
-             });
+            });
 
-            document.getElementById('export-drawing').addEventListener('click', () => { 
+            document.getElementById('export-drawing').addEventListener('click', () => {
                 saveState();
                 const stateString = localStorage.getItem('drawingState') || '{}';
                 const blob = new Blob([stateString], { type: 'application/octet-stream' });
@@ -1314,19 +1493,19 @@
                 URL.revokeObjectURL(url);
                 document.getElementById('export-menu').classList.add('hidden');
                 showNotification("Zeichnung wird gespeichert...");
-             });
-             
+            });
+
             document.getElementById('file-import').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
                 const importAction = () => {
+                    paths = []; // Clear paths regardless of image import to prevent mixing old drawings
                     const reader = new FileReader();
                     if (file.type.startsWith('image/')) {
                         reader.onload = (event) => {
                             const img = new Image();
                             img.onload = () => {
-                                paths = [];
                                 imageState = {
                                     img: img, src: event.target.result,
                                     x: (canvas.width - img.width) / 2, y: (canvas.height - img.height) / 2,
@@ -1347,13 +1526,13 @@
                     } else {
                         showNotification('Ungültiger Dateityp.');
                     }
-                    e.target.value = ''; 
+                    e.target.value = '';
                 };
-                
-                showModal('Ihre aktuelle Zeichnung wird ersetzt. Fortfahren?', importAction);
-             });
 
-            backToContentBtn.addEventListener('click', () => { 
+                showModal('Ihre aktuelle Zeichnung wird ersetzt. Fortfahren?', importAction);
+            });
+
+            backToContentBtn.addEventListener('click', () => {
                 const bounds = calculateContentBounds();
                 if (!bounds) return;
                 const contentCenterX = (bounds.minX + bounds.maxX) / 2;
@@ -1364,7 +1543,7 @@
                     top: contentCenterY * zoom - canvasWrapper.clientHeight / 2,
                     behavior: 'smooth'
                 });
-             });
+            });
             canvasWrapper.addEventListener('scroll', () => {
                 clearTimeout(scrollCheckTimeout);
                 scrollCheckTimeout = setTimeout(checkContentInView, 150);
@@ -1376,10 +1555,10 @@
             canvasWrapper.addEventListener('pointerup', handlePointerUp);
             canvasWrapper.addEventListener('pointerleave', handlePointerUp);
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
-            
+
             // Event Listeners für das Verschieben mit der mittleren Maustaste
             canvasWrapper.addEventListener('mousedown', (e) => {
-                if (e.button === 1) { 
+                if (e.button === 1) {
                     e.preventDefault();
                     isPanningWithMouse = true;
                     lastPanPoint = { x: e.clientX, y: e.clientY };

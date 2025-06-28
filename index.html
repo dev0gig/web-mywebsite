@@ -56,7 +56,22 @@
         /* Haupt-Inhaltsbereich relativ positioniert für den Loader */
         #main-content {
             position: relative;
+            /* MODIFIZIERT: top: 4rem; für mobilen Header berücksichtigen */
+            top: 4rem;
+            height: calc(100% - 4rem);
+            /* Höhe anpassen, um den Header zu kompensieren */
         }
+
+        /* Nur für Desktop, mobile Anpassungen werden direkt im HTML überschrieben */
+        @media (min-width: 768px) {
+            #main-content {
+                padding-top: 0;
+                /* Kein Padding auf Desktop */
+                top: 0;
+                height: 100%;
+            }
+        }
+
 
         /* Lade-Abdeckung für den Iframe-Wechsel */
         #content-loader {
@@ -283,7 +298,7 @@
         </ul>
     </nav>
 
-    <main id="main-content" class="h-full pt-20 md:pt-0 md:ml-[4.5rem]">
+    <main id="main-content" class="h-full md:ml-[4.5rem]">
         <div class="relative w-full h-full">
             <div id="content-loader">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
