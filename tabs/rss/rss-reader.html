@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Color variables from appdrawer.html for consistency */
+        /* Color variables for theme consistency */
         :root {
             --bg-color: #f9fafb;
             --text-color: #111827;
@@ -20,6 +20,8 @@
             --border-color: #e5e7eb;
             --accent-color: #7c3aed;
             --accent-color-hover: #8b5cf6;
+            --favorite-color: #facc15;
+            /* yellow-400 */
         }
 
         html[data-theme='dark'] {
@@ -88,29 +90,98 @@
             background-color: var(--accent-color);
         }
 
-        .sidebar-item-active span {
+        .sidebar-item-active span,
+        .sidebar-item-active svg {
             color: white !important;
             font-weight: 600;
         }
 
-        .sidebar-item-active svg {
-            color: white !important;
+        /* Reader mode content styling */
+        #reader-body p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
         }
 
-        /* Style for article thumbnails */
-        .article-thumbnail {
-            width: 100%;
-            height: 125px;
-            object-fit: cover;
+        #reader-body a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        #reader-body img {
+            max-width: 100%;
+            height: auto;
             border-radius: 0.5rem;
-            /* rounded-lg */
+            margin: 1rem 0;
+        }
+
+        #reader-body h1,
+        #reader-body h2,
+        #reader-body h3,
+        #reader-body h4 {
+            font-weight: bold;
+            margin: 1.5rem 0 1rem;
+        }
+
+        #reader-body ul,
+        #reader-body ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            list-style-position: inside;
+        }
+
+        #reader-body pre {
             background-color: var(--border-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #reader-body blockquote {
+            border-left: 4px solid var(--border-color);
+            padding-left: 1rem;
+            margin-left: 0;
+            font-style: italic;
+        }
+
+        /* Filter button styling */
+        .filter-btn {
+            background-color: transparent;
+            color: var(--text-color-light);
             border: 1px solid var(--border-color);
+        }
+
+        .filter-btn-active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* Favorite button styling */
+        .favorite-btn svg {
+            color: var(--text-color-light);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .favorite-btn:hover svg {
+            color: var(--favorite-color);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.is-favorite svg {
+            fill: var(--favorite-color);
+            color: var(--favorite-color);
+        }
+
+        /* Mobile Sidebar Transition */
+        #mobile-sidebar {
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
 
-<body>
+<body class="overflow-x-hidden">
     <div class="min-h-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <header class="mb-8">
@@ -150,55 +221,94 @@
                     </main>
                 </div>
 
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="p-4 rounded-lg sticky top-8"
+                <!-- Sidebar (Desktop) -->
+                <aside class="hidden lg:block lg:col-span-1">
+                    <div id="desktop-sidebar-content" class="p-4 rounded-lg sticky top-8"
                         style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                        <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
-                            <div class="flex space-x-2">
-                                <button id="import-btn" title="Feeds importieren"
-                                    class="p-2 rounded-md hover:bg-gray-100" style="color: var(--text-color-light);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                </button>
-                                <button id="export-btn" title="Feeds exportieren"
-                                    class="p-2 rounded-md hover:bg-gray-100" style="color: var(--text-color-light);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
-                            <button id="show-all-btn"
-                                class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                                    style="color: var(--text-color-light);">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                                <span class="font-medium group-hover:text-violet-600"
-                                    style="color: var(--text-color);">Alle Feeds anzeigen</span>
-                            </button>
-                        </div>
-                        <div id="sidebar-list" class="max-h-[55vh] overflow-y-auto pr-2">
-                            <!-- Sidebar content will be injected here -->
-                        </div>
+                        <!-- Sidebar content gets injected here -->
                     </div>
                 </aside>
             </div>
         </div>
     </div>
 
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"></div>
+
+    <!-- Mobile Sidebar Panel -->
+    <aside id="mobile-sidebar"
+        class="fixed top-0 right-0 h-full w-80 max-w-[85vw] transform translate-x-full lg:hidden p-4 z-40"
+        style="background-color: var(--card-bg);">
+        <!-- Mobile sidebar content gets injected here -->
+    </aside>
+
+    <!-- Floating Action Button (FAB) for Mobile -->
+    <button id="fab-open-sidebar"
+        class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20"
+        style="background-color: var(--accent-color);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- Reader Mode Modal -->
+    <div id="reader-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
+        <div id="reader-modal-content"
+            class="relative flex flex-col h-full w-full sm:max-h-[95vh] sm:w-full sm:max-w-3xl sm:rounded-lg shadow-xl"
+            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+            <!-- Previous Article Button -->
+            <button id="reader-prev-btn"
+                class="absolute left-0 sm:-left-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <!-- Next Article Button -->
+            <button id="reader-next-btn"
+                class="absolute right-0 sm:-right-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+
+            <header class="flex-shrink-0 flex justify-between items-center p-4 border-b"
+                style="border-color: var(--border-color);">
+                <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate pr-4"
+                    style="color: var(--text-color);"></h3>
+                <div class="flex items-center gap-2">
+                    <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
+                        title="Originalartikel öffnen"
+                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                        style="color: var(--text-color-light);">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                    <button id="reader-close-btn" title="Schließen"
+                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                        style="color: var(--text-color-light);">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            <div id="reader-body" class="p-6 overflow-y-auto" style="color: var(--text-color);">
+                <!-- Article content goes here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Import Confirmation Modal -->
-    <div id="import-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50"
+    <div id="import-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
         aria-hidden="true">
         <div class="flex items-center justify-center min-h-screen">
             <div class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
@@ -211,8 +321,8 @@
                     </svg>
                     <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Feeds überschreiben?</h3>
                     <p class="text-sm mt-2" style="color: var(--text-color-light);">
-                        Möchtest du wirklich eine neue Feed-Liste importieren? Alle deine aktuell gespeicherten Feeds
-                        werden dabei permanent gelöscht.
+                        Möchtest du wirklich eine neue Feed-Liste importieren? Alle deine aktuell gespeicherten Feeds,
+                        Gelesen-Markierungen und Favoriten werden dabei permanent gelöscht.
                     </p>
                 </div>
                 <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
@@ -232,7 +342,7 @@
 
 
     <script>
-        // --- THEME SWITCHING LISTENER (Logic from appdrawer.html) ---
+        // --- THEME SWITCHING LISTENER ---
         window.addEventListener('message', (event) => {
             if (event.data === 'set-theme-dark') {
                 document.documentElement.dataset.theme = 'dark';
@@ -242,36 +352,87 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            // --- RSS READER LOGIC ---
+            // --- DOM ELEMENT SELECTORS ---
             const feedContainer = document.getElementById('feed-container');
             const urlInput = document.getElementById('rss-url-input');
             const loadBtn = document.getElementById('load-feed-btn');
-            const sidebarList = document.getElementById('sidebar-list');
-            const importBtn = document.getElementById('import-btn');
-            const exportBtn = document.getElementById('export-btn');
-            const showAllBtn = document.getElementById('show-all-btn');
-            const importModal = document.getElementById('import-modal');
-            const confirmImportBtn = document.getElementById('confirm-import-btn');
-            const cancelImportBtn = document.getElementById('cancel-import-btn');
 
+            // Sidebar elements
+            const desktopSidebarContent = document.getElementById('desktop-sidebar-content');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const fabOpenSidebar = document.getElementById('fab-open-sidebar');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+            // Reader Modal Elements
+            const readerModal = document.getElementById('reader-modal');
+            const readerModalContent = document.getElementById('reader-modal-content');
+            const readerTitle = document.getElementById('reader-title');
+            const readerBody = document.getElementById('reader-body');
+            const readerCloseBtn = document.getElementById('reader-close-btn');
+            const readerOriginalLink = document.getElementById('reader-original-link');
+            const readerPrevBtn = document.getElementById('reader-prev-btn');
+            const readerNextBtn = document.getElementById('reader-next-btn');
+
+            // --- HELPER FUNCTIONS (EARLY) ---
+            const getFaviconUrl = (url) => { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch (e) { return placeholderFavicon; } };
+
+            // --- STATE MANAGEMENT ---
             const feedsStorageKey = 'savedRssFeeds';
             const visitedLinksKey = 'rssVisitedLinks';
+            const favoritesKey = 'rssFavoriteLinks';
             const placeholderFavicon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6' /%3E%3C/svg%3E`;
 
-            let savedFeeds = JSON.parse(localStorage.getItem(feedsStorageKey)) || [];
-            let visitedLinks = new Set(JSON.parse(localStorage.getItem(visitedLinksKey)) || []);
-            let activeUrl = null;
+            const defaultFeeds = [
+                { url: "https://www.heise.de/rss/heise.rdf", title: "heise online News" },
+                { url: "https://static.winfuture.de/feeds/WinFuture-News-rss2.0.xml", title: "WinFuture News" },
+                { url: "https://www.hardwareluxx.de/hwl.feed", title: "Hardwareluxx RSS Feed" },
+                { url: "https://www.pcgameshardware.de/feed.cfm?menu_alias=home/", title: "PCGameshardware: Computer, IT-Technik und Spiele" },
+                { url: "https://feeds.feedburner.com/netzwelt", title: "netzwelt.de - News, Downloads & Tests" },
+                { url: "https://feeds.feedburner.com/caschysblog", title: "Caschys Blog" },
+                { url: "https://partner-feeds.20min.ch/rss/20minuten", title: "20 Minuten | Front" },
+                { url: "https://www.derstandard.at/rss/web", title: "Web - derStandard.at" }
+            ];
+            const defaultFeedUrls = new Set(defaultFeeds.map(f => f.url));
 
-            const getFaviconUrl = (url) => {
-                try {
-                    const domain = new URL(url).hostname;
-                    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-                } catch (e) { return placeholderFavicon; }
+            let savedFeeds = JSON.parse(localStorage.getItem(feedsStorageKey));
+            if (savedFeeds === null) {
+                // On first run, populate with default feeds.
+                savedFeeds = defaultFeeds.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
+                localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
+            }
+
+            let visitedLinks = new Set(JSON.parse(localStorage.getItem(visitedLinksKey)) || []);
+            let favoriteLinks = new Set(JSON.parse(localStorage.getItem(favoritesKey)) || []);
+            let activeUrl = null;
+            let currentArticles = [];
+            let articlesToDisplay = [];
+            let currentArticleIndex = -1;
+            let currentFilter = 'unread';
+
+            // --- HELPER FUNCTIONS ---
+            const saveFeeds = () => localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
+            const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
+            const saveFavoriteLinks = () => localStorage.setItem(favoritesKey, JSON.stringify(Array.from(favoriteLinks)));
+            const showLoading = () => { feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`; };
+            const showMessage = (message, isError = false) => { const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);'; feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`; };
+
+            // --- SIDEBAR LOGIC ---
+            const openMobileSidebar = () => { sidebarBackdrop.classList.remove('hidden'); mobileSidebar.classList.remove('translate-x-full'); };
+            const closeMobileSidebar = () => { sidebarBackdrop.classList.add('hidden'); mobileSidebar.classList.add('translate-x-full'); };
+            const setActiveSidebarItem = (url) => {
+                activeUrl = url;
+                document.querySelectorAll('.sidebar-item-active').forEach(el => el.classList.remove('sidebar-item-active'));
+                let activeItems = [];
+                if (url === 'all') { activeItems = document.querySelectorAll('.show-all-btn'); }
+                else if (url === 'favorites') { activeItems = document.querySelectorAll('.show-favorites-btn'); }
+                else { activeItems = document.querySelectorAll(`.sidebar-item[data-url="${url}"]`); }
+                activeItems.forEach(item => item.classList.add('sidebar-item-active'));
             };
 
-            const findImage = (item) => {
+            // --- IMAGE FINDING LOGIC ---
+            const findImageInFeedItem = (item) => {
                 if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) return item.thumbnail;
-                if (item.enclosure && item.enclosure.type && item.enclosure.type.startsWith('image')) return item.enclosure.link;
+                if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image')) return item.enclosure.link;
                 const content = item.description || item.content || '';
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = content;
@@ -279,207 +440,353 @@
                 return firstImage ? firstImage.src : null;
             };
 
-            const saveFeeds = () => localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
-            const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
-
-            const setActiveSidebarItem = (url) => {
-                activeUrl = url;
-                document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-item-active'));
-                const activeItem = document.querySelector(`.sidebar-item[data-url="${url}"]`);
-                if (activeItem) activeItem.classList.add('sidebar-item-active');
+            const findImageFromUrl = async (url) => {
+                if (!url) return null;
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) return null;
+                    const htmlText = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    const ogImage = doc.querySelector('meta[property="og:image"]');
+                    if (ogImage && ogImage.content) return ogImage.content;
+                    const twitterImage = doc.querySelector('meta[name="twitter:image"]');
+                    if (twitterImage && twitterImage.content) return twitterImage.content;
+                    const highResLink = doc.querySelector('link[rel="image_src"]');
+                    if (highResLink && highResLink.href) return highResLink.href;
+                    return null;
+                } catch (e) {
+                    console.error(`Error fetching or parsing article for image from ${url}:`, e);
+                    return null;
+                }
             };
 
+            // --- RENDER FUNCTIONS ---
             const renderSidebar = () => {
-                sidebarList.innerHTML = '';
-                if (savedFeeds.length === 0) {
-                    sidebarList.innerHTML = `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>`;
-                    return;
-                }
-                savedFeeds.forEach((feed, index) => {
-                    const feedItem = document.createElement('div');
-                    feedItem.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group sidebar-item';
-                    feedItem.dataset.url = feed.url;
-                    feedItem.innerHTML = `
-                        <div class="flex items-center gap-3 truncate">
-                            <img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">
-                            <span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span>
+                const sidebarHtml = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
+                        <div class="flex space-x-1">
+                            <button class="import-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds importieren" style="color: var(--text-color-light);"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></button>
+                            <button class="export-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds exportieren" style="color: var(--text-color-light);"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
                         </div>
-                        <button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                        </button>
-                    `;
-                    sidebarList.appendChild(feedItem);
-                });
+                    </div>
+                    <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
+                        <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--text-color-light);"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
+                        <button class="show-favorites-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--text-color-light);"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span id="favorites-count">0</span>)</span></button>
+                    </div>
+                    <div class="max-h-[50vh] overflow-y-auto pr-2">
+                        ${savedFeeds.length === 0 ? `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>` :
+                        savedFeeds.map((feed, index) => {
+                            const isDefault = defaultFeedUrls.has(feed.url);
+                            const deleteButtonHtml = isDefault ? '' : `<button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg></button>`;
+                            return `
+                            <div class="flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group sidebar-item" data-url="${feed.url}">
+                                <div class="flex items-center gap-3 truncate"><img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'"><span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span></div>
+                                ${deleteButtonHtml}
+                            </div>`;
+                        }).join('')}
+                    </div>`;
+
+                desktopSidebarContent.innerHTML = sidebarHtml;
+                mobileSidebar.innerHTML = sidebarHtml;
+
+                addSidebarEventListeners();
+                updateSidebarCounts();
                 setActiveSidebarItem(activeUrl);
             };
 
-            const showLoading = () => {
-                feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`;
+            const addSidebarEventListeners = () => {
+                document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => { loadAllFeeds(); closeMobileSidebar(); }));
+                document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => { loadFavorites(); closeMobileSidebar(); }));
+                document.querySelectorAll('.import-btn').forEach(btn => btn.addEventListener('click', () => { document.getElementById('import-modal').classList.remove('hidden'); }));
+                document.querySelectorAll('.export-btn').forEach(btn => btn.addEventListener('click', handleExport));
+                document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', (e) => {
+                    // Check if the click was on the delete button itself
+                    if (e.target.closest('.delete-btn')) {
+                        // The delete logic is now handled in its own listener, so we do nothing here to prevent feed loading.
+                        return;
+                    }
+                    loadFeed(item.dataset.url).catch(err => console.error(err));
+                    closeMobileSidebar();
+                }));
+                // Dedicated listener for delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+                    e.stopPropagation(); // Prevent the parent .sidebar-item click
+                    const index = parseInt(btn.dataset.index, 10);
+                    if (isNaN(index)) return;
+
+                    // Provide visual feedback
+                    btn.disabled = true;
+                    btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+                    savedFeeds.splice(index, 1);
+                    await cleanupOrphanedFavorites();
+
+                    saveFeeds();
+                    saveFavoriteLinks(); // Save the potentially cleaned-up favorites
+                    renderSidebar(); // Re-render the whole sidebar
+
+                    // If the currently active feed was the one deleted, show a message
+                    if (activeUrl === btn.closest('.sidebar-item').dataset.url) {
+                        showMessage("Der ausgewählte Feed wurde gelöscht.");
+                        activeUrl = null; // Reset active URL
+                    }
+                }));
             };
 
-            const showMessage = (message, isError = false) => {
-                const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444;' : 'background-color: rgba(59, 130, 246, 0.1); color: #3b82f6;';
-                feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`;
+            const updateSidebarCounts = () => {
+                document.querySelectorAll('#favorites-count').forEach(el => {
+                    el.textContent = favoriteLinks.size;
+                });
             };
 
-            const createArticleHtml = (item) => {
-                const imageUrl = findImage(item);
+            const createArticleHtml = (item, index) => {
+                const imageUrl = findImageInFeedItem(item);
+                const isVisited = visitedLinks.has(item.link);
+                const isFavorite = favoriteLinks.has(item.link);
+                const titleHtml = `<h3 class="text-xl font-semibold transition-colors ${isVisited ? 'visited-title' : 'group-hover/item:text-violet-600'}" style="color: var(--text-color);">${item.title}</h3>`;
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = item.description;
-                const sanitizedDescription = tempDiv.textContent || tempDiv.innerText || "";
+                const sanitizedDescription = (tempDiv.textContent || tempDiv.innerText || "").substring(0, 150);
                 let pubDate = new Date(item.pubDate).toLocaleString('de-DE');
-                const isVisited = visitedLinks.has(item.link);
-
-                const titleHtml = `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block article-link"><h3 class="text-xl font-semibold transition-colors ${isVisited ? 'visited-title' : ''}" style="color: var(--text-color);">${item.title}</h3></a>`;
                 const metaHtml = `<p class="text-sm mt-1 mb-3" style="color: var(--text-color-light);">${pubDate}</p><p class="line-clamp-2" style="color: var(--text-color);">${sanitizedDescription}</p>`;
                 const sourceHtml = item.sourceTitle ? `<div class="flex items-center gap-2 mt-3 text-xs" style="color: var(--text-color-light);"><img src="${item.sourceFavicon}" class="w-4 h-4 rounded" onerror="this.src='${placeholderFavicon}'"/><span>${item.sourceTitle}</span></div>` : '';
+                const favoriteBtnHtml = `<button class="favorite-btn p-2 rounded-full absolute top-3 right-2 z-10 ${isFavorite ? 'is-favorite' : ''}" data-link="${item.link}" title="Als Favorit markieren"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></button>`;
 
+                let imageContainerHtml = '';
                 if (imageUrl) {
-                    return `<div class="flex flex-col sm:flex-row gap-5">
-                                <div class="sm:w-1/3 flex-shrink-0">
-                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer"><img src="${imageUrl}" class="article-thumbnail" alt="Artikelbild" onerror="this.style.display='none'"></a>
-                                </div>
-                                <div class="sm:w-2/3">${titleHtml}${metaHtml}${sourceHtml}</div>
-                            </div>`;
+                    imageContainerHtml = `<div class="sm:w-1/3 flex-shrink-0 cursor-pointer article-item-content" data-index="${index}"><img src="${imageUrl}" class="w-full h-32 object-cover rounded-lg bg-neutral-200 dark:bg-neutral-700" alt="Artikelbild" onerror="this.parentElement.remove()"></div>`;
+                } else if (item.link) {
+                    imageContainerHtml = `<div class="article-image-container sm:w-1/3 flex-shrink-0 cursor-pointer article-item-content" data-link="${item.link}" data-index="${index}"><div class="w-full h-32 rounded-lg bg-neutral-200 dark:bg-neutral-700"></div></div>`;
                 }
-                return `<div>${titleHtml}${metaHtml}${sourceHtml}</div>`;
+
+                const textContentHtml = `<div class="sm:w-2/3 flex flex-col"><div class="article-item-content flex-1 cursor-pointer" data-index="${index}">${titleHtml}${metaHtml}${sourceHtml}</div></div>`;
+
+                return `<div class="flex flex-col sm:flex-row gap-5 relative group/item">${favoriteBtnHtml}${imageContainerHtml}${textContentHtml}</div>`;
             };
 
-            const renderFeed = (data, faviconUrl) => {
+            const rerenderArticleList = () => {
+                const articlesWrapper = document.getElementById('articles-wrapper');
+                if (!articlesWrapper) return;
+                articlesToDisplay = currentArticles.filter(item => { const isVisited = visitedLinks.has(item.link); if (currentFilter === 'unread') return !isVisited; if (currentFilter === 'read') return isVisited; return true; });
+                const unreadCount = currentArticles.filter(i => !visitedLinks.has(i.link)).length;
+                const readCount = currentArticles.length - unreadCount;
+                const unreadEl = document.getElementById('unread-count');
+                const readEl = document.getElementById('read-count');
+                if (unreadEl) unreadEl.textContent = unreadCount;
+                if (readEl) readEl.textContent = readCount;
+                if (articlesToDisplay.length > 0) {
+                    articlesWrapper.innerHTML = articlesToDisplay.map((item, index) => `<article class="border-b py-6 last:border-b-0 group" style="border-color: var(--border-color);">${createArticleHtml(item, index)}</article>`).join('');
+                } else {
+                    let message = `Keine ${currentFilter === 'unread' ? 'ungelesenen' : 'gelesenen'} Artikel in dieser Ansicht.`;
+                    if (activeUrl === 'favorites') message = 'Du hast noch keine Favoriten markiert.';
+                    articlesWrapper.innerHTML = `<p class="text-center py-4" style="color: var(--text-color-light);">${message}</p>`;
+                }
+
+                document.querySelectorAll('.article-image-container').forEach(async (container) => {
+                    const link = container.dataset.link;
+                    const imageUrl = await findImageFromUrl(link);
+                    if (imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.className = 'w-full h-32 object-cover rounded-lg bg-neutral-200 dark:bg-neutral-700';
+                        img.alt = 'Artikelbild';
+                        img.onerror = () => container.remove();
+                        container.innerHTML = '';
+                        container.appendChild(img);
+                    } else {
+                        container.remove();
+                    }
+                });
+            };
+
+            const renderFeedLayout = (title, iconHtml, showFilters = true) => {
                 feedContainer.innerHTML = '';
                 const wrapper = document.createElement('div');
                 wrapper.className = 'p-6 rounded-lg';
                 wrapper.style.backgroundColor = 'var(--card-bg)';
                 wrapper.style.border = '1px solid var(--border-color)';
-
                 const titleWrapper = document.createElement('div');
                 titleWrapper.className = 'flex items-center gap-4 mb-4 pb-4 border-b';
                 titleWrapper.style.borderColor = 'var(--border-color)';
-                titleWrapper.innerHTML = `<img src="${faviconUrl}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'"><h2 class="text-2xl font-bold" style="color: var(--text-color);">${data.feed.title}</h2>`;
+                titleWrapper.innerHTML = `${iconHtml}<h2 class="text-2xl font-bold" style="color: var(--text-color);">${title}</h2>`;
                 wrapper.appendChild(titleWrapper);
-
-                const articlesWrapper = document.createElement('div');
-                articlesWrapper.className = 'space-y-6';
-
-                if (data.items && data.items.length > 0) {
-                    data.items.forEach(item => {
-                        const article = document.createElement('article');
-                        article.className = 'border-b pb-6 last:border-b-0 last:pb-0';
-                        article.style.borderColor = 'var(--border-color)';
-                        article.innerHTML = createArticleHtml(item);
-                        articlesWrapper.appendChild(article);
-                    });
-                } else {
-                    articlesWrapper.innerHTML = `<p style="color: var(--text-color-light);">Dieser Feed enthält keine Einträge.</p>`;
+                if (showFilters) {
+                    const filterWrapper = document.createElement('div');
+                    filterWrapper.className = 'flex items-center gap-2 py-4';
+                    filterWrapper.innerHTML = `<button id="filter-unread-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Ungelesen (<span id="unread-count">0</span>)</button><button id="filter-read-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Gelesen (<span id="read-count">0</span>)</button>`;
+                    wrapper.appendChild(filterWrapper);
                 }
-
+                const articlesWrapper = document.createElement('div');
+                articlesWrapper.id = 'articles-wrapper';
                 wrapper.appendChild(articlesWrapper);
                 feedContainer.appendChild(wrapper);
+                if (showFilters) {
+                    document.getElementById('filter-unread-btn').addEventListener('click', () => { currentFilter = 'unread'; updateFilterButtons(); rerenderArticleList(); });
+                    document.getElementById('filter-read-btn').addEventListener('click', () => { currentFilter = 'read'; updateFilterButtons(); rerenderArticleList(); });
+                    updateFilterButtons();
+                }
+            }
 
-                feedContainer.querySelectorAll('.article-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.currentTarget.querySelector('h3')?.classList.add('visited-title');
-                        visitedLinks.add(link.href);
-                        saveVisitedLinks();
-                    });
-                });
+            const updateFilterButtons = () => {
+                const unreadBtn = document.getElementById('filter-unread-btn');
+                const readBtn = document.getElementById('filter-read-btn');
+                if (!unreadBtn || !readBtn) return;
+                unreadBtn.classList.toggle('filter-btn-active', currentFilter === 'unread');
+                readBtn.classList.toggle('filter-btn-active', currentFilter === 'read');
             };
 
-            const renderAllFeeds = (articles) => {
-                feedContainer.innerHTML = '';
-                const wrapper = document.createElement('div');
-                wrapper.className = 'p-6 rounded-lg';
-                wrapper.style.backgroundColor = 'var(--card-bg)';
-                wrapper.style.border = '1px solid var(--border-color)';
+            // --- READER MODAL LOGIC ---
+            const openReaderMode = (index) => {
+                if (index < 0 || index >= articlesToDisplay.length) return;
 
-                const titleWrapper = document.createElement('div');
-                titleWrapper.className = 'flex items-center gap-4 mb-4 pb-4 border-b';
-                titleWrapper.style.borderColor = 'var(--border-color)';
-                titleWrapper.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--accent-color);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg><h2 class="text-2xl font-bold" style="color: var(--text-color);">Alle Feeds (Neueste zuerst)</h2>`;
-                wrapper.appendChild(titleWrapper);
+                currentArticleIndex = index;
+                const item = articlesToDisplay[currentArticleIndex];
 
-                const articlesWrapper = document.createElement('div');
-                articlesWrapper.className = 'space-y-6';
+                readerTitle.textContent = item.title;
+                readerBody.innerHTML = item.content || item.description;
+                readerBody.scrollTop = 0;
+                readerOriginalLink.href = item.link;
 
-                if (articles.length > 0) {
-                    articles.forEach(item => {
-                        const article = document.createElement('article');
-                        article.className = 'border-b pb-6 last:border-b-0 last:pb-0';
-                        article.style.borderColor = 'var(--border-color)';
-                        article.innerHTML = createArticleHtml(item);
-                        articlesWrapper.appendChild(article);
-                    });
-                } else {
-                    articlesWrapper.innerHTML = `<p style="color: var(--text-color-light);">Keine Artikel in den gespeicherten Feeds gefunden.</p>`;
+                if (!visitedLinks.has(item.link)) {
+                    visitedLinks.add(item.link);
+                    saveVisitedLinks();
                 }
 
-                wrapper.appendChild(articlesWrapper);
-                feedContainer.appendChild(wrapper);
+                readerPrevBtn.classList.toggle('hidden', currentArticleIndex === 0);
+                readerNextBtn.classList.toggle('hidden', currentArticleIndex === articlesToDisplay.length - 1);
 
-                feedContainer.querySelectorAll('.article-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.currentTarget.querySelector('h3')?.classList.add('visited-title');
-                        visitedLinks.add(link.href);
-                        saveVisitedLinks();
-                    });
-                });
+                if (readerModal.classList.contains('hidden')) {
+                    readerModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
             };
 
-            const loadAllFeeds = async () => {
-                if (savedFeeds.length === 0) {
-                    showMessage('Es sind keine Feeds zum Anzeigen gespeichert.'); return;
+            const showNextArticle = () => {
+                if (currentArticleIndex + 1 < articlesToDisplay.length) {
+                    openReaderMode(currentArticleIndex + 1);
                 }
-                setActiveSidebarItem('all');
-                showLoading();
-                const fetchPromises = savedFeeds.map(feed =>
-                    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`).then(response => response.json()).then(data => ({ ...data, sourceFeed: feed }))
-                );
+            };
+
+            const showPreviousArticle = () => {
+                if (currentArticleIndex - 1 >= 0) {
+                    openReaderMode(currentArticleIndex - 1);
+                }
+            };
+
+            const closeReaderMode = () => {
+                readerModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                rerenderArticleList();
+                if (document.getElementById('filter-unread-btn')) updateFilterButtons();
+            };
+
+            const fetchAllArticles = async () => {
+                if (savedFeeds.length === 0) return [];
+                const fetchPromises = savedFeeds.map(feed => fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`).then(response => response.json()));
                 const results = await Promise.allSettled(fetchPromises);
                 let allItems = [];
-                results.forEach(result => {
+                results.forEach((result, index) => {
                     if (result.status === 'fulfilled' && result.value.status === 'ok') {
-                        const itemsWithSource = result.value.items.map(item => ({ ...item, sourceTitle: result.value.sourceFeed.title, sourceFavicon: result.value.sourceFeed.favicon }));
+                        const feedInfo = savedFeeds[index];
+                        if (!feedInfo) return;
+                        const itemsWithSource = result.value.items.map(item => ({ ...item, sourceTitle: feedInfo.title, sourceFavicon: feedInfo.favicon, sourceUrl: feedInfo.url }));
                         allItems.push(...itemsWithSource);
                     }
                 });
-                allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-                renderAllFeeds(allItems);
+                return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate)).slice(0, 100);
+            }
+
+            // --- NEW: CLEANUP LOGIC ---
+            const cleanupOrphanedFavorites = async () => {
+                // This function ensures that the `favoriteLinks` set only contains links
+                // from articles that are actually in the user's saved feeds.
+                const allCurrentArticles = await fetchAllArticles();
+                const validArticleLinks = new Set(allCurrentArticles.map(item => item.link));
+
+                const originalCount = favoriteLinks.size;
+                favoriteLinks = new Set([...favoriteLinks].filter(favLink => validArticleLinks.has(favLink)));
+
+                // Only write to localStorage if a change occurred
+                if (favoriteLinks.size !== originalCount) {
+                    saveFavoriteLinks();
+                }
+            };
+
+
+            // --- CORE LOGIC & EVENT HANDLERS ---
+            const loadAllFeeds = async () => {
+                if (savedFeeds.length === 0) { showMessage('Es sind keine Feeds zum Anzeigen gespeichert.'); return; }
+                currentFilter = 'unread';
+                setActiveSidebarItem('all');
+                showLoading();
+                currentArticles = await fetchAllArticles();
+                const allFeedsIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--accent-color);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`;
+                renderFeedLayout('Alle Feeds (Neueste zuerst)', allFeedsIcon);
+                rerenderArticleList();
+            };
+
+            const loadFavorites = async () => {
+                currentFilter = 'all';
+                setActiveSidebarItem('favorites');
+                showLoading();
+                // First, ensure favorites are clean
+                await cleanupOrphanedFavorites();
+                updateSidebarCounts();
+
+                const allArticles = await fetchAllArticles();
+                currentArticles = allArticles.filter(item => favoriteLinks.has(item.link));
+                const favIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" style="color: var(--favorite-color);" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`;
+                renderFeedLayout('Favoriten', favIcon, false);
+                rerenderArticleList();
             };
 
             const loadFeed = (rssUrl) => {
-                if (!rssUrl || !rssUrl.trim()) {
-                    showMessage('Bitte gib eine gültige URL ein.', true); return;
-                }
-                setActiveSidebarItem(rssUrl);
-                showLoading();
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
+                return new Promise((resolve, reject) => {
+                    if (!rssUrl || !rssUrl.trim()) {
+                        showMessage('Bitte gib eine gültige URL ein.', true);
+                        return reject(new Error('Invalid URL'));
+                    }
+
+                    currentFilter = 'unread';
+                    setActiveSidebarItem(rssUrl);
+                    showLoading();
+
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+                    fetch(apiUrl).then(response => response.json()).then(data => {
                         if (data.status === 'ok') {
-                            const faviconUrl = getFaviconUrl(data.feed.url || rssUrl);
-                            renderFeed(data, faviconUrl);
+                            const iconHtml = `<img src="${getFaviconUrl(data.feed.url || rssUrl)}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">`;
+                            currentArticles = (data.items || []).map(item => ({ ...item, sourceUrl: rssUrl }));
+
+                            renderFeedLayout(data.feed.title, iconHtml);
+                            rerenderArticleList();
+
                             urlInput.value = '';
-                            if (!savedFeeds.some(feed => feed.url === rssUrl)) {
-                                savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: faviconUrl });
-                                saveFeeds();
-                                renderSidebar();
-                            }
+                            if (!savedFeeds.some(feed => feed.url === rssUrl)) { savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: getFaviconUrl(rssUrl) }); saveFeeds(); renderSidebar(); }
+
+                            resolve();
                         } else {
                             showMessage(`Fehler beim Laden des Feeds: ${data.message}`, true);
+                            reject(new Error(data.message));
                         }
-                    })
-                    .catch(error => { showMessage(`Ein Fehler ist aufgetreten: ${error.message}. Überprüfe die URL.`, true); });
+                    }).catch(error => {
+                        showMessage(`Ein Netzwerkfehler ist aufgetreten: ${error.message}. Überprüfe die URL und deine Verbindung.`, true);
+                        reject(error);
+                    });
+                });
             };
 
             const handleExport = () => {
-                if (savedFeeds.length === 0) { showMessage('Keine Feeds zum Exportieren vorhanden.', false); return; }
-                const dataStr = JSON.stringify(savedFeeds.map(({ url, title }) => ({ url, title })), null, 2);
+                if (savedFeeds.length === 0 && visitedLinks.size === 0 && favoriteLinks.size === 0) { showMessage('Keine Daten zum Exportieren vorhanden.'); return; }
+                const exportData = { feeds: savedFeeds.map(({ url, title }) => ({ url, title })), visited: Array.from(visitedLinks), favorites: Array.from(favoriteLinks) };
+                const dataStr = JSON.stringify(exportData, null, 2);
                 const dataBlob = new Blob([dataStr], { type: "application/json" });
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'rss_feeds.json';
+                link.download = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -497,11 +804,13 @@
                     reader.onload = (event) => {
                         try {
                             const importedData = JSON.parse(event.target.result);
-                            if (!Array.isArray(importedData) || !importedData.every(f => f && f.url && f.title)) throw new Error('Ungültiges Format oder unvollständige Daten.');
-                            savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
-                            saveFeeds();
-                            renderSidebar();
-                            showMessage(`${savedFeeds.length} Feed(s) importiert.`, false);
+                            if (Array.isArray(importedData)) {
+                                savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) })); visitedLinks = new Set(); favoriteLinks = new Set();
+                            } else if (typeof importedData === 'object' && importedData.feeds) {
+                                savedFeeds = (importedData.feeds || []).map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) })); visitedLinks = new Set(importedData.visited || []); favoriteLinks = new Set(importedData.favorites || []);
+                            } else { throw new Error('Ungültiges Dateiformat.'); }
+                            saveFeeds(); saveVisitedLinks(); saveFavoriteLinks();
+                            renderSidebar(); showMessage(`${savedFeeds.length} Feed(s) und zugehörige Daten erfolgreich importiert.`, false);
                         } catch (error) { showMessage(`Import fehlgeschlagen: ${error.message}`, true); }
                     };
                     reader.readAsText(file);
@@ -509,30 +818,53 @@
                 input.click();
             };
 
-            loadBtn.addEventListener('click', () => loadFeed(urlInput.value));
-            urlInput.addEventListener('keypress', e => e.key === 'Enter' && loadFeed(urlInput.value));
-            exportBtn.addEventListener('click', handleExport);
-            showAllBtn.addEventListener('click', loadAllFeeds);
-            importBtn.addEventListener('click', () => importModal.classList.remove('hidden'));
-            cancelImportBtn.addEventListener('click', () => importModal.classList.add('hidden'));
-            confirmImportBtn.addEventListener('click', () => {
-                importModal.classList.add('hidden');
-                triggerImport();
-            });
-            sidebarList.addEventListener('click', (e) => {
-                const deleteButton = e.target.closest('.delete-btn');
-                if (deleteButton) {
+            // --- GLOBAL EVENT LISTENERS ---
+            loadBtn.addEventListener('click', () => loadFeed(urlInput.value).catch(err => console.error(err)));
+            urlInput.addEventListener('keypress', e => { if (e.key === 'Enter') loadFeed(urlInput.value).catch(err => console.error(err)); });
+
+            fabOpenSidebar.addEventListener('click', openMobileSidebar);
+            sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+            feedContainer.addEventListener('click', (e) => {
+                const favoriteBtn = e.target.closest('.favorite-btn');
+                if (favoriteBtn) {
                     e.stopPropagation();
-                    const index = parseInt(deleteButton.dataset.index, 10);
-                    savedFeeds.splice(index, 1);
-                    saveFeeds();
-                    renderSidebar();
+                    const link = favoriteBtn.dataset.link;
+                    if (!link) return;
+                    if (favoriteLinks.has(link)) {
+                        favoriteLinks.delete(link);
+                    } else {
+                        favoriteLinks.add(link);
+                    }
+                    saveFavoriteLinks();
+                    updateSidebarCounts();
+                    favoriteBtn.classList.toggle('is-favorite');
+                    if (activeUrl === 'favorites') loadFavorites();
                     return;
                 }
-                const feedItem = e.target.closest('[data-url]');
-                if (feedItem) loadFeed(feedItem.dataset.url);
+                const articleContent = e.target.closest('.article-item-content');
+                if (!articleContent) return;
+                const index = parseInt(articleContent.dataset.index, 10);
+                openReaderMode(index);
             });
 
+            // Reader Modal Listeners
+            readerCloseBtn.addEventListener('click', closeReaderMode);
+            readerPrevBtn.addEventListener('click', showPreviousArticle);
+            readerNextBtn.addEventListener('click', showNextArticle);
+            document.addEventListener('keydown', (e) => { if (!readerModal.classList.contains('hidden')) { if (e.key === 'ArrowRight') showNextArticle(); if (e.key === 'ArrowLeft') showPreviousArticle(); if (e.key === 'Escape') closeReaderMode(); } });
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+            readerModalContent.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            readerModalContent.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
+            const handleSwipe = () => { if (touchEndX < touchStartX - 50) showNextArticle(); if (touchEndX > touchStartX + 50) showPreviousArticle(); };
+
+            // Import Modal Listeners
+            document.getElementById('confirm-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); triggerImport(); });
+            document.getElementById('cancel-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); });
+
+            // --- INITIALIZATION ---
             renderSidebar();
         });
     </script>
