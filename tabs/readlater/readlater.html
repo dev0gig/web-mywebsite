@@ -558,8 +558,13 @@
                 const linksJSON = localStorage.getItem('readLaterLinks');
                 let storedLinks = linksJSON ? JSON.parse(linksJSON) : [];
                 return storedLinks.map(link => {
+                    // Ensure 'tags' property is initialized as an array, even if empty in stored data
                     const defaults = { title: link.url || '', description: '', image: '', tags: [], status: 'active', metadataStatus: 'pending', hostname: '' };
                     let finalLink = { ...defaults, ...link };
+                    // If tags exist in the stored link, ensure they are an array
+                    if (finalLink.tags && !Array.isArray(finalLink.tags)) {
+                        finalLink.tags = []; // Default to empty array if tags are not an array
+                    }
                     if (finalLink.metadataStatus === 'failed') {
                         finalLink.metadataStatus = 'pending';
                         finalLink.description = 'Lade Metadaten erneut...';
@@ -611,6 +616,7 @@
                     currentTagsContainer.innerHTML = ''; // Clear existing tags display
 
                     // Display existing tags as clickable elements
+                    // Ensure linkToEdit.tags is an array before calling forEach
                     (linkToEdit.tags || []).forEach(tag => {
                         const tagSpan = document.createElement('span');
                         tagSpan.className = 'tag-item';
@@ -732,6 +738,7 @@
             };
 
             const renderLinkCard = (link, isPreview = false) => {
+                // Ensure link.tags is an array before mapping
                 const tagsHTML = (link.tags || []).map(tag => `<span class="bg-neutral-700 text-xs font-medium px-2 py-1 rounded-full">${tag}</span>`).join(' ');
                 const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${link.url}&size=16`;
                 const placeholderImg = `https://placehold.co/600x400/262626/525252?text=${link.hostname || ''}`;
@@ -773,7 +780,8 @@
                 const filteredLinks = links.filter(link => {
                     const matchesArchive = viewState.showArchived ? link.status === 'archived' : link.status === 'active';
                     const matchesSearch = !viewState.searchTerm || link.title.toLowerCase().includes(viewState.searchTerm) || link.url.toLowerCase().includes(viewState.searchTerm);
-                    const matchesTag = !viewState.filterTag || link.tags.includes(viewState.filterTag);
+                    // Ensure link.tags is an array before checking includes
+                    const matchesTag = !viewState.filterTag || (link.tags || []).includes(viewState.filterTag);
                     return matchesArchive && matchesSearch && matchesTag;
                 });
 
@@ -830,7 +838,7 @@
 
                 // Render tag filters
                 const sourceLinks = viewState.showArchived ? links.filter(l => l.status === 'archived') : links.filter(l => l.status === 'active');
-                const allTags = [...new Set(sourceLinks.flatMap(l => l.tags))];
+                const allTags = [...new Set(sourceLinks.flatMap(l => l.tags || []))]; // Ensure flatMap handles non-array tags
                 tagFiltersContainer.innerHTML = '<span class="text-sm font-medium text-neutral-400">Tags:</span>';
                 if (allTags.length > 0) {
                     createFilterButton(tagFiltersContainer, 'Alle', 'filterTag', null);
@@ -1087,7 +1095,15 @@
 
                         const newAndExistingLinks = [
                             ...links,
-                            ...newLinksRaw.map(link => ({ ...link, id: link.id || Date.now() + Math.random(), title: link.url, description: 'Warte auf Metadaten...', image: '', metadataStatus: 'pending' }))
+                            ...newLinksRaw.map(link => ({
+                                ...link,
+                                id: link.id || Date.now() + Math.random(),
+                                title: link.url,
+                                description: 'Warte auf Metadaten...',
+                                image: '',
+                                tags: Array.isArray(link.tags) ? link.tags : [], // Ensure tags are imported as an array
+                                metadataStatus: 'pending'
+                            }))
                         ];
 
                         const uniqueLinks = Array.from(new Map(newAndExistingLinks.map(link => [link.url, link])).values());
