@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,35 +8,52 @@
     <link rel="icon" href="https://img.icons8.com/color/512/color-widgets.png" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN (kann jetzt entfernt werden, da Icons nicht mehr verwendet werden) -->
+    <!-- <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script> -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* CSS-Variablen für Theme-Farben */
         :root {
-            --header-text-color: #111827; /* Dunkler Text für Light Mode Überschriften */
-            --text-color: #6b7280;      /* Mittlerer Text für Light Mode */
+            --header-text-color: #111827;
+            /* Dunkler Text für Light Mode Überschriften */
+            --text-color: #6b7280;
+            /* Mittlerer Text für Light Mode */
+            --bg-color: #F4F4F5;
+            /* Heller, neutraler Hintergrund für Light Mode (ähnlich Tailwind zinc-100) */
         }
+
         html[data-theme='dark'] {
-            --header-text-color: #fafafa; /* Heller Text für Dark Mode Überschriften */
-            --text-color: #a3a3a3;      /* Mittlerer Text für Dark Mode */
+            --header-text-color: #fafafa;
+            /* Heller Text für Dark Mode Überschriften */
+            --text-color: #a3a3a3;
+            /* Mittlerer Text für Dark Mode */
+            --bg-color: #27272A;
+            /* Dunkler, neutraler Hintergrund für Dark Mode (ähnlich Tailwind zinc-900) */
         }
 
         /* Custom font for a better look */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: transparent; /* Hintergrund transparent gemacht */
+            background-color: transparent;
+            /* Hintergrund transparent gemacht */
+            /* padding-top wird jetzt dynamisch per JavaScript gesetzt, um den fixierten Header zu berücksichtigen */
         }
+
         /* Specific iframe styling for border, matching original dashed style */
         .iframe-container {
             /* Rahmen entfernt */
-            background-color: transparent; /* Hintergrund des Containers transparent gemacht */
+            background-color: transparent;
+            /* Hintergrund des Containers transparent gemacht */
+            /* scroll-margin-top wurde entfernt, da das Scrollen jetzt per JavaScript genauer gesteuert wird */
         }
 
         /* Stile für Überschrift und Text, die die CSS-Variablen verwenden */
         .main-header {
             color: var(--header-text-color);
         }
+
         .main-text {
             color: var(--text-color);
         }
@@ -43,79 +61,109 @@
         /* Stellt sicher, dass der Iframe selbst die volle Breite und feste Höhe einnimmt */
         iframe {
             width: 100%;
-            height: 700px; /* Feste Höhe, wie zuvor besprochen */
-            border: none; /* Keine zusätzlichen Rahmen für den Iframe selbst */
+            height: 700px;
+            /* Feste Höhe, wie zuvor besprochen */
+            border: none;
+            /* Keine zusätzlichen Rahmen für den Iframe selbst */
         }
 
         /* Styles for the widget navigation buttons */
         .widget-nav-button {
-            background-color: #e5e7eb; /* Light gray */
-            color: #374151; /* Darker text */
+            background-color: #e5e7eb;
+            /* Light gray */
+            color: #374151;
+            /* Darker text */
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap; /* Prevent wrapping */
+            white-space: nowrap;
+            /* Prevent wrapping */
         }
 
         .widget-nav-button:hover {
-            background-color: #d1d5db; /* Slightly darker gray on hover */
+            background-color: #d1d5db;
+            /* Slightly darker gray on hover */
         }
 
         html[data-theme='dark'] .widget-nav-button {
-            background-color: #4b5563; /* Darker gray for dark mode */
-            color: #f9fafb; /* Lighter text for dark mode */
+            background-color: #4b5563;
+            /* Darker gray for dark mode */
+            color: #f9fafb;
+            /* Lighter text for dark mode */
         }
 
         html[data-theme='dark'] .widget-nav-button:hover {
-            background-color: #6b7280; /* Even darker gray on hover in dark mode */
+            background-color: #6b7280;
+            /* Even darker gray on hover in dark mode */
+        }
+
+        /* Fixed header for the navigation */
+        .fixed-header {
+            position: fixed;
+            /* Fixierte Position, um es oben zu halten */
+            top: 0;
+            /* Oben am Viewport ausrichten */
+            left: 0;
+            /* Links am Viewport ausrichten */
+            width: 100%;
+            /* Volle Breite einnehmen */
+            z-index: 50;
+            /* Sicherstellen, dass es über anderen Inhalten liegt */
+            background-color: var(--bg-color);
+            /* Hintergrundfarbe des Themes verwenden */
+            padding: 1rem 0;
+            /* Etwas Polsterung hinzufügen */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Dezenter Schatten */
         }
     </style>
 </head>
-<body class="p-4 min-h-screen flex flex-col items-center justify-center">
-    <div class="container mx-auto p-4">
-        <!-- Überschrift verwendet jetzt die adaptive Farbe -->
-        <h1 class="text-3xl font-bold mb-6 text-center main-header">Ihre Widgets</h1>
 
-        <!-- 
-            Layout-Container:
-            - Mobile (default): flex-col-reverse -> Navigationsleiste ist oben, Widgets unten.
-            - Large screens (lg:): flex-row -> Widgets links, Navigationsleiste rechts.
-        -->
-        <div class="flex flex-col-reverse lg:flex-row lg:gap-8 lg:items-start">
-
-            <!-- Hauptinhaltsbereich (Widgets), der den verfügbaren Platz einnimmt -->
-            <div class="flex-grow">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-jap-kana" src="jap-kana.html" title="Japanisch Kana" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-calculator" src="calculator.html" title="Taschenrechner" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-clock" src="clock.html" title="Uhr Widget" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-easy-math" src="easy-math.html" title="Einfache Mathematik" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe src="tariff.html" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-capital-city-eu" src="capital-city-EU.html" title="Europäische Hauptstädte Quiz" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                    <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                        <iframe id="widget-weather" src="weather.html" title="Wetter Widget" class="w-full h-[700px]" frameborder="0"></iframe>
-                    </div>
-                </div>
+<body class="min-h-screen">
+    <!-- Fixierter Header für die Navigationsschaltflächen -->
+    <div class="fixed-header">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold mb-4 text-center main-header">Ihre Widgets</h1>
+            <div id="widget-nav-list" class="flex flex-row flex-wrap justify-center gap-2">
+                <!-- Links werden per JavaScript eingefügt -->
             </div>
+        </div>
+    </div>
 
-            <!-- Sticky Navigationsleiste rechts (auf großen Bildschirmen) -->
-            <div class="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-8 mb-8 lg:mb-0">
-                <div id="widget-nav-list" class="flex flex-row flex-wrap justify-center gap-2 lg:flex-col">
-                    <!-- Links will be populated by JavaScript -->
+    <!-- Hauptinhaltsbereich, der durch das padding-top im Body nach unten verschoben wird -->
+    <div class="container mx-auto p-4 flex flex-col lg:flex-row lg:gap-8 lg:items-start">
+        <!-- Widget-Gitter -->
+        <div class="flex-grow">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-jap-kana" src="jap-kana.html" title="Japanisch Kana" class="w-full h-[700px]"
+                        frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-calculator" src="calculator.html" title="Taschenrechner" class="w-full h-[700px]"
+                        frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-clock" src="clock.html" title="Uhr Widget" class="w-full h-[700px]"
+                        frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-easy-math" src="easy-math.html" title="Einfache Mathematik"
+                        class="w-full h-[700px]" frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-tariff" src="tariff.html" title="Tarifrechner" class="w-full h-[700px]"
+                        frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-capital-city-eu" src="capital-city-EU.html" title="Europäische Hauptstädte Quiz"
+                        class="w-full h-[700px]" frameborder="0"></iframe>
+                </div>
+                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
+                    <iframe id="widget-weather" src="weather.html" title="Wetter Widget" class="w-full h-[700px]"
+                        frameborder="0"></iframe>
                 </div>
             </div>
         </div>
@@ -132,28 +180,53 @@
             });
 
             const widgetNavList = document.getElementById('widget-nav-list');
-            const iframes = document.querySelectorAll('.grid.grid-cols-1 iframe'); // Select iframes within the grid
+            const fixedHeader = document.querySelector('.fixed-header');
+            const iframes = document.querySelectorAll('.grid iframe'); // Wählt Iframes innerhalb des Gitters aus
+
+            // Passt den oberen Abstand des Bodys an die Höhe des fixierten Headers an
+            function adjustBodyPadding() {
+                const headerHeight = fixedHeader.offsetHeight;
+                document.body.style.paddingTop = `${headerHeight + 20}px`; // Fügt 20px extra Puffer hinzu
+            }
+
+            // Ruft die Funktion auf, um den Abstand beim Laden und bei Größenänderung anzupassen
+            adjustBodyPadding();
+            window.addEventListener('resize', adjustBodyPadding);
 
             iframes.forEach(iframe => {
                 const title = iframe.title;
-                const id = iframe.id; // Use the already assigned ID
+                const id = iframe.id; // Verwendet die bereits zugewiesene ID
 
                 if (title && id) {
                     const button = document.createElement('button');
+                    // Flexbox-Klassen für die Zentrierung des Textes im Button
+                    button.className = 'widget-nav-button flex items-center justify-center';
+                    button.dataset.targetId = id; // Speichert die ID des Ziel-Iframes
+
+                    // Fügt den Text des Buttons hinzu (Icons wurden entfernt)
                     button.textContent = title;
-                    button.className = 'widget-nav-button';
-                    button.dataset.targetId = id; // Store the target iframe's ID
 
                     button.addEventListener('click', () => {
                         const targetIframe = document.getElementById(button.dataset.targetId);
                         if (targetIframe) {
-                            targetIframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            const headerHeight = fixedHeader.offsetHeight;
+                            // Scrollt manuell zur Position des Iframes abzüglich der Headerhöhe und des Puffers
+                            window.scrollTo({
+                                top: targetIframe.offsetTop - headerHeight - 20, // 20px extra Puffer
+                                behavior: 'smooth'
+                            });
                         }
                     });
                     widgetNavList.appendChild(button);
                 }
             });
+
+            // Der Aufruf von lucide.createIcons() ist nicht mehr notwendig, da keine Icons mehr verwendet werden.
+            // setTimeout(() => {
+            //     lucide.createIcons();
+            // }, 100);
         });
     </script>
 </body>
+
 </html>
