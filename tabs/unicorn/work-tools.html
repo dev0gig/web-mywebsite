@@ -60,13 +60,7 @@
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
             display: flex;
-            /* Added for flexbox layout */
             flex-direction: column;
-            /* Arrange items vertically */
-            justify-content: space-between;
-            /* Push copyright to bottom */
-            padding-bottom: 1rem;
-            /* Add some padding at the bottom */
         }
 
         #sidebar:hover {
@@ -167,49 +161,33 @@
 
 <body data-theme="system">
 
-    <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="p-2 flex flex-col">
-        <!-- This div will grow and push the others down -->
-        <div class="flex-grow">
-            <ul id="nav-links" class="space-y-2 mt-2">
-                <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
-                        class="sidebar-link flex items-center p-3 rounded-lg active">
-                        <img src="../../assets/icons/home.svg" alt="Dashboard Icon" class="w-7 h-7 flex-shrink-0">
-                        <!-- Assumed assets/icons/home.svg exists -->
-                        <span class="sidebar-text font-medium">Dashboard</span></a></li>
-                <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
-                        class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/contact.svg" alt="Kontakte Icon" class="w-7 h-7 flex-shrink-0">
-                        <!-- Assumed assets/icons/users.svg exists -->
-                        <span class="sidebar-text font-medium">Kontakte</span>
-                    </a></li>
-                <li><a href="we-iframe/templates.html" data-target="frame-templates"
-                        class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/mail.svg" alt="Mail-Vorlagen Icon" class="w-7 h-7 flex-shrink-0">
-                        <!-- Assumed assets/icons/mail.svg exists -->
-                        <span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
-                <!-- New 'Tools' link added with the new SVG icon -->
-                <li><a href="we-iframe/tool-widgets.html" data-target="frame-tools"
-                        class="sidebar-link flex items-center p-3 rounded-lg">
-                        <img src="../../assets/icons/tools.svg" alt="Tools Icon" class="w-7 h-7 flex-shrink-0">
-                        <!-- Assumed assets/icons/tools.svg exists -->
-                        <span class="sidebar-text font-medium">Tools</span>
-                    </a></li>
-            </ul>
-        </div>
-        <ul class="space-y-2">
+    <nav id="sidebar" class="p-2">
+        <ul id="nav-links" class="space-y-2 mt-2">
+            <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
+                    class="sidebar-link flex items-center p-3 rounded-lg active">
+                    <img src="../../assets/icons/home.svg" alt="Dashboard Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Dashboard</span></a></li>
+            <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="../../assets/icons/contact.svg" alt="Kontakte Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Kontakte</span>
+                </a></li>
+            <li><a href="we-iframe/templates.html" data-target="frame-templates"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="../../assets/icons/mail.svg" alt="Mail-Vorlagen Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
+            <li><a href="we-iframe/tool-widgets.html" data-target="frame-tools"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <img src="../../assets/icons/tools.svg" alt="Tools Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="sidebar-text font-medium">Tools</span>
+                </a></li>
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
                     <img src="../../assets/icons/settings.svg" alt="Einstellungen Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span>
                 </button></li>
         </ul>
-        <!-- Copyright information at the bottom of the sidebar -->
-        <div class="copyright-info">
-            &copy; NGIPAV
-        </div>
     </nav>
 
-    <!-- Iframe Content Area -->
     <main id="main-content">
         <iframe id="frame-dashboard" src="we-iframe/dashboard.html"
             class="content-iframe w-full h-full border-0 opacity-0"></iframe>
@@ -221,7 +199,6 @@
             class="content-iframe w-full h-full border-0 opacity-0 hidden"></iframe>
     </main>
 
-    <!-- Settings Modal -->
     <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70"></div>
     <div id="settings-modal"
         class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6">
@@ -258,16 +235,15 @@
         </div>
     </div>
 
-    <!-- The loader element -->
     <div id="loader" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
-        <!-- Changed from SVG to image -->
         <img src="../../assets/loading/we_loading.png" alt="Loading Icon" class="h-48 animate-pulse">
     </div>
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const contentFrames = document.querySelectorAll('.content-iframe');
-            const navLinks = document.querySelectorAll('#nav-links a');
+            // Query all links and buttons inside the new single list
+            const navLinks = document.querySelectorAll('#nav-links a, #nav-links button');
             const settingsBtn = document.getElementById('settings-btn');
             const settingsModal = document.getElementById('settings-modal');
             const loader = document.getElementById('loader');
@@ -278,6 +254,12 @@
 
             // Funktion zur Handhabung des Navigationsklicks
             function handleNavClick(event) {
+                // Check if the clicked element is the settings button
+                if (event.currentTarget.id === 'settings-btn') {
+                    openModal();
+                    return; // Stop further execution for settings button
+                }
+
                 event.preventDefault();
                 const link = event.currentTarget;
                 const targetId = link.dataset.target;
@@ -315,14 +297,20 @@
                     }
                 });
             });
-            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+
+            // Attach event listener to all nav items (links and the button)
+            navLinks.forEach(link => {
+                if (link.tagName === 'A') {
+                    link.addEventListener('click', handleNavClick);
+                }
+            });
 
             // Funktionen zum Öffnen und Schließen des Modals
             const openModal = () => { settingsModal.classList.remove('hidden'); overlay.classList.remove('hidden'); };
             const closeModal = () => { settingsModal.classList.add('hidden'); overlay.classList.add('hidden'); };
 
-            // Event-Listener für Modal-Buttons
-            settingsBtn.addEventListener('click', openModal);
+            // Event-Listener for Modal-Buttons
+            settingsBtn.addEventListener('click', openModal); // Direct listener for the settings button
             closeModalBtn.addEventListener('click', closeModal);
             overlay.addEventListener('click', closeModal);
             resetLayoutBtn.addEventListener('click', () => {

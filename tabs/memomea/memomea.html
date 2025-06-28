@@ -730,30 +730,50 @@
                 lucide.createIcons();
             };
 
+            // === KORRIGIERTE FUNKTION ===
             function handleDateClick(e) {
                 const dateString = e.currentTarget.dataset.date;
                 const wasJustCreated = journalEntries[dateString] === undefined;
+
+                // Neuen Eintrag erstellen, falls er nicht existiert
                 if (wasJustCreated) {
                     journalEntries[dateString] = '';
                     saveEntries(journalEntries);
                 }
 
-                currentPage = 1;
-                activeTagFilters = []; // Tag-Filter löschen, wenn ein Datum angeklickt wird
+                // Filter und Suche zurücksetzen
+                activeTagFilters = [];
                 activeSearchTerm = '';
                 searchInput.value = '';
 
+                // Die korrekte Seite für das geklickte Datum finden
+                const sortedDates = Object.keys(journalEntries).sort().reverse();
+                const entryIndex = sortedDates.indexOf(dateString);
+
+                if (entryIndex !== -1) {
+                    currentPage = Math.floor(entryIndex / ENTRIES_PER_PAGE) + 1;
+                } else {
+                    // Fallback, falls das Datum nicht gefunden wird (sollte nicht passieren)
+                    currentPage = 1;
+                }
+
+                // Journal mit der korrekten Seite neu rendern
                 updateAll();
 
+                // Mobile Kalender-Ansicht schließen
                 closeCalendarSidebar();
 
+                // Kurze Verzögerung, um sicherzustellen, dass die Seite gerendert wurde,
+                // bevor wir zum Element scrollen.
                 setTimeout(() => {
                     const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         if (wasJustCreated) {
+                            // Editor für den neuen Eintrag öffnen
                             element.click();
                         } else {
+                            // Bestehenden Eintrag hervorheben
                             element.classList.add('ring-2', 'ring-blue-400');
                             setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
                         }

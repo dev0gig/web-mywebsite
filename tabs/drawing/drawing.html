@@ -651,7 +651,6 @@
             <div id="right-controls">
                 <div id="file-controls">
                     <div style="position: relative;">
-                        <!-- MODIFIZIERT: Icon von 'upload' auf 'download' geändert -->
                         <button id="export-btn-main" class="btn" title="Exportieren">
                             <i data-lucide="download"></i>
                         </button>
@@ -666,7 +665,6 @@
                             </button>
                         </div>
                     </div>
-                    <!-- MODIFIZIERT: Icon von 'download' auf 'upload' geändert -->
                     <label for="file-import" class="btn" title="Importieren">
                         <i data-lucide="upload"></i>
                     </label>
@@ -712,6 +710,7 @@
             let currentPath = [];
             let isDrawing = false;
             let currentTool = 'pen';
+            let previousTool = 'pen'; // Speichert das Werkzeug vor dem Wechsel zum Bild-Werkzeug
             let penColor = '#000000';
 
             const penWidthSteps = [1, 2, 4, 6, 9, 12, 16, 22, 30, 40];
@@ -778,7 +777,6 @@
                 }
             });
 
-            // MODIFIZIERT: Farben logisch sortiert
             const paletteColors = [
                 '#000000', '#808080', '#8B4513', '#a16207', '#ef4444', '#f97316',
                 '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6',
@@ -947,6 +945,20 @@
             function handlePointerDown(e) {
                 if (e.target.closest('#controls-container') || e.target.closest('#zoom-controls')) return;
 
+                // Logik, um das Bild zu "platzieren", wenn man daneben klickt
+                if (currentTool === 'image') {
+                    const pos = getCanvasPoint(e);
+                    const handle = getHandleUnderCursor(pos);
+                    const isInImage = isPointInRect(pos, imageState);
+
+                    if (!handle && !isInImage) {
+                        // Klick ausserhalb des Bildes -> platziert es und wechselt zum vorherigen Werkzeug
+                        setActiveTool(previousTool || 'pen');
+                        return; // Verhindert, dass eine neue Linie gezeichnet wird
+                    }
+                }
+
+
                 activePointers.set(e.pointerId, e);
                 canvasWrapper.setPointerCapture(e.pointerId);
 
@@ -1076,17 +1088,22 @@
                         const dx = pos.x - interactionState.startX;
                         const dy = pos.y - interactionState.startY;
                         const handle = interactionState.type.replace('resize-', '');
-                        if (handle.includes('r')) imageState.width = Math.max(20, interactionState.startImageWidth + dx);
-                        if (handle.includes('b')) imageState.height = Math.max(20, interactionState.startImageHeight + dy);
+
                         if (handle.includes('l')) {
-                            const newWidth = Math.max(20, interactionState.startImageHeight - dx); /* Corrected: newWidth should be based on dx and original width */
+                            const newWidth = Math.max(20, interactionState.startImageWidth - dx);
                             imageState.x = interactionState.startImageX + interactionState.startImageWidth - newWidth;
                             imageState.width = newWidth;
+                        }
+                        if (handle.includes('r')) {
+                            imageState.width = Math.max(20, interactionState.startImageWidth + dx);
                         }
                         if (handle.includes('t')) {
                             const newHeight = Math.max(20, interactionState.startImageHeight - dy);
                             imageState.y = interactionState.startImageY + interactionState.startImageHeight - newHeight;
                             imageState.height = newHeight;
+                        }
+                        if (handle.includes('b')) {
+                            imageState.height = Math.max(20, interactionState.startImageHeight + dy);
                         }
                         redrawAll();
                     } else if (interactionState.type === 'draw') {
@@ -1126,46 +1143,102 @@
                 }
             }
 
+            // ==================================================================
+            // === FINALE KORREKTUR / FINAL FIX (Version 3) ===
+            // ==================================================================
             function handlePointerUp(e) {
+                if (!activePointers.has(e.pointerId)) return;
+
+                // Behalten Sie eine Referenz auf den Interaktionstyp, bevor er zurückgesetzt wird.
+                const finishedInteractionType = interactionState.type;
+                const wasImageInteraction = finishedInteractionType === 'move' || finishedInteractionType?.startsWith('resize-');
+
+                // Beenden Sie den Zeichen-/Bewegungszustand.
+                isDrawing = false;
+
+                // Beenden Sie spezifische Werkzeug-Aktionen
                 if (currentTool === 'lasso') {
-                    if (isDrawing) {
-                        isDrawing = false;
-                        selectPathsInLasso();
-                    }
                     if (isMovingSelection) {
                         isMovingSelection = false;
                         moveStartPoint = null;
                         lassoPath = getSelectionBoundsPoly();
-                        saveState();
+                    } else if (finishedInteractionType) { // Nur wenn eine neue Auswahl gezeichnet wurde
+                        selectPathsInLasso();
                     }
-                    redrawAll();
-                } else if (isDrawing) {
-                    if (interactionState.type === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
-                        paths.push({ points: currentPath, color: (currentTool === 'pen') ? penColor : 'ERASER', width: penWidth });
-                    }
-                    currentPath = [];
-                    redrawAll();
+                }
+
+                // Finalisieren Sie den gezeichneten Pfad
+                if (finishedInteractionType === 'draw' && currentTool !== 'stroke-eraser' && currentPath.length > 1) {
+                    paths.push({ points: currentPath, color: (currentTool === 'pen') ? penColor : 'ERASER', width: penWidth });
+                }
+
+                // Speichern Sie den Zustand nach JEDER abgeschlossenen Aktion.
+                if (finishedInteractionType) {
                     saveState();
                 }
 
+                // Setzen Sie die Zustände für die nächste Interaktion zurück.
+                currentPath = [];
+                interactionState.type = null;
+
+                // Pointer-Verwaltung.
                 activePointers.delete(e.pointerId);
+                if (canvasWrapper.hasPointerCapture(e.pointerId)) {
+                    canvasWrapper.releasePointerCapture(e.pointerId);
+                }
 
                 if (activePointers.size === 0) {
-                    isDrawing = false;
                     isGesturing = false;
-                    interactionState.type = null;
-                }
-                else if (activePointers.size === 1) {
-                    const pointers = Array.from(activePointers.values());
-                    if (pointers[0].pointerType === 'touch') {
-                        interactionState.type = 'pan';
-                        lastGesture.pan = { x: pointers[0].clientX, y: pointers[0].clientY };
+                    // Wenn die letzte Aktion eine Bildinteraktion war, wechseln Sie jetzt das Werkzeug.
+                    // Dies geschieht NACHDEM alle Zustände bereinigt wurden.
+                    if (wasImageInteraction) {
+                        setActiveTool(previousTool || 'pen');
                     }
                 }
 
-                canvasWrapper.releasePointerCapture(e.pointerId);
+                // Zeichnen Sie die Leinwand neu, um den endgültigen Zustand anzuzeigen.
+                redrawAll();
                 updateCursorStyle(e);
             }
+
+
+            function handleContextMenu(e) {
+                e.preventDefault();
+                const pos = getCanvasPoint(e);
+
+                // Fall 1: Lasso-Auswahl ist aktiv und der Rechtsklick ist darin
+                if (currentTool === 'lasso' && selectedPathIndices.length > 0 && isPointInSelectionBounds(pos)) {
+                    showModal('Möchten Sie die ausgewählten Linien löschen?', () => {
+                        // Linien aus dem Array entfernen
+                        paths = paths.filter((_, index) => !selectedPathIndices.includes(index));
+
+                        // Lasso-Status zurücksetzen
+                        selectedPathIndices = [];
+                        lassoPath = [];
+
+                        saveState();
+                        redrawAll();
+                    });
+                    return;
+                }
+
+                // Fall 2: Ein Bild ist vorhanden und der Rechtsklick ist darin
+                if (imageState.img && isPointInRect(pos, imageState)) {
+                    showModal('Möchten Sie das Bild löschen?', () => {
+                        imageState = { img: null, src: null, x: 0, y: 0, width: 0, height: 0 };
+                        imageToolBtn.classList.add('disabled');
+
+                        if (currentTool === 'image') {
+                            setActiveTool(previousTool || 'pen');
+                        }
+
+                        saveState();
+                        redrawAll();
+                    });
+                    return;
+                }
+            }
+
 
             const getCanvasPoint = (e) => {
                 const wrapperRect = canvasWrapper.getBoundingClientRect();
@@ -1314,8 +1387,13 @@
             }
 
 
+            // MODIFIZIERT: Speichert das vorherige Werkzeug
             function setActiveTool(tool) {
                 if (tool === 'image' && !imageState.img) return;
+
+                if (tool === 'image' && currentTool !== 'image') {
+                    previousTool = currentTool;
+                }
 
                 if (currentTool === 'lasso' && tool !== 'lasso') {
                     selectedPathIndices = [];
@@ -1499,10 +1577,10 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                const importAction = () => {
-                    paths = []; // Clear paths regardless of image import to prevent mixing old drawings
-                    const reader = new FileReader();
-                    if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                if (file.type.startsWith('image/')) {
+                    const loadImage = () => {
                         reader.onload = (event) => {
                             const img = new Image();
                             img.onload = () => {
@@ -1520,23 +1598,37 @@
                             img.src = event.target.result;
                         };
                         reader.readAsDataURL(file);
-                    } else if (file.name.endsWith('.drawing')) {
-                        reader.onload = (event) => { localStorage.setItem('drawingState', event.target.result); loadState(); };
-                        reader.readAsText(file);
-                    } else {
-                        showNotification('Ungültiger Dateityp.');
-                    }
-                    e.target.value = '';
-                };
+                        e.target.value = '';
+                    };
 
-                showModal('Ihre aktuelle Zeichnung wird ersetzt. Fortfahren?', importAction);
+                    if (imageState.img) {
+                        showModal('Möchten Sie das vorhandene Bild ersetzen? Ihre Zeichnungen bleiben erhalten.', loadImage);
+                    } else {
+                        loadImage();
+                    }
+                }
+                else if (file.name.endsWith('.drawing')) {
+                    const loadDrawing = () => {
+                        reader.onload = (event) => {
+                            localStorage.setItem('drawingState', event.target.result);
+                            loadState();
+                        };
+                        reader.readAsText(file);
+                        e.target.value = '';
+                    };
+                    showModal('Dadurch wird Ihre aktuelle Zeichnung (inklusive Bild) vollständig ersetzt. Fortfahren?', loadDrawing);
+                }
+                else {
+                    showNotification('Ungültiger Dateityp.');
+                    e.target.value = '';
+                }
             });
 
             backToContentBtn.addEventListener('click', () => {
                 const bounds = calculateContentBounds();
                 if (!bounds) return;
                 const contentCenterX = (bounds.minX + bounds.maxX) / 2;
-                const contentCenterY = (bounds.minY + bounds.maxY) / 2;
+                const contentCenterY = (bounds.minY + maxY) / 2;
 
                 canvasWrapper.scrollTo({
                     left: contentCenterX * zoom - canvasWrapper.clientWidth / 2,
@@ -1555,6 +1647,7 @@
             canvasWrapper.addEventListener('pointerup', handlePointerUp);
             canvasWrapper.addEventListener('pointerleave', handlePointerUp);
             canvasWrapper.addEventListener('pointercancel', handlePointerUp);
+            canvasWrapper.addEventListener('contextmenu', handleContextMenu); // Listener für Rechtsklick
 
             // Event Listeners für das Verschieben mit der mittleren Maustaste
             canvasWrapper.addEventListener('mousedown', (e) => {
