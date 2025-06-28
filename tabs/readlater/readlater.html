@@ -352,6 +352,11 @@
                 <p class="text-neutral-400 mt-1">Dein persönliches Lesezeichen-Archiv.</p>
             </div>
             <div id="header-actions" class="flex gap-2 items-center">
+                <!-- Button to archive all active links -->
+                <button id="archive-all-btn"
+                    class="hidden text-sm bg-orange-700 hover:bg-orange-600 text-white font-medium rounded-md px-4 py-2 transition">
+                    Alle archivieren
+                </button>
                 <button id="clear-archive-btn"
                     class="hidden text-sm bg-red-800 hover:bg-red-700 text-white font-medium rounded-md px-4 py-2 transition">Archiv
                     leeren</button>
@@ -509,6 +514,7 @@
             const tagFiltersContainer = document.getElementById('tag-filters-container');
             const toggleArchiveBtn = document.getElementById('toggle-archive-btn');
             const clearArchiveBtn = document.getElementById('clear-archive-btn');
+            const archiveAllBtn = document.getElementById('archive-all-btn'); // New button element
             const emptyState = document.getElementById('empty-state');
             const emptyStateTitle = document.getElementById('empty-state-title');
             const emptyStateText = document.getElementById('empty-state-text');
@@ -559,12 +565,11 @@
                 let storedLinks = linksJSON ? JSON.parse(linksJSON) : [];
                 return storedLinks.map(link => {
                     // Ensure 'tags' property is initialized as an array, even if empty in stored data
+                    // Ensure tags are always an array, even if null/undefined in storage
                     const defaults = { title: link.url || '', description: '', image: '', tags: [], status: 'active', metadataStatus: 'pending', hostname: '' };
                     let finalLink = { ...defaults, ...link };
-                    // If tags exist in the stored link, ensure they are an array
-                    if (finalLink.tags && !Array.isArray(finalLink.tags)) {
-                        finalLink.tags = []; // Default to empty array if tags are not an array
-                    }
+                    // If tags exist in the stored link, ensure they are an array. If not an array, default to empty array.
+                    finalLink.tags = Array.isArray(finalLink.tags) ? finalLink.tags : [];
                     if (finalLink.metadataStatus === 'failed') {
                         finalLink.metadataStatus = 'pending';
                         finalLink.description = 'Lade Metadaten erneut...';
@@ -784,6 +789,14 @@
                     const matchesTag = !viewState.filterTag || (link.tags || []).includes(viewState.filterTag);
                     return matchesArchive && matchesSearch && matchesTag;
                 });
+
+                // Show/hide "Archive All" button only when in active view and there are active links
+                const hasActiveLinks = links.some(link => link.status === 'active');
+                if (!viewState.showArchived && hasActiveLinks) {
+                    archiveAllBtn.classList.remove('hidden');
+                } else {
+                    archiveAllBtn.classList.add('hidden');
+                }
 
                 toggleArchiveBtn.classList.toggle('bg-violet-600', viewState.showArchived);
                 toggleArchiveBtn.classList.toggle('hover:bg-violet-500', viewState.showArchived);
@@ -1038,6 +1051,27 @@
                 );
             });
 
+            // New: Archive all links button functionality
+            archiveAllBtn.addEventListener('click', () => {
+                openConfirmModal(
+                    'Alle Links archivieren',
+                    'Möchten Sie wirklich alle aktiven Links archivieren?',
+                    () => {
+                        let linksArchivedCount = 0;
+                        links.forEach(link => {
+                            if (link.status === 'active') {
+                                link.status = 'archived';
+                                linksArchivedCount++;
+                            }
+                        });
+                        saveLinks();
+                        render();
+                        showToast(`${linksArchivedCount} Links archiviert.`, 'success');
+                        closeLinkGroupModal(); // Close any open modal
+                    }
+                );
+            });
+
             confirmCancelBtn.addEventListener('click', closeConfirmModal);
             confirmConfirmBtn.addEventListener('click', () => {
                 if (typeof confirmCallback === 'function') {
@@ -1091,31 +1125,54 @@
                         const imported = JSON.parse(e.target.result);
                         if (!Array.isArray(imported)) throw new Error('Invalid format');
                         const currentUrls = new Set(links.map(l => l.url));
-                        const newLinksRaw = imported.filter(link => link.url && !currentUrls.has(link.url));
 
-                        const newAndExistingLinks = [
-                            ...links,
-                            ...newLinksRaw.map(link => ({
-                                ...link,
-                                id: link.id || Date.now() + Math.random(),
-                                title: link.url,
-                                description: 'Warte auf Metadaten...',
-                                image: '',
-                                tags: Array.isArray(link.tags) ? link.tags : [], // Ensure tags are imported as an array
-                                metadataStatus: 'pending'
-                            }))
-                        ];
+                        const newLinksToProcess = imported
+                            .filter(link => link.url) // Only process links with a URL
+                            .map(link => {
+                                // Create a new link object with defaults, but prioritize imported values
+                                const baseLink = {
+                                    id: link.id || Date.now() + Math.random(), // Use existing ID or generate new
+                                    url: link.url,
+                                    title: link.title || link.url, // Use imported title or URL as fallback
+                                    description: link.description || '', // Use imported description
+                                    image: link.image || '', // Use imported image
+                                    tags: Array.isArray(link.tags) ? link.tags : [], // Ensure tags are always an array
+                                    status: link.status || 'active', // Use imported status or default to 'active'
+                                    metadataStatus: link.title && link.description ? 'completed' : 'pending', // Assume completed if title/description present, otherwise pending
+                                    hostname: getHostname(link.url) || '' // Get hostname from URL
+                                };
+                                return baseLink;
+                            });
 
-                        const uniqueLinks = Array.from(new Map(newAndExistingLinks.map(link => [link.url, link])).values());
+                        // Filter out duplicates based on URL and merge with existing links
+                        const uniqueLinksMap = new Map(links.map(link => [link.url, link]));
+                        newLinksToProcess.forEach(link => {
+                            // If a link with the same URL already exists, update its properties
+                            // Otherwise, add the new link
+                            if (uniqueLinksMap.has(link.url)) {
+                                const existingLink = uniqueLinksMap.get(link.url);
+                                // Merge properties, prioritizing new values for title, description, image, tags, status
+                                uniqueLinksMap.set(link.url, {
+                                    ...existingLink,
+                                    ...link, // Overwrite with imported values
+                                    tags: Array.isArray(existingLink.tags) && Array.isArray(link.tags) ?
+                                        [...new Set([...existingLink.tags, ...link.tags])] : link.tags, // Merge and deduplicate tags
+                                    metadataStatus: existingLink.metadataStatus === 'completed' ? 'completed' : link.metadataStatus // Keep completed if already completed
+                                });
+                            } else {
+                                uniqueLinksMap.set(link.url, link);
+                            }
+                        });
 
-                        links = uniqueLinks;
+                        links = Array.from(uniqueLinksMap.values());
 
                         saveLinks();
                         render();
-                        showToast(`${newLinksRaw.length} Links importiert/aktualisiert. Lade Details...`);
+                        showToast(`${newLinksToProcess.length} Links importiert/aktualisiert. Lade Details...`);
                         processMetadataQueue();
                     } catch (error) {
-                        showToast('Import fehlgeschlagen. Ungültige Datei.', 'error');
+                        console.error("Import error:", error);
+                        showToast('Import fehlgeschlagen. Ungültige Datei oder Format.', 'error');
                     } finally {
                         importFileInput.value = '';
                     }
