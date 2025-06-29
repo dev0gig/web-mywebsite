@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes</title>
+    <!-- Tailwind CSS für das Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js zur Umwandlung von Markdown in HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- JSZip zum Erstellen von ZIP-Dateien für den Export und Import -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Lucide Icons für Symbole -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Google Font für eine saubere Typografie */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* Theming Variablen für Light & Dark Mode */
+        :root {
+            --bg-color: #f8fafc;
+            /* slate-50 */
+            --text-color: #1e293b;
+            /* slate-800 */
+            --text-color-light: #64748b;
+            /* slate-500 */
+            --text-color-heading: #334155;
+            /* slate-700 */
+            --border-color: #e2e8f0;
+            /* slate-200 */
+            --card-bg: #ffffff;
+            /* white */
+            --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --button-primary-bg: #1e293b;
+            /* slate-800 */
+            --button-primary-text: #ffffff;
+            /* white */
+            --button-primary-hover-bg: #334155;
+            /* slate-700 */
+            --button-secondary-bg: #ffffff;
+            /* white */
+            --button-secondary-border: #cbd5e1;
+            /* slate-300 */
+            --button-secondary-text: #334155;
+            /* slate-700 */
+            --button-secondary-hover-bg: #f8fafc;
+            /* slate-50 */
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --prose-blockquote-border: #cbd5e1;
+            --prose-blockquote-text: #64748b;
+            --prose-code-bg: #e2e8f0;
+            --prose-pre-bg: #f1f5f9;
+            --tag-bg: #e0e7ff;
+            /* indigo-100 */
+            --tag-text: #3730a3;
+            /* indigo-800 */
+            --scrollbar-thumb-bg: rgba(0, 0, 0, 0.1);
+            /* Dezenter Scrollbalken für Light-Theme */
+            --scrollbar-thumb-hover-bg: rgba(0, 0, 0, 0.2);
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            /* neutral-900 */
+            --text-color: #e5e5e5;
+            /* neutral-200 */
+            --text-color-light: #a3a3a3;
+            /* neutral-400 */
+            --text-color-heading: #fafafa;
+            /* neutral-50 */
+            --border-color: #404040;
+            /* neutral-700 */
+            --card-bg: #262626;
+            /* neutral-800 */
+            --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+            --button-primary-bg: #f5f5f5;
+            /* neutral-100 */
+            --button-primary-text: #171717;
+            /* neutral-900 */
+            --button-primary-hover-bg: #e5e5e5;
+            /* neutral-200 */
+            --button-secondary-bg: #262626;
+            --button-secondary-border: #525252;
+            /* neutral-600 */
+            --button-secondary-text: #e5e5e5;
+            --button-secondary-hover-bg: #404040;
+            --input-bg: #404040;
+            --input-border: #525252;
+            --prose-blockquote-border: #525252;
+            --prose-blockquote-text: #a3a3a3;
+            --prose-code-bg: #404040;
+            --prose-pre-bg: #171717;
+            --tag-bg: #3730a3;
+            /* indigo-800 */
+            --tag-text: #e0e7ff;
+            /* indigo-100 */
+            --scrollbar-thumb-bg: rgba(255, 255, 255, 0.1);
+            /* Dezenter Scrollbalken für Dark-Theme */
+            --scrollbar-thumb-hover-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Basis-Styling für den Body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Überschreiben von Tailwind-Klassen mit CSS-Variablen */
+        .main-header {
+            border-color: var(--border-color);
+        }
+
+        .main-header h1 {
+            color: var(--text-color-heading);
+        }
+
+        .journal-entry {
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .journal-entry h2 {
+            color: var(--text-color-light);
+            border-color: var(--border-color);
+        }
+
+        .journal-entry textarea {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+        }
+
+        #tag-cloud-container {
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        #pagination-controls button,
+        .modal-button {
+            background-color: var(--button-secondary-bg);
+            border-color: var(--button-secondary-border);
+            color: var(--button-secondary-text);
+        }
+
+        #pagination-controls button:hover,
+        .modal-button:hover {
+            background-color: var(--button-secondary-hover-bg);
+        }
+
+        .primary-button {
+            background-color: var(--button-primary-bg);
+            color: var(--button-primary-text);
+        }
+
+        .primary-button:hover {
+            background-color: var(--button-primary-hover-bg);
+        }
+
+        /* Markdown-Vorschau-Stile */
+        .prose-preview h1 {
+            color: var(--text-color-heading);
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 1em;
+            margin-bottom: 0.6em;
+        }
+
+        .prose-preview h2 {
+            color: var(--text-color-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .prose-preview h3 {
+            color: var(--text-color-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .prose-preview p {
+            margin-bottom: 0.75em;
+            line-height: 1.6;
+        }
+
+        .prose-preview ul,
+        .prose-preview ol {
+            padding-left: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .prose-preview blockquote {
+            border-left-width: 4px;
+            border-left-color: var(--prose-blockquote-border);
+            color: var(--prose-blockquote-text);
+            padding-left: 1em;
+            margin-left: 0;
+        }
+
+        .prose-preview code {
+            background-color: var(--prose-code-bg);
+            padding: 0.1em 0.3em;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .prose-preview pre {
+            background-color: var(--prose-pre-bg);
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .prose-preview pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .date-header {
+            cursor: pointer;
+        }
+
+        /* Tag-Styling */
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.25em 0.6em;
+            border-radius: 9999px;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        /* Hover-Effekt für Tags */
+        .tag:hover {
+            background-color: var(--tag-text);
+            /* Tausche Farben auf Hover */
+            color: var(--tag-bg);
+            border-color: var(--tag-text);
+        }
+
+        .tag.active {
+            background-color: var(--tag-text);
+            color: var(--tag-bg);
+            border-color: var(--tag-bg);
+        }
+
+        html[data-theme='dark'] .tag.active {
+            border-color: var(--tag-text);
+        }
+
+        /* Tag Cloud Styling */
+        .tag-cloud-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tag-cloud-tag {
+            transition: transform 0.2s;
+        }
+
+        /* Eigene Scrollbar-Stile */
+        #tag-cloud::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #tag-cloud::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #tag-cloud::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-bg);
+            /* Verwende die neue dezente Variable */
+            border-radius: 10px;
+        }
+
+        #tag-cloud::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover-bg);
+            /* Verwende die neue dezente Variable für Hover */
+        }
+
+        /* Kalender-Stile */
+        .calendar-day-has-entry {
+            position: relative;
+        }
+
+        .calendar-day-has-entry::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        html[data-theme='dark'] .calendar-day-has-entry::after {
+            background-color: #60a5fa;
+        }
+
+        /* Notification-Stile (ANGEPASST) */
+        #notification.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Styling for the delete button */
+        .delete-entry-button {
+            color: var(--text-color-light);
+        }
+
+        /* Positionierung des schwebenden Kalender-Buttons unter Berücksichtigung der Safe Area */
+        #fab-open-calendar {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom));
+        }
+    </style>
+</head>
+
+<body class="transition-colors duration-300">
+
+    <!-- Padding unten (pb-20) hinzugefügt, um Platz für den FAB auf Mobilgeräten zu schaffen -->
+    <div class="container mx-auto max-w-7xl px-4 py-8 pb-20 lg:pb-8">
+        <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b gap-4">
+            <h1 class="text-3xl font-bold">Meine Notizen</h1>
+            <!-- NEU: Suchfeld -->
+            <div class="relative flex-grow max-w-xl w-full">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
+                    style="color: var(--text-color-light)"></i>
+                <input type="text" id="search-input" placeholder="Einträge durchsuchen..."
+                    class="w-full pl-10 pr-10 py-2 rounded-lg"
+                    style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 p-1">
+                    <i data-lucide="x" class="w-5 h-5" style="color: var(--text-color-light)"></i>
+                </button>
+            </div>
+            <div class="flex items-center space-x-2">
+                <!-- GEÄNDERTER ANLEITUNGS-BUTTON -->
+                <button id="anleitung-button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
+                    <i data-lucide="help-circle" class="mr-2 h-4 w-4"></i> Anleitung
+                </button>
+                <label for="import-files"
+                    class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
+                    <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
+                </label>
+                <!-- Erlaubt jetzt .md, .txt und .zip Dateien -->
+                <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt,.zip">
+
+                <button id="export-button"
+                    class="primary-button inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                    <i data-lucide="download" class="mr-2 h-4 w-4"></i> Exportieren
+                </button>
+                <button id="delete-all-button" title="Alle Einträge löschen"
+                    class="primary-button inline-flex items-center justify-center p-2 border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 bg-red-600 hover:bg-red-700">
+                    <i data-lucide="trash-2" class="h-4 w-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div id="filter-header" class="hidden items-center mb-4 flex-wrap gap-2"></div>
+                <main id="journal-container"></main>
+                <footer id="pagination-controls" class="mt-8 flex justify-between items-center"></footer>
+            </div>
+            <aside class="lg:col-span-1">
+                <div class="sticky top-8 flex flex-col space-y-8" style="height: calc(100vh - 4rem);">
+                    <div id="calendar-desktop-wrapper" class="hidden lg:block p-4 rounded-lg flex-shrink-0"
+                        style="background-color: var(--card-bg); box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+                        <div id="calendar-container-desktop"></div>
+                    </div>
+                    <div id="tag-cloud-container" class="hidden lg:flex p-4 rounded-lg flex-col min-h-0">
+                        <h3 class="text-lg font-semibold mb-4 flex-shrink-0" style="color: var(--text-color-heading);">
+                            Tag-Wolke</h3>
+                        <div id="tag-cloud" class="flex-grow overflow-y-auto pr-2">
+                            <div class="tag-cloud-wrapper">
+                                <p class="text-sm" style="color: var(--text-color-light)">Keine Tags gefunden.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- GEKÜRZTES ANLEITUNGS-MODAL -->
+    <div id="anleitung-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md"
+            style="background-color: var(--card-bg); border-color: var(--border-color);">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b"
+                    style="border-color: var(--border-color);">
+                    <h3 class="text-xl leading-6 font-medium" style="color: var(--text-color-heading);">Kurzanleitung
+                    </h3>
+                    <button id="cancel-anleitung-button"
+                        class="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-neutral-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="mt-2 px-4 py-3 text-left max-h-[60vh] overflow-y-auto" style="color: var(--text-color);">
+                    <p class="text-base mb-4">Willkommen! Hier die wichtigsten Funktionen im Überblick:</p>
+                    <ul class="list-disc list-inside space-y-3">
+                        <li><b>Notiz erstellen:</b> Klicken Sie in einen Tageseintrag, um zu schreiben. Die Speicherung
+                            erfolgt automatisch.</li>
+                        <li><b>Formatierung:</b> Nutzen Sie Markdown, z.B. <code># Überschrift</code>,
+                            <code>*kursiv*</code>, <code>**fett**</code>, <code>- Liste</code>.
+                        </li>
+                        <li><b>Tags & Filter:</b> Setzen Sie Tags mit <code>#tag-name</code>. Klicken Sie auf Tags oder
+                            nutzen Sie die Suche, um Einträge zu filtern.</li>
+                        <li><b>Navigation:</b> Verwenden Sie den Kalender, um schnell zu einem Datum zu springen (blaue
+                            Punkte markieren Einträge).</li>
+                        <li><b>Daten sichern:</b> Exportieren und importieren Sie Ihre Notizen über die entsprechenden
+                            Schaltflächen. Dateien müssen <code>JJJJ-MM-TT.md</code> heißen.</li>
+                    </ul>
+                </div>
+                <div class="items-center px-4 py-3 text-right border-t mt-4" style="border-color: var(--border-color);">
+                    <button id="close-anleitung-button"
+                        class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
+                        Verstanden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Date Range Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md"
+            style="background-color: var(--card-bg); border-color: var(--border-color);">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren
+                </h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den
+                        Export.</p>
+                    <div class="space-y-4 mt-4">
+                        <div>
+                            <label for="start-date" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Startdatum</label>
+                            <input type="date" id="start-date"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                        </div>
+                        <div>
+                            <label for="end-date" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Enddatum</label>
+                            <input type="date" id="end-date"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                        </div>
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3 space-x-2">
+                    <button id="confirm-export-button"
+                        class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
+                        Weiter
+                    </button>
+                    <button id="cancel-export-button"
+                        class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEU: Export Rename Modal -->
+    <div id="export-rename-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--card-bg);">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--text-color-heading);">Export benennen</h3>
+            <p class="mb-4" style="color: var(--text-color-light);">Geben Sie einen Dateinamen für Ihren Export ein.</p>
+            <input type="text" id="export-filename-input" class="w-full p-2 rounded-md mb-6"
+                style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color)">
+            <div class="flex justify-end gap-4">
+                <button id="export-rename-cancel-btn"
+                    class="font-bold py-2 px-4 rounded-lg transition modal-button">Abbrechen</button>
+                <button id="export-rename-confirm-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">OK &
+                    Exportieren</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Notification Element (ANGEPASST) -->
+    <div id="notification"
+        class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12 z-50">
+        <p id="notification-message"></p>
+    </div>
+
+    <!-- Kalender Seitenleiste (Mobile) -->
+    <div id="calendar-sidebar-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+    </div>
+    <div id="calendar-sidebar"
+        class="fixed top-0 right-0 h-full w-full max-w-xs shadow-xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
+        style="background-color: var(--card-bg);">
+        <div class="p-4 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 w-full flex-shrink-0">
+                <h3 class="text-xl font-bold" style="color: var(--text-color-heading);">Kalender</h3>
+                <button id="close-calendar-sidebar-btn"
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="calendar-container-mobile" class="flex flex-col w-full h-full">
+                <!-- Mobile Calendar will be rendered here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Schwebender Kalender-Button -->
+    <button id="fab-open-calendar" title="Kalender anzeigen"
+        class="lg:hidden fixed right-6 primary-button w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
+        <i data-lucide="calendar" class="h-7 w-7"></i>
+    </button>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const journalContainer = document.getElementById('journal-container');
+            const paginationControls = document.getElementById('pagination-controls');
+            const calendarContainerDesktop = document.getElementById('calendar-container-desktop');
+            const calendarContainerMobile = document.getElementById('calendar-container-mobile');
+
+            const tagCloud = document.getElementById('tag-cloud');
+            const filterHeader = document.getElementById('filter-header');
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+            const importInput = document.getElementById('import-files');
+            const exportButton = document.getElementById('export-button');
+            const deleteAllButton = document.getElementById('delete-all-button');
+
+            // Elemente für Export-Modals
+            const exportModal = document.getElementById('export-modal');
+            const confirmExportButton = document.getElementById('confirm-export-button');
+            const cancelExportButton = document.getElementById('cancel-export-button');
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+
+            // NEU: Elemente für Umbenennungs-Modal
+            const exportRenameModal = document.getElementById('export-rename-modal');
+            const exportFilenameInput = document.getElementById('export-filename-input');
+            const exportRenameCancelBtn = document.getElementById('export-rename-cancel-btn');
+            const exportRenameConfirmBtn = document.getElementById('export-rename-confirm-btn');
+
+            // NEUE ELEMENTE FÜR ANLEITUNGS-MODAL
+            const anleitungButton = document.getElementById('anleitung-button');
+            const anleitungModal = document.getElementById('anleitung-modal');
+            const cancelAnleitungButton = document.getElementById('cancel-anleitung-button');
+            const closeAnleitungButton = document.getElementById('close-anleitung-button');
+
+
+            const calendarSidebar = document.getElementById('calendar-sidebar');
+            const calendarSidebarOverlay = document.getElementById('calendar-sidebar-overlay');
+            const openCalendarBtn = document.getElementById('fab-open-calendar');
+            const closeCalendarBtn = document.getElementById('close-calendar-sidebar-btn');
+
+            const STORAGE_KEY = 'markdownNotesEntries_work';
+            const ENTRIES_PER_PAGE = 20;
+            let currentPage = 1;
+            let calendarDate = new Date();
+            let activeTagFilters = [];
+            let activeSearchTerm = '';
+
+            // NEU: Globale Variablen zum Speichern des Datumsbereichs für den Export
+            let exportStartDate, exportEndDate;
+
+            window.addEventListener('message', (event) => {
+                if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
+                    const theme = event.data.substring('set-theme-'.length);
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            });
+
+            const loadEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            const saveEntries = (entries) => localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+
+            let journalEntries = loadEntries();
+
+            const formatDate = (date) => date.toISOString().split('T')[0];
+
+            const formatDisplayDate = (dateString) => {
+                const date = new Date(dateString);
+                return new Intl.DateTimeFormat('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(date);
+            };
+
+            const showNotification = (message, type = 'success', duration = 3000) => {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+
+                notification.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
+                if (type === 'success') {
+                    notification.classList.add('bg-green-500');
+                } else if (type === 'warning') {
+                    notification.classList.add('bg-yellow-500');
+                } else {
+                    notification.classList.add('bg-red-500');
+                }
+
+                messageEl.textContent = message;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, duration);
+            };
+
+            const parseAndStyleContent = (markdownText) => {
+                const defaultText = '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>';
+                if (!markdownText) {
+                    return defaultText;
+                }
+                let html = marked.parse(markdownText);
+                html = html.replace(/(^|\s|>)(#[\p{L}\p{N}_-]+)/gu, (match, p1, p2) => {
+                    const tag = p2.toLowerCase();
+                    const isActive = activeTagFilters.includes(tag) ? ' active' : '';
+                    return `${p1}<span class="tag${isActive}" data-tag="${tag}">${p2}</span>`;
+                });
+                return html;
+            };
+
+            const handleTagClick = (tag) => {
+                const normalizedTag = tag.toLowerCase();
+                const index = activeTagFilters.indexOf(normalizedTag);
+
+                if (index > -1) {
+                    activeTagFilters.splice(index, 1); // Tag entfernen
+                } else {
+                    activeTagFilters.push(normalizedTag); // Tag hinzufügen
+                }
+
+                activeSearchTerm = '';
+                searchInput.value = '';
+                currentPage = 1;
+                updateAll();
+            };
+
+            const createEntryElement = (dateString, content) => {
+                const entryDiv = document.createElement('div');
+                entryDiv.classList.add('journal-entry', 'mb-6', 'p-6', 'rounded-lg', 'transition-all', 'duration-300');
+                entryDiv.dataset.date = dateString;
+
+                const displayDate = formatDisplayDate(dateString);
+                const header = document.createElement('h2');
+                header.textContent = displayDate;
+                header.classList.add('text-xl', 'font-semibold', 'mb-3', 'pb-2', 'border-b', 'date-header');
+
+                const previewDiv = document.createElement('div');
+                previewDiv.classList.add('prose', 'prose-slate', 'max-w-none', 'prose-preview');
+                previewDiv.innerHTML = parseAndStyleContent(content);
+
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
+                textArea.setAttribute('rows', '8');
+
+                entryDiv.append(header, previewDiv, textArea);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('absolute', 'top-2', 'right-2', 'p-1', 'rounded-full', 'hover:bg-red-100', 'dark:hover:bg-red-900', 'cursor-pointer', 'delete-entry-button');
+                deleteButton.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
+                deleteButton.title = 'Eintrag löschen';
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showCustomConfirm('Möchten Sie diesen Eintrag wirklich löschen?', () => {
+                        delete journalEntries[dateString];
+                        saveEntries(journalEntries);
+                        updateAll();
+                        showNotification('Eintrag erfolgreich gelöscht.', 'success');
+                    });
+                });
+                entryDiv.classList.add('relative');
+                entryDiv.appendChild(deleteButton);
+
+                entryDiv.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tag')) {
+                        const tag = e.target.dataset.tag;
+                        if (tag) {
+                            handleTagClick(tag);
+                        }
+                        return;
+                    }
+
+                    if (textArea.classList.contains('hidden')) {
+                        previewDiv.classList.add('hidden');
+                        textArea.classList.remove('hidden');
+                        textArea.focus();
+                    }
+                });
+
+                textArea.addEventListener('blur', () => {
+                    const newContent = textArea.value;
+                    const todayString = formatDate(new Date());
+
+                    if (newContent.trim() === '' && dateString !== todayString) {
+                        delete journalEntries[dateString];
+                    } else {
+                        journalEntries[dateString] = newContent;
+                    }
+
+                    saveEntries(journalEntries);
+                    updateAll();
+                });
+                return entryDiv;
+            };
+
+            const renderTagCloud = () => {
+                const tagCounts = {};
+                const tagRegex = /#([\p{L}\p{N}_-]+)/gu;
+
+                Object.values(journalEntries).forEach(content => {
+                    const matches = content.match(tagRegex);
+                    if (matches) {
+                        matches.forEach(tag => {
+                            const normalizedTag = tag.toLowerCase();
+                            tagCounts[normalizedTag] = (tagCounts[normalizedTag] || 0) + 1;
+                        });
+                    }
+                });
+
+                const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
+                const cloudWrapper = tagCloud.querySelector('.tag-cloud-wrapper') || document.createElement('div');
+                cloudWrapper.className = 'tag-cloud-wrapper';
+                cloudWrapper.innerHTML = '';
+
+                if (sortedTags.length === 0) {
+                    cloudWrapper.innerHTML = `<p class="text-sm" style="color: var(--text-color-light)">Keine Tags gefunden.</p>`;
+                    tagCloud.appendChild(cloudWrapper);
+                    return;
+                }
+
+                sortedTags.forEach(([tag, count]) => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = `tag tag-cloud-tag ${activeTagFilters.includes(tag) ? 'active' : ''}`;
+                    tagEl.textContent = `${tag} (${count})`;
+                    tagEl.addEventListener('click', () => handleTagClick(tag));
+                    cloudWrapper.appendChild(tagEl);
+                });
+                tagCloud.appendChild(cloudWrapper);
+            };
+
+            const renderCalendar = () => {
+                const containers = [calendarContainerDesktop, calendarContainerMobile];
+                const year = calendarDate.getFullYear();
+                const month = calendarDate.getMonth();
+
+                containers.forEach(container => {
+                    if (!container) return;
+                    container.innerHTML = '';
+
+                    const header = document.createElement('div');
+                    header.classList.add('flex', 'justify-between', 'items-center', 'mb-4');
+                    const monthName = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(calendarDate);
+                    header.innerHTML = `<button data-action="prev-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-left"></i></button><h3 class="font-semibold text-lg">${monthName}</h3><button data-action="next-month" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-700"><i data-lucide="chevron-right"></i></button>`;
+                    container.appendChild(header);
+
+                    const grid = document.createElement('div');
+                    grid.classList.add('grid', 'grid-cols-7', 'gap-1', 'text-center', 'text-sm');
+                    container.appendChild(grid);
+
+                    const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+                    weekdays.forEach(day => { grid.innerHTML += `<div class="font-medium" style="color: var(--text-color-light)">${day}</div>`; });
+
+                    const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+                    for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
+
+                    const todayString = formatDate(new Date());
+
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const currentDate = new Date(Date.UTC(year, month, day));
+                        const dateString = formatDate(currentDate);
+                        const dayButton = document.createElement('button');
+                        dayButton.textContent = day;
+                        dayButton.dataset.date = dateString;
+                        dayButton.classList.add('p-2', 'rounded-full', 'hover:bg-slate-100', 'dark:hover:bg-neutral-700', 'transition-colors', 'relative');
+                        if (dateString === todayString) dayButton.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600', 'dark:hover:bg-blue-600');
+                        if (journalEntries[dateString]?.trim()) dayButton.classList.add('calendar-day-has-entry');
+                        dayButton.addEventListener('click', handleDateClick);
+                        grid.appendChild(dayButton);
+                    }
+                });
+
+                document.querySelectorAll('[data-action="prev-month"]').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }));
+                document.querySelectorAll('[data-action="next-month"]').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }));
+
+                lucide.createIcons();
+            };
+
+            function handleDateClick(e) {
+                const dateString = e.currentTarget.dataset.date;
+                const wasJustCreated = journalEntries[dateString] === undefined;
+
+                if (wasJustCreated) {
+                    journalEntries[dateString] = '';
+                    saveEntries(journalEntries);
+                }
+
+                activeTagFilters = [];
+                activeSearchTerm = '';
+                searchInput.value = '';
+
+                const sortedDates = Object.keys(journalEntries).sort().reverse();
+                const entryIndex = sortedDates.indexOf(dateString);
+
+                if (entryIndex !== -1) {
+                    currentPage = Math.floor(entryIndex / ENTRIES_PER_PAGE) + 1;
+                } else {
+                    currentPage = 1;
+                }
+
+                updateAll();
+                closeCalendarSidebar();
+
+                setTimeout(() => {
+                    const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (wasJustCreated) {
+                            element.click();
+                        } else {
+                            element.classList.add('ring-2', 'ring-blue-400');
+                            setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                        }
+                    }
+                }, 100);
+            }
+
+            const renderJournal = () => {
+                journalContainer.innerHTML = '';
+                paginationControls.innerHTML = '';
+
+                let datesToDisplay = Object.keys(journalEntries).sort().reverse();
+
+                if (activeTagFilters.length > 0) {
+                    const tagsHTML = activeTagFilters.map(tag => `<span class="tag active">${tag}</span>`).join('');
+                    filterHeader.innerHTML = `
+                        <h2 class="text-xl font-bold flex items-center gap-2" style="color: var(--text-color-heading);">
+                            Einträge mit: ${tagsHTML}
+                        </h2>
+                        <button id="clear-filter" class="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i data-lucide="x" class="h-5 w-5"></i>
+                        </button>
+                    `;
+                    filterHeader.classList.remove('hidden');
+                    filterHeader.classList.add('flex');
+                    document.getElementById('clear-filter').addEventListener('click', () => {
+                        activeTagFilters = [];
+                        currentPage = 1;
+                        updateAll();
+                    });
+
+                    datesToDisplay = datesToDisplay.filter(date => {
+                        const content = journalEntries[date].toLowerCase();
+                        return activeTagFilters.every(tag => content.includes(tag));
+                    });
+
+                } else if (activeSearchTerm) {
+                    filterHeader.innerHTML = `
+                        <h2 class="text-xl font-bold" style="color: var(--text-color-heading);">Suchergebnisse für: <span class="italic">'${activeSearchTerm}'</span></h2>
+                        <button id="clear-filter" class="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i data-lucide="x" class="h-5 w-5"></i>
+                        </button>
+                    `;
+                    filterHeader.classList.remove('hidden');
+                    filterHeader.classList.add('flex');
+                    document.getElementById('clear-filter').addEventListener('click', () => {
+                        searchInput.value = '';
+                        clearSearchBtn.classList.add('hidden');
+                        activeSearchTerm = '';
+                        currentPage = 1;
+                        updateAll();
+                    });
+
+                    const lowerCaseSearch = activeSearchTerm.toLowerCase();
+                    datesToDisplay = datesToDisplay.filter(date => {
+                        const content = journalEntries[date].toLowerCase();
+                        const displayDate = formatDisplayDate(date).toLowerCase();
+                        return content.includes(lowerCaseSearch) || displayDate.includes(lowerCaseSearch);
+                    });
+                } else {
+                    filterHeader.classList.add('hidden');
+                    filterHeader.classList.remove('flex');
+                    const todayString = formatDate(new Date());
+
+                    if (journalEntries[todayString] === undefined) {
+                        journalEntries[todayString] = '';
+                        saveEntries(journalEntries);
+                    }
+                }
+
+                const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
+                const endIndex = startIndex + ENTRIES_PER_PAGE;
+                const paginatedDates = datesToDisplay.slice(startIndex, endIndex);
+
+                if (paginatedDates.length === 0 && (activeTagFilters.length > 0 || activeSearchTerm)) {
+                    journalContainer.innerHTML = `<p style="color: var(--text-color-light)">Keine Einträge für diesen Filter gefunden.</p>`;
+                } else {
+                    paginatedDates.forEach(dateString => {
+                        const entryElement = createEntryElement(dateString, journalEntries[dateString]);
+                        journalContainer.appendChild(entryElement);
+                    });
+                }
+
+                setupPagination(datesToDisplay.length);
+                lucide.createIcons();
+            };
+
+            const setupPagination = (totalEntries) => {
+                const totalPages = Math.ceil(totalEntries / ENTRIES_PER_PAGE);
+                if (totalPages <= 1) {
+                    paginationControls.innerHTML = '';
+                    return;
+                }
+
+                const createButton = (text, onClick, condition) => {
+                    const button = document.createElement('button');
+                    button.textContent = text;
+                    button.classList.add('modal-button', 'px-4', 'py-2', 'border', 'text-sm', 'font-medium', 'rounded-md', 'disabled:opacity-50', 'disabled:cursor-not-allowed');
+                    button.disabled = condition;
+                    button.addEventListener('click', onClick);
+                    return button;
+                };
+
+                const prevButton = createButton('Zurück', () => { currentPage--; renderJournal(); window.scrollTo(0, 0); }, currentPage === 1);
+                const pageInfo = document.createElement('span');
+                pageInfo.textContent = `Seite ${currentPage} von ${totalPages}`;
+                pageInfo.classList.add('text-sm');
+                pageInfo.style.color = 'var(--text-color-light)';
+                const nextButton = createButton('Weiter', () => { currentPage++; renderJournal(); window.scrollTo(0, 0); }, currentPage === totalPages);
+
+                paginationControls.innerHTML = '';
+                paginationControls.append(prevButton, pageInfo, nextButton);
+            };
+
+            const createConfirmModal = () => {
+                const modal = document.createElement('div');
+                modal.id = 'custom-confirm-modal';
+                modal.classList.add('fixed', 'inset-0', 'bg-gray-600', 'bg-opacity-50', 'overflow-y-auto', 'h-full', 'w-full', 'hidden', 'z-50');
+                modal.innerHTML = `
+                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md"
+                        style="background-color: var(--card-bg); border-color: var(--border-color);">
+                        <div class="mt-3 text-center">
+                            <h3 id="confirm-modal-title" class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);"></h3>
+                            <div class="mt-2 px-7 py-3">
+                                <p id="confirm-modal-message" class="text-sm" style="color: var(--text-color-light);"></p>
+                            </div>
+                            <div class="items-center px-4 py-3 space-x-2">
+                                <button id="confirm-modal-ok"
+                                    class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
+                                    OK
+                                </button>
+                                <button id="confirm-modal-cancel"
+                                    class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
+                                    Abbrechen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                return modal;
+            };
+
+            let confirmModal = null;
+            let confirmCallback = null;
+
+            const showCustomConfirm = (message, onConfirm, onCancel = () => { }) => {
+                if (!confirmModal) {
+                    confirmModal = createConfirmModal();
+                }
+
+                document.getElementById('confirm-modal-message').textContent = message;
+                document.getElementById('confirm-modal-title').textContent = 'Bestätigung';
+                confirmModal.classList.remove('hidden');
+
+                confirmCallback = onConfirm;
+
+                const okButton = document.getElementById('confirm-modal-ok');
+                const cancelButton = document.getElementById('confirm-modal-cancel');
+
+                const handleOk = () => {
+                    confirmModal.classList.add('hidden');
+                    okButton.removeEventListener('click', handleOk);
+                    cancelButton.removeEventListener('click', handleCancel);
+                    confirmCallback();
+                };
+
+                const handleCancel = () => {
+                    confirmModal.classList.add('hidden');
+                    okButton.removeEventListener('click', handleOk);
+                    cancelButton.removeEventListener('click', handleCancel);
+                    onCancel();
+                };
+
+                okButton.addEventListener('click', handleOk);
+                cancelButton.addEventListener('click', handleCancel);
+            };
+
+            const updateAll = () => {
+                renderJournal();
+                renderCalendar();
+                renderTagCloud();
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                clearSearchBtn.classList.toggle('hidden', !searchTerm);
+                activeSearchTerm = searchTerm;
+                activeTagFilters = [];
+                currentPage = 1;
+                updateAll();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                activeSearchTerm = '';
+                currentPage = 1;
+                updateAll();
+            });
+
+            importInput.addEventListener('change', async (event) => {
+                const files = event.target.files;
+                if (!files.length) return;
+
+                const currentEntries = loadEntries();
+                let importedCount = 0;
+                const importedDates = [];
+
+                const processTextFile = (file) => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const dateMatch = file.name.match(/^(\d{4}-\d{2}-\d{2})/);
+                            if (dateMatch) {
+                                resolve({ date: dateMatch[1], content: e.target.result });
+                            } else {
+                                resolve(null);
+                            }
+                        };
+                        reader.onerror = (e) => reject(e);
+                        reader.readAsText(file);
+                    });
+                };
+
+                const processZipFile = async (zipFile) => {
+                    let zipPromises = [];
+                    try {
+                        const zip = await JSZip.loadAsync(zipFile);
+                        zip.forEach((relativePath, zipEntry) => {
+                            if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.md')) {
+                                zipPromises.push(zipEntry.async('string').then(content => {
+                                    const dateMatch = relativePath.match(/^(\d{4}-\d{2}-\d{2})/);
+                                    if (dateMatch) {
+                                        return { date: dateMatch[1], content: content };
+                                    } else {
+                                        return null;
+                                    }
+                                }));
+                            }
+                        });
+                        return Promise.all(zipPromises);
+                    } catch (error) {
+                        showNotification(`Fehler beim Importieren der ZIP-Datei "${zipFile.name}".`, 'error');
+                        return [];
+                    }
+                };
+
+                for (const file of files) {
+                    if (file.name.toLowerCase().endsWith('.zip')) {
+                        const extractedFiles = await processZipFile(file);
+                        extractedFiles.forEach(result => {
+                            if (result) {
+                                currentEntries[result.date] = result.content;
+                                importedDates.push(result.date);
+                                importedCount++;
+                            }
+                        });
+                    } else if (file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.txt')) {
+                        const result = await processTextFile(file);
+                        if (result) {
+                            currentEntries[result.date] = result.content;
+                            importedDates.push(result.date);
+                            importedCount++;
+                        }
+                    }
+                }
+
+                if (importedCount > 0) {
+                    journalEntries = currentEntries;
+                    saveEntries(journalEntries);
+                    let newestImportedDate = '';
+                    if (importedDates.length > 0) {
+                        newestImportedDate = importedDates.sort().reverse()[0];
+                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z');
+                    }
+                    currentPage = 1;
+                    updateAll();
+                    showNotification(`${importedCount} Eintrag/Einträge erfolgreich importiert.`, 'success');
+                    if (newestImportedDate) {
+                        setTimeout(() => {
+                            const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                element.classList.add('ring-2', 'ring-blue-400');
+                                setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                            }
+                        }, 100);
+                    }
+                } else {
+                    showNotification('Keine gültigen Einträge zum Importieren gefunden.', 'warning');
+                }
+                importInput.value = '';
+            });
+
+            // --- NEUE EXPORT-LOGIK ---
+
+            // Schritt 1: Funktion zum Erstellen der ZIP-Datei (extrahiert)
+            const createZipAndDownload = (filename, startDate, endDate) => {
+                const zip = new JSZip();
+                let filesAdded = 0;
+                Object.keys(journalEntries).forEach(dateString => {
+                    if (dateString >= startDate && dateString <= endDate) {
+                        const content = journalEntries[dateString];
+                        if (content?.trim()) {
+                            zip.file(`${dateString}.md`, content);
+                            filesAdded++;
+                        }
+                    }
+                });
+
+                if (filesAdded === 0) {
+                    showNotification('Keine Einträge im ausgewählten Zeitraum gefunden.', 'warning');
+                    return;
+                }
+
+                zip.generateAsync({ type: "blob" })
+                    .then(content => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(content);
+                        // Verwende den übergebenen Dateinamen
+                        link.download = `${filename}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        showNotification('Export erfolgreich!', 'success');
+                    })
+                    .catch(error => {
+                        console.error("Fehler beim Generieren der ZIP-Datei:", error);
+                        showNotification('Fehler beim Exportieren der Einträge.', 'error');
+                    });
+            };
+
+            // Schritt 2: Event Listener für den "Exportieren"-Button (öffnet Datums-Modal)
+            exportButton.addEventListener('click', () => {
+                const dates = Object.keys(journalEntries).sort();
+                if (dates.length > 0) {
+                    startDateInput.value = dates[0];
+                    endDateInput.value = dates[dates.length - 1];
+                } else {
+                    const today = formatDate(new Date());
+                    startDateInput.value = today;
+                    endDateInput.value = today;
+                }
+                exportModal.classList.remove('hidden');
+            });
+
+            cancelExportButton.addEventListener('click', () => exportModal.classList.add('hidden'));
+
+            // Schritt 3: Event Listener für den "Weiter"-Button (öffnet Umbenennungs-Modal)
+            confirmExportButton.addEventListener('click', () => {
+                exportStartDate = startDateInput.value;
+                exportEndDate = endDateInput.value;
+                if (!exportStartDate || !exportEndDate || exportStartDate > exportEndDate) {
+                    showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
+                    return;
+                }
+
+                const defaultFilename = `Notizen_${exportStartDate}_bis_${exportEndDate}`;
+                exportFilenameInput.value = defaultFilename;
+
+                exportModal.classList.add('hidden');
+                exportRenameModal.classList.remove('hidden');
+                exportFilenameInput.focus();
+            });
+
+            // Schritt 4: Event Listener für das Umbenennungs-Modal
+            exportRenameCancelBtn.addEventListener('click', () => {
+                exportRenameModal.classList.add('hidden');
+            });
+
+            exportRenameConfirmBtn.addEventListener('click', () => {
+                const filename = exportFilenameInput.value.trim();
+                if (filename) {
+                    createZipAndDownload(filename, exportStartDate, exportEndDate);
+                    exportRenameModal.classList.add('hidden');
+                } else {
+                    showNotification('Bitte geben Sie einen gültigen Dateinamen an.', 'error');
+                }
+            });
+
+
+            deleteAllButton.addEventListener('click', () => {
+                showCustomConfirm('Möchten Sie WIRKLICH ALLE Einträge unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden!', () => {
+                    journalEntries = {};
+                    saveEntries(journalEntries);
+                    updateAll();
+                    showNotification('Alle Einträge wurden erfolgreich gelöscht.', 'success');
+                });
+            });
+
+            const openAnleitungModal = () => {
+                anleitungModal.classList.remove('hidden');
+                lucide.createIcons();
+            };
+            const closeAnleitungModal = () => anleitungModal.classList.add('hidden');
+
+            anleitungButton.addEventListener('click', openAnleitungModal);
+            cancelAnleitungButton.addEventListener('click', closeAnleitungModal);
+            closeAnleitungButton.addEventListener('click', closeAnleitungModal);
+
+            window.addEventListener('click', (event) => {
+                if (event.target == exportModal) exportModal.classList.add('hidden');
+                if (event.target == anleitungModal) anleitungModal.classList.add('hidden');
+                if (event.target == exportRenameModal) exportRenameModal.classList.add('hidden'); // Schließt auch das neue Modal
+            });
+
+            function openCalendarSidebar() {
+                calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.remove('translate-x-full');
+                lucide.createIcons();
+            }
+
+            function closeCalendarSidebar() {
+                calendarSidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+                calendarSidebar.classList.add('translate-x-full');
+            }
+
+            openCalendarBtn.addEventListener('click', openCalendarSidebar);
+            closeCalendarBtn.addEventListener('click', closeCalendarSidebar);
+            calendarSidebarOverlay.addEventListener('click', closeCalendarSidebar);
+
+            updateAll();
+        });
+    </script>
+</body>
+
+<script>
+    window.addEventListener('message', (event) => {
+        if (event.source !== window.parent) {
+            return;
+        }
+
+        const message = event.data;
+        const STORAGE_KEY = 'markdownNotesEntries_work'; // Ensure key matches
+
+        if (message && message.type === 'getBackupData') {
+            const journalData = localStorage.getItem(STORAGE_KEY);
+            window.parent.postMessage({
+                type: 'backupDataResponse',
+                key: 'memomea', // Dies muss mit dem data-key des iframes übereinstimmen!
+                data: JSON.parse(journalData || '{}')
+            }, '*');
+        }
+
+        if (message && message.type === 'restoreBackupData') {
+            const restoredEntries = message.data;
+            if (typeof restoredEntries === 'object' && restoredEntries !== null) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(restoredEntries));
+                window.location.reload();
+            }
+        }
+    });
+</script>
+
+</html>
