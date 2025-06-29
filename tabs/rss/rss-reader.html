@@ -1035,4 +1035,54 @@
     </script>
 </body>
 
+<!-- Füge dies am Ende des <body>-Tags in rss-reader.html ein -->
+<script>
+    window.addEventListener('message', (event) => {
+        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        if (event.source !== window.parent) {
+            return;
+        }
+
+        const message = event.data;
+
+        if (message && message.type === 'getBackupData') {
+            // Sammle alle relevanten Daten für den RSS-Reader.
+            const feedsData = localStorage.getItem('savedRssFeeds');
+            const visitedData = localStorage.getItem('rssVisitedLinks');
+            const favoritesData = localStorage.getItem('rssFavoriteLinks');
+
+            // Bündle alle Daten in einem einzigen Objekt.
+            const backupPayload = {
+                feeds: JSON.parse(feedsData || '[]'),
+                visited: JSON.parse(visitedData || '[]'),
+                favorites: JSON.parse(favoritesData || '[]')
+            };
+
+            // Sende das Objekt zurück an das Hauptfenster (index.html).
+            window.parent.postMessage({
+                type: 'backupDataResponse',
+                key: 'rss',
+                data: backupPayload
+            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+        }
+
+        if (message && message.type === 'restoreBackupData') {
+            // Empfange das wiederherzustellende Datenobjekt.
+            const restoredData = message.data;
+
+            // Überprüfe, ob die wiederhergestellten Daten das erwartete Format haben.
+            if (typeof restoredData === 'object' && restoredData !== null && 'feeds' in restoredData && 'visited' in restoredData && 'favorites' in restoredData) {
+                // Speichere jeden Teil der Daten in seinem jeweiligen localStorage-Eintrag.
+                localStorage.setItem('savedRssFeeds', JSON.stringify(restoredData.feeds || []));
+                localStorage.setItem('rssVisitedLinks', JSON.stringify(restoredData.visited || []));
+                localStorage.setItem('rssFavoriteLinks', JSON.stringify(restoredData.favorites || []));
+
+                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                window.location.reload();
+            }
+        }
+    });
+</script>
+
+
 </html>

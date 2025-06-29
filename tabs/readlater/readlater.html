@@ -831,4 +831,43 @@
     </script>
 </body>
 
+<!-- Füge dies am Ende des <body>-Tags in readlater.html ein -->
+<script>
+    window.addEventListener('message', (event) => {
+        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        if (event.source !== window.parent) {
+            return;
+        }
+
+        const message = event.data;
+
+        if (message && message.type === 'getBackupData') {
+            // Sammle die "Später lesen"-Links aus dem localStorage.
+            const linksData = localStorage.getItem('readLaterLinks');
+
+            // Sende die Daten zurück an das Hauptfenster (index.html).
+            // Der 'key' muss mit dem 'data-key' des iframes übereinstimmen.
+            window.parent.postMessage({
+                type: 'backupDataResponse',
+                key: 'readlater',
+                data: JSON.parse(linksData || '[]') // Stelle sicher, dass gültiges JSON gesendet wird.
+            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+        }
+
+        if (message && message.type === 'restoreBackupData') {
+            // Empfange die wiederherzustellenden Daten.
+            const restoredLinks = message.data;
+
+            if (Array.isArray(restoredLinks)) {
+                // Speichere die wiederhergestellten Daten im localStorage.
+                localStorage.setItem('readLaterLinks', JSON.stringify(restoredLinks));
+
+                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                window.location.reload();
+            }
+        }
+    });
+</script>
+
+
 </html>

@@ -8,8 +8,6 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons für Symbole -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- JSZip for creating zip files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -231,28 +229,29 @@
 
     <nav id="sidebar" class="p-2 flex flex-col">
         <ul id="nav-links" class="space-y-2 mt-2">
-            <li><a href="appdrawer.html" data-target="frame-appdrawer"
+            <li><a href="tabs/appdrawer/appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Appdrawer</span></a>
             </li>
-            <li><a href="widgets/widgets-iframe.html" data-target="frame-widgets"
+            <li><a href="tabs/widgets/widgets-iframe.html" data-target="frame-widgets"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/widgets.svg" alt="Widgets Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="readlater.html" data-target="frame-readlater"
+            <li><a href="tabs/readlater/readlater.html" data-target="frame-readlater"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/readlater.svg" alt="ReadlateR Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">ReadlateR</span></a></li>
-            <li><a href="rss-reader.html" data-target="frame-rss" class="sidebar-link flex items-center p-3 rounded-lg">
+            <li><a href="tabs/rss/rss-reader.html" data-target="frame-rss"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/rss.svg" alt="RSS Reader Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">RSS Reader</span></a></li>
-            <li><a href="aurimea.html" data-target="frame-aurimea"
+            <li><a href="tabs/aurimea/aurimea.html" data-target="frame-aurimea"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
-            <li><a href="memomea.html" data-target="frame-memomea"
+            <li><a href="tabs/memomea/memomea.html" data-target="frame-memomea"
                     class="sidebar-link flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">MemoMea</span></a>
@@ -273,6 +272,8 @@
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
+        </ul>
+        <ul class="space-y-2 mt-auto pb-4">
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
@@ -330,21 +331,15 @@
                     <legend class="sr-only">Theme selection</legend>
                     <div><input type="radio" name="theme" id="theme-light" value="light"
                             class="theme-radio-peer hidden"><label for="theme-light"
-                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
-                            <i data-lucide="sun" class="w-5 h-5"></i> Light
-                        </label>
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
                     </div>
                     <div><input type="radio" name="theme" id="theme-dark" value="dark"
                             class="theme-radio-peer hidden"><label for="theme-dark"
-                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
-                            <i data-lucide="moon" class="w-5 h-5"></i> Dark
-                        </label>
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
                     </div>
                     <div><input type="radio" name="theme" id="theme-system" value="system"
                             class="theme-radio-peer hidden"><label for="theme-system"
-                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
-                            <i data-lucide="monitor" class="w-5 h-5"></i> System
-                        </label>
+                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
                     </div>
                 </fieldset>
             </div>
@@ -356,13 +351,25 @@
                         style="background-color: var(--accent-color);"
                         onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
                         onmouseout="this.style.backgroundColor='var(--accent-color)'">
-                        <i data-lucide="package" class="w-7 h-7"></i>
-                        Backup all
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                        </svg>
+                        Alles Sichern
                     </button>
                     <label for="restore-all-input"
                         class="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
-                        <i data-lucide="package-open" class="w-7 h-7"></i>
-                        Restore all
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.5 2.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3.4a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3.4a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                        </svg>
+                        Alles Wiederherstellen
                     </label>
                     <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                 </div>
@@ -392,8 +399,7 @@
             const backupAllBtn = document.getElementById('backup-all-btn');
             const restoreAllInput = document.getElementById('restore-all-input');
             let backupData = {};
-            // Filter to only include frames that should be backed up
-            const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key !== 'widgets');
+            const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
             let expectedResponses = 0;
             let receivedResponses = 0;
 
@@ -439,7 +445,10 @@
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
-                    if (backupData[key] && ((Array.isArray(backupData[key]) && backupData[key].length > 0) || (typeof backupData[key] === 'object' && Object.keys(backupData[key]).length > 0))) {
+                    // **KORRIGIERTE LOGIK HIER**
+                    // Speichere die Datei, solange die Daten nicht null oder undefined sind.
+                    // Das schließt leere Arrays `[]` und leere Objekte `{}` mit ein.
+                    if (backupData[key] !== null && backupData[key] !== undefined) {
                         zip.file(`${key}.json`, JSON.stringify(backupData[key], null, 2));
                         filesAdded++;
                     }
@@ -507,7 +516,7 @@
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'backupDataResponse') {
                     const { key, data } = event.data;
-                    if (key && data) {
+                    if (key) { // Accept the key even if data is empty
                         backupData[key] = data;
                     }
                     receivedResponses++;
@@ -554,7 +563,6 @@
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
             }
 
-            // Clone all nav items for mobile menu
             document.querySelectorAll('#sidebar > ul > li').forEach(li => {
                 const newLi = li.cloneNode(true);
                 const linkOrButton = newLi.querySelector('a, button');
@@ -577,8 +585,6 @@
             mobileMenuOverlay.addEventListener('click', closeMobileMenu);
             closeModalBtn.addEventListener('click', closeSettingsModal);
             modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
-
-            // ... (your existing JavaScript code) ...
 
             const themeRadios = document.querySelectorAll('input[name="theme"]');
             function applyTheme(theme) {
@@ -629,9 +635,6 @@
                 document.querySelector('a[data-target="frame-appdrawer"]')?.classList.add('active');
                 mobileHeaderTitle.textContent = 'Appdrawer';
             }
-
-            // Initialize Lucide icons after the DOM is fully loaded and elements are present
-            lucide.createIcons();
         });
     </script>
 </body>
