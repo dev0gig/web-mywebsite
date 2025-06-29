@@ -23,10 +23,14 @@
             --sidebar-bg-color: #ffffff;
             /* Hintergrundfarbe der Sidebar im Light Mode */
             --sidebar-text-color: #111827;
-            --scrollbar-thumb-color-light: #cbd5e1; /* Helles Grau für Scrollbalken im Light Mode */
-            --scrollbar-track-color-light: #f1f5f9; /* Noch helleres Grau für Scrollbalken-Hintergrund */
-            --accent-color: #8B5CF6; /* Haupt-Akzentfarbe: Violett */
-            --accent-color-hover: #7C3AED; /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
+            --scrollbar-thumb-color-light: #cbd5e1;
+            /* Helles Grau für Scrollbalken im Light Mode */
+            --scrollbar-track-color-light: #f1f5f9;
+            /* Noch helleres Grau für Scrollbalken-Hintergrund */
+            --accent-color: #8B5CF6;
+            /* Haupt-Akzentfarbe: Violett */
+            --accent-color-hover: #7C3AED;
+            /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
         }
 
         html[data-theme='dark'] {
@@ -39,10 +43,14 @@
             --sidebar-bg-color: #262626;
             /* Hintergrundfarbe der Sidebar im Dark Mode */
             --sidebar-text-color: #fafafa;
-            --scrollbar-thumb-color-dark: #475569; /* Dunkles Grau für Scrollbalken im Dark Mode */
-            --scrollbar-track-color-dark: #1f2937; /* Noch dunkleres Grau für Scrollbalken-Hintergrund */
-            --accent-color: #8B5CF6; /* Haupt-Akzentfarbe: Violett */
-            --accent-color-hover: #7C3AED; /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
+            --scrollbar-thumb-color-dark: #475569;
+            /* Dunkles Grau für Scrollbalken im Dark Mode */
+            --scrollbar-track-color-dark: #1f2937;
+            /* Noch dunkleres Grau für Scrollbalken-Hintergrund */
+            --accent-color: #8B5CF6;
+            /* Haupt-Akzentfarbe: Violett */
+            --accent-color-hover: #7C3AED;
+            /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
         }
 
         /* Custom font for a better look */
@@ -51,30 +59,38 @@
             background-color: transparent;
             /* Hintergrund transparent gemacht */
             /* Benutzerdefinierte Scrollbar-Styles */
-            scrollbar-width: thin; /* Für Firefox */
-            scrollbar-color: var(--scrollbar-thumb-color-light) var(--scrollbar-track-color-light); /* Für Firefox */
+            scrollbar-width: thin;
+            /* Für Firefox */
+            scrollbar-color: var(--scrollbar-thumb-color-light) var(--scrollbar-track-color-light);
+            /* Für Firefox */
         }
 
         /* Webkit (Chrome, Safari, Edge) Scrollbar-Styles */
         body::-webkit-scrollbar {
-            width: 8px; /* Breite des vertikalen Scrollbalkens */
-            height: 8px; /* Höhe des horizontalen Scrollbalkens */
+            width: 8px;
+            /* Breite des vertikalen Scrollbalkens */
+            height: 8px;
+            /* Höhe des horizontalen Scrollbalkens */
         }
 
         body::-webkit-scrollbar-track {
-            background: var(--scrollbar-track-color-light); /* Farbe des Scrollbalken-Hintergrunds */
+            background: var(--scrollbar-track-color-light);
+            /* Farbe des Scrollbalken-Hintergrunds */
             border-radius: 10px;
         }
 
         body::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb-color-light); /* Farbe des Scrollbalken-Griffs */
+            background-color: var(--scrollbar-thumb-color-light);
+            /* Farbe des Scrollbalken-Griffs */
             border-radius: 10px;
-            border: 2px solid var(--scrollbar-track-color-light); /* Rand um den Griff */
+            border: 2px solid var(--scrollbar-track-color-light);
+            /* Rand um den Griff */
         }
 
         /* Dark Mode Scrollbar-Styles */
         html[data-theme='dark'] body {
-            scrollbar-color: var(--scrollbar-thumb-color-dark) var(--scrollbar-track-color-dark); /* Für Firefox */
+            scrollbar-color: var(--scrollbar-thumb-color-dark) var(--scrollbar-track-color-dark);
+            /* Für Firefox */
         }
 
         html[data-theme='dark'] body::-webkit-scrollbar-track {
@@ -177,7 +193,8 @@
             position: fixed;
             bottom: 1.5rem;
             right: 1.5rem;
-            background-color: var(--accent-color); /* Akzentfarbe für den Button */
+            background-color: var(--accent-color);
+            /* Akzentfarbe für den Button */
             color: white;
             border-radius: 9999px;
             /* Macht den Button rund */
@@ -194,7 +211,8 @@
         }
 
         .sidebar-toggle-button:hover {
-            background-color: var(--accent-color-hover); /* Dunklere Akzentfarbe für Hover */
+            background-color: var(--accent-color-hover);
+            /* Dunklere Akzentfarbe für Hover */
         }
 
         .sidebar-close-button {
@@ -289,6 +307,10 @@
             const sidebarCloseButton = document.getElementById('sidebar-close-button');
             const widgetNavListSidebar = document.getElementById('widget-nav-list-sidebar');
 
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const minSwipeDistance = 50; // Mindestentfernung für eine Wischgeste
+
             // Funktion zum Erstellen der Navigationsbuttons
             function createNavButton(iframe, targetList) {
                 const title = iframe.title;
@@ -311,6 +333,8 @@
                             // Sidebar schließen, nachdem ein Button in der Sidebar geklickt wurde
                             if (sidebar.classList.contains('open')) {
                                 sidebar.classList.remove('open');
+                                // Scrollen des Bodys wieder erlauben, wenn Sidebar geschlossen wird
+                                document.body.style.overflow = '';
                             }
                         }
                     });
@@ -323,13 +347,21 @@
                 createNavButton(iframe, widgetNavListSidebar);
             });
 
-            // Sidebar-Funktionalität
+            // Sidebar-Funktionalität: Öffnen/Schließen durch Klicken auf den runden Button
             sidebarToggleButton.addEventListener('click', () => {
-                sidebar.classList.add('open');
+                if (sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
+                } else {
+                    sidebar.classList.add('open');
+                    document.body.style.overflow = 'hidden'; // Scrollen des Bodys verhindern
+                }
             });
 
+            // Sidebar schließen durch Klicken auf den "X"-Button
             sidebarCloseButton.addEventListener('click', () => {
                 sidebar.classList.remove('open');
+                document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
             });
 
             // Schließen der Sidebar, wenn außerhalb geklickt wird
@@ -338,14 +370,27 @@
                     !sidebar.contains(event.target) &&
                     !sidebarToggleButton.contains(event.target)) {
                     sidebar.classList.remove('open');
+                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
                 }
             });
 
-            // Verhindert das Scrollen des Bodys, wenn die Sidebar geöffnet ist
-            sidebar.addEventListener('transitionend', () => {
-                if (sidebar.classList.contains('open')) {
+            // Touch-Gesten für die Sidebar
+            document.addEventListener('touchstart', (event) => {
+                touchStartX = event.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (event) => {
+                touchEndX = event.changedTouches[0].clientX;
+                const swipeDistance = touchEndX - touchStartX;
+
+                // Sidebar öffnen mit Wischgeste von rechts nach links (vom Bildschirmrand kommend)
+                if (touchStartX > window.innerWidth - 50 && swipeDistance < -minSwipeDistance && !sidebar.classList.contains('open')) {
+                    sidebar.classList.add('open');
                     document.body.style.overflow = 'hidden';
-                } else {
+                }
+                // Sidebar schließen mit Wischgeste von links nach rechts (innerhalb der Sidebar)
+                else if (sidebar.classList.contains('open') && swipeDistance > minSwipeDistance && touchStartX < (window.innerWidth - sidebar.offsetWidth + 50)) {
+                    sidebar.classList.remove('open');
                     document.body.style.overflow = '';
                 }
             });
