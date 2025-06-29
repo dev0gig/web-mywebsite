@@ -372,6 +372,7 @@
                         </label>
                         <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                     </div>
+
                     <button id="delete-all-btn"
                         class="w-full text-white bg-red-600 hover:bg-red-700 font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -419,10 +420,12 @@
             const backupAllBtn = document.getElementById('backup-all-btn');
             const restoreAllInput = document.getElementById('restore-all-input');
             const deleteAllBtn = document.getElementById('delete-all-btn');
+
             let backupData = {};
             const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
             let expectedResponses = 0;
             let receivedResponses = 0;
+            let backupInProgress = false;
 
             // --- Confirmation Modal ---
             const confirmModal = document.getElementById('confirm-modal');
@@ -465,32 +468,40 @@
             };
 
             const backupAllData = () => {
+                if (backupInProgress) return;
+                backupInProgress = true;
+
                 backupData = {};
                 expectedResponses = backupFrames.length;
                 receivedResponses = 0;
 
                 if (expectedResponses === 0) {
                     showToast('Keine Apps zum Sichern gefunden.', 'info');
+                    backupInProgress = false;
                     return;
                 }
 
                 showToast('Backup wird gestartet...', 'info', 0);
-
                 backupFrames.forEach(frame => {
                     frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*');
                 });
 
                 setTimeout(() => {
-                    if (receivedResponses < expectedResponses && receivedResponses > 0) {
-                        showToast('Backup-Timeout: Nicht alle Tabs haben geantwortet. Teil-Backup wird erstellt.', 'error');
-                        createAndDownloadZip();
-                    } else if (receivedResponses === 0) {
-                        showToast('Backup-Fehler: Keine App hat geantwortet.', 'error');
+                    if (receivedResponses < expectedResponses) {
+                        if (receivedResponses > 0) {
+                            showToast('Backup-Timeout: Teil-Backup wird erstellt.', 'error');
+                            createAndDownloadZip();
+                        } else {
+                            showToast('Backup-Fehler: Keine App hat geantwortet.', 'error');
+                            backupInProgress = false;
+                        }
                     }
                 }, 10000);
             };
 
             const createAndDownloadZip = () => {
+                if (!backupInProgress) return;
+
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
@@ -499,6 +510,8 @@
                         filesAdded++;
                     }
                 }
+
+                backupInProgress = false;
 
                 if (filesAdded === 0) {
                     showToast('Keine Daten zum Sichern gefunden.', 'info');
@@ -516,6 +529,10 @@
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
                         showToast('Backup erfolgreich heruntergeladen!', 'success');
+
+                        // NEU: Sitzung als "sauber" markieren nach erfolgreichem Backup
+                        localStorage.removeItem('sessionInProgress');
+                        console.log('Session marked as clean after backup.');
                     })
                     .catch(err => {
                         console.error('Zip generation failed:', err);
@@ -562,7 +579,7 @@
             const deleteAllData = () => {
                 openConfirmModal(
                     'Alle Daten löschen?',
-                    'Möchten Sie wirklich ALLE Anwendungsdaten (gespeicherte Links, Feeds, Favoriten, etc.) aus Ihrem Browser löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
+                    'Möchten Sie wirklich ALLE Anwendungsdaten aus Ihrem Browser löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
                     () => {
                         localStorage.clear();
                         showToast('Alle Daten wurden gelöscht. Die Seite wird neu geladen.', 'success');
@@ -574,11 +591,8 @@
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'backupDataResponse') {
                     const { key, data } = event.data;
-                    if (key) {
-                        backupData[key] = data;
-                    }
+                    if (key) { backupData[key] = data; }
                     receivedResponses++;
-
                     if (receivedResponses === expectedResponses) {
                         createAndDownloadZip();
                     }
@@ -591,6 +605,14 @@
             backupAllBtn.addEventListener('click', backupAllData);
             restoreAllInput.addEventListener('change', restoreAllData);
             deleteAllBtn.addEventListener('click', deleteAllData);
+
+            // NEU: Logik für die "Willkommen zurück"-Nachricht
+            if (localStorage.getItem('sessionInProgress') === 'true') {
+                showToast('Willkommen zurück! Ihre letzte Sitzung wurde geladen.', 'info', 5000);
+            }
+            localStorage.setItem('sessionInProgress', 'true');
+            console.log('Session marked as in-progress.');
+
 
             const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
             const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };

@@ -177,10 +177,8 @@
             background-color: #f0f0f0;
         }
 
-        /* FIX: Changed back to object-cover to fill the area and crop correctly */
         .image-container img {
             object-fit: cover;
-            /* This ensures the image fills the container, cropping as needed */
             width: 100%;
             height: 100%;
         }
@@ -222,6 +220,19 @@
             -webkit-line-clamp: unset;
         }
 
+        /* Styles for tags in the edit modal */
+        .tag-item-modal {
+            background-color: var(--text-color-light);
+            color: var(--bg-color);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .tag-item-modal:hover {
+            background-color: #ef4444;
+            /* red-500 */
+            color: white;
+        }
 
         @media (min-width: 768px) {
             .link-card {
@@ -519,9 +530,8 @@
                 if (linkToEdit) {
                     addTagsInput.value = '';
                     currentTagsContainer.innerHTML = (linkToEdit.tags || []).map(tag =>
-                        `<span class="tag-item bg-gray-500 text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
+                        `<span class="tag-item-modal text-xs font-medium px-2.5 py-1 rounded-full" data-tag="${tag}">
                             ${tag}
-                            <button class="remove-tag-btn text-white hover:text-red-300" data-tag="${tag}">&times;</button>
                         </span>`
                     ).join('');
                     openModal(addTagsModalOverlay, addTagsModal);
@@ -530,8 +540,8 @@
             };
 
             currentTagsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-tag-btn')) {
-                    e.target.parentElement.remove();
+                if (e.target.classList.contains('tag-item-modal')) {
+                    e.target.remove();
                 }
             });
 
@@ -540,7 +550,7 @@
                 if (currentEditLinkId === null) return;
                 const linkIndex = links.findIndex(l => l.id === currentEditLinkId);
                 if (linkIndex !== -1) {
-                    const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.remove-tag-btn')).map(btn => btn.dataset.tag);
+                    const existingTagsInModal = Array.from(currentTagsContainer.querySelectorAll('.tag-item-modal')).map(span => span.dataset.tag);
                     const newTagsFromInput = addTagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
                     links[linkIndex].tags = [...new Set([...existingTagsInModal, ...newTagsFromInput])];
                     saveLinks();
@@ -596,7 +606,8 @@
             };
 
             const renderLinkCard = (link, isPreview = false) => {
-                const tagsHTML = (link.tags || []).map(tag => `<span class="bg-gray-600 text-xs font-medium px-2 py-1 rounded-full">${tag}</span>`).join(' ');
+                // FIX: Added text-white to the tag class for better readability
+                const tagsHTML = (link.tags || []).map(tag => `<span class="bg-gray-600 text-white text-xs font-medium px-2 py-1 rounded-full">${tag}</span>`).join(' ');
                 const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${link.url}&size=16`;
                 const placeholderImg = `https://placehold.co/600x400/262626/525252?text=${link.hostname || ''}`;
 
