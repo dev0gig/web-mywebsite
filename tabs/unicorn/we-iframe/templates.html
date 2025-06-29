@@ -131,14 +131,18 @@
         }
 
         #search-input-container {
-            position: -webkit-sticky; /* Für Safari */
+            position: -webkit-sticky;
+            /* Für Safari */
             position: sticky;
             top: 0;
             z-index: 10;
-            background-color: var(--bg-color); /* Hintergrund, um durchscrollenden Text zu verdecken */
-            padding-bottom: 1rem; /* Ersetzt margin-bottom, um den Abstand zu halten */
+            background-color: var(--bg-color);
+            /* Hintergrund, um durchscrollenden Text zu verdecken */
+            padding-bottom: 1rem;
+            /* Ersetzt margin-bottom, um den Abstand zu halten */
             flex-shrink: 0;
-            /* margin-bottom: 1rem; */ /* Wird durch padding-bottom ersetzt */
+            /* margin-bottom: 1rem; */
+            /* Wird durch padding-bottom ersetzt */
         }
 
         #search-input {
@@ -414,6 +418,17 @@
                     document.documentElement.dataset.theme = event.data.replace('set-theme-', '');
                 }
             });
+
+            // Speichern des Namens im localStorage, wenn sich der Wert ändert
+            nameInput.addEventListener('input', () => {
+                localStorage.setItem('signatureName', nameInput.value);
+            });
+
+            // Beim Laden der Seite den gespeicherten Namen abrufen
+            const savedName = localStorage.getItem('signatureName');
+            if (savedName) {
+                nameInput.value = savedName;
+            }
 
             // Initialisierung: Vorlagen vorabladen und UI rendern
             await prefetchTemplates();
