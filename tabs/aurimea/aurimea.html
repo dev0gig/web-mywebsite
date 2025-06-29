@@ -282,6 +282,62 @@
         #fab-add-transaction {
             bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
+
+        /* Standard-Desktop-Positionierung für das Transaktionsmodal */
+        #transaction-modal {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            /* Standard-Breite, 11/12 von Tailwind ist 91.66% */
+            max-width: 32rem;
+            /* max-w-lg von Tailwind ist 32rem */
+        }
+
+        /* Maximale Höhe für den Inhalt des Transaktionsmodals auf Desktop */
+        #transaction-modal .card {
+            max-height: 90vh;
+            /* Begrenze die Höhe auf 90% der Viewport-Höhe auf Desktop */
+        }
+
+        @media (max-width: 767px) {
+
+            /* Für Mobilgeräte (bis md breakpoint) */
+            #transaction-modal {
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                transform: none;
+                /* Deaktiviere die Zentrier-Transformation */
+                max-width: none;
+                /* Entferne maximale Breite */
+                border-radius: 0;
+                /* Entferne abgerundete Ecken */
+            }
+
+            #transaction-modal .card {
+                height: 100%;
+                /* Sorge dafür, dass der Inhalt die volle Höhe einnimmt */
+                max-height: 100%;
+                /* Stelle sicher, dass es die volle Höhe einnimmt */
+                border-radius: 0;
+                /* Entferne abgerundete Ecken für den Inhalt */
+                padding-bottom: env(safe-area-inset-bottom);
+                /* Berücksichtige die Safe Area unten */
+            }
+        }
+
+        /* Styles für das Kalendersymbol im Datumsfeld */
+        .calendar-icon {
+            color: var(--subtle-text);
+            /* Standardfarbe für Light Mode */
+        }
+
+        html[data-theme='dark'] .calendar-icon {
+            color: #fafafa;
+            /* Weiß für Dark Mode */
+        }
     </style>
 </head>
 
@@ -429,9 +485,8 @@
     <div id="transaction-modal-overlay"
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
-    <div id="transaction-modal"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <div class="card p-6 rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
+    <div id="transaction-modal" class="fixed z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
                 <button id="close-modal-btn"
@@ -443,9 +498,25 @@
             </div>
             <form id="transaction-form">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label for="trans-datum" class="block text-sm font-medium subtle-text mb-1">Datum</label><input
-                            type="date" id="trans-datum" required class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <div>
+                        <label for="trans-datum-display"
+                            class="block text-sm font-medium subtle-text mb-1">Datum</label>
+                        <div class="relative">
+                            <!-- Das unsichtbare HTML5-Datumseingabefeld, das den Datumswert speichert und den Picker öffnet -->
+                            <input type="date" id="trans-datum"
+                                class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" aria-hidden="true"
+                                required>
+                            <!-- Das sichtbare Textfeld, das das formatierte Datum anzeigt -->
+                            <input type="text" id="trans-datum-display" placeholder="Datum auswählen" readonly
+                                class="w-full p-2 rounded-lg pr-10 cursor-pointer"
+                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                            <!-- Das Lucide Icons Kalendersymbol, das den Datumspicker ebenfalls öffnet -->
+                            <button type="button" id="open-date-picker-btn"
+                                class="absolute inset-y-0 right-0 flex items-center pr-3" title="Datum auswählen">
+                                <svg data-lucide="calendar" class="h-5 w-5 calendar-icon"></svg>
+                            </button>
+                        </div>
+                    </div>
                     <div><label for="trans-art" class="block text-sm font-medium subtle-text mb-1">Art</label><select
                             id="trans-art" required class="w-full p-2 rounded-lg"
                             style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
@@ -1147,6 +1218,11 @@
             const transKontoSelect = document.getElementById('trans-konto');
             const paymentMethodRadios = document.querySelectorAll('input[name="trans-zahlungsmethode"]');
 
+            // NEUE ELEMENTE FÜR DATUMSAUSWAHL
+            const transDatumInput = document.getElementById('trans-datum'); // Das versteckte input type="date"
+            const transDatumDisplay = document.getElementById('trans-datum-display'); // Das sichtbare Textfeld
+            const openDatePickerBtn = document.getElementById('open-date-picker-btn'); // Der Button mit dem Kalendersymbol
+
 
             function handlePaymentMethodChange() {
                 const isCash = document.getElementById('trans-zahlungsmethode-bar').checked;
@@ -1180,6 +1256,20 @@
 
             transArtSelect.addEventListener('change', updateCategoryOptions);
 
+            // Hilfsfunktion zur Formatierung des Datums
+            function formatGermanLongDate(isoDateString) {
+                if (!isoDateString) return '';
+                const date = new Date(isoDateString + 'T00:00:00'); // Fügen Sie T00:00:00 hinzu, um Zeitzonenprobleme zu vermeiden
+                // Verwenden Sie 'de-DE' Locale für deutsche Wochentagsnamen und Datumsformat
+                const options = {
+                    weekday: 'long', // Z.B. "Montag"
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                };
+                return new Intl.DateTimeFormat('de-DE', options).format(date);
+            }
+
             function openModal(transactionId = null) {
                 modalForm.reset();
                 document.getElementById('trans-zahlungsmethode-karte').checked = true;
@@ -1189,7 +1279,8 @@
                     const transaction = allTransactions.find(t => t.id === transactionId);
                     if (transaction) {
                         modalForm.dataset.editingId = transactionId;
-                        document.getElementById('trans-datum').value = transaction.parsedDate;
+                        transDatumInput.value = transaction.parsedDate; // Setzt den Wert des versteckten Datumsfeldes
+                        transDatumDisplay.value = formatGermanLongDate(transaction.parsedDate); // Setzt den Wert des sichtbaren Textfeldes
                         document.getElementById('trans-art').value = transaction.Art;
                         document.getElementById('trans-betrag').value = transaction.Betrag;
                         document.getElementById('trans-beschreibung').value = transaction.Beschreibung;
@@ -1207,7 +1298,9 @@
                 } else {
                     modalTitle.textContent = "Neue Transaktion hinzufügen";
                     delete modalForm.dataset.editingId;
-                    document.getElementById('trans-datum').value = new Date().toISOString().split('T')[0];
+                    const todayIso = new Date().toISOString().split('T')[0];
+                    transDatumInput.value = todayIso; // Setzt den Wert des versteckten Datumsfeldes auf heute
+                    transDatumDisplay.value = formatGermanLongDate(todayIso); // Setzt den Wert des sichtbaren Textfeldes auf heute
                     updateCategoryOptions();
                 }
 
@@ -1215,6 +1308,7 @@
 
                 modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
                 modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+                lucide.createIcons(); // Erstellt das Lucide Icon im Modal
             }
 
             function closeModal() {
@@ -1227,14 +1321,27 @@
             document.getElementById('close-modal-btn').addEventListener('click', closeModal);
             modalOverlay.addEventListener('click', closeModal);
 
+            // Event-Listener für das versteckte input type="date" Feld
+            transDatumInput.addEventListener('change', () => {
+                transDatumDisplay.value = formatGermanLongDate(transDatumInput.value);
+            });
+
+            // Event-Listener für das sichtbare Textfeld und den Kalender-Button zum Öffnen des Datumspickers
+            transDatumDisplay.addEventListener('click', () => {
+                transDatumInput.showPicker();
+            });
+            openDatePickerBtn.addEventListener('click', () => {
+                transDatumInput.showPicker();
+            });
+
             modalForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const editingId = modalForm.dataset.editingId;
-                const parsedDate = document.getElementById('trans-datum').value;
-                const dateParts = parsedDate.split('-');
-                const displayDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+                const parsedDate = transDatumInput.value; // Nimmt den ISO-Datumswert vom versteckten Feld
+                const displayDate = formatGermanLongDate(parsedDate); // Formatiert für die Anzeige in der Tabelle
+
                 const transactionData = {
-                    Datum: displayDate,
+                    Datum: displayDate, // Angezeigtes Datum
                     Art: document.getElementById('trans-art').value,
                     Betrag: parseFloat(document.getElementById('trans-betrag').value),
                     Beschreibung: document.getElementById('trans-beschreibung').value,
@@ -1242,7 +1349,7 @@
                     Konto: document.getElementById('trans-konto').value, // This will be '' if cash is selected
                     Zahlungsmethode: document.querySelector('input[name="trans-zahlungsmethode"]:checked').value,
                     Wiederkehrend: document.getElementById('trans-wiederkehrend').checked ? 'Ja' : 'Nein',
-                    parsedDate: parsedDate,
+                    parsedDate: parsedDate, // Das ISO-Datum für interne Logik und Sortierung
                     ['Sonstige Infos']: document.getElementById('trans-sonstige-infos').value
                 };
 
@@ -1298,6 +1405,7 @@
                         const accountFilteredData = (currentFilter === 'all') ? allTransactions : allTransactions.filter(row => row.Konto === currentFilter);
                         const financialSummary = processData(accountFilteredData);
                         createOrUpdateCharts(financialSummary);
+                        lucide.createIcons(); // Stellt sicher, dass Symbole neu gerendert werden, um Farbänderungen anzuwenden
                     }
                 });
             });
