@@ -126,18 +126,6 @@ const appsData = [
         ariaLabel: "OneDrive"
     },
     {
-        id: "Perplexity",
-        iconUrl: "https://play-lh.googleusercontent.com/6STp0lYx2ctvQ-JZpXA1LeAAZIlq6qN9gpy7swLPlRhmp-hfvZePcBxqwVkqN2BH1g=s48-rw",
-        targetUrl: "https://www.perplexity.ai/",
-        ariaLabel: "Perplexity"
-    },
-    {
-        id: "ChatGPT",
-        iconUrl: "https://play-lh.googleusercontent.com/lmG9HlI0awHie0cyBieWXeNjpyXvHPwDBb8MNOVIyp0P8VEh95AiBHtUZSDVR3HLe3A=w240-h480-rw",
-        targetUrl: "https://chatgpt.com/",
-        ariaLabel: "ChatGPT"
-    },
-    {
         id: "Gemini",
         iconUrl: "https://play-lh.googleusercontent.com/Pkwn0AbykyjSuCdSYCbq0dvOqHP-YXcbBLTZ8AOUZhvnRuhUnZ2aJrw_YCf6kVMcZ4PM=w240-h480-rw",
         targetUrl: "https://gemini.google.com/app",
@@ -148,12 +136,6 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/0IH4L3pX-jqQXKYCDmxTM5t3Tvak2cb_zUuIs9nKCHPeOqkaRJ_bRTq1qKawsSvunw=w240-h480-rw",
         targetUrl: "https://www.deepl.com/en/translator",
         ariaLabel: "DeepL"
-    },
-    {
-        id: "DeepSeek",
-        iconUrl: "https://play-lh.googleusercontent.com/d2zqBFBEymSZKaVg_dRo1gh3hBFn7_Kl9rO74xkDmnJeLgDW0MoJD3cUx0QzZN6jdsg=w240-h480-rw",
-        targetUrl: "https://chat.deepseek.com/",
-        ariaLabel: "DeepSeek"
     },
     {
         id: "Copilot",
@@ -205,7 +187,7 @@ const appsData = [
     },
     {
         id: "Itch.io",
-        iconUrl: "https://static-00.iconduck.com/assets.00/itch-io-icon-2048x2048-i6hzclad.png",
+        iconUrl: "https://play-lh.googleusercontent.com/vutNmbJfKNO-bEH2NJnaImSl49JT7f3t85nsev75-JyBoGoUdee3Q_2CG8dgQGRVlQ=w240-h480-rw",
         targetUrl: "https://itch.io/my-purchases",
         ariaLabel: "Itch.io"
     },
@@ -382,12 +364,6 @@ const appsData = [
         iconUrl: "https://play-lh.googleusercontent.com/-jz18EgBYlmeHlnsq_iltq6uLnYFtXAVR_gi_d0qEj0pANQ1MtrJIstJoCQtImlWKwc=s48-rw",
         targetUrl: "https://www.bitwarden.com/",
         ariaLabel: "Bitwarden"
-    },
-    {
-        id: "Pixabay",
-        iconUrl: "https://cdn-icons-png.flaticon.com/256/3291/3291666.png",
-        targetUrl: "https://pixabay.com/de/",
-        ariaLabel: "Pixabay"
     },
     {
         id: "Google Calendar",
