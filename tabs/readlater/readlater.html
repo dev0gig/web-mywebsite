@@ -182,11 +182,69 @@
             -webkit-box-orient: vertical;
         }
 
+        /* Styles for the preview link card to control overflow */
+        .link-card.is-preview {
+            height: 100%;
+            /* Ensure it fills the parent container */
+            display: flex;
+            /* Make it a flex container */
+            flex-direction: column;
+            /* Force column layout for preview */
+            overflow: hidden;
+            /* Hide any overflow from the card itself */
+        }
+
+        /* Adjust image and content containers within the preview link card */
+        .link-card.is-preview .image-container {
+            height: 40%;
+            /* Image takes 40% of the preview card height */
+            min-height: 100px;
+            /* Minimum height for image to be visible */
+            max-height: 150px;
+            /* Maximum height for image */
+            flex-shrink: 0;
+            /* Prevent image from shrinking */
+        }
+
+        .link-card.is-preview .content-container {
+            flex-grow: 1;
+            /* Content takes remaining space */
+            overflow-y: auto;
+            /* Enable vertical scrolling for content */
+            display: flex;
+            /* Make content-container a flexbox too for its internal layout */
+            flex-direction: column;
+        }
+
+        /* Ensure paragraph in content-container scrolls if too long within preview */
+        .link-card.is-preview .content-container p {
+            max-height: none;
+            /* Remove fixed max-height to allow full content or scrolling */
+            /* Removed overflow: auto here, as parent content-container handles it */
+            -webkit-line-clamp: unset;
+            /* Remove line clamping for scrolling content */
+        }
+
 
         @media (min-width: 768px) {
             .link-card {
                 flex-direction: row;
                 height: 14rem;
+            }
+
+            /* Specific adjustments for preview on larger screens */
+            .link-card.is-preview {
+                flex-direction: row;
+                /* On larger screens, revert to row layout for preview */
+            }
+
+            .link-card.is-preview .image-container {
+                width: 40%;
+                /* Image takes 40% width in row layout */
+                height: 100%;
+                /* Image takes 100% height in row layout */
+                max-height: none;
+                /* Remove max-height constraint for larger screens */
             }
         }
     </style>
@@ -257,6 +315,7 @@
                     </button>
                 </form>
             </div>
+            <!-- Removed h-56 class to allow grid to handle height matching -->
             <div class="hidden lg:block p-4 sm:p-6 rounded-lg"
                 style="background-color:var(--card-bg); border: 1px solid var(--border-color);">
                 <h2 class="text-xl font-bold mb-4">Live-Vorschau</h2>
@@ -276,7 +335,7 @@
                 <button id="toggle-archive-btn"
                     class="ml-4 flex-shrink-0 text-sm font-medium rounded-md px-4 py-2 transition flex items-center whitespace-nowrap"
                     style="background-color: #4b5563; color: #e5e7eb;">
-                    <i data-lucide="archive" class="w-4 h-4 mr-2"></i>Archiv
+                    <i data-lucide="archive" class="w-4 h-4 mr-2"></i>Archiv (<span id="archive-count">0</span>)
                 </button>
             </div>
             <div id="tag-filters-container" class="flex flex-wrap gap-2 items-center mt-2"></div>
@@ -345,6 +404,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const linksContainer = document.getElementById('links-container');
             const toggleArchiveBtn = document.getElementById('toggle-archive-btn');
+            // Get the archive count element
+            const archiveCountSpan = document.getElementById('archive-count');
 
             // Render function to update the UI
             const render = () => {
@@ -359,6 +420,10 @@
                     toggleArchiveBtn.style.backgroundColor = '#4b5563'; // gray-600
                     toggleArchiveBtn.style.color = '#e5e7eb'; // gray-200
                 }
+
+                // Update the archive count
+                const archivedLinksCount = links.filter(link => link.status === 'archived').length;
+                archiveCountSpan.textContent = archivedLinksCount;
 
                 // ... (rest of the render function)
                 // Initialize all Lucid Icons after DOM content is loaded and rendered
@@ -566,9 +631,11 @@
                     }
                     statusActions += `<button data-id="${link.id}" class="add-tags-btn text-sm font-medium text-blue-500 hover:text-blue-600 transition ml-auto flex items-center gap-1"><i data-lucide="tag"></i>Tags</button>`;
                 }
+                // Add the 'is-preview' class if it's a preview
+                const previewClass = isPreview ? 'is-preview' : '';
 
                 return `
-                <div class="image-container w-full h-48 md:w-64 md:h-auto flex-shrink-0">
+                <div class="image-container w-full h-48 md:w-64 flex-shrink-0">
                    <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="h-full block">
                         <img src="${link.image}" onerror="this.onerror=null;this.src='${placeholderImg}';" alt="Vorschaubild für ${link.title}" class="object-cover w-full h-full">
                     </a>
@@ -667,7 +734,8 @@
                     return;
                 }
                 const previewElement = document.createElement('div');
-                previewElement.className = 'link-card h-full';
+                // Pass true for isPreview to renderLinkCard to add 'is-preview' class
+                previewElement.className = 'link-card h-full is-preview'; // Added is-preview class here
                 previewElement.innerHTML = renderLinkCard(data, true);
                 livePreviewContainer.innerHTML = '';
                 livePreviewContainer.appendChild(previewElement);
@@ -831,10 +899,10 @@
     </script>
 </body>
 
-<!-- Füge dies am Ende des <body>-Tags in readlater.html ein -->
+<!-- Add this at the end of the <body> tag in readlater.html -->
 <script>
     window.addEventListener('message', (event) => {
-        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        // Security check: only respond to messages from the parent window
         if (event.source !== window.parent) {
             return;
         }
@@ -842,32 +910,31 @@
         const message = event.data;
 
         if (message && message.type === 'getBackupData') {
-            // Sammle die "Später lesen"-Links aus dem localStorage.
+            // Collect "read later" links from localStorage.
             const linksData = localStorage.getItem('readLaterLinks');
 
-            // Sende die Daten zurück an das Hauptfenster (index.html).
-            // Der 'key' muss mit dem 'data-key' des iframes übereinstimmen.
+            // Send the data back to the main window (index.html).
+            // The 'key' must match the 'data-key' of the iframe.
             window.parent.postMessage({
                 type: 'backupDataResponse',
                 key: 'readlater',
-                data: JSON.parse(linksData || '[]') // Stelle sicher, dass gültiges JSON gesendet wird.
-            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+                data: JSON.parse(linksData || '[]') // Ensure valid JSON is sent.
+            }, '*'); // In a real application, you should specify the exact URL of the parent here.
         }
 
         if (message && message.type === 'restoreBackupData') {
-            // Empfange die wiederherzustellenden Daten.
+            // Receive the data to be restored.
             const restoredLinks = message.data;
 
             if (Array.isArray(restoredLinks)) {
-                // Speichere die wiederhergestellten Daten im localStorage.
+                // Store the restored data in localStorage.
                 localStorage.setItem('readLaterLinks', JSON.stringify(restoredLinks));
 
-                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                // Reload the page to make the changes visible.
                 window.location.reload();
             }
         }
     });
 </script>
-
 
 </html>

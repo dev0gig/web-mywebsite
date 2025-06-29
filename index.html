@@ -10,6 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- JSZip for creating zip files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg-color: #f9fafb;
@@ -228,7 +230,7 @@
     </header>
 
     <nav id="sidebar" class="p-2 flex flex-col">
-        <ul id="nav-links" class="space-y-2 mt-2">
+        <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
             <li><a href="tabs/appdrawer/appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
@@ -272,9 +274,7 @@
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Google Notizen</span></a></li>
-        </ul>
-        <ul class="space-y-2 mt-auto pb-4">
-            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
+            <li class="mt-auto"><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
         </ul>
@@ -329,50 +329,70 @@
                 <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Erscheinungsbild</h3>
                 <fieldset class="space-y-3">
                     <legend class="sr-only">Theme selection</legend>
-                    <div><input type="radio" name="theme" id="theme-light" value="light"
-                            class="theme-radio-peer hidden"><label for="theme-light"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
+                    <div>
+                        <input type="radio" name="theme" id="theme-light" value="light" class="theme-radio-peer hidden">
+                        <label for="theme-light"
+                            class="theme-radio-label flex items-center justify-center w-full p-3 rounded-lg cursor-pointer">
+                            <i data-lucide="sun" class="w-5 h-5 mr-2"></i>
+                            <span>Light</span>
+                        </label>
                     </div>
-                    <div><input type="radio" name="theme" id="theme-dark" value="dark"
-                            class="theme-radio-peer hidden"><label for="theme-dark"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
+                    <div>
+                        <input type="radio" name="theme" id="theme-dark" value="dark" class="theme-radio-peer hidden">
+                        <label for="theme-dark"
+                            class="theme-radio-label flex items-center justify-center w-full p-3 rounded-lg cursor-pointer">
+                            <i data-lucide="moon" class="w-5 h-5 mr-2"></i>
+                            <span>Dark</span>
+                        </label>
                     </div>
-                    <div><input type="radio" name="theme" id="theme-system" value="system"
-                            class="theme-radio-peer hidden"><label for="theme-system"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
+                    <div>
+                        <input type="radio" name="theme" id="theme-system" value="system"
+                            class="theme-radio-peer hidden">
+                        <label for="theme-system"
+                            class="theme-radio-label flex items-center justify-center w-full p-3 rounded-lg cursor-pointer">
+                            <i data-lucide="monitor" class="w-5 h-5 mr-2"></i>
+                            <span>System</span>
+                        </label>
                     </div>
                 </fieldset>
             </div>
             <div>
-                <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Daten-Backup</h3>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="backup-all-btn"
-                        class="flex-1 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2"
-                        style="background-color: var(--accent-color);"
-                        onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
-                        onmouseout="this.style.backgroundColor='var(--accent-color)'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                            <path
-                                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
-                        </svg>
-                        Alles Sichern
+                <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Datenverwaltung</h3>
+                <div class="flex flex-col space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="backup-all-btn"
+                            class="flex-1 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Backup All</span>
+                        </button>
+                        <label for="restore-all-input"
+                            class="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            <span>Restore All</span>
+                        </label>
+                        <input type="file" id="restore-all-input" class="hidden" accept=".zip">
+                    </div>
+                    <button id="delete-all-btn"
+                        class="w-full text-white bg-red-600 hover:bg-red-700 font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Delete All</span>
                     </button>
-                    <label for="restore-all-input"
-                        class="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M.5 2.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3.4a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3.4a.5.5 0 0 1 .5-.5z" />
-                            <path
-                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
-                        </svg>
-                        Alles Wiederherstellen
-                    </label>
-                    <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 z-[110] flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--modal-bg);">
+            <h3 id="confirm-modal-title" class="text-xl font-bold mb-4" style="color: var(--header-text-color);"></h3>
+            <p id="confirm-modal-text" class="mb-6" style="color: var(--text-color-light);"></p>
+            <div class="flex justify-end gap-4">
+                <button id="confirm-modal-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                    style="background-color: var(--sidebar-border); color: var(--text-color);">Abbrechen</button>
+                <button id="confirm-modal-confirm-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
             </div>
         </div>
     </div>
@@ -383,7 +403,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const contentLoader = document.getElementById('content-loader');
             const contentFrames = document.querySelectorAll('.content-iframe');
-            const desktopNavLinks = document.querySelectorAll('#sidebar #nav-links .sidebar-link');
+            const desktopNavLinks = document.querySelectorAll('#sidebar #nav-links a, #sidebar #nav-links button');
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -395,13 +415,42 @@
             const closeModalBtn = document.getElementById('close-modal-btn');
             const notificationToast = document.getElementById('notification-toast');
 
-            // --- Backup & Restore ---
+            // --- Data Management ---
             const backupAllBtn = document.getElementById('backup-all-btn');
             const restoreAllInput = document.getElementById('restore-all-input');
+            const deleteAllBtn = document.getElementById('delete-all-btn');
             let backupData = {};
             const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
             let expectedResponses = 0;
             let receivedResponses = 0;
+
+            // --- Confirmation Modal ---
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmModalTitle = document.getElementById('confirm-modal-title');
+            const confirmModalText = document.getElementById('confirm-modal-text');
+            const confirmCancelBtn = document.getElementById('confirm-modal-cancel-btn');
+            const confirmConfirmBtn = document.getElementById('confirm-modal-confirm-btn');
+            let confirmCallback = null;
+
+            const openConfirmModal = (title, text, onConfirm) => {
+                confirmModalTitle.textContent = title;
+                confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                confirmModal.classList.remove('hidden');
+            };
+
+            const closeConfirmModal = () => {
+                confirmModal.classList.add('hidden');
+                confirmCallback = null;
+            };
+
+            confirmCancelBtn.addEventListener('click', closeConfirmModal);
+            confirmConfirmBtn.addEventListener('click', () => {
+                if (typeof confirmCallback === 'function') {
+                    confirmCallback();
+                }
+                closeConfirmModal();
+            });
 
             const showToast = (message, type = 'success', duration = 3000) => {
                 notificationToast.textContent = message;
@@ -445,9 +494,6 @@
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
-                    // **KORRIGIERTE LOGIK HIER**
-                    // Speichere die Datei, solange die Daten nicht null oder undefined sind.
-                    // Das schließt leere Arrays `[]` und leere Objekte `{}` mit ein.
                     if (backupData[key] !== null && backupData[key] !== undefined) {
                         zip.file(`${key}.json`, JSON.stringify(backupData[key], null, 2));
                         filesAdded++;
@@ -513,10 +559,22 @@
                 restoreAllInput.value = '';
             };
 
+            const deleteAllData = () => {
+                openConfirmModal(
+                    'Alle Daten löschen?',
+                    'Möchten Sie wirklich ALLE Anwendungsdaten (gespeicherte Links, Feeds, Favoriten, etc.) aus Ihrem Browser löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
+                    () => {
+                        localStorage.clear();
+                        showToast('Alle Daten wurden gelöscht. Die Seite wird neu geladen.', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    }
+                );
+            };
+
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'backupDataResponse') {
                     const { key, data } = event.data;
-                    if (key) { // Accept the key even if data is empty
+                    if (key) {
                         backupData[key] = data;
                     }
                     receivedResponses++;
@@ -532,10 +590,15 @@
 
             backupAllBtn.addEventListener('click', backupAllData);
             restoreAllInput.addEventListener('change', restoreAllData);
+            deleteAllBtn.addEventListener('click', deleteAllData);
 
             const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
             const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };
-            const openSettingsModal = () => { settingsModal.classList.remove('hidden'); modalOverlay.classList.remove('hidden'); };
+            const openSettingsModal = () => {
+                settingsModal.classList.remove('hidden');
+                modalOverlay.classList.remove('hidden');
+                lucide.createIcons();
+            };
             const closeSettingsModal = () => { settingsModal.classList.add('hidden'); modalOverlay.classList.add('hidden'); };
 
             function handleNavLinkClick(e) {
@@ -555,8 +618,15 @@
                     if (targetFrame && !targetFrame.classList.contains('active')) {
                         document.querySelector('.content-iframe.active')?.classList.remove('active');
                         targetFrame.classList.add('active');
-                        document.querySelectorAll('#nav-links .sidebar-link, #mobile-nav-links .sidebar-link').forEach(l => l.classList.remove('active'));
-                        document.querySelectorAll(`a[data-target="${targetFrameId}"]`).forEach(l => l.classList.add('active'));
+                        document.querySelectorAll('#nav-links .sidebar-link, #nav-links button, #mobile-nav-links .sidebar-link, #mobile-nav-links button').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll(`a[data-target="${targetFrameId}"], button#settings-btn`).forEach(l => {
+                            if (target.id === 'settings-btn' && l.id === 'settings-btn') {
+                                l.classList.add('active');
+                            } else if (l.dataset && l.dataset.target === targetFrameId) {
+                                l.classList.add('active');
+                            }
+                        });
+
                         mobileHeaderTitle.textContent = target.querySelector('.sidebar-text')?.textContent || 'Dashboard';
                     }
                 }
@@ -579,7 +649,7 @@
             });
 
             desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
-            document.getElementById('settings-btn').addEventListener('click', handleNavLinkClick);
+
             hamburgerBtn.addEventListener('click', openMobileMenu);
             closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
             mobileMenuOverlay.addEventListener('click', closeMobileMenu);
@@ -624,10 +694,10 @@
 
             const lastActiveTabId = localStorage.getItem('lastActiveTab') || 'frame-appdrawer';
             const targetFrame = document.getElementById(lastActiveTabId);
-            const targetLink = document.querySelector(`a[data-target="${lastActiveTabId}"]`);
+            const targetLink = document.querySelector(`a[data-target="${lastActiveTabId}"], button[data-target="${lastActiveTabId}"]`);
             if (targetFrame && targetLink) {
                 targetFrame.classList.add('active');
-                document.querySelectorAll(`a[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
+                document.querySelectorAll(`a[data-target="${lastActiveTabId}"], button[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
                 mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || 'Dashboard';
             } else {
                 localStorage.removeItem('lastActiveTab');
@@ -635,6 +705,8 @@
                 document.querySelector('a[data-target="frame-appdrawer"]')?.classList.add('active');
                 mobileHeaderTitle.textContent = 'Appdrawer';
             }
+
+            lucide.createIcons();
         });
     </script>
 </body>
