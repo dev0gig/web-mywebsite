@@ -8,6 +8,8 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons für Symbole -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- JSZip for creating zip files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -299,13 +301,17 @@
             <div id="content-loader">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
+            <iframe id="frame-appdrawer" src="tabs/appdrawer/appdrawer.html" class="content-iframe"
+                data-key="appdrawer"></iframe>
             <iframe id="frame-widgets" src="tabs/widgets/widgets-iframe.html" class="content-iframe"
                 data-key="widgets"></iframe>
-            <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe" data-key="readlater"></iframe>
+            <iframe id="frame-readlater" src="tabs/readlater/readlater.html" class="content-iframe"
+                data-key="readlater"></iframe>
             <iframe id="frame-rss" src="tabs/rss/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
-            <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
-            <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe" data-key="memomea"></iframe>
+            <iframe id="frame-aurimea" src="tabs/aurimea/aurimea.html" class="content-iframe"
+                data-key="aurimea"></iframe>
+            <iframe id="frame-memomea" src="tabs/memomea/memomea.html" class="content-iframe"
+                data-key="memomea"></iframe>
         </div>
     </main>
 
@@ -324,15 +330,21 @@
                     <legend class="sr-only">Theme selection</legend>
                     <div><input type="radio" name="theme" id="theme-light" value="light"
                             class="theme-radio-peer hidden"><label for="theme-light"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Light</label>
+                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
+                            <i data-lucide="sun" class="w-5 h-5"></i> Light
+                        </label>
                     </div>
                     <div><input type="radio" name="theme" id="theme-dark" value="dark"
                             class="theme-radio-peer hidden"><label for="theme-dark"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">Dark</label>
+                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
+                            <i data-lucide="moon" class="w-5 h-5"></i> Dark
+                        </label>
                     </div>
                     <div><input type="radio" name="theme" id="theme-system" value="system"
                             class="theme-radio-peer hidden"><label for="theme-system"
-                            class="theme-radio-label block w-full p-3 text-center rounded-lg cursor-pointer">System</label>
+                            class="theme-radio-label flex items-center justify-center gap-2 w-full p-3 text-center rounded-lg cursor-pointer">
+                            <i data-lucide="monitor" class="w-5 h-5"></i> System
+                        </label>
                     </div>
                 </fieldset>
             </div>
@@ -344,25 +356,13 @@
                         style="background-color: var(--accent-color);"
                         onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
                         onmouseout="this.style.backgroundColor='var(--accent-color)'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                            <path
-                                d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
-                        </svg>
-                        Alles Sichern
+                        <i data-lucide="package" class="w-7 h-7"></i>
+                        Backup all
                     </button>
                     <label for="restore-all-input"
                         class="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M.5 2.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3.4a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3.4a.5.5 0 0 1 .5-.5z" />
-                            <path
-                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
-                        </svg>
-                        Alles Wiederherstellen
+                        <i data-lucide="package-open" class="w-7 h-7"></i>
+                        Restore all
                     </label>
                     <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                 </div>
@@ -578,6 +578,8 @@
             closeModalBtn.addEventListener('click', closeSettingsModal);
             modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
 
+            // ... (your existing JavaScript code) ...
+
             const themeRadios = document.querySelectorAll('input[name="theme"]');
             function applyTheme(theme) {
                 let effectiveTheme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
@@ -627,6 +629,9 @@
                 document.querySelector('a[data-target="frame-appdrawer"]')?.classList.add('active');
                 mobileHeaderTitle.textContent = 'Appdrawer';
             }
+
+            // Initialize Lucide icons after the DOM is fully loaded and elements are present
+            lucide.createIcons();
         });
     </script>
 </body>
