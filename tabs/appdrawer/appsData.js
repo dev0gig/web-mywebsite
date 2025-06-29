@@ -424,5 +424,11 @@ const appsData = [
         iconUrl: "https://pbs.twimg.com/profile_images/853541927781904384/LKvUgs4u_400x400.jpg",
         targetUrl: "https://www.theodinproject.com/dashboard",
         ariaLabel: "TheOdinProject"
+    },
+    {
+        id: "Google Messages",
+        iconUrl: "https://play-lh.googleusercontent.com/9AZOTXU_CpreTFAXUPAmJNkm8VGCb1C90fjJ9pHGcVmpGMDSTq3cUbaQJdBT9Tdp9A=w240-h480-rw",
+        targetUrl: "https://messages.google.com/web/conversations",
+        ariaLabel: "Google Messages"
     }
 ];
