@@ -686,10 +686,19 @@
                 wrapper.style.backgroundColor = 'var(--card-bg)';
                 wrapper.style.border = '1px solid var(--border-color)';
                 const titleWrapper = document.createElement('div');
-                titleWrapper.className = 'flex items-center gap-4 mb-4 pb-4 border-b';
+                titleWrapper.className = 'flex items-center justify-between gap-4 mb-4 pb-4 border-b';
                 titleWrapper.style.borderColor = 'var(--border-color)';
-                titleWrapper.innerHTML = `${iconHtml}<h2 class="text-2xl font-bold" style="color: var(--text-color);">${title}</h2>`;
+                titleWrapper.innerHTML = `
+                    <div class="flex items-center gap-4 min-w-0">
+                        ${iconHtml}
+                        <h2 class="text-2xl font-bold truncate" style="color: var(--text-color);">${title}</h2>
+                    </div>
+                    <button id="refresh-feed-btn" onclick="handleRefresh()" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700 flex-shrink-0" title="Neu laden">
+                        <i data-lucide="refresh-cw" class="h-6 w-6"></i>
+                    </button>
+                `;
                 wrapper.appendChild(titleWrapper);
+
                 if (showFilters) {
                     const filterWrapper = document.createElement('div');
                     filterWrapper.className = 'flex items-center gap-2 py-4';
@@ -700,11 +709,15 @@
                 articlesWrapper.id = 'articles-wrapper';
                 wrapper.appendChild(articlesWrapper);
                 feedContainer.appendChild(wrapper);
+
                 if (showFilters) {
                     document.getElementById('filter-unread-btn').addEventListener('click', () => { currentFilter = 'unread'; updateFilterButtons(); rerenderArticleList(); });
                     document.getElementById('filter-read-btn').addEventListener('click', () => { currentFilter = 'read'; updateFilterButtons(); rerenderArticleList(); });
                     updateFilterButtons();
                 }
+
+                // Create lucide icons for the newly added content
+                lucide.createIcons({ container: wrapper, attributes: { 'stroke-width': 2 } });
             }
 
             const updateFilterButtons = () => {
@@ -861,6 +874,39 @@
                 }
             };
 
+            // --- REFRESH LOGIC ---
+            const handleRefresh = async () => {
+                const refreshBtn = document.getElementById('refresh-feed-btn');
+                // Prevent re-triggering if already in progress
+                if (!refreshBtn || refreshBtn.disabled) return;
+
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    // Use Tailwind's spin animation class
+                    icon.classList.add('animate-spin');
+                }
+                refreshBtn.disabled = true;
+
+                // The called function will eventually re-render the button,
+                // which resets its state (not spinning, enabled).
+                try {
+                    if (activeUrl === 'all') {
+                        await loadAllFeeds();
+                    } else if (activeUrl === 'favorites') {
+                        await loadFavorites();
+                    } else if (activeUrl) {
+                        await loadFeed(activeUrl);
+                    } else {
+                        // Fallback if somehow activeUrl is null
+                        await loadAllFeeds();
+                    }
+                } catch (error) {
+                    console.error("Failed to refresh feed(s):", error);
+                    // The error message will be shown by the loadFeed/showMessage function.
+                }
+            };
+            window.handleRefresh = handleRefresh;
+
 
             // --- CORE LOGIC & EVENT HANDLERS ---
             const loadAllFeeds = async () => {
@@ -869,15 +915,9 @@
                 setActiveSidebarItem('all');
                 showLoading();
                 currentArticles = await fetchAllArticles();
-                // Use <i data-lucide="book-open"></i> for the icon
                 const allFeedsIcon = `<i data-lucide="book-open" class="h-8 w-8" style="color: var(--accent-color);"></i>`;
                 renderFeedLayout('Alle Feeds (Neueste zuerst)', allFeedsIcon);
                 rerenderArticleList();
-                // Re-create icon in title
-                lucide.createIcons({
-                    container: feedContainer.querySelector('.flex.items.center.gap-4'),
-                    attributes: { 'stroke-width': 2 }
-                });
             };
 
             const loadFavorites = async () => {
@@ -890,15 +930,9 @@
 
                 const allArticles = await fetchAllArticles();
                 currentArticles = allArticles.filter(item => favoriteLinks.has(item.link));
-                // Use <i data-lucide="star"></i> for the icon
                 const favIcon = `<i data-lucide="star" class="h-8 w-8" style="color: var(--favorite-color);"></i>`;
                 renderFeedLayout('Favoriten', favIcon, false);
                 rerenderArticleList();
-                // Re-create icon in title
-                lucide.createIcons({
-                    container: feedContainer.querySelector('.flex.items.center.gap-4'),
-                    attributes: { 'stroke-width': 2 }
-                });
             };
 
             const loadFeed = (rssUrl) => {
