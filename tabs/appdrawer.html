@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AppDrawer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg-color: #f9fafb;
@@ -129,25 +131,43 @@
             /* Allow input to grow */
         }
 
-        #add-app-btn {
+        .icon-btn {
             background-color: var(--primary-color);
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 0.5rem;
             border: none;
             cursor: pointer;
             transition: background-color 0.2s;
-            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
         }
 
-        #add-app-btn:hover {
+        .icon-btn:hover {
             background-color: var(--primary-color-hover);
         }
 
-        #add-app-btn:disabled {
+        .icon-btn:disabled {
             background-color: var(--text-color-light);
             cursor: not-allowed;
         }
+
+        .icon-btn.secondary {
+            background-color: var(--dock-border);
+            color: var(--text-color);
+        }
+
+        html[data-theme='dark'] .icon-btn.secondary {
+            background-color: #404040;
+        }
+
+        .icon-btn.secondary:hover {
+            background-color: #9ca3af;
+        }
+
 
         .main-layout {
             display: flex;
@@ -325,7 +345,7 @@
             transform: translateY(-5px);
         }
 
-        #confirmation-overlay {
+        .modal-overlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.5);
@@ -333,7 +353,7 @@
             z-index: 199;
         }
 
-        #confirmation-modal {
+        .modal {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -365,25 +385,44 @@
             transition: background-color 0.2s;
         }
 
-        #confirm-remove-btn {
+        #modal-input {
+            width: 100%;
+            margin-top: 1rem;
+            border: 1px solid var(--dock-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .modal-btn-confirm {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            background-color: var(--primary-color-hover);
+        }
+
+        .modal-btn-danger {
             background-color: var(--danger-color);
             color: white;
         }
 
-        #confirm-remove-btn:hover {
+        .modal-btn-danger:hover {
             background-color: var(--danger-color-hover);
         }
 
-        #cancel-remove-btn {
+        .modal-btn-cancel {
             background-color: var(--dock-border);
             color: var(--text-color);
         }
 
-        html[data-theme='dark'] #cancel-remove-btn {
+        html[data-theme='dark'] .modal-btn-cancel {
             background-color: #404040;
         }
 
-        #cancel-remove-btn:hover {
+        .modal-btn-cancel:hover {
             background-color: #9ca3af;
         }
 
@@ -412,9 +451,6 @@
             }
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-theme="light">
@@ -452,7 +488,18 @@
             <div id="add-app-form-wrapper">
                 <form id="add-app-form">
                     <input type="url" id="new-app-url" placeholder="Link einfügen um App hinzuzufügen..." required>
-                    <button type="submit" id="add-app-btn">+ Hinzufügen</button>
+                    <button type="submit" id="add-app-btn" class="icon-btn" title="Hinzufügen">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Hinzufügen</span>
+                    </button>
+                    <button type="button" id="import-btn" class="icon-btn secondary" title="Importieren">
+                        <i data-lucide="file-up" class="w-4 h-4"></i>
+                        <span>Import</span>
+                    </button>
+                    <button type="button" id="export-btn" class="icon-btn secondary" title="Exportieren">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span>Export</span>
+                    </button>
                 </form>
             </div>
             <div id="app-grid"></div>
@@ -465,18 +512,31 @@
         </div>
     </div>
 
-
     <div id="favorites-dock"></div>
 
-    <div id="confirmation-overlay" class="hidden"></div>
-    <div id="confirmation-modal" class="hidden">
+    <!-- Confirmation Modal (for delete/remove) -->
+    <div id="confirmation-overlay" class="modal-overlay hidden"></div>
+    <div id="confirmation-modal" class="modal hidden">
         <h3 id="modal-title" class="text-lg font-medium"></h3>
         <p id="modal-text" class="mt-2 text-sm"></p>
         <div class="modal-button-group">
-            <button id="cancel-remove-btn" class="modal-button">Abbrechen</button>
-            <button id="confirm-remove-btn" class="modal-button">Entfernen</button>
+            <button id="cancel-remove-btn" class="modal-button modal-btn-cancel">Abbrechen</button>
+            <button id="confirm-remove-btn" class="modal-button modal-btn-danger">Entfernen</button>
         </div>
     </div>
+
+    <!-- Export Modal -->
+    <div id="export-overlay" class="modal-overlay hidden"></div>
+    <div id="export-modal" class="modal hidden">
+        <h3 class="text-lg font-medium">Backup exportieren</h3>
+        <p class="mt-2 text-sm">Gib einen Namen für deine Backup-Datei ein.</p>
+        <input type="text" id="export-filename" class="modal-input" placeholder="appdrawer-backup">
+        <div class="modal-button-group">
+            <button id="cancel-export-btn" class="modal-button modal-btn-cancel">Abbrechen</button>
+            <button id="confirm-export-btn" class="modal-button modal-btn-confirm">Exportieren</button>
+        </div>
+    </div>
+
 
     <script>
         // --- IFRAME COMMUNICATION HANDLER (THEME, BACKUP, RESTORE) ---
@@ -524,6 +584,8 @@
 
         // --- MAIN APP LOGIC ---
         document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons(); // Initialize Lucide Icons
+
             const appGrid = document.getElementById('app-grid');
             const favoritesDock = document.getElementById('favorites-dock');
 
@@ -535,21 +597,27 @@
             const confirmRemoveBtn = document.getElementById('confirm-remove-btn');
             const cancelRemoveBtn = document.getElementById('cancel-remove-btn');
 
+            const exportOverlay = document.getElementById('export-overlay');
+            const exportModal = document.getElementById('export-modal');
+            const exportFilenameInput = document.getElementById('export-filename');
+            const confirmExportBtn = document.getElementById('confirm-export-btn');
+            const cancelExportBtn = document.getElementById('cancel-export-btn');
+
             // Search Elements
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search-btn');
 
-            // Add App Form
+            // Form Elements
             const addAppForm = document.getElementById('add-app-form');
             const newAppUrlInput = document.getElementById('new-app-url');
             const addAppBtn = document.getElementById('add-app-btn');
+            const importBtn = document.getElementById('import-btn');
+            const exportBtn = document.getElementById('export-btn');
 
             let apps = [];
             let favorites = [];
             let actionToConfirm = null;
 
-            // The default app list now only contains URLs.
-            // The name and icon will be fetched automatically on first load.
             const defaultAppUrls = [
                 { url: "https://finanzonline.bmf.gv.at/fon/" },
                 { url: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen" },
@@ -625,75 +693,56 @@
                 { url: "https://messages.google.com/web/conversations" }
             ];
 
-            /**
-             * Fetches metadata (title and icon) for a given URL.
-             * It uses a proxy to bypass CORS issues.
-             * @param {string} url The URL to fetch metadata from.
-             * @returns {Promise<{name: string, iconUrl: string}>}
-             */
             async function getAppMetadata(url) {
-                let name = new URL(url).hostname; // Default name
-                // Fallback icon using a high-quality logo service
+                let name = new URL(url).hostname;
                 let iconUrl = `https://logo.clearbit.com/${name}`;
 
                 try {
-                    // Use a proxy to fetch the site's HTML
                     const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                    if (!response.ok) throw new Error('Proxy request failed');
                     const data = await response.json();
                     const doc = new DOMParser().parseFromString(data.contents, 'text/html');
 
-                    // Get Name from the <title> tag
                     name = doc.querySelector('title')?.textContent.trim() || name;
 
-                    // Find the best quality icon from <link> tags
                     const appleIcon = doc.querySelector('link[rel="apple-touch-icon"]')?.href;
-                    const highResIcon = doc.querySelector('link[rel="icon"][sizes="192x192"]')?.href;
+                    const highResIcon = doc.querySelector('link[rel="icon"][sizes~="192x192"]')?.href;
                     const icon = doc.querySelector('link[rel="icon"]')?.href;
                     const shortcutIcon = doc.querySelector('link[rel="shortcut icon"]')?.href;
-
                     let bestIconPath = appleIcon || highResIcon || icon || shortcutIcon;
 
                     if (bestIconPath) {
-                        // Resolve relative path (e.g., "/favicon.ico") to an absolute URL
                         iconUrl = new URL(bestIconPath, url).href;
                     }
-
                 } catch (error) {
-                    console.error(`Konnte Metadaten für ${url} nicht abrufen, verwende Standardwerte. Fehler:`, error);
+                    console.error(`Konnte Metadaten für ${url} nicht abrufen. Fehler:`, error);
                 }
-
                 return { name, iconUrl };
             }
-
 
             // --- DATA MANAGEMENT ---
             async function initializeData() {
                 const storedApps = localStorage.getItem('userApps');
                 if (storedApps === null) {
-                    // If no apps in storage, fetch metadata for all default URLs
                     addAppBtn.disabled = true;
-                    addAppBtn.textContent = 'Lade...';
+                    addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin"></i><span>Lade...</span>';
+                    lucide.createIcons();
 
                     const initialApps = [];
                     for (const [index, appDef] of defaultAppUrls.entries()) {
                         const metadata = await getAppMetadata(appDef.url);
-                        initialApps.push({
-                            ...metadata, // Contains name and iconUrl
-                            url: appDef.url,
-                            id: `default-${index}`
-                        });
+                        initialApps.push({ ...metadata, url: appDef.url, id: `default-${index}` });
                     }
                     apps = initialApps;
                     saveApps();
 
                     addAppBtn.disabled = false;
-                    addAppBtn.textContent = '+ Hinzufügen';
+                    addAppBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Hinzufügen</span>';
+                    lucide.createIcons();
                 } else {
                     apps = JSON.parse(storedApps);
                 }
-
-                const storedFavorites = localStorage.getItem('favoriteApps');
-                favorites = storedFavorites ? JSON.parse(storedFavorites) : [];
+                favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                 renderAll();
             }
 
@@ -709,18 +758,14 @@
             const renderAll = (searchTerm = '') => {
                 appGrid.innerHTML = '';
                 favoritesDock.innerHTML = '';
-
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
                 const filteredApps = apps.filter(app =>
                     app.name.toLowerCase().includes(lowerCaseSearchTerm)
                 ).sort((a, b) => a.name.localeCompare(b.name));
 
-
                 filteredApps.forEach(app => {
-                    const isFavorited = favorites.includes(app.id);
-                    appGrid.appendChild(createAppElement(app, isFavorited));
+                    appGrid.appendChild(createAppElement(app, favorites.includes(app.id)));
                 });
-
                 const favoriteApps = apps.filter(app => favorites.includes(app.id));
                 favoriteApps.forEach(app => {
                     favoritesDock.appendChild(createAppElement(app, true, true));
@@ -736,16 +781,16 @@
 
                 const iconWrapper = document.createElement('div');
                 iconWrapper.className = 'app-icon-wrapper';
-
                 const icon = document.createElement('img');
-                // Use the iconUrl that was fetched and stored with the app
                 icon.src = app.iconUrl;
                 icon.alt = `${app.name} Icon`;
                 icon.className = 'app-icon';
                 icon.onerror = function () {
-                    this.onerror = null; // prevent infinite loop
-                    // Fallback to a letter placeholder if the logo fails to load
-                    this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${app.name.charAt(0)}`;
+                    this.onerror = function () {
+                        this.onerror = null;
+                        this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${app.name.charAt(0)}`;
+                    };
+                    this.src = `https://www.google.com/s2/favicons?domain=${new URL(app.url).hostname}&sz=64`;
                 };
                 iconWrapper.appendChild(icon);
 
@@ -754,23 +799,15 @@
                     star.className = 'favorite-star';
                     if (isFavorited) star.classList.add('favorited');
                     star.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>`;
-                    star.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleFavorite(app.id);
-                    });
+                    star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(app.id); });
                     iconWrapper.appendChild(star);
                 }
 
                 item.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    if (isDockItem) {
-                        openConfirmationModal('removeFavorite', app.id);
-                    } else {
-                        openConfirmationModal('deleteApp', app.id);
-                    }
+                    if (isDockItem) openConfirmationModal('removeFavorite', app.id);
+                    else openConfirmationModal('deleteApp', app.id);
                 });
-
                 item.appendChild(iconWrapper);
 
                 if (!isDockItem) {
@@ -779,27 +816,22 @@
                     label.textContent = app.name;
                     item.appendChild(label);
                 }
-
                 return item;
             };
 
             // --- ACTIONS ---
             function toggleFavorite(appId) {
                 const index = favorites.indexOf(appId);
-                if (index > -1) {
-                    favorites.splice(index, 1);
-                } else {
-                    favorites.push(appId);
-                }
+                if (index > -1) favorites.splice(index, 1);
+                else favorites.push(appId);
                 saveFavorites();
                 renderAll(searchInput.value);
             };
 
             function deleteApp(appId) {
                 apps = apps.filter(app => app.id !== appId);
-                favorites = favorites.filter(favId => favId !== appId); // Also remove from favorites
-                saveApps();
-                saveFavorites();
+                favorites = favorites.filter(favId => favId !== appId);
+                saveApps(); saveFavorites();
                 renderAll(searchInput.value);
             }
 
@@ -825,13 +857,46 @@
 
             function handleConfirm() {
                 if (!actionToConfirm) return;
-
-                if (actionToConfirm.type === 'removeFavorite') {
-                    toggleFavorite(actionToConfirm.id);
-                } else if (actionToConfirm.type === 'deleteApp') {
-                    deleteApp(actionToConfirm.id);
-                }
+                if (actionToConfirm.type === 'removeFavorite') toggleFavorite(actionToConfirm.id);
+                else if (actionToConfirm.type === 'deleteApp') deleteApp(actionToConfirm.id);
                 closeConfirmationModal();
+            }
+
+            // --- IMPORT/EXPORT LOGIC ---
+            function handleExport() {
+                exportModal.classList.remove('hidden');
+                exportOverlay.classList.remove('hidden');
+                const date = new Date();
+                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                exportFilenameInput.value = `appdrawer-backup-${formattedDate}`;
+            }
+
+            function handleImport() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data && Array.isArray(data.apps) && Array.isArray(data.favorites)) {
+                                localStorage.setItem('userApps', JSON.stringify(data.apps));
+                                localStorage.setItem('favoriteApps', JSON.stringify(data.favorites));
+                                window.location.reload();
+                            } else {
+                                alert("Die Datei hat ein ungültiges Format.");
+                            }
+                        } catch (err) {
+                            alert("Fehler beim Lesen der Datei. Bitte stelle sicher, dass es eine gültige Backup-Datei ist.");
+                            console.error(err);
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
             }
 
             // --- EVENT LISTENERS ---
@@ -839,47 +904,60 @@
                 e.preventDefault();
                 let url = newAppUrlInput.value.trim();
                 if (!url) return;
+                if (!url.startsWith('http')) url = 'https://' + url;
 
-                if (!url.startsWith('http')) {
-                    url = 'https://' + url;
-                }
-
-                // Check for duplicates
-                const urlExists = apps.some(app => app.url === url);
-                if (urlExists) {
-                    alert("Diese App existiert bereits in deiner Liste.");
-                    return;
+                if (apps.some(app => app.url === url)) {
+                    alert("Diese App existiert bereits in deiner Liste."); return;
                 }
 
                 addAppBtn.disabled = true;
-                addAppBtn.textContent = '...';
+                addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin"></i><span>Hinzufügen</span>';
+                lucide.createIcons();
 
                 const metadata = await getAppMetadata(url);
-
-                const newApp = {
-                    id: `user-${Date.now()}`,
-                    name: metadata.name,
-                    url: url,
-                    iconUrl: metadata.iconUrl
-                };
-                apps.push(newApp);
+                apps.push({ id: `user-${Date.now()}`, ...metadata, url });
                 saveApps();
                 renderAll(searchInput.value);
+
                 addAppForm.reset();
                 addAppBtn.disabled = false;
-                addAppBtn.textContent = '+ Hinzufügen';
+                addAppBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Hinzufügen</span>';
+                lucide.createIcons();
             });
 
             confirmRemoveBtn.addEventListener('click', handleConfirm);
             cancelRemoveBtn.addEventListener('click', closeConfirmationModal);
             confirmationOverlay.addEventListener('click', closeConfirmationModal);
 
-            searchInput.addEventListener('input', () => {
-                const searchTerm = searchInput.value;
-                renderAll(searchTerm);
-                clearSearchBtn.classList.toggle('hidden', !searchTerm);
+            exportBtn.addEventListener('click', handleExport);
+            importBtn.addEventListener('click', handleImport);
+            cancelExportBtn.addEventListener('click', () => {
+                exportModal.classList.add('hidden');
+                exportOverlay.classList.add('hidden');
+            });
+            confirmExportBtn.addEventListener('click', () => {
+                const dataStr = JSON.stringify({
+                    apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
+                    favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
+                });
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                let filename = exportFilenameInput.value.trim();
+                if (!filename) filename = 'appdrawer-backup';
+                link.download = `${filename}.json`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                exportModal.classList.add('hidden');
+                exportOverlay.classList.add('hidden');
             });
 
+
+            searchInput.addEventListener('input', () => {
+                renderAll(searchInput.value);
+                clearSearchBtn.classList.toggle('hidden', !searchInput.value);
+            });
             clearSearchBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 renderAll();

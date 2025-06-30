@@ -63,6 +63,8 @@
             /* Für Firefox */
             scrollbar-color: var(--scrollbar-thumb-color-light) var(--scrollbar-track-color-light);
             /* Für Firefox */
+            padding-right: 0;
+            /* Standardmäßig kein Padding auf dem Body */
         }
 
         /* Webkit (Chrome, Safari, Edge) Scrollbar-Styles */
@@ -164,11 +166,9 @@
             display: none;
         }
 
-        /* Sidebar-Styles (für alle Bildschirmgrößen) */
+        /* Sidebar-Styles */
         .sidebar {
             position: fixed;
-            right: -300px;
-            /* Startposition außerhalb des Bildschirms */
             top: 0;
             width: 300px;
             height: 100%;
@@ -178,17 +178,27 @@
             transition: right 0.3s ease-in-out;
             padding: 1rem;
             display: flex;
-            /* Immer flex */
             flex-direction: column;
             color: var(--sidebar-text-color);
-        }
-
-        .sidebar.open {
             right: 0;
-            /* Endposition auf dem Bildschirm */
+            /* Desktop: Sidebar immer sichtbar */
         }
 
-        /* Sidebar-Toggle-Button (für alle Bildschirmgrößen) */
+        /* Auf Mobilgeräten (kleiner als 1024px) */
+        @media (max-width: 1023px) {
+            .sidebar {
+                right: -300px;
+                /* Mobile: Sidebar standardmäßig ausgeblendet */
+            }
+
+            .sidebar.open {
+                right: 0;
+                /* Mobile: Sidebar wird bei 'open' sichtbar */
+            }
+        }
+
+
+        /* Sidebar-Toggle-Button */
         .sidebar-toggle-button {
             position: fixed;
             bottom: 1.5rem;
@@ -207,12 +217,14 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 110;
             transition: background-color 0.2s;
-            /* Immer anzeigen */
         }
 
-        .sidebar-toggle-button:hover {
-            background-color: var(--accent-color-hover);
-            /* Dunklere Akzentfarbe für Hover */
+        /* Button nur auf Mobilgeräten anzeigen */
+        @media (min-width: 1024px) {
+            .sidebar-toggle-button {
+                display: none;
+                /* Im Desktop-Modus ausblenden */
+            }
         }
 
         .sidebar-close-button {
@@ -224,10 +236,32 @@
             cursor: pointer;
         }
 
+        /* "X"-Button nur auf Mobilgeräten anzeigen */
+        @media (min-width: 1024px) {
+            .sidebar-close-button {
+                display: none;
+                /* Im Desktop-Modus ausblenden */
+            }
+        }
+
+
         .sidebar-nav-list .widget-nav-button {
             width: 100%;
             text-align: left;
             margin-bottom: 0.5rem;
+        }
+
+        /* Hauptinhaltsbereich anpassen: Body-Padding für Sidebar-Platz auf Desktop */
+        @media (min-width: 1024px) {
+            body {
+                padding-right: 300px;
+                /* Schafft Platz für die feste Sidebar auf dem Desktop */
+            }
+
+            .main-content-area {
+                margin-right: 0;
+                /* Entfernt den vorherigen margin-right, da das Body-Padding den Platz regelt */
+            }
         }
     </style>
 </head>
@@ -242,7 +276,7 @@
         </div>
     </div>
 
-    <!-- Button zum Öffnen der Sidebar (für alle Bildschirmgrößen sichtbar) -->
+    <!-- Button zum Öffnen der Sidebar (wird im Desktop-Modus ausgeblendet) -->
     <button class="sidebar-toggle-button" id="sidebar-toggle-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -255,17 +289,17 @@
 
 
     <!-- Hauptinhaltsbereich -->
-    <div class="container mx-auto p-4 flex flex-col lg:flex-row lg:gap-8 lg:items-start">
+    <div class="container mx-auto p-4 flex flex-col lg:flex-row lg:gap-8 lg:items-start main-content-area">
         <!-- Widget-Gitter -->
         <div class="flex-grow">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-jap-kana" src="widgets/jap-kana.html" title="Japanisch Kana" class="w-full h-[700px]"
-                        frameborder="0"></iframe>
+                    <iframe id="widget-jap-kana" src="widgets/jap-kana.html" title="Japanisch Kana"
+                        class="w-full h-[700px]" frameborder="0"></iframe>
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-calculator" src="widgets/calculator.html" title="Taschenrechner" class="w-full h-[700px]"
-                        frameborder="0"></iframe>
+                    <iframe id="widget-calculator" src="widgets/calculator.html" title="Taschenrechner"
+                        class="w-full h-[700px]" frameborder="0"></iframe>
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
                     <iframe id="widget-clock" src="widgets/clock.html" title="Uhr Widget" class="w-full h-[700px]"
@@ -280,12 +314,12 @@
                         frameborder="0"></iframe>
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-capital-city-eu" src="widgets/capital-city-EU.html" title="Europäische Hauptstädte Quiz"
-                        frameborder="0"></iframe>
+                    <iframe id="widget-capital-city-eu" src="widgets/capital-city-EU.html"
+                        title="Europäische Hauptstädte Quiz" frameborder="0"></iframe>
                 </div>
                 <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-weather" src="widgets/weather.html" title="Wetter Widget" class="w-full h-[700px]"
-                        frameborder="0"></iframe>
+                    <iframe id="widget-weather" src="widgets/weather.html" title="Wetter Widget"
+                        class="w-full h-[700px]" frameborder="0"></iframe>
                 </div>
             </div>
         </div>
@@ -306,10 +340,32 @@
             const sidebarToggleButton = document.getElementById('sidebar-toggle-button');
             const sidebarCloseButton = document.getElementById('sidebar-close-button');
             const widgetNavListSidebar = document.getElementById('widget-nav-list-sidebar');
+            const mainContentArea = document.querySelector('.main-content-area'); // Hauptinhaltsbereich
 
             let touchStartX = 0;
             let touchEndX = 0;
             const minSwipeDistance = 50; // Mindestentfernung für eine Wischgeste
+
+            // Funktion zum Überprüfen, ob es sich um ein mobiles Gerät handelt
+            const isMobile = () => window.innerWidth < 1024;
+
+            // Funktion zum Aktualisieren des Sidebar-Zustands basierend auf der Bildschirmbreite
+            const updateSidebarState = () => {
+                if (!isMobile()) {
+                    sidebar.classList.add('open'); // Desktop: Sidebar immer offen
+                    document.body.style.overflow = ''; // Scrollen des Bodys erlauben
+                } else {
+                    sidebar.classList.remove('open'); // Mobile: Sidebar standardmäßig geschlossen
+                    document.body.style.overflow = ''; // Scrollen des Bodys erlauben
+                }
+            };
+
+            // Initialer Aufruf beim Laden der Seite
+            updateSidebarState();
+
+            // Event-Listener für Größenänderungen des Fensters
+            window.addEventListener('resize', updateSidebarState);
+
 
             // Funktion zum Erstellen der Navigationsbuttons
             function createNavButton(iframe, targetList) {
@@ -330,8 +386,8 @@
                                 top: targetIframe.offsetTop,
                                 behavior: 'smooth'
                             });
-                            // Sidebar schließen, nachdem ein Button in der Sidebar geklickt wurde
-                            if (sidebar.classList.contains('open')) {
+                            // Sidebar nur auf Mobilgeräten schließen, nachdem ein Button in der Sidebar geklickt wurde
+                            if (isMobile() && sidebar.classList.contains('open')) {
                                 sidebar.classList.remove('open');
                                 // Scrollen des Bodys wieder erlauben, wenn Sidebar geschlossen wird
                                 document.body.style.overflow = '';
@@ -347,26 +403,30 @@
                 createNavButton(iframe, widgetNavListSidebar);
             });
 
-            // Sidebar-Funktionalität: Öffnen/Schließen durch Klicken auf den runden Button
+            // Sidebar-Funktionalität: Öffnen/Schließen durch Klicken auf den runden Button (nur auf Mobilgeräten aktiv)
             sidebarToggleButton.addEventListener('click', () => {
-                if (sidebar.classList.contains('open')) {
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
-                } else {
-                    sidebar.classList.add('open');
-                    document.body.style.overflow = 'hidden'; // Scrollen des Bodys verhindern
+                if (isMobile()) { // Nur auf Mobilgeräten reagieren
+                    if (sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
+                    } else {
+                        sidebar.classList.add('open');
+                        document.body.style.overflow = 'hidden'; // Scrollen des Bodys verhindern
+                    }
                 }
             });
 
-            // Sidebar schließen durch Klicken auf den "X"-Button
+            // Sidebar schließen durch Klicken auf den "X"-Button (nur auf Mobilgeräten aktiv)
             sidebarCloseButton.addEventListener('click', () => {
-                sidebar.classList.remove('open');
-                document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
+                if (isMobile()) { // Nur auf Mobilgeräten reagieren
+                    sidebar.classList.remove('open');
+                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
+                }
             });
 
-            // Schließen der Sidebar, wenn außerhalb geklickt wird
+            // Schließen der Sidebar, wenn außerhalb geklickt wird (nur auf Mobilgeräten aktiv)
             document.addEventListener('click', (event) => {
-                if (sidebar.classList.contains('open') &&
+                if (isMobile() && sidebar.classList.contains('open') &&
                     !sidebar.contains(event.target) &&
                     !sidebarToggleButton.contains(event.target)) {
                     sidebar.classList.remove('open');
@@ -374,24 +434,28 @@
                 }
             });
 
-            // Touch-Gesten für die Sidebar
+            // Touch-Gesten für die Sidebar (nur auf Mobilgeräten aktiv)
             document.addEventListener('touchstart', (event) => {
-                touchStartX = event.touches[0].clientX;
+                if (isMobile()) { // Nur auf Mobilgeräten reagieren
+                    touchStartX = event.touches[0].clientX;
+                }
             });
 
             document.addEventListener('touchend', (event) => {
-                touchEndX = event.changedTouches[0].clientX;
-                const swipeDistance = touchEndX - touchStartX;
+                if (isMobile()) { // Nur auf Mobilgeräten reagieren
+                    touchEndX = event.changedTouches[0].clientX;
+                    const swipeDistance = touchEndX - touchStartX;
 
-                // Sidebar öffnen mit Wischgeste von rechts nach links (vom Bildschirmrand kommend)
-                if (touchStartX > window.innerWidth - 50 && swipeDistance < -minSwipeDistance && !sidebar.classList.contains('open')) {
-                    sidebar.classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                }
-                // Sidebar schließen mit Wischgeste von links nach rechts (innerhalb der Sidebar)
-                else if (sidebar.classList.contains('open') && swipeDistance > minSwipeDistance && touchStartX < (window.innerWidth - sidebar.offsetWidth + 50)) {
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = '';
+                    // Sidebar öffnen mit Wischgeste von rechts nach links (vom Bildschirmrand kommend)
+                    if (touchStartX > window.innerWidth - 50 && swipeDistance < -minSwipeDistance && !sidebar.classList.contains('open')) {
+                        sidebar.classList.add('open');
+                        document.body.style.overflow = 'hidden';
+                    }
+                    // Sidebar schließen mit Wischgeste von links nach rechts (innerhalb der Sidebar)
+                    else if (sidebar.classList.contains('open') && swipeDistance > minSwipeDistance && touchStartX < (window.innerWidth - sidebar.offsetWidth + 50)) {
+                        sidebar.classList.remove('open');
+                        document.body.style.overflow = '';
+                    }
                 }
             });
         });
