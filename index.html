@@ -23,6 +23,11 @@
             --accent-color: #7c3aed;
             --accent-color-hover: #8b5cf6;
             --sidebar-link-active-bg: #7c3aed;
+            /* New dock variables */
+            --dock-bg: rgba(255, 255, 255, 0.7);
+            --dock-border: #e5e7eb;
+            --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --app-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         html[data-theme='dark'] {
@@ -33,8 +38,12 @@
             --sidebar-bg: #262626cc;
             --sidebar-border: #404040;
             --modal-bg: #262626;
+            /* New dark dock variables */
+            --dock-bg: rgba(23, 23, 23, 0.7);
+            --dock-border: #404040;
         }
 
+        /* UPDATED: Removed #app-dock img from this filter */
         html[data-theme='dark'] #mobile-menu img,
         html[data-theme='dark'] #sidebar img {
             filter: invert(1) brightness(1.5) contrast(1.2);
@@ -49,10 +58,13 @@
             overflow: hidden;
         }
 
+        /* UPDATED: Removed padding-bottom to allow iframes to go behind the dock */
         #main-content {
             position: relative;
             top: 4rem;
+            /* Same as mobile header height */
             height: calc(100% - 4rem);
+            /* Adjust height to account for mobile header */
         }
 
         @media (min-width: 768px) {
@@ -63,6 +75,7 @@
                 margin-left: 4.5rem;
             }
         }
+
 
         #content-loader {
             position: absolute;
@@ -209,6 +222,72 @@
         #notification-toast.show {
             bottom: 20px;
         }
+
+        /* App Dock Styles */
+        #app-dock {
+            position: fixed;
+            bottom: calc(10px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem;
+            background-color: var(--dock-bg);
+            border: 1px solid var(--dock-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            gap: 1rem;
+            z-index: 90;
+            /* High z-index to float above iframes */
+            transition: background-color 0.3s ease;
+            max-width: 90vw;
+            overflow-x: auto;
+        }
+
+        #app-dock::-webkit-scrollbar {
+            display: none;
+        }
+
+        #app-dock {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .dock-app-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: transform 0.2s ease;
+        }
+
+        .dock-app-item:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        .dock-app-icon-wrapper {
+            width: 50px;
+            height: 50px;
+        }
+
+        .dock-app-icon {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--app-shadow);
+            transition: box-shadow 0.2s ease;
+            background-color: var(--dock-border);
+        }
+
+        .dock-app-item:hover .dock-app-icon {
+            box-shadow: var(--app-shadow-hover);
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -230,29 +309,28 @@
 
     <nav id="sidebar" class="p-2 flex flex-col">
         <ul id="nav-links" class="space-y-2 mt-2 flex-grow">
-            <li><a href="tabs/appdrawer.html" data-target="frame-appdrawer"
+            <li><a href="appdrawer.html" data-target="frame-appdrawer"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/appdrawer.svg" alt="Appdrawer Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Appdrawer</span></a>
             </li>
-            <li><a href="tabs/widgets-iframe.html" data-target="frame-widgets"
+            <li><a href="widgets-iframe.html" data-target="frame-widgets"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/widgets.svg" alt="Widgets Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Widgets</span></a></li>
-            <li><a href="tabs/readlater.html" data-target="frame-readlater"
+            <li><a href="readlater.html" data-target="frame-readlater"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/readlater.svg" alt="ReadlateR Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">ReadlateR</span></a></li>
-            <li><a href="tabs/rss-reader.html" data-target="frame-rss"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
+            <li><a href="rss-reader.html" data-target="frame-rss" class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/rss.svg" alt="RSS Reader Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">RSS Reader</span></a></li>
-            <li><a href="tabs/aurimea.html" data-target="frame-aurimea"
+            <li><a href="aurimea.html" data-target="frame-aurimea"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/aurimea.svg" alt="AuriMea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">AuriMea</span></a>
             </li>
-            <li><a href="tabs/memomea.html" data-target="frame-memomea"
+            <li><a href="memomea.html" data-target="frame-memomea"
                     class="sidebar-link flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/memomea.svg" alt="Memomea Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">MemoMea</span></a>
@@ -301,19 +379,17 @@
             <div id="content-loader">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <iframe id="frame-appdrawer" src="tabs/appdrawer.html" class="content-iframe"
-                data-key="appdrawer"></iframe>
-            <iframe id="frame-widgets" src="tabs/widgets-iframe.html" class="content-iframe"
-                data-key="widgets"></iframe>
-            <iframe id="frame-readlater" src="tabs/readlater.html" class="content-iframe"
-                data-key="readlater"></iframe>
+            <iframe id="frame-appdrawer" src="tabs/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
+            <iframe id="frame-widgets" src="tabs/widgets-iframe.html" class="content-iframe" data-key="widgets"></iframe>
+            <iframe id="frame-readlater" src="tabs/readlater.html" class="content-iframe" data-key="readlater"></iframe>
             <iframe id="frame-rss" src="tabs/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
-            <iframe id="frame-aurimea" src="tabs/aurimea.html" class="content-iframe"
-                data-key="aurimea"></iframe>
-            <iframe id="frame-memomea" src="tabs/memomea.html" class="content-iframe"
-                data-key="memomea"></iframe>
+            <iframe id="frame-aurimea" src="tabs/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
+            <iframe id="frame-memomea" src="tabs/memomea.html" class="content-iframe" data-key="memomea"></iframe>
         </div>
     </main>
+
+    <div id="app-dock"></div>
+
 
     <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50"></div>
     <div id="settings-modal"
@@ -403,6 +479,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const contentLoader = document.getElementById('content-loader');
             const contentFrames = document.querySelectorAll('.content-iframe');
+            const appdrawerFrame = document.getElementById('frame-appdrawer');
+            const appDock = document.getElementById('app-dock');
             const desktopNavLinks = document.querySelectorAll('#sidebar #nav-links a, #sidebar #nav-links button');
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -415,7 +493,6 @@
             const closeModalBtn = document.getElementById('close-modal-btn');
             const notificationToast = document.getElementById('notification-toast');
 
-            // --- Data Management ---
             const backupAllBtn = document.getElementById('backup-all-btn');
             const restoreAllInput = document.getElementById('restore-all-input');
             const deleteAllBtn = document.getElementById('delete-all-btn');
@@ -426,7 +503,6 @@
             let receivedResponses = 0;
             let backupInProgress = false;
 
-            // --- Confirmation Modal ---
             const confirmModal = document.getElementById('confirm-modal');
             const confirmModalTitle = document.getElementById('confirm-modal-title');
             const confirmModalText = document.getElementById('confirm-modal-text');
@@ -469,22 +545,18 @@
             const backupAllData = () => {
                 if (backupInProgress) return;
                 backupInProgress = true;
-
                 backupData = {};
                 expectedResponses = backupFrames.length;
                 receivedResponses = 0;
-
                 if (expectedResponses === 0) {
                     showToast('Keine Apps zum Sichern gefunden.', 'info');
                     backupInProgress = false;
                     return;
                 }
-
                 showToast('Backup wird gestartet...', 'info', 0);
                 backupFrames.forEach(frame => {
                     frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*');
                 });
-
                 setTimeout(() => {
                     if (receivedResponses < expectedResponses) {
                         if (receivedResponses > 0) {
@@ -500,7 +572,6 @@
 
             const createAndDownloadZip = () => {
                 if (!backupInProgress) return;
-
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
@@ -509,14 +580,11 @@
                         filesAdded++;
                     }
                 }
-
                 backupInProgress = false;
-
                 if (filesAdded === 0) {
                     showToast('Keine Daten zum Sichern gefunden.', 'info');
                     return;
                 }
-
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
@@ -528,27 +596,22 @@
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
                         showToast('Backup erfolgreich heruntergeladen!', 'success');
-
-                        // NEU: Sitzung als "sauber" markieren nach erfolgreichem Backup
                         localStorage.removeItem('sessionInProgress');
-                        console.log('Session marked as clean after backup.');
                     })
                     .catch(err => {
                         console.error('Zip generation failed:', err);
                         showToast('Backup-Erstellung fehlgeschlagen.', 'error');
                     });
-            }
+            };
 
             const restoreAllData = (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
-
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     try {
                         const zip = await JSZip.loadAsync(e.target.result);
                         let restoredCount = 0;
-
                         for (const filename in zip.files) {
                             if (filename.endsWith('.json')) {
                                 const key = filename.replace('.json', '');
@@ -565,7 +628,6 @@
                         }
                         showToast(`${restoredCount} App(s) erfolgreich wiederhergestellt. Die Seiten werden neu geladen.`, 'success');
                         setTimeout(() => window.location.reload(), 1500);
-
                     } catch (err) {
                         console.error('Restore failed:', err);
                         showToast('Wiederherstellung fehlgeschlagen. Ist es eine gültige Backup-Datei?', 'error');
@@ -587,17 +649,49 @@
                 );
             };
 
+            const renderAppDock = (favoriteApps = []) => {
+                appDock.innerHTML = '';
+                if (favoriteApps.length === 0) {
+                    appDock.style.display = 'none';
+                    return;
+                }
+                appDock.style.display = 'flex';
+
+                favoriteApps.forEach(app => {
+                    const item = document.createElement('a');
+                    item.href = app.url;
+                    item.target = '_blank';
+                    item.rel = 'noopener noreferrer';
+                    item.className = 'dock-app-item';
+                    item.setAttribute('aria-label', app.name);
+                    item.title = app.name;
+                    const iconWrapper = document.createElement('div');
+                    iconWrapper.className = 'dock-app-icon-wrapper';
+                    const icon = document.createElement('img');
+                    icon.src = app.iconUrl || `https://www.google.com/s2/favicons?domain=${new URL(app.url).hostname}&sz=64`;
+                    icon.alt = `${app.name} Icon`;
+                    icon.className = 'dock-app-icon';
+                    icon.onerror = function () {
+                        this.onerror = null;
+                        this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`;
+                    };
+                    iconWrapper.appendChild(icon);
+                    item.appendChild(iconWrapper);
+                    appDock.appendChild(item);
+                });
+            };
+
             window.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'backupDataResponse') {
-                    const { key, data } = event.data;
+                const { type, payload, key, data } = event.data;
+                if (type === 'favoritesUpdated') {
+                    renderAppDock(payload);
+                }
+                if (type === 'backupDataResponse') {
                     if (key) { backupData[key] = data; }
                     receivedResponses++;
                     if (receivedResponses === expectedResponses) {
                         createAndDownloadZip();
                     }
-                } else if (event.data && event.data.startsWith('set-theme-')) {
-                    const theme = event.data.substring('set-theme-'.length);
-                    document.documentElement.setAttribute('data-theme', theme);
                 }
             });
 
@@ -605,13 +699,10 @@
             restoreAllInput.addEventListener('change', restoreAllData);
             deleteAllBtn.addEventListener('click', deleteAllData);
 
-            // NEU: Logik für die "Willkommen zurück"-Nachricht
             if (localStorage.getItem('sessionInProgress') === 'true') {
                 showToast('Willkommen zurück! Ihre letzte Sitzung wurde geladen.', 'info', 5000);
             }
             localStorage.setItem('sessionInProgress', 'true');
-            console.log('Session marked as in-progress.');
-
 
             const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
             const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };
@@ -624,12 +715,10 @@
 
             function handleNavLinkClick(e) {
                 const target = e.currentTarget;
-
                 if (target.closest('#settings-btn')) {
                     e.preventDefault();
                     openSettingsModal();
                 } else if (target.target === '_blank') {
-                    // Let the browser handle it
                 } else {
                     e.preventDefault();
                     const targetFrameId = target.dataset.target;
@@ -647,8 +736,7 @@
                                 l.classList.add('active');
                             }
                         });
-
-                        mobileHeaderTitle.textContent = target.querySelector('.sidebar-text')?.textContent || 'Dashboard';
+                        mobileHeaderTitle.textContent = target.querySelector('.sidebar-text')?.textContent || target.querySelector('span')?.textContent || 'Dashboard';
                     }
                 }
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
@@ -674,6 +762,7 @@
             hamburgerBtn.addEventListener('click', openMobileMenu);
             closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
             mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            document.getElementById('settings-btn').addEventListener('click', openSettingsModal);
             closeModalBtn.addEventListener('click', closeSettingsModal);
             modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
 
@@ -700,6 +789,11 @@
                         loadedFrames++;
                         const savedTheme = localStorage.getItem('theme') || 'system';
                         applyTheme(savedTheme);
+
+                        if (frame.id === 'frame-appdrawer') {
+                            frame.contentWindow.postMessage('getFavorites', '*');
+                        }
+
                         if (loadedFrames >= totalFrames) {
                             setTimeout(() => contentLoader.classList.add('hidden'), 200);
                         }
@@ -719,7 +813,7 @@
             if (targetFrame && targetLink) {
                 targetFrame.classList.add('active');
                 document.querySelectorAll(`a[data-target="${lastActiveTabId}"], button[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
-                mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || 'Dashboard';
+                mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || targetLink.querySelector('span')?.textContent || 'Dashboard';
             } else {
                 localStorage.removeItem('lastActiveTab');
                 document.getElementById('frame-appdrawer')?.classList.add('active');

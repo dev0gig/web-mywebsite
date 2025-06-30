@@ -37,7 +37,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
-            padding-bottom: calc(120px + env(safe-area-inset-bottom));
+            /* Removed bottom padding as the dock is now external */
         }
 
         body::-webkit-scrollbar {
@@ -307,48 +307,7 @@
             stroke: #9ca3af;
         }
 
-        #favorites-dock {
-            position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.75rem;
-            background-color: var(--dock-bg);
-            border: 1px solid var(--dock-border);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            gap: 1rem;
-            z-index: 100;
-            transition: background-color 0.3s ease;
-            max-width: 90vw;
-            overflow-x: auto;
-        }
-
-        #favorites-dock::-webkit-scrollbar {
-            display: none;
-        }
-
-        #favorites-dock {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-
-        #favorites-dock .app-item {
-            margin-bottom: 0;
-        }
-
-        #favorites-dock .app-icon-wrapper {
-            width: 50px;
-            height: 50px;
-        }
-
-        #favorites-dock .app-item:hover {
-            transform: translateY(-5px);
-        }
+        /* Removed #favorites-dock styles as it's no longer in this file */
 
         @media (max-width: 1024px) {
             .header-container {
@@ -441,10 +400,9 @@
         </div>
     </div>
 
-    <div id="favorites-dock"></div>
+    <!-- Dock is removed from here -->
 
     <!-- MODAL SECTION: Updated for consistent styling -->
-    <!-- Confirmation Modal (for delete/remove) -->
     <div id="confirmation-overlay"
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
@@ -486,70 +444,87 @@
 
 
     <script>
-        // --- IFRAME COMMUNICATION HANDLER (THEME, BACKUP, RESTORE) ---
-        window.addEventListener('message', (event) => {
-            // Security: only accept messages from the parent window
-            if (event.source !== window.parent) {
-                return;
-            }
-
-            const message = event.data;
-
-            if (message === 'set-theme-dark') {
-                document.documentElement.dataset.theme = 'dark';
-                document.body.dataset.theme = 'dark';
-            } else if (message === 'set-theme-light') {
-                document.documentElement.dataset.theme = 'light';
-                document.body.dataset.theme = 'light';
-            }
-
-            if (message && message.type === 'getBackupData') {
-                const backupData = {
-                    apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
-                    favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
-                };
-                window.parent.postMessage({
-                    type: 'backupDataResponse',
-                    key: 'appdrawer', // Identifies this iframe
-                    data: backupData
-                }, '*');
-            }
-
-            if (message && message.type === 'restoreBackupData') {
-                const restoredData = message.data;
-                if (restoredData && Array.isArray(restoredData.apps) && Array.isArray(restoredData.favorites)) {
-                    localStorage.setItem('userApps', JSON.stringify(restoredData.apps));
-                    localStorage.setItem('favoriteApps', JSON.stringify(restoredData.favorites));
-                    window.location.reload();
-                }
-            }
-        });
-
-
-        // --- MAIN APP LOGIC ---
         document.addEventListener('DOMContentLoaded', () => {
+            // --- IFRAME COMMUNICATION HANDLER (THEME, BACKUP, RESTORE, AND NEW DOCK LOGIC) ---
+
+            const notifyParentOfFavoritesChange = () => {
+                const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
+                const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+                const favoriteAppsData = userApps.filter(app => favoriteIds.includes(app.id));
+
+                // Security: only post messages to the parent window
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'favoritesUpdated',
+                        payload: favoriteAppsData
+                    }, '*'); // In a real app, use the parent's origin instead of '*'
+                }
+            };
+
+            window.addEventListener('message', (event) => {
+                // Security: only accept messages from the parent window
+                if (event.source !== window.parent) {
+                    return;
+                }
+
+                const message = event.data;
+
+                // Handle theme changes from parent
+                if (message === 'set-theme-dark') {
+                    document.documentElement.dataset.theme = 'dark';
+                    document.body.dataset.theme = 'dark';
+                } else if (message === 'set-theme-light') {
+                    document.documentElement.dataset.theme = 'light';
+                    document.body.dataset.theme = 'light';
+                }
+
+                // Handle request for favorites from parent
+                if (message === 'getFavorites') {
+                    notifyParentOfFavoritesChange();
+                }
+
+                // Handle backup/restore messages
+                if (message && message.type === 'getBackupData') {
+                    const backupData = {
+                        apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
+                        favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
+                    };
+                    window.parent.postMessage({
+                        type: 'backupDataResponse',
+                        key: 'appdrawer',
+                        data: backupData
+                    }, '*');
+                }
+                if (message && message.type === 'restoreBackupData') {
+                    const restoredData = message.data;
+                    if (restoredData && Array.isArray(restoredData.apps) && Array.isArray(restoredData.favorites)) {
+                        localStorage.setItem('userApps', JSON.stringify(restoredData.apps));
+                        localStorage.setItem('favoriteApps', JSON.stringify(restoredData.favorites));
+                        window.location.reload(); // Reload to apply changes and notify parent
+                    }
+                }
+            });
+
+
+            // --- MAIN APP LOGIC ---
             lucide.createIcons();
 
             const appGrid = document.getElementById('app-grid');
-            const favoritesDock = document.getElementById('favorites-dock');
+            // favoritesDock element is removed, no longer needed here
 
-            // Modal Elements
             const confirmationOverlay = document.getElementById('confirmation-overlay');
             const confirmationModal = document.getElementById('confirmation-modal');
             const modalTitle = document.getElementById('modal-title');
             const modalText = document.getElementById('modal-text');
             const confirmRemoveBtn = document.getElementById('confirm-remove-btn');
             const cancelRemoveBtn = document.getElementById('cancel-remove-btn');
-
             const exportOverlay = document.getElementById('export-overlay');
             const exportModal = document.getElementById('export-modal');
             const exportFilenameInput = document.getElementById('export-filename');
             const confirmExportBtn = document.getElementById('confirm-export-btn');
             const cancelExportBtn = document.getElementById('cancel-export-btn');
-
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search-btn');
-
             const addAppForm = document.getElementById('add-app-form');
             const newAppUrlInput = document.getElementById('new-app-url');
             const newAppNameInput = document.getElementById('new-app-name');
@@ -563,6 +538,7 @@
             let actionToConfirm = null;
 
             const defaultAppDefs = [
+                // Your default apps array remains unchanged
                 { url: "https://finanzonline.bmf.gv.at/fon/", name: "FinanzOnline" },
                 { url: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen", name: "Post" },
                 { url: "https://losleben.wienerstaedtische.at/app/dashboard", name: "LosLeben" },
@@ -638,9 +614,17 @@
             ];
 
             // --- DATA MANAGEMENT ---
+            function saveApps() {
+                localStorage.setItem('userApps', JSON.stringify(apps));
+                notifyParentOfFavoritesChange(); // Notify on change
+            }
+            function saveFavorites() {
+                localStorage.setItem('favoriteApps', JSON.stringify(favorites));
+                notifyParentOfFavoritesChange(); // Notify on change
+            }
+
             async function initializeData() {
                 let storedApps = localStorage.getItem('userApps');
-
                 if (!storedApps || JSON.parse(storedApps).length === 0) {
                     apps = defaultAppDefs.map((appDef, index) => ({
                         ...appDef,
@@ -652,23 +636,16 @@
                 } else {
                     apps = JSON.parse(storedApps);
                 }
-
                 favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                 renderAll();
+                notifyParentOfFavoritesChange(); // Initial notification
             }
 
-            function saveApps() {
-                localStorage.setItem('userApps', JSON.stringify(apps));
-            }
-
-            function saveFavorites() {
-                localStorage.setItem('favoriteApps', JSON.stringify(favorites));
-            }
 
             // --- UI RENDERING ---
             const renderAll = (searchTerm = '') => {
                 appGrid.innerHTML = '';
-                favoritesDock.innerHTML = '';
+                // No need to render the dock here anymore
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
                 const filteredApps = apps.filter(app =>
                     app.name && app.name.toLowerCase().includes(lowerCaseSearchTerm)
@@ -677,96 +654,79 @@
                 filteredApps.forEach(app => {
                     appGrid.appendChild(createAppElement(app, favorites.includes(app.id)));
                 });
-                const favoriteApps = apps.filter(app => favorites.includes(app.id));
-                favoriteApps.forEach(app => {
-                    favoritesDock.appendChild(createAppElement(app, true, true));
-                });
             };
 
-            const createAppElement = (app, isFavorited, isDockItem = false) => {
+            const createAppElement = (app, isFavorited) => { // Removed isDockItem parameter
                 const item = document.createElement('a');
                 item.href = app.url;
                 item.target = '_blank';
                 item.className = 'app-item';
                 item.setAttribute('aria-label', app.name);
-
                 const iconWrapper = document.createElement('div');
                 iconWrapper.className = 'app-icon-wrapper';
                 const icon = document.createElement('img');
                 icon.src = app.iconUrl || `https://www.google.com/s2/favicons?domain=${new URL(app.url).hostname}&sz=64`;
                 icon.alt = `${app.name} Icon`;
                 icon.className = 'app-icon';
-                icon.onerror = function () {
-                    this.onerror = null;
-                    this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`;
-                };
+                icon.onerror = function () { this.onerror = null; this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`; };
                 iconWrapper.appendChild(icon);
 
-                if (!isDockItem) {
-                    const star = document.createElement('div');
-                    star.className = 'favorite-star';
-                    if (isFavorited) star.classList.add('favorited');
-                    star.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>`;
-                    star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(app.id); });
-                    iconWrapper.appendChild(star);
-                }
+                // Star is only for the main grid, not the dock
+                const star = document.createElement('div');
+                star.className = 'favorite-star';
+                if (isFavorited) star.classList.add('favorited');
+                star.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>`;
+                star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(app.id); });
+                iconWrapper.appendChild(star);
 
                 item.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    if (isDockItem) openConfirmationModal('removeFavorite', app.id);
-                    else openConfirmationModal('deleteApp', app.id);
+                    openConfirmationModal('deleteApp', app.id);
                 });
                 item.appendChild(iconWrapper);
-
-                if (!isDockItem) {
-                    const label = document.createElement('span');
-                    label.className = 'app-label';
-                    label.textContent = app.name || new URL(app.url).hostname;
-                    item.appendChild(label);
-                }
+                const label = document.createElement('span');
+                label.className = 'app-label';
+                label.textContent = app.name || new URL(app.url).hostname;
+                item.appendChild(label);
                 return item;
             };
 
-            // --- ACTIONS ---
+            // --- ACTIONS (Unchanged, but toggleFavorite now calls saveFavorites which notifies parent) ---
             function toggleFavorite(appId) {
                 const index = favorites.indexOf(appId);
                 if (index > -1) favorites.splice(index, 1);
                 else favorites.push(appId);
-                saveFavorites();
+                saveFavorites(); // This now also notifies the parent
                 renderAll(searchInput.value);
             };
-
             function deleteApp(appId) {
                 apps = apps.filter(app => app.id !== appId);
                 favorites = favorites.filter(favId => favId !== appId);
-                saveApps(); saveFavorites();
+                saveApps(); // This will trigger a favorites update to parent
                 renderAll(searchInput.value);
             }
-
             function deleteAllApps() {
                 apps = [];
                 favorites = [];
                 localStorage.removeItem('userApps');
                 localStorage.removeItem('favoriteApps');
                 renderAll(searchInput.value);
+                notifyParentOfFavoritesChange(); // Notify parent that favorites are gone
                 setTimeout(initializeData, 100);
             }
 
-            // --- NEW MODAL LOGIC ---
+            // --- Modal Logic (Unchanged) ---
             const openModal = (overlay, modal) => {
                 overlay.classList.remove('opacity-0', 'pointer-events-none');
                 modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
             };
-
             const closeModal = (overlay, modal) => {
                 overlay.classList.add('opacity-0', 'pointer-events-none');
                 modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
             };
-
             function openConfirmationModal(type, id) {
                 actionToConfirm = { type, id };
-
-                confirmRemoveBtn.className = 'font-bold py-2 px-4 rounded-lg transition text-white'; // Reset classes
+                confirmRemoveBtn.className = 'font-bold py-2 px-4 rounded-lg transition text-white';
                 if (type === 'deleteAllApps') {
                     modalTitle.textContent = 'Alle Apps löschen?';
                     modalText.textContent = 'Möchtest du wirklich ALLE Apps und Favoriten dauerhaft löschen? Die Standard-Apps werden danach neu geladen.';
@@ -785,34 +745,28 @@
                 }
                 openModal(confirmationOverlay, confirmationModal);
             };
-
             function closeConfirmationModal() {
                 actionToConfirm = null;
                 closeModal(confirmationOverlay, confirmationModal);
             };
-
             function handleConfirm() {
                 if (!actionToConfirm) return;
-                if (actionToConfirm.type === 'removeFavorite') {
-                    toggleFavorite(actionToConfirm.id)
-                }
-                else if (actionToConfirm.type === 'deleteApp') {
+                // Note: 'removeFavorite' case is now obsolete as right-clicking on dock items happens in index.html
+                if (actionToConfirm.type === 'deleteApp') {
                     deleteApp(actionToConfirm.id);
-                }
-                else if (actionToConfirm.type === 'deleteAllApps') {
+                } else if (actionToConfirm.type === 'deleteAllApps') {
                     deleteAllApps();
                 }
                 closeConfirmationModal();
             }
 
-            // --- IMPORT/EXPORT LOGIC ---
+            // --- Import/Export Logic (Unchanged) ---
             function handleExport() {
                 const date = new Date();
                 const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
                 exportFilenameInput.value = `appdrawer-backup-${formattedDate}`;
                 openModal(exportOverlay, exportModal);
             }
-
             function handleImport() {
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -827,7 +781,7 @@
                             if (data && Array.isArray(data.apps) && Array.isArray(data.favorites)) {
                                 localStorage.setItem('userApps', JSON.stringify(data.apps));
                                 localStorage.setItem('favoriteApps', JSON.stringify(data.favorites));
-                                window.location.reload();
+                                window.location.reload(); // Reload triggers re-initialization and notifies parent
                             } else {
                                 alert("Die Datei hat ein ungültiges Format.");
                             }
@@ -841,45 +795,32 @@
                 input.click();
             }
 
-            // --- EVENT LISTENERS ---
+            // --- Event Listeners (Mostly Unchanged) ---
             newAppUrlInput.addEventListener('input', () => {
                 try {
                     let url = newAppUrlInput.value.trim();
-                    if (!url) {
-                        newAppNameInput.value = '';
-                        return;
-                    }
-                    if (!url.match(/^https?:\/\//i)) {
-                        url = 'https://' + url;
-                    }
+                    if (!url) { newAppNameInput.value = ''; return; }
+                    if (!url.match(/^https?:\/\//i)) { url = 'https://' + url; }
                     const hostname = new URL(url).hostname.replace(/^www\./, '');
                     newAppNameInput.value = hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1);
                 } catch (e) {
                     newAppNameInput.value = '';
                 }
             });
-
             addAppForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 let url = newAppUrlInput.value.trim();
                 const name = newAppNameInput.value.trim();
-
                 if (!url || !name) return;
                 if (!url.startsWith('http')) url = 'https://' + url;
-
-                if (apps.some(app => app.url === url)) {
-                    alert("Diese App existiert bereits in deiner Liste."); return;
-                }
-
+                if (apps.some(app => app.url === url)) { alert("Diese App existiert bereits in deiner Liste."); return; }
                 addAppBtn.disabled = true;
                 addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin"></i><span>Hinzufügen</span>';
                 lucide.createIcons();
-
                 const iconUrl = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
                 apps.push({ id: `user-${Date.now()}`, name, url, iconUrl });
-                saveApps();
+                saveApps(); // This will notify the parent
                 renderAll(searchInput.value);
-
                 addAppForm.reset();
                 addAppBtn.disabled = false;
                 addAppBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Hinzufügen</span>';
@@ -889,16 +830,11 @@
             confirmRemoveBtn.addEventListener('click', handleConfirm);
             cancelRemoveBtn.addEventListener('click', closeConfirmationModal);
             confirmationOverlay.addEventListener('click', closeConfirmationModal);
-
             exportBtn.addEventListener('click', handleExport);
             importBtn.addEventListener('click', handleImport);
-            deleteAllBtn.addEventListener('click', () => {
-                openConfirmationModal('deleteAllApps');
-            });
-
+            deleteAllBtn.addEventListener('click', () => { openConfirmationModal('deleteAllApps'); });
             cancelExportBtn.addEventListener('click', () => closeModal(exportOverlay, exportModal));
             exportOverlay.addEventListener('click', () => closeModal(exportOverlay, exportModal));
-
             confirmExportBtn.addEventListener('click', () => {
                 const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
                 const dataStr = JSON.stringify({
@@ -916,8 +852,6 @@
                 URL.revokeObjectURL(url);
                 closeModal(exportOverlay, exportModal);
             });
-
-
             searchInput.addEventListener('input', () => {
                 renderAll(searchInput.value);
                 clearSearchBtn.classList.toggle('hidden', !searchInput.value);
