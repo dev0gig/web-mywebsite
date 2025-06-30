@@ -4,460 +4,302 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Widgets-Iframe Layout</title>
+    <title>Widgets</title>
     <link rel="icon" href="https://img.icons8.com/color/512/color-widgets.png" />
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        /* CSS-Variablen für Theme-Farben */
         :root {
-            --header-text-color: #111827;
-            /* Dunkler Text für Light Mode Überschriften */
-            --text-color: #6b7280;
-            /* Mittlerer Text für Light Mode */
             --bg-color: #f9fafb;
-            /* Angepasst an --bg-color aus readlater.html */
-            --sidebar-bg-color: #ffffff;
-            /* Hintergrundfarbe der Sidebar im Light Mode */
-            --sidebar-text-color: #111827;
-            --scrollbar-thumb-color-light: #cbd5e1;
-            /* Helles Grau für Scrollbalken im Light Mode */
-            --scrollbar-track-color-light: #f1f5f9;
-            /* Noch helleres Grau für Scrollbalken-Hintergrund */
-            --accent-color: #8B5CF6;
-            /* Haupt-Akzentfarbe: Violett */
-            --accent-color-hover: #7C3AED;
-            /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --header-text-color: #111827;
+            --sidebar-bg: #ffffff;
+            --sidebar-border: #e5e7eb;
+            --widget-bg: #ffffff;
+            --widget-border: #e5e7eb;
+            --accent-color: #7c3aed;
+            /* violet-600 - Unified Accent Color */
+            --accent-color-hover: #6d28d9;
+            /* violet-700 */
+            --link-active-bg: #ede9fe;
+            /* violet-100 */
+            --link-active-text: #5b21b6;
+            /* violet-700 */
         }
 
         html[data-theme='dark'] {
-            --header-text-color: #fafafa;
-            /* Heller Text für Dark Mode Überschriften */
-            --text-color: #a3a3a3;
-            /* Mittlerer Text für Dark Mode */
             --bg-color: #171717;
-            /* Angepasst an --bg-color aus readlater.html */
-            --sidebar-bg-color: #262626;
-            /* Hintergrundfarbe der Sidebar im Dark Mode */
-            --sidebar-text-color: #fafafa;
-            --scrollbar-thumb-color-dark: #475569;
-            /* Dunkles Grau für Scrollbalken im Dark Mode */
-            --scrollbar-track-color-dark: #1f2937;
-            /* Noch dunkleres Grau für Scrollbalken-Hintergrund */
-            --accent-color: #8B5CF6;
-            /* Haupt-Akzentfarbe: Violett */
-            --accent-color-hover: #7C3AED;
-            /* Akzentfarbe für Hover-Effekt: Dunkleres Violett */
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --header-text-color: #fafafa;
+            --sidebar-bg: #262626;
+            --sidebar-border: #404040;
+            --widget-bg: #262626;
+            --widget-border: #404040;
+            --link-active-bg: #4c1d95;
+            /* violet-900 */
+            --link-active-text: #ddd6fe;
+            /* violet-200 */
         }
 
-        /* Custom font for a better look */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: transparent;
-            /* Hintergrund transparent gemacht */
-            /* Benutzerdefinierte Scrollbar-Styles */
-            scrollbar-width: thin;
-            /* Für Firefox */
-            scrollbar-color: var(--scrollbar-thumb-color-light) var(--scrollbar-track-color-light);
-            /* Für Firefox */
-            padding-right: 0;
-            /* Standardmäßig kein Padding auf dem Body */
-        }
-
-        /* Webkit (Chrome, Safari, Edge) Scrollbar-Styles */
-        body::-webkit-scrollbar {
-            width: 8px;
-            /* Breite des vertikalen Scrollbalkens */
-            height: 8px;
-            /* Höhe des horizontalen Scrollbalkens */
-        }
-
-        body::-webkit-scrollbar-track {
-            background: var(--scrollbar-track-color-light);
-            /* Farbe des Scrollbalken-Hintergrunds */
-            border-radius: 10px;
-        }
-
-        body::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb-color-light);
-            /* Farbe des Scrollbalken-Griffs */
-            border-radius: 10px;
-            border: 2px solid var(--scrollbar-track-color-light);
-            /* Rand um den Griff */
-        }
-
-        /* Dark Mode Scrollbar-Styles */
-        html[data-theme='dark'] body {
-            scrollbar-color: var(--scrollbar-thumb-color-dark) var(--scrollbar-track-color-dark);
-            /* Für Firefox */
-        }
-
-        html[data-theme='dark'] body::-webkit-scrollbar-track {
-            background: var(--scrollbar-track-color-dark);
-        }
-
-        html[data-theme='dark'] body::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb-color-dark);
-            border: 2px solid var(--scrollbar-track-color-dark);
-        }
-
-        /* Specific iframe styling for border, matching original dashed style */
-        .iframe-container {
-            /* Rahmen entfernt */
-            background-color: transparent;
-            /* Hintergrund des Containers transparent gemacht */
-        }
-
-        /* Stile für Überschrift und Text, die die CSS-Variablen verwenden */
-        .main-header {
-            color: var(--header-text-color);
-        }
-
-        .main-text {
+            background-color: var(--bg-color);
             color: var(--text-color);
+            overflow-x: hidden;
         }
 
-        /* Stellt sicher, dass der Iframe selbst die volle Breite und feste Höhe einnimmt */
-        iframe {
-            width: 100%;
-            height: 700px;
-            /* Feste Höhe, wie zuvor besprochen */
-            border: none;
-            /* Keine zusätzlichen Rahmen für den Iframe selbst */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        /* Styles for the widget navigation buttons */
-        .widget-nav-button {
-            background-color: #e5e7eb;
-            /* Light gray */
-            color: #374151;
-            /* Darker text */
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap;
-            /* Prevent wrapping */
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        .widget-nav-button:hover {
-            background-color: #d1d5db;
-            /* Slightly darker gray on hover */
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--text-color-light);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
         }
 
-        html[data-theme='dark'] .widget-nav-button {
-            background-color: #4b5563;
-            /* Darker gray for dark mode */
-            color: #f9fafb;
-            /* Lighter text for dark mode */
-        }
-
-        html[data-theme='dark'] .widget-nav-button:hover {
-            background-color: #6b7280;
-            /* Even darker gray on hover in dark mode */
-        }
-
-        /* Fixed header ist jetzt vollständig ausgeblendet, da die Sidebar für alle Ansichten verwendet wird */
-        .fixed-header {
-            display: none;
-        }
-
-        /* Sidebar-Styles */
         .sidebar {
-            position: fixed;
-            top: 0;
-            width: 300px;
-            height: 100%;
-            background-color: var(--sidebar-bg-color);
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            transition: right 0.3s ease-in-out;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            color: var(--sidebar-text-color);
-            right: 0;
-            /* Desktop: Sidebar immer sichtbar */
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
         }
 
-        /* Auf Mobilgeräten (kleiner als 1024px) */
-        @media (max-width: 1023px) {
-            .sidebar {
-                right: -300px;
-                /* Mobile: Sidebar standardmäßig ausgeblendet */
-            }
-
-            .sidebar.open {
-                right: 0;
-                /* Mobile: Sidebar wird bei 'open' sichtbar */
-            }
+        .sidebar-link {
+            color: var(--text-color-light);
+            transition: background-color 0.2s, color 0.2s;
         }
 
-
-        /* Sidebar-Toggle-Button */
-        .sidebar-toggle-button {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background-color: var(--accent-color);
-            /* Akzentfarbe für den Button */
-            color: white;
-            border-radius: 9999px;
-            /* Macht den Button rund */
-            width: 3.5rem;
-            height: 3.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 110;
-            transition: background-color 0.2s;
+        .sidebar-link:hover {
+            background-color: var(--link-active-bg);
+            color: var(--link-active-text);
         }
 
-        /* Button nur auf Mobilgeräten anzeigen */
-        @media (min-width: 1024px) {
-            .sidebar-toggle-button {
-                display: none;
-                /* Im Desktop-Modus ausblenden */
-            }
+        .sidebar-link.active {
+            background-color: var(--link-active-bg);
+            color: var(--link-active-text);
+            font-weight: 600;
         }
 
-        .sidebar-close-button {
-            background: none;
-            border: none;
-            color: var(--sidebar-text-color);
-            font-size: 1.5rem;
-            align-self: flex-end;
-            cursor: pointer;
+        .sidebar-link.active i {
+            color: var(--link-active-text);
         }
 
-        /* "X"-Button nur auf Mobilgeräten anzeigen */
-        @media (min-width: 1024px) {
-            .sidebar-close-button {
-                display: none;
-                /* Im Desktop-Modus ausblenden */
-            }
+        #widget-container {
+            background-color: var(--widget-bg);
+            border: 1px solid var(--widget-border);
         }
 
-
-        .sidebar-nav-list .widget-nav-button {
-            width: 100%;
-            text-align: left;
-            margin-bottom: 0.5rem;
+        #widget-iframe {
+            transition: opacity 0.3s ease-in-out;
         }
 
-        /* Hauptinhaltsbereich anpassen: Body-Padding für Sidebar-Platz auf Desktop */
-        @media (min-width: 1024px) {
-            body {
-                padding-right: 300px;
-                /* Schafft Platz für die feste Sidebar auf dem Desktop */
-            }
-
-            .main-content-area {
-                margin-right: 0;
-                /* Entfernt den vorherigen margin-right, da das Body-Padding den Platz regelt */
-            }
+        #mobile-sidebar {
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
 
 <body class="min-h-screen">
-    <!-- Sidebar für alle Bildschirmgrößen -->
-    <div id="sidebar" class="sidebar">
-        <button class="sidebar-close-button" id="sidebar-close-button">&times;</button>
-        <h2 class="text-2xl font-bold mb-4 text-center main-header">Widgets</h2>
-        <div id="widget-nav-list-sidebar" class="flex flex-col gap-2 overflow-y-auto">
-            <!-- Links werden per JavaScript eingefügt -->
-        </div>
-    </div>
+    <div class="flex h-screen">
+        <!-- Sidebar (Desktop) -->
+        <aside id="desktop-sidebar" class="hidden lg:flex flex-col w-64 sidebar flex-shrink-0">
+            <div class="px-6 py-4">
+                <h2 class="text-2xl font-bold" style="color: var(--header-text-color);">Widgets</h2>
+            </div>
+            <nav id="widget-nav-desktop" class="flex-1 px-4 space-y-2"></nav>
+        </aside>
 
-    <!-- Button zum Öffnen der Sidebar (wird im Desktop-Modus ausgeblendet) -->
-    <button class="sidebar-toggle-button" id="sidebar-toggle-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-menu">
-            <line x1="4" x2="20" y1="12" y2="12"></line>
-            <line x1="4" x2="20" y1="6" y2="6"></line>
-            <line x1="4" x2="20" y1="18" y2="18"></line>
-        </svg>
-    </button>
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Mobile Header -->
+            <header class="lg:hidden flex justify-between items-center p-4 border-b"
+                style="border-color: var(--sidebar-border); background-color: var(--sidebar-bg);">
+                <h2 id="mobile-widget-title" class="text-xl font-bold" style="color: var(--header-text-color);">Wähle
+                    ein Widget</h2>
+                <!-- Hamburger button removed from header -->
+            </header>
 
-
-    <!-- Hauptinhaltsbereich -->
-    <div class="container mx-auto p-4 flex flex-col lg:flex-row lg:gap-8 lg:items-start main-content-area">
-        <!-- Widget-Gitter -->
-        <div class="flex-grow">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-jap-kana" src="widgets/jap-kana.html" title="Japanisch Kana"
-                        class="w-full h-[700px]" frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-calculator" src="widgets/calculator.html" title="Taschenrechner"
-                        class="w-full h-[700px]" frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-clock" src="widgets/clock.html" title="Uhr Widget" class="w-full h-[700px]"
-                        frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-easy-math" src="widgets/easy-math.html" title="Einfache Mathematik"
-                        class="w-full h-[700px]" frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-tariff" src="widgets/tariff.html" title="Tarifrechner" class="w-full h-[700px]"
-                        frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-capital-city-eu" src="widgets/capital-city-EU.html"
-                        title="Europäische Hauptstädte Quiz" frameborder="0"></iframe>
-                </div>
-                <div class="iframe-container p-2 rounded-[50px] overflow-hidden">
-                    <iframe id="widget-weather" src="widgets/weather.html" title="Wetter Widget"
-                        class="w-full h-[700px]" frameborder="0"></iframe>
+            <!-- Content Area -->
+            <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8">
+                <div id="widget-container"
+                    class="w-full h-[85vh] rounded-2xl shadow-lg flex items-center justify-center p-1">
+                    <iframe id="widget-iframe" class="w-full h-full rounded-xl opacity-0"
+                        title="Widget-Anzeige"></iframe>
+                    <div id="placeholder-text" class="text-center">
+                        <i data-lucide="layout-dashboard" class="w-16 h-16 mx-auto mb-4"
+                            style="color: var(--text-color-light);"></i>
+                        <h3 class="text-xl font-semibold">Willkommen bei den Widgets!</h3>
+                        <p class="mt-2" style="color: var(--text-color-light);">Wähle ein Widget aus der Seitenleiste,
+                            um es hier anzuzeigen.</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"></div>
+    <aside id="mobile-sidebar" class="fixed top-0 left-0 h-full w-72 sidebar transform -translate-x-full z-40">
+        <div class="flex justify-between items-center p-4 border-b" style="border-color: var(--sidebar-border);">
+            <h2 class="text-2xl font-bold" style="color: var(--header-text-color);">Widgets</h2>
+            <button id="close-mobile-menu-btn" class="p-2">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <nav id="widget-nav-mobile" class="flex-1 p-4 space-y-2"></nav>
+    </aside>
+
+    <!-- Floating Action Button (FAB) for Mobile -->
+    <button id="fab-open-sidebar"
+        class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20 transition-transform transform hover:scale-110 active:scale-100"
+        style="background-color: var(--accent-color);">
+        <i data-lucide="menu" class="h-7 w-7"></i>
+    </button>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Event-Listener für Nachrichten vom übergeordneten Fenster, um das Theme zu ändern
+            const widgets = [
+                { id: 'widget-jap-kana', title: 'Japanisch Kana', src: 'widgets/jap-kana.html', icon: 'languages' },
+                { id: 'widget-calculator', title: 'Taschenrechner', src: 'widgets/calculator.html', icon: 'calculator' },
+                { id: 'widget-clock', title: 'Uhr', src: 'widgets/clock.html', icon: 'clock' },
+                { id: 'widget-easy-math', title: 'Einfache Mathematik', src: 'widgets/easy-math.html', icon: 'superscript' },
+                { id: 'widget-tariff', title: 'Tarifrechner', src: 'widgets/tariff.html', icon: 'receipt' },
+                { id: 'widget-capital-city-eu', title: 'EU-Hauptstädte Quiz', src: 'widgets/capital-city-EU.html', icon: 'map' },
+                { id: 'widget-weather', title: 'Wetter', src: 'widgets/weather.html', icon: 'cloud-sun' }
+            ];
+
+            const desktopNav = document.getElementById('widget-nav-desktop');
+            const mobileNav = document.getElementById('widget-nav-mobile');
+            const widgetIframe = document.getElementById('widget-iframe');
+            const placeholder = document.getElementById('placeholder-text');
+            const mobileWidgetTitle = document.getElementById('mobile-widget-title');
+
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
+            const fabOpenSidebar = document.getElementById('fab-open-sidebar');
+            const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
+
+            let currentTheme = 'light';
+            let activeWidgetId = null;
+
+            // --- Theme Handling ---
             window.addEventListener('message', (event) => {
                 if (event.data === 'set-theme-dark') {
                     document.documentElement.dataset.theme = 'dark';
+                    currentTheme = 'dark';
+                    updateActiveWidgetTheme();
                 } else if (event.data === 'set-theme-light') {
                     document.documentElement.dataset.theme = 'light';
+                    currentTheme = 'light';
+                    updateActiveWidgetTheme();
                 }
             });
 
-            const iframes = document.querySelectorAll('.grid iframe');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggleButton = document.getElementById('sidebar-toggle-button');
-            const sidebarCloseButton = document.getElementById('sidebar-close-button');
-            const widgetNavListSidebar = document.getElementById('widget-nav-list-sidebar');
-            const mainContentArea = document.querySelector('.main-content-area'); // Hauptinhaltsbereich
-
-            let touchStartX = 0;
-            let touchEndX = 0;
-            const minSwipeDistance = 50; // Mindestentfernung für eine Wischgeste
-
-            // Funktion zum Überprüfen, ob es sich um ein mobiles Gerät handelt
-            const isMobile = () => window.innerWidth < 1024;
-
-            // Funktion zum Aktualisieren des Sidebar-Zustands basierend auf der Bildschirmbreite
-            const updateSidebarState = () => {
-                if (!isMobile()) {
-                    sidebar.classList.add('open'); // Desktop: Sidebar immer offen
-                    document.body.style.overflow = ''; // Scrollen des Bodys erlauben
-                } else {
-                    sidebar.classList.remove('open'); // Mobile: Sidebar standardmäßig geschlossen
-                    document.body.style.overflow = ''; // Scrollen des Bodys erlauben
-                }
-            };
-
-            // Initialer Aufruf beim Laden der Seite
-            updateSidebarState();
-
-            // Event-Listener für Größenänderungen des Fensters
-            window.addEventListener('resize', updateSidebarState);
-
-
-            // Funktion zum Erstellen der Navigationsbuttons
-            function createNavButton(iframe, targetList) {
-                const title = iframe.title;
-                const id = iframe.id;
-
-                if (title && id) {
-                    const button = document.createElement('button');
-                    button.className = 'widget-nav-button flex items-center justify-center';
-                    button.dataset.targetId = id;
-                    button.textContent = title;
-
-                    button.addEventListener('click', () => {
-                        const targetIframe = document.getElementById(button.dataset.targetId);
-                        if (targetIframe) {
-                            // Scrollt manuell zur Position des Iframes
-                            window.scrollTo({
-                                top: targetIframe.offsetTop,
-                                behavior: 'smooth'
-                            });
-                            // Sidebar nur auf Mobilgeräten schließen, nachdem ein Button in der Sidebar geklickt wurde
-                            if (isMobile() && sidebar.classList.contains('open')) {
-                                sidebar.classList.remove('open');
-                                // Scrollen des Bodys wieder erlauben, wenn Sidebar geschlossen wird
-                                document.body.style.overflow = '';
-                            }
-                        }
-                    });
-                    targetList.appendChild(button);
+            function updateActiveWidgetTheme() {
+                if (widgetIframe.contentWindow) {
+                    widgetIframe.contentWindow.postMessage(`set-theme-${currentTheme}`, '*');
                 }
             }
 
-            // Buttons für die Sidebar-Navigation generieren
-            iframes.forEach(iframe => {
-                createNavButton(iframe, widgetNavListSidebar);
-            });
+            // --- Widget Navigation ---
+            function createNavButton(widget) {
+                const button = document.createElement('button');
+                button.className = 'sidebar-link w-full flex items-center p-3 rounded-lg text-left';
+                button.dataset.widgetId = widget.id;
+                button.innerHTML = `
+                    <i data-lucide="${widget.icon}" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                    <span>${widget.title}</span>
+                `;
+                button.addEventListener('click', () => loadWidget(widget.id));
+                return button;
+            }
 
-            // Sidebar-Funktionalität: Öffnen/Schließen durch Klicken auf den runden Button (nur auf Mobilgeräten aktiv)
-            sidebarToggleButton.addEventListener('click', () => {
-                if (isMobile()) { // Nur auf Mobilgeräten reagieren
-                    if (sidebar.classList.contains('open')) {
-                        sidebar.classList.remove('open');
-                        document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
-                    } else {
-                        sidebar.classList.add('open');
-                        document.body.style.overflow = 'hidden'; // Scrollen des Bodys verhindern
-                    }
+            function renderNav() {
+                desktopNav.innerHTML = '';
+                mobileNav.innerHTML = '';
+                widgets.forEach(widget => {
+                    desktopNav.appendChild(createNavButton(widget));
+                    mobileNav.appendChild(createNavButton(widget));
+                });
+                lucide.createIcons();
+            }
+
+            function loadWidget(widgetId) {
+                const widget = widgets.find(w => w.id === widgetId);
+                if (!widget) return;
+
+                placeholder.classList.add('hidden');
+                widgetIframe.classList.add('opacity-0'); // Hide while loading
+
+                widgetIframe.src = widget.src;
+
+                widgetIframe.onload = () => {
+                    updateActiveWidgetTheme(); // Send theme message after load
+                    widgetIframe.classList.remove('opacity-0'); // Show when loaded
+                };
+
+                widgetIframe.onerror = () => {
+                    widgetIframe.classList.add('opacity-0');
+                    placeholder.classList.remove('hidden');
+                    placeholder.innerHTML = `
+                        <div class="text-center p-4">
+                            <i data-lucide="alert-triangle" class="w-16 h-16 mx-auto mb-4 text-red-500"></i>
+                            <h3 class="text-xl font-semibold">Fehler beim Laden</h3>
+                            <p class="mt-2" style="color: var(--text-color-light);">Das Widget unter <code>${widget.src}</code> konnte nicht gefunden werden. Bitte überprüfe den Dateipfad.</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                };
+
+                mobileWidgetTitle.textContent = widget.title;
+                setActiveLink(widget.id);
+                localStorage.setItem('lastActiveWidget', widget.id);
+                activeWidgetId = widget.id;
+
+                if (window.innerWidth < 1024) {
+                    closeMobileMenu();
                 }
-            });
+            }
 
-            // Sidebar schließen durch Klicken auf den "X"-Button (nur auf Mobilgeräten aktiv)
-            sidebarCloseButton.addEventListener('click', () => {
-                if (isMobile()) { // Nur auf Mobilgeräten reagieren
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
+            function setActiveLink(widgetId) {
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.classList.toggle('active', link.dataset.widgetId === widgetId);
+                });
+            }
+
+            // --- Mobile Menu ---
+            function openMobileMenu() {
+                mobileSidebarOverlay.classList.remove('hidden');
+                mobileSidebar.classList.remove('-translate-x-full');
+            }
+            function closeMobileMenu() {
+                mobileSidebarOverlay.classList.add('hidden');
+                mobileSidebar.classList.add('-translate-x-full');
+            }
+            fabOpenSidebar.addEventListener('click', openMobileMenu);
+            closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+            mobileSidebarOverlay.addEventListener('click', closeMobileMenu);
+
+            // --- Initialization ---
+            function initialize() {
+                renderNav();
+                const lastWidget = localStorage.getItem('lastActiveWidget');
+                if (lastWidget) {
+                    loadWidget(lastWidget);
                 }
-            });
+                lucide.createIcons();
+            }
 
-            // Schließen der Sidebar, wenn außerhalb geklickt wird (nur auf Mobilgeräten aktiv)
-            document.addEventListener('click', (event) => {
-                if (isMobile() && sidebar.classList.contains('open') &&
-                    !sidebar.contains(event.target) &&
-                    !sidebarToggleButton.contains(event.target)) {
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = ''; // Scrollen des Bodys wieder erlauben
-                }
-            });
-
-            // Touch-Gesten für die Sidebar (nur auf Mobilgeräten aktiv)
-            document.addEventListener('touchstart', (event) => {
-                if (isMobile()) { // Nur auf Mobilgeräten reagieren
-                    touchStartX = event.touches[0].clientX;
-                }
-            });
-
-            document.addEventListener('touchend', (event) => {
-                if (isMobile()) { // Nur auf Mobilgeräten reagieren
-                    touchEndX = event.changedTouches[0].clientX;
-                    const swipeDistance = touchEndX - touchStartX;
-
-                    // Sidebar öffnen mit Wischgeste von rechts nach links (vom Bildschirmrand kommend)
-                    if (touchStartX > window.innerWidth - 50 && swipeDistance < -minSwipeDistance && !sidebar.classList.contains('open')) {
-                        sidebar.classList.add('open');
-                        document.body.style.overflow = 'hidden';
-                    }
-                    // Sidebar schließen mit Wischgeste von links nach rechts (innerhalb der Sidebar)
-                    else if (sidebar.classList.contains('open') && swipeDistance > minSwipeDistance && touchStartX < (window.innerWidth - sidebar.offsetWidth + 50)) {
-                        sidebar.classList.remove('open');
-                        document.body.style.overflow = '';
-                    }
-                }
-            });
+            initialize();
         });
     </script>
 </body>
