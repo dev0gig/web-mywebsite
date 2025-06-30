@@ -392,6 +392,21 @@
         </div>
     </div>
 
+    <!-- Modal for renaming export file -->
+    <div id="rename-export-modal-overlay" class="modal-overlay hidden"></div>
+    <div id="rename-export-modal" class="modal-content hidden w-11/12 max-w-md rounded-lg shadow-lg p-6">
+        <h3 class="text-xl font-bold mb-4">Exportdatei umbenennen</h3>
+        <input type="text" id="export-filename-input" placeholder="Dateiname (z.B. meine_links.json)"
+            class="w-full rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 transition"
+            style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); --tw-ring-color: var(--accent-color);">
+        <div class="flex justify-end gap-4">
+            <button id="rename-export-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                style="background-color: var(--border-color); color: var(--text-color);">Abbrechen</button>
+            <button id="rename-export-confirm-btn"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">Exportieren</button>
+        </div>
+    </div>
+
     <div id="toast"></div>
 
     <script>
@@ -461,6 +476,13 @@
             const addTagsSaveBtn = document.getElementById('add-tags-save-btn');
             const addTagsCancelBtn = document.getElementById('add-tags-cancel-btn');
 
+            // New elements for rename functionality
+            const renameExportModalOverlay = document.getElementById('rename-export-modal-overlay');
+            const renameExportModal = document.getElementById('rename-export-modal');
+            const exportFilenameInput = document.getElementById('export-filename-input');
+            const renameExportCancelBtn = document.getElementById('rename-export-cancel-btn');
+            const renameExportConfirmBtn = document.getElementById('rename-export-confirm-btn');
+
             // --- State ---
             let links = [];
             window.viewState = { showArchived: false, searchTerm: '', filterTag: null };
@@ -468,6 +490,7 @@
             let confirmCallback = null;
             let previewData = null;
             let currentEditLinkId = null;
+            let exportFilename = `readlater_backup_${new Date().toISOString().slice(0, 10)}.json`; // Default filename
 
             // --- Utils ---
             const showToast = (message, type = 'success', duration = 3000) => {
@@ -865,14 +888,49 @@
 
             searchInput.addEventListener('input', (e) => { window.viewState.searchTerm = e.target.value.toLowerCase(); window.renderApp(); });
 
+            // Export button click handler (opens rename modal)
             exportBtn.addEventListener('click', () => {
-                if (links.length === 0) return showToast('Keine Links zum Exportieren vorhanden.', 'error');
+                if (links.length === 0) {
+                    showToast('Keine Links zum Exportieren vorhanden.', 'error');
+                    return;
+                }
+                exportFilenameInput.value = exportFilename; // Set default filename in input
+                openModal(renameExportModalOverlay, renameExportModal);
+                exportFilenameInput.focus();
+            });
+
+            // Handle rename export modal cancel
+            [renameExportCancelBtn, renameExportModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(renameExportModalOverlay, renameExportModal)));
+
+            // Handle rename export modal confirm
+            renameExportConfirmBtn.addEventListener('click', () => {
+                let filename = exportFilenameInput.value.trim();
+                if (!filename) {
+                    showToast('Dateiname darf nicht leer sein.', 'error');
+                    return;
+                }
+                if (!filename.endsWith('.json')) {
+                    filename += '.json';
+                }
+                exportFilename = filename; // Update the export filename
+                closeModal(renameExportModalOverlay, renameExportModal);
+
+                // Perform the actual export
                 const dataStr = JSON.stringify(links, null, 2);
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
-                a.download = `readlater_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = exportFilename;
                 a.click();
                 URL.revokeObjectURL(a.href);
+                showToast('Links exportiert.', 'success');
+            });
+
+            // Allow pressing Enter in filename input to confirm
+            exportFilenameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    renameExportConfirmBtn.click();
+                }
             });
 
             importFileInput.addEventListener('change', (event) => {

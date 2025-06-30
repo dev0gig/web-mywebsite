@@ -403,8 +403,8 @@
                 <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren
                 </h3>
                 <div class="mt-2 px-7 py-3">
-                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den
-                        Export.</p>
+                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich und den
+                        Dateinamen für den Export.</p>
                     <div class="space-y-4 mt-4">
                         <div>
                             <label for="start-date" class="text-left block text-sm font-medium"
@@ -417,6 +417,14 @@
                             <label for="end-date" class="text-left block text-sm font-medium"
                                 style="color: var(--text-color-heading);">Enddatum</label>
                             <input type="date" id="end-date"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                        </div>
+                        <!-- NEU: Eingabefeld für Dateinamen -->
+                        <div>
+                            <label for="export-filename" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Dateiname (ohne .zip)</label>
+                            <input type="text" id="export-filename" value="Journal-Export"
                                 class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
@@ -487,8 +495,9 @@
             const confirmExportButton = document.getElementById('confirm-export-button');
             const cancelExportButton = document.getElementById('cancel-export-button');
             const startDateInput = document.getElementById('start-date');
-            const deleteAllButton = document.getElementById('delete-all-button');
             const endDateInput = document.getElementById('end-date');
+            const exportFilenameInput = document.getElementById('export-filename'); // NEU: Dateiname Input
+            const deleteAllButton = document.getElementById('delete-all-button');
 
             const calendarSidebar = document.getElementById('calendar-sidebar');
             const calendarSidebarOverlay = document.getElementById('calendar-sidebar-overlay');
@@ -564,9 +573,9 @@
                 const index = activeTagFilters.indexOf(normalizedTag);
 
                 if (index > -1) {
-                    activeTagFilters.splice(index, 1); // Tag entfernen
+                    activeTagFilters.splice(index, 1); // Remove tag
                 } else {
-                    activeTagFilters.push(normalizedTag); // Tag hinzufügen
+                    activeTagFilters.push(normalizedTag); // Add tag
                 }
 
                 activeSearchTerm = '';
@@ -705,13 +714,13 @@
 
                     const firstDayOfMonth = new Date(year, month, 1).getDay();
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Montags ist 1, Sonntags ist 0
+                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Monday is 1, Sunday is 0
                     for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
 
                     const todayString = formatDate(new Date());
 
                     for (let day = 1; day <= daysInMonth; day++) {
-                        const currentDate = new Date(Date.UTC(year, month, day)); // UTC verwenden, um Zeitzonenprobleme zu vermeiden
+                        const currentDate = new Date(Date.UTC(year, month, day)); // Use UTC to avoid timezone issues
                         const dateString = formatDate(currentDate);
                         const dayButton = document.createElement('button');
                         dayButton.textContent = day;
@@ -730,50 +739,49 @@
                 lucide.createIcons();
             };
 
-            // === KORRIGIERTE FUNKTION ===
+            // === CORRECTED FUNCTION ===
             function handleDateClick(e) {
                 const dateString = e.currentTarget.dataset.date;
                 const wasJustCreated = journalEntries[dateString] === undefined;
 
-                // Neuen Eintrag erstellen, falls er nicht existiert
+                // Create new entry if it doesn't exist
                 if (wasJustCreated) {
                     journalEntries[dateString] = '';
                     saveEntries(journalEntries);
                 }
 
-                // Filter und Suche zurücksetzen
+                // Reset filter and search
                 activeTagFilters = [];
                 activeSearchTerm = '';
                 searchInput.value = '';
 
-                // Die korrekte Seite für das geklickte Datum finden
+                // Find the correct page for the clicked date
                 const sortedDates = Object.keys(journalEntries).sort().reverse();
                 const entryIndex = sortedDates.indexOf(dateString);
 
                 if (entryIndex !== -1) {
                     currentPage = Math.floor(entryIndex / ENTRIES_PER_PAGE) + 1;
                 } else {
-                    // Fallback, falls das Datum nicht gefunden wird (sollte nicht passieren)
+                    // Fallback if date not found (shouldn't happen)
                     currentPage = 1;
                 }
 
-                // Journal mit der korrekten Seite neu rendern
+                // Re-render journal with the correct page
                 updateAll();
 
-                // Mobile Kalender-Ansicht schließen
+                // Close mobile calendar view
                 closeCalendarSidebar();
 
-                // Kurze Verzögerung, um sicherzustellen, dass die Seite gerendert wurde,
-                // bevor wir zum Element scrollen.
+                // Small delay to ensure page is rendered before scrolling
                 setTimeout(() => {
                     const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         if (wasJustCreated) {
-                            // Editor für den neuen Eintrag öffnen
+                            // Open editor for the new entry
                             element.click();
                         } else {
-                            // Bestehenden Eintrag hervorheben
+                            // Highlight existing entry
                             element.classList.add('ring-2', 'ring-blue-400');
                             setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
                         }
@@ -960,12 +968,12 @@
                 renderTagCloud();
             };
 
-            // --- EVENT LISTENER FÜR DIE SUCHE ---
+            // --- EVENT LISTENER FOR SEARCH ---
             searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value;
                 clearSearchBtn.classList.toggle('hidden', !searchTerm);
                 activeSearchTerm = searchTerm;
-                activeTagFilters = []; // Suche überschreibt Tag-Filter
+                activeTagFilters = []; // Search overrides tag filters
                 currentPage = 1;
                 updateAll();
             });
@@ -986,7 +994,7 @@
                 let importedCount = 0;
                 const importedDates = [];
 
-                // Funktion zum Verarbeiten einer einzelnen Textdatei (.md oder .txt)
+                // Function to process a single text file (.md or .txt)
                 const processTextFile = (file) => {
                     return new Promise((resolve, reject) => {
                         const reader = new FileReader();
@@ -995,32 +1003,32 @@
                             if (dateMatch) {
                                 resolve({ date: dateMatch[1], content: e.target.result });
                             } else {
-                                console.warn(`Konnte kein Datum aus dem Dateinamen extrahieren: ${file.name}`);
-                                resolve(null); // Ignoriere Dateien ohne Datum im Namen
+                                console.warn(`Could not extract date from filename: ${file.name}`);
+                                resolve(null); // Ignore files without date in name
                             }
                         };
                         reader.onerror = (e) => {
-                            console.error("Fehler beim Lesen der Datei:", file.name, e);
+                            console.error("Error reading file:", file.name, e);
                             reject(e);
                         };
                         reader.readAsText(file);
                     });
                 };
 
-                // Funktion zum Verarbeiten einer ZIP-Datei
+                // Function to process a ZIP file
                 const processZipFile = async (zipFile) => {
                     let zipPromises = [];
                     try {
                         const zip = await JSZip.loadAsync(zipFile);
                         zip.forEach((relativePath, zipEntry) => {
-                            // Nur Markdown-Dateien verarbeiten, die keine Verzeichnisse sind
+                            // Process only Markdown files that are not directories
                             if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.md')) {
                                 zipPromises.push(zipEntry.async('string').then(content => {
                                     const dateMatch = relativePath.match(/^(\d{4}-\d{2}-\d{2})/);
                                     if (dateMatch) {
                                         return { date: dateMatch[1], content: content };
                                     } else {
-                                        console.warn(`Konnte kein Datum aus dem Dateinamen in ZIP extrahieren: ${relativePath}`);
+                                        console.warn(`Could not extract date from filename in ZIP: ${relativePath}`);
                                         return null;
                                     }
                                 }));
@@ -1028,9 +1036,9 @@
                         });
                         return Promise.all(zipPromises);
                     } catch (error) {
-                        console.error("Fehler beim Laden oder Verarbeiten der ZIP-Datei:", zipFile.name, error);
-                        showNotification(`Fehler beim Importieren der ZIP-Datei "${zipFile.name}".`, 'error');
-                        return []; // Leeres Array zurückgeben, um den Import fortzusetzen
+                        console.error("Error loading or processing ZIP file:", zipFile.name, error);
+                        showNotification(`Error importing ZIP file "${zipFile.name}".`, 'error');
+                        return []; // Return empty array to continue import
                     }
                 };
 
@@ -1052,7 +1060,7 @@
                             importedCount++;
                         }
                     } else {
-                        console.warn(`Dateityp nicht unterstützt oder Dateiname ungültig: ${file.name}`);
+                        console.warn(`File type not supported or invalid filename: ${file.name}`);
                     }
                 }
 
@@ -1062,11 +1070,11 @@
                     let newestImportedDate = '';
                     if (importedDates.length > 0) {
                         newestImportedDate = importedDates.sort().reverse()[0];
-                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z'); // UTC verwenden
+                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z'); // Use UTC
                     }
                     currentPage = 1;
                     updateAll();
-                    showNotification(`${importedCount} Eintrag/Einträge erfolgreich importiert.`, 'success');
+                    showNotification(`${importedCount} entry/entries successfully imported.`, 'success');
                     if (newestImportedDate) {
                         setTimeout(() => {
                             const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
@@ -1078,9 +1086,9 @@
                         }, 100);
                     }
                 } else {
-                    showNotification('Keine gültigen Einträge zum Importieren gefunden.', 'warning');
+                    showNotification('No valid entries found to import.', 'warning');
                 }
-                importInput.value = ''; // Eingabefeld zurücksetzen
+                importInput.value = ''; // Reset input field
             });
 
 
@@ -1094,6 +1102,8 @@
                     startDateInput.value = today;
                     endDateInput.value = today;
                 }
+                // Set default filename based on current date
+                exportFilenameInput.value = `Journal-Export_${formatDate(new Date())}`;
                 exportModal.classList.remove('hidden');
             });
 
@@ -1103,14 +1113,18 @@
             confirmExportButton.addEventListener('click', () => {
                 const startDate = startDateInput.value;
                 const endDate = endDateInput.value;
+                const filename = exportFilenameInput.value.trim(); // Get filename from input
+
                 if (!startDate || !endDate || startDate > endDate) return showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
+                if (!filename) return showNotification('Bitte geben Sie einen Dateinamen ein.', 'warning');
+
 
                 const zip = new JSZip();
                 let filesAdded = 0;
                 Object.keys(journalEntries).forEach(dateString => {
                     if (dateString >= startDate && dateString <= endDate) {
                         const content = journalEntries[dateString];
-                        if (content?.trim()) { // Nur Einträge mit Inhalt exportieren
+                        if (content?.trim()) { // Only export entries with content
                             zip.file(`${dateString}.md`, content);
                             filesAdded++;
                         }
@@ -1123,14 +1137,14 @@
                     .then(content => {
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(content);
-                        link.download = `Journal-Export_${startDate}_bis_${endDate}.zip`;
+                        link.download = `${filename}.zip`; // Use the custom filename
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
                     })
                     .catch(error => {
-                        console.error("Fehler beim Generieren der ZIP-Datei:", error);
+                        console.error("Error generating ZIP file:", error);
                         showNotification('Fehler beim Exportieren der Einträge.', 'error');
                     });
                 exportModal.classList.add('hidden');
@@ -1145,7 +1159,7 @@
                 });
             });
 
-            // --- KALENDER SEITENLEISTE LOGIK (NEU) ---
+            // --- CALENDAR SIDEBAR LOGIC (NEW) ---
             function openCalendarSidebar() {
                 calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
                 calendarSidebar.classList.remove('translate-x-full');
@@ -1168,7 +1182,7 @@
 
 <script>
     window.addEventListener('message', (event) => {
-        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        // Security check: only respond to messages from the parent window
         if (event.source !== window.parent) {
             return;
         }
@@ -1176,28 +1190,28 @@
         const message = event.data;
 
         if (message && message.type === 'getBackupData') {
-            // Sammle die Journaleinträge aus dem localStorage.
+            // Collect journal entries from localStorage.
             const journalData = localStorage.getItem('markdownJournalEntries');
 
-            // Sende die Daten zurück an das Hauptfenster (index.html).
-            // Der 'key' muss mit dem 'data-key' des iframes übereinstimmen.
+            // Send data back to the main window (index.html).
+            // The 'key' must match the 'data-key' of the iframe.
             window.parent.postMessage({
                 type: 'backupDataResponse',
                 key: 'memomea',
-                data: JSON.parse(journalData || '{}') // Stelle sicher, dass gültiges JSON gesendet wird (ein Objekt).
-            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+                data: JSON.parse(journalData || '{}') // Ensure valid JSON is sent (an object).
+            }, '*'); // In a real application, you should specify the exact URL of the parent here.
         }
 
         if (message && message.type === 'restoreBackupData') {
-            // Empfange die wiederherzustellenden Daten.
+            // Receive data to be restored.
             const restoredEntries = message.data;
 
-            // Überprüfe, ob die wiederhergestellten Daten ein Objekt sind.
+            // Check if the restored data is an object.
             if (typeof restoredEntries === 'object' && restoredEntries !== null) {
-                // Speichere die wiederhergestellten Daten im localStorage.
+                // Save the restored data in localStorage.
                 localStorage.setItem('markdownJournalEntries', JSON.stringify(restoredEntries));
 
-                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                // Reload the page so changes are visible.
                 window.location.reload();
             }
         }

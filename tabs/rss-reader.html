@@ -206,10 +206,24 @@
 <body class="overflow-x-hidden">
     <div class="min-h-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <header class="mb-8">
-                <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">RSS Reader</h1>
-                <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
-                    neuesten Beiträge anzuzeigen.</p>
+            <header class="mb-8 flex justify-between items-start relative">
+                <div>
+                    <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">RSS Reader</h1>
+                    <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
+                        neuesten Beiträge anzuzeigen.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="export-btn-top"
+                        class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors"
+                        style="background-color: #3b82f6; hover:background-color: #2563eb;" title="Feeds exportieren">
+                        <i data-lucide="upload" class="h-5 w-5 mr-1 inline-block align-text-bottom"></i>Export
+                    </button>
+                    <button id="import-btn-top"
+                        class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors"
+                        style="background-color: #10b981; hover:background-color: #059669;" title="Feeds importieren">
+                        <i data-lucide="download" class="h-5 w-5 mr-1 inline-block align-text-bottom"></i>Import
+                    </button>
+                </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -273,7 +287,7 @@
 
     <!-- Reader Mode Modal -->
     <div id="reader-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
+        class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
         <div id="reader-modal-content"
             class="relative flex flex-col h-full w-full sm:max-h-[95vh] sm:w-full sm:max-w-3xl sm:rounded-lg shadow-xl"
             style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
@@ -378,6 +392,39 @@
         </div>
     </div>
 
+    <!-- Rename Export Modal -->
+    <div id="rename-export-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
+        aria-hidden="true">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
+                style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="text-center">
+                    <i data-lucide="file-text" class="mx-auto h-12 w-12 text-blue-400"></i>
+                    <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Export-Dateiname</h3>
+                    <p class="text-sm mt-2" style="color: var(--text-color-light);">
+                        Bitte geben Sie einen Dateinamen für den Export Ihrer RSS-Daten ein.
+                    </p>
+                    <input type="text" id="export-filename-input"
+                        class="mt-4 block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
+                        style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
+                        placeholder="rss_reader_backup.json">
+                </div>
+                <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
+                    <button id="confirm-export-name-btn" type="button"
+                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Exportieren
+                    </button>
+                    <button id="cancel-export-name-btn" type="button"
+                        class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
+                        style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- THEME SWITCHING LISTENER ---
@@ -426,6 +473,13 @@
             // Font size controls
             const fontSizeDecreaseBtn = document.getElementById('font-size-decrease');
             const fontSizeIncreaseBtn = document.getElementById('font-size-increase');
+
+            // Export/Rename Modal Elements
+            const renameExportModal = document.getElementById('rename-export-modal');
+            const exportFilenameInput = document.getElementById('export-filename-input');
+            const confirmExportNameBtn = document.getElementById('confirm-export-name-btn');
+            const cancelExportNameBtn = document.getElementById('cancel-export-name-btn');
+
 
             // --- HELPER FUNCTIONS (EARLY) ---
             const getFaviconUrl = (url) => { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch (e) { return placeholderFavicon; } };
@@ -525,10 +579,6 @@
                 const sidebarHtml = `
                     <div class="flex justify-between items-center mb-2">
                         <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
-                        <div class="flex space-x-1">
-                            <button class="import-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds importieren" style="color: var(--text-color-light);"><i data-lucide="download" class="h-6 w-6"></i></button>
-                            <button class="export-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700" title="Feeds exportieren" style="color: var(--text-color-light);"><i data-lucide="upload" class="h-6 w-6"></i></button>
-                        </div>
                     </div>
                     <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
                         <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="book-open" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
@@ -568,8 +618,7 @@
             const addSidebarEventListeners = () => {
                 document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => { loadAllFeeds(); closeMobileSidebar(); }));
                 document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => { loadFavorites(); closeMobileSidebar(); }));
-                document.querySelectorAll('.import-btn').forEach(btn => btn.addEventListener('click', () => { document.getElementById('import-modal').classList.remove('hidden'); }));
-                document.querySelectorAll('.export-btn').forEach(btn => btn.addEventListener('click', handleExport));
+
                 document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', (e) => {
                     // Check if the click was on the delete button itself
                     if (e.target.closest('.delete-btn')) {
@@ -971,19 +1020,44 @@
                 });
             };
 
-            const handleExport = () => {
-                if (savedFeeds.length === 0 && visitedLinks.size === 0 && favoriteLinks.size === 0) { showMessage('Keine Daten zum Exportieren vorhanden.'); return; }
-                const exportData = { feeds: savedFeeds.map(({ url, title }) => ({ url, title })), visited: Array.from(visitedLinks), favorites: Array.from(favoriteLinks) };
+            // Main function to initiate the export process (shows the rename modal)
+            const handleExportClick = () => {
+                if (savedFeeds.length === 0 && visitedLinks.size === 0 && favoriteLinks.size === 0) {
+                    showMessage('Keine Daten zum Exportieren vorhanden.');
+                    return;
+                }
+                const defaultFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
+                exportFilenameInput.value = defaultFilename; // Set default value in input
+                renameExportModal.classList.remove('hidden'); // Show the modal
+                lucide.createIcons({ container: renameExportModal, attributes: { 'stroke-width': 2 } }); // Re-render icons for modal
+            };
+
+            // Function to perform the actual download based on the provided filename
+            const performExport = (filename) => {
+                let finalFilename = filename.trim();
+                if (finalFilename === '') {
+                    finalFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`; // Fallback to default if empty
+                }
+                if (!finalFilename.toLowerCase().endsWith('.json')) {
+                    finalFilename += '.json';
+                }
+
+                const exportData = {
+                    feeds: savedFeeds.map(({ url, title }) => ({ url, title })),
+                    visited: Array.from(visitedLinks),
+                    favorites: Array.from(favoriteLinks)
+                };
                 const dataStr = JSON.stringify(exportData, null, 2);
                 const dataBlob = new Blob([dataStr], { type: "application/json" });
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
+                link.download = finalFilename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
+                showMessage(`Daten erfolgreich als "${finalFilename}" exportiert.`);
             };
 
             const triggerImport = () => {
@@ -1059,6 +1133,23 @@
             // Import Modal Listeners
             document.getElementById('confirm-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); triggerImport(); });
             document.getElementById('cancel-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); });
+
+            // Event listeners for the new top-right import/export buttons
+            document.getElementById('import-btn-top').addEventListener('click', () => {
+                document.getElementById('import-modal').classList.remove('hidden');
+            });
+            document.getElementById('export-btn-top').addEventListener('click', handleExportClick); // Now calls the new handler
+
+            // Event listeners for the Rename Export Modal
+            confirmExportNameBtn.addEventListener('click', () => {
+                const filename = exportFilenameInput.value;
+                renameExportModal.classList.add('hidden'); // Hide the modal
+                performExport(filename); // Perform the export with the chosen filename
+            });
+
+            cancelExportNameBtn.addEventListener('click', () => {
+                renameExportModal.classList.add('hidden'); // Just hide the modal
+            });
 
             // --- INITIALIZATION ---
             // Set initial font size from localStorage

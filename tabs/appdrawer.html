@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppDrawer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --dock-bg: rgba(255, 255, 255, 0.7);
+            --dock-border: #e5e7eb;
+            --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --app-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --modal-bg: #ffffff;
+            --modal-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --danger-color: #ef4444;
+            --danger-color-hover: #dc2626;
+            --primary-color: #3b82f6;
+            --primary-color-hover: #2563eb;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --dock-bg: rgba(23, 23, 23, 0.7);
+            --dock-border: #404040;
+            --modal-bg: #262626;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            padding-bottom: calc(120px + env(safe-area-inset-bottom));
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--text-color-light);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+
+        .header-container {
+            padding: 2rem 2rem 0;
+            max-width: 1660px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .main-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            flex-shrink: 0;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 2.5rem;
+            border: 1px solid var(--dock-border);
+            border-radius: 0.75rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .search-input:focus {
+            outline: 2px solid var(--text-color-light);
+            outline-offset: 2px;
+        }
+
+        .search-icon,
+        #clear-search-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-color-light);
+        }
+
+        .search-icon {
+            left: 0.75rem;
+            pointer-events: none;
+        }
+
+        #clear-search-btn {
+            right: 0.75rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #add-app-form-wrapper {
+            padding: 1.5rem 2rem 0;
+        }
+
+        #add-app-form {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #add-app-form input {
+            border: 1px solid var(--dock-border);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            flex-grow: 1;
+            /* Allow input to grow */
+        }
+
+        #add-app-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        #add-app-btn:hover {
+            background-color: var(--primary-color-hover);
+        }
+
+        #add-app-btn:disabled {
+            background-color: var(--text-color-light);
+            cursor: not-allowed;
+        }
+
+        .main-layout {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 1rem;
+            gap: 1.5rem;
+            max-width: 1660px;
+            margin: 0 auto;
+        }
+
+        .app-drawer-container {
+            flex-grow: 1;
+            min-width: 300px;
+            border-top: 1px solid var(--dock-border);
+            margin-top: 2rem;
+        }
+
+        .widgets-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 500px;
+            display: none;
+            /* Hidden by default on small screens */
+            padding-top: 2rem;
+        }
+
+        .widgets-sidebar iframe {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: none;
+            width: 100%;
+            height: 290px;
+        }
+
+        #weather-iframe {
+            height: 550px;
+        }
+
+
+        #app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .app-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: transform 0.2s ease;
+        }
+
+        .app-item:hover {
+            transform: scale(1.1);
+        }
+
+        .app-icon-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
+        .app-icon {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--app-shadow);
+            transition: box-shadow 0.2s ease;
+            background-color: var(--dock-border);
+            /* Placeholder background */
+        }
+
+        .app-item:hover .app-icon {
+            box-shadow: var(--app-shadow-hover);
+        }
+
+        .app-label {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 90px;
+        }
+
+        .favorite-star {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: scale(0.5);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        html[data-theme='dark'] .favorite-star {
+            background-color: rgba(50, 50, 50, 0.9);
+        }
+
+        .app-item:hover .favorite-star {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .favorite-star svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .favorite-star.favorited svg {
+            fill: #facc15;
+            stroke: #facc15;
+        }
+
+        .favorite-star:not(.favorited) svg {
+            stroke: #9ca3af;
+        }
+
+        #favorites-dock {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem;
+            background-color: var(--dock-bg);
+            border: 1px solid var(--dock-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+            max-width: 90vw;
+            overflow-x: auto;
+        }
+
+        #favorites-dock::-webkit-scrollbar {
+            display: none;
+        }
+
+        #favorites-dock {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+
+        #favorites-dock .app-item {
+            margin-bottom: 0;
+        }
+
+        #favorites-dock .app-icon-wrapper {
+            width: 50px;
+            height: 50px;
+        }
+
+        #favorites-dock .app-item:hover {
+            transform: translateY(-5px);
+        }
+
+        #confirmation-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 199;
+        }
+
+        #confirmation-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--modal-shadow);
+            z-index: 200;
+            text-align: center;
+        }
+
+        .modal-button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #confirm-remove-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        #confirm-remove-btn:hover {
+            background-color: var(--danger-color-hover);
+        }
+
+        #cancel-remove-btn {
+            background-color: var(--dock-border);
+            color: var(--text-color);
+        }
+
+        html[data-theme='dark'] #cancel-remove-btn {
+            background-color: #404040;
+        }
+
+        #cancel-remove-btn:hover {
+            background-color: #9ca3af;
+        }
+
+        @media (max-width: 1024px) {
+            .header-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .main-title {
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .main-layout {
+                align-items: stretch;
+            }
+
+            .widgets-sidebar {
+                display: flex;
+            }
+
+            .app-drawer-container {
+                max-width: calc(100% - 500px - 1.5rem);
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-theme="light">
+
+    <div class="header-container">
+        <h1 class="main-title">AppDrawer</h1>
+
+        <!-- Search fields -->
+        <div class="search-container flex-grow-[2] min-w-[200px]">
+            <form class="w-full" action="https://www.google.com/search" method="get" target="_blank">
+                <div class="relative">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"
+                        alt="Google Icon" class="search-icon w-6 h-6 object-contain">
+                    <input type="text" name="q" class="search-input w-full" placeholder="Google Suche...">
+                </div>
+            </form>
+        </div>
+        <div class="search-container flex-grow-[1] min-w-[200px]">
+            <svg class="search-icon w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="text" id="search-input" class="search-input" placeholder="App suchen...">
+            <button id="clear-search-btn" class="hidden"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg></button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <div class="app-drawer-container">
+            <!-- Add App Form Container -->
+            <div id="add-app-form-wrapper">
+                <form id="add-app-form">
+                    <input type="url" id="new-app-url" placeholder="Link einfügen um App hinzuzufügen..." required>
+                    <button type="submit" id="add-app-btn">+ Hinzufügen</button>
+                </form>
+            </div>
+            <div id="app-grid"></div>
+        </div>
+
+        <!-- Widgets-Seitenleiste -->
+        <div class="widgets-sidebar">
+            <iframe src="widgets/clock.html" title="Uhr Widget"></iframe>
+            <iframe src="widgets/weather.html" title="Wetter Widget" id="weather-iframe"></iframe>
+        </div>
+    </div>
+
+
+    <div id="favorites-dock"></div>
+
+    <div id="confirmation-overlay" class="hidden"></div>
+    <div id="confirmation-modal" class="hidden">
+        <h3 id="modal-title" class="text-lg font-medium"></h3>
+        <p id="modal-text" class="mt-2 text-sm"></p>
+        <div class="modal-button-group">
+            <button id="cancel-remove-btn" class="modal-button">Abbrechen</button>
+            <button id="confirm-remove-btn" class="modal-button">Entfernen</button>
+        </div>
+    </div>
+
+    <script>
+        // --- IFRAME COMMUNICATION HANDLER (THEME, BACKUP, RESTORE) ---
+        window.addEventListener('message', (event) => {
+            // Security: only accept messages from the parent window
+            if (event.source !== window.parent) {
+                return;
+            }
+
+            const message = event.data;
+
+            // Theme switching
+            if (message === 'set-theme-dark') {
+                document.documentElement.dataset.theme = 'dark';
+                document.body.dataset.theme = 'dark';
+            } else if (message === 'set-theme-light') {
+                document.documentElement.dataset.theme = 'light';
+                document.body.dataset.theme = 'light';
+            }
+
+            // Backup data request from parent
+            if (message && message.type === 'getBackupData') {
+                const backupData = {
+                    apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
+                    favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
+                };
+                window.parent.postMessage({
+                    type: 'backupDataResponse',
+                    key: 'appdrawer', // Identifies this iframe
+                    data: backupData
+                }, '*'); // Use parent's origin in production
+            }
+
+            // Restore data command from parent
+            if (message && message.type === 'restoreBackupData') {
+                const restoredData = message.data;
+                if (restoredData && Array.isArray(restoredData.apps) && Array.isArray(restoredData.favorites)) {
+                    localStorage.setItem('userApps', JSON.stringify(restoredData.apps));
+                    localStorage.setItem('favoriteApps', JSON.stringify(restoredData.favorites));
+                    window.location.reload(); // Reload to apply restored data
+                }
+            }
+        });
+
+
+        // --- MAIN APP LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const appGrid = document.getElementById('app-grid');
+            const favoritesDock = document.getElementById('favorites-dock');
+
+            // Modal Elements
+            const confirmationOverlay = document.getElementById('confirmation-overlay');
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const confirmRemoveBtn = document.getElementById('confirm-remove-btn');
+            const cancelRemoveBtn = document.getElementById('cancel-remove-btn');
+
+            // Search Elements
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+
+            // Add App Form
+            const addAppForm = document.getElementById('add-app-form');
+            const newAppUrlInput = document.getElementById('new-app-url');
+            const addAppBtn = document.getElementById('add-app-btn');
+
+            let apps = [];
+            let favorites = [];
+            let actionToConfirm = null;
+
+            // The default app list now only contains URLs.
+            // The name and icon will be fetched automatically on first load.
+            const defaultAppUrls = [
+                { url: "https://finanzonline.bmf.gv.at/fon/" },
+                { url: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen" },
+                { url: "https://losleben.wienerstaedtische.at/app/dashboard" },
+                { url: "https://smartmeter-web.wienernetze.at/uebersicht" },
+                { url: "https://meine.wienenergie.at/privat/meine-produkte" },
+                { url: "https://passwords.google.com/" },
+                { url: "https://m365.cloud.microsoft/?auth=1" },
+                { url: "https://github.com/dev0gig" },
+                { url: "https://www.paypal.com/myaccount/summary" },
+                { url: "https://photos.google.com/" },
+                { url: "https://www.udemy.com/home/my-courses/learning/" },
+                { url: "https://webreader.mytolino.com/library/" },
+                { url: "https://notebooklm.google.com/" },
+                { url: "https://account.bitpanda.com/login" },
+                { url: "https://coinmarketcap.com/" },
+                { url: "https://george.sparkasse.at/r/index.html?at=c#/overview" },
+                { url: "https://sso.revolut.com/signin?client_id=o3r08ao16zvdlf2y5fdc&code_challenge=7EVFQ49eb3I_mM8CF4VSd5ZXTG0xKJ18eWYZrycWhas&code_challenge_method=S256&response_type=code&redirect_uri=https%3A%2F%2Fapp.revolut.com%2Fhome&response_mode=query&ui_color_scheme=dark&ui_locales=en&state=KPbgwrh2iBUue1C4" },
+                { url: "https://app.n26.com/login" },
+                { url: "https://my.pcloud.com/" },
+                { url: "https://drive.google.com/" },
+                { url: "https://onedrive.live.com/?id=root&cid=0C6CCA416C0AEF80" },
+                { url: "https://gemini.google.com/app" },
+                { url: "https://www.deepl.com/en/translator" },
+                { url: "https://copilot.microsoft.com/" },
+                { url: "https://www.hoyolab.com/home" },
+                { url: "https://game8.co" },
+                { url: "https://deckstats.net/" },
+                { url: "https://www.chess.com/daily-chess-puzzle" },
+                { url: "https://store.epicgames.com/de/" },
+                { url: "https://gaming.amazon.com/home" },
+                { url: "https://store.steampowered.com/" },
+                { url: "https://itch.io/my-purchases" },
+                { url: "https://www.youtube.com/" },
+                { url: "https://www.netflix.com" },
+                { url: "https://www.crunchyroll.com/de/" },
+                { url: "https://at.pinterest.com/" },
+                { url: "https://www.reddit.com" },
+                { url: "https://www.temu.com" },
+                { url: "https://www.hockerty.at" },
+                { url: "https://www.willhaben.at" },
+                { url: "https://www.amazon.de" },
+                { url: "https://www.thalia.at/" },
+                { url: "https://translate.google.com/" },
+                { url: "https://contacts.google.com/" },
+                { url: "https://www.google.com/maps/" },
+                { url: "https://keep.google.com/" },
+                { url: "https://docs.google.com/spreadsheets/u/0/" },
+                { url: "https://docs.google.com/document/u/0/" },
+                { url: "https://play.google.com/" },
+                { url: "https://tasks.google.com/tasks/" },
+                { url: "https://www.a1.net/mein-a1" },
+                { url: "https://www.myheritage.com/" },
+                { url: "https://tools.pdf24.org/de/alle-tools" },
+                { url: "https://wallet.google.com/" },
+                { url: "https://tv.apple.com/at" },
+                { url: "https://discord.com/channels/@me" },
+                { url: "https://www.lego.com/de-at/member" },
+                { url: "https://xserv.kdportal.de/show/Kunde_Vertraege" },
+                { url: "https://www.wienmobil.at/" },
+                { url: "https://www.forem.com/" },
+                { url: "https://www.bitwarden.com/" },
+                { url: "https://calendar.google.com/calendar/u/0/r" },
+                { url: "https://mail.google.com/mail/u/0/#inbox" },
+                { url: "https://outlook.live.com/mail/inbox" },
+                { url: "https://www.proton.me/de/mail" },
+                { url: "https://www.icloud.com/mail/" },
+                { url: "https://www.booking.com/" },
+                { url: "https://trello.com/u/dev0gig/boards" },
+                { url: "https://www.nebo.app/app/pages" },
+                { url: "https://eu.manscaped.com/de" },
+                { url: "https://www.theodinproject.com/dashboard" },
+                { url: "https://messages.google.com/web/conversations" }
+            ];
+
+            /**
+             * Fetches metadata (title and icon) for a given URL.
+             * It uses a proxy to bypass CORS issues.
+             * @param {string} url The URL to fetch metadata from.
+             * @returns {Promise<{name: string, iconUrl: string}>}
+             */
+            async function getAppMetadata(url) {
+                let name = new URL(url).hostname; // Default name
+                // Fallback icon using a high-quality logo service
+                let iconUrl = `https://logo.clearbit.com/${name}`;
+
+                try {
+                    // Use a proxy to fetch the site's HTML
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                    const data = await response.json();
+                    const doc = new DOMParser().parseFromString(data.contents, 'text/html');
+
+                    // Get Name from the <title> tag
+                    name = doc.querySelector('title')?.textContent.trim() || name;
+
+                    // Find the best quality icon from <link> tags
+                    const appleIcon = doc.querySelector('link[rel="apple-touch-icon"]')?.href;
+                    const highResIcon = doc.querySelector('link[rel="icon"][sizes="192x192"]')?.href;
+                    const icon = doc.querySelector('link[rel="icon"]')?.href;
+                    const shortcutIcon = doc.querySelector('link[rel="shortcut icon"]')?.href;
+
+                    let bestIconPath = appleIcon || highResIcon || icon || shortcutIcon;
+
+                    if (bestIconPath) {
+                        // Resolve relative path (e.g., "/favicon.ico") to an absolute URL
+                        iconUrl = new URL(bestIconPath, url).href;
+                    }
+
+                } catch (error) {
+                    console.error(`Konnte Metadaten für ${url} nicht abrufen, verwende Standardwerte. Fehler:`, error);
+                }
+
+                return { name, iconUrl };
+            }
+
+
+            // --- DATA MANAGEMENT ---
+            async function initializeData() {
+                const storedApps = localStorage.getItem('userApps');
+                if (storedApps === null) {
+                    // If no apps in storage, fetch metadata for all default URLs
+                    addAppBtn.disabled = true;
+                    addAppBtn.textContent = 'Lade...';
+
+                    const initialApps = [];
+                    for (const [index, appDef] of defaultAppUrls.entries()) {
+                        const metadata = await getAppMetadata(appDef.url);
+                        initialApps.push({
+                            ...metadata, // Contains name and iconUrl
+                            url: appDef.url,
+                            id: `default-${index}`
+                        });
+                    }
+                    apps = initialApps;
+                    saveApps();
+
+                    addAppBtn.disabled = false;
+                    addAppBtn.textContent = '+ Hinzufügen';
+                } else {
+                    apps = JSON.parse(storedApps);
+                }
+
+                const storedFavorites = localStorage.getItem('favoriteApps');
+                favorites = storedFavorites ? JSON.parse(storedFavorites) : [];
+                renderAll();
+            }
+
+            function saveApps() {
+                localStorage.setItem('userApps', JSON.stringify(apps));
+            }
+
+            function saveFavorites() {
+                localStorage.setItem('favoriteApps', JSON.stringify(favorites));
+            }
+
+            // --- UI RENDERING ---
+            const renderAll = (searchTerm = '') => {
+                appGrid.innerHTML = '';
+                favoritesDock.innerHTML = '';
+
+                const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                const filteredApps = apps.filter(app =>
+                    app.name.toLowerCase().includes(lowerCaseSearchTerm)
+                ).sort((a, b) => a.name.localeCompare(b.name));
+
+
+                filteredApps.forEach(app => {
+                    const isFavorited = favorites.includes(app.id);
+                    appGrid.appendChild(createAppElement(app, isFavorited));
+                });
+
+                const favoriteApps = apps.filter(app => favorites.includes(app.id));
+                favoriteApps.forEach(app => {
+                    favoritesDock.appendChild(createAppElement(app, true, true));
+                });
+            };
+
+            const createAppElement = (app, isFavorited, isDockItem = false) => {
+                const item = document.createElement('a');
+                item.href = app.url;
+                item.target = '_blank';
+                item.className = 'app-item';
+                item.setAttribute('aria-label', app.name);
+
+                const iconWrapper = document.createElement('div');
+                iconWrapper.className = 'app-icon-wrapper';
+
+                const icon = document.createElement('img');
+                // Use the iconUrl that was fetched and stored with the app
+                icon.src = app.iconUrl;
+                icon.alt = `${app.name} Icon`;
+                icon.className = 'app-icon';
+                icon.onerror = function () {
+                    this.onerror = null; // prevent infinite loop
+                    // Fallback to a letter placeholder if the logo fails to load
+                    this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${app.name.charAt(0)}`;
+                };
+                iconWrapper.appendChild(icon);
+
+                if (!isDockItem) {
+                    const star = document.createElement('div');
+                    star.className = 'favorite-star';
+                    if (isFavorited) star.classList.add('favorited');
+                    star.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>`;
+                    star.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(app.id);
+                    });
+                    iconWrapper.appendChild(star);
+                }
+
+                item.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    if (isDockItem) {
+                        openConfirmationModal('removeFavorite', app.id);
+                    } else {
+                        openConfirmationModal('deleteApp', app.id);
+                    }
+                });
+
+                item.appendChild(iconWrapper);
+
+                if (!isDockItem) {
+                    const label = document.createElement('span');
+                    label.className = 'app-label';
+                    label.textContent = app.name;
+                    item.appendChild(label);
+                }
+
+                return item;
+            };
+
+            // --- ACTIONS ---
+            function toggleFavorite(appId) {
+                const index = favorites.indexOf(appId);
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                } else {
+                    favorites.push(appId);
+                }
+                saveFavorites();
+                renderAll(searchInput.value);
+            };
+
+            function deleteApp(appId) {
+                apps = apps.filter(app => app.id !== appId);
+                favorites = favorites.filter(favId => favId !== appId); // Also remove from favorites
+                saveApps();
+                saveFavorites();
+                renderAll(searchInput.value);
+            }
+
+            // --- MODAL LOGIC ---
+            function openConfirmationModal(type, id) {
+                actionToConfirm = { type, id };
+                if (type === 'removeFavorite') {
+                    modalTitle.textContent = 'Favorit entfernen?';
+                    modalText.textContent = 'Möchtest du diese App wirklich aus deinen Favoriten entfernen?';
+                } else if (type === 'deleteApp') {
+                    modalTitle.textContent = 'App löschen?';
+                    modalText.textContent = 'Möchtest du diese App dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.';
+                }
+                confirmationModal.classList.remove('hidden');
+                confirmationOverlay.classList.remove('hidden');
+            };
+
+            function closeConfirmationModal() {
+                actionToConfirm = null;
+                confirmationModal.classList.add('hidden');
+                confirmationOverlay.classList.add('hidden');
+            };
+
+            function handleConfirm() {
+                if (!actionToConfirm) return;
+
+                if (actionToConfirm.type === 'removeFavorite') {
+                    toggleFavorite(actionToConfirm.id);
+                } else if (actionToConfirm.type === 'deleteApp') {
+                    deleteApp(actionToConfirm.id);
+                }
+                closeConfirmationModal();
+            }
+
+            // --- EVENT LISTENERS ---
+            addAppForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let url = newAppUrlInput.value.trim();
+                if (!url) return;
+
+                if (!url.startsWith('http')) {
+                    url = 'https://' + url;
+                }
+
+                // Check for duplicates
+                const urlExists = apps.some(app => app.url === url);
+                if (urlExists) {
+                    alert("Diese App existiert bereits in deiner Liste.");
+                    return;
+                }
+
+                addAppBtn.disabled = true;
+                addAppBtn.textContent = '...';
+
+                const metadata = await getAppMetadata(url);
+
+                const newApp = {
+                    id: `user-${Date.now()}`,
+                    name: metadata.name,
+                    url: url,
+                    iconUrl: metadata.iconUrl
+                };
+                apps.push(newApp);
+                saveApps();
+                renderAll(searchInput.value);
+                addAppForm.reset();
+                addAppBtn.disabled = false;
+                addAppBtn.textContent = '+ Hinzufügen';
+            });
+
+            confirmRemoveBtn.addEventListener('click', handleConfirm);
+            cancelRemoveBtn.addEventListener('click', closeConfirmationModal);
+            confirmationOverlay.addEventListener('click', closeConfirmationModal);
+
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value;
+                renderAll(searchTerm);
+                clearSearchBtn.classList.toggle('hidden', !searchTerm);
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                renderAll();
+                clearSearchBtn.classList.add('hidden');
+            });
+
+            // Initial Load
+            initializeData();
+        });
+    </script>
+</body>
+
+</html>

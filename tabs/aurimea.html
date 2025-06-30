@@ -432,9 +432,10 @@
                         <i data-lucide="file-down" class="h-4 w-4"></i><span>Importieren</span>
                     </button>
                     <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                    <button id="export-csv-btn" title="Alle Transaktionen als CSV-Datei exportieren"
+                    <!-- Der Export-Button wurde zum Backup-Button umfunktioniert -->
+                    <button id="export-csv-btn" title="Transaktionen sichern"
                         class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                        <i data-lucide="file-up" class="h-4 w-4"></i><span>Exportieren</span>
+                        <i data-lucide="save" class="h-4 w-4"></i><span>Backup</span>
                     </button>
                     <button id="delete-all-transactions-btn" title="Alle Transaktionen löschen"
                         class="filter-btn p-2 rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center">
@@ -603,6 +604,26 @@
         </div>
     </div>
 
+    <!-- NEUES MODAL FÜR BACKUP-DATEINAMEN -->
+    <div id="backup-name-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
+    </div>
+    <div id="backup-name-modal"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-md z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-bold mb-4">Backup-Dateinamen eingeben</h3>
+            <input type="text" id="backup-filename-input" class="w-full p-2 rounded-lg mb-4"
+                style="background-color: var(--bg-color); border: 1px solid var(--border-color);"
+                placeholder="z.B. aurimea-backup-2024-06-28">
+            <div class="flex justify-end gap-4">
+                <button id="backup-name-cancel-btn"
+                    class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Abbrechen</button>
+                <button id="backup-name-confirm-btn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition">Download</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Benachrichtigungs-Element -->
     <div id="notification"
         class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12">
@@ -688,6 +709,13 @@
             const notification = document.getElementById('notification');
             const notificationMessage = document.getElementById('notification-message');
             let confirmCallback = null;
+
+            // NEUE ELEMENTE FÜR BACKUP-MODAL
+            const backupNameModalOverlay = document.getElementById('backup-name-modal-overlay');
+            const backupNameModal = document.getElementById('backup-name-modal');
+            const backupFilenameInput = document.getElementById('backup-filename-input');
+            const backupNameCancelBtn = document.getElementById('backup-name-cancel-btn');
+            const backupNameConfirmBtn = document.getElementById('backup-name-confirm-btn');
 
 
             // --- DATA HANDLING ---
@@ -1011,35 +1039,7 @@
                 closeCalendarSidebar();
             }
 
-            // --- CSV IMPORT / EXPORT ---
-            function exportToCSV() {
-                const headers = ['Datum', 'Art', 'Betrag', 'Beschreibung', 'Kategorie', 'Konto', 'Zahlungsmethode', 'Wiederkehrend', 'Sonstige Infos'];
-                const dataToExport = allTransactions.map(t => ({
-                    Datum: t.Datum,
-                    Art: t.Art,
-                    Betrag: String(t.Betrag).replace('.', ','),
-                    Beschreibung: t.Beschreibung,
-                    Kategorie: t.Kategorie,
-                    Konto: t.Konto,
-                    Zahlungsmethode: t.Zahlungsmethode,
-                    Wiederkehrend: t.Wiederkehrend,
-                    'Sonstige Infos': t['Sonstige Infos']
-                }));
-                const csv = Papa.unparse({
-                    fields: headers,
-                    data: dataToExport
-                });
-                const blob = new Blob([csv], {
-                    type: 'text/csv;charset=utf-8;'
-                });
-                const link = document.createElement("a");
-                link.setAttribute("href", URL.createObjectURL(blob));
-                link.setAttribute("download", "aurimea-transaktionen.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-
+            // --- CSV IMPORT / BACKUP (ehemals CSV EXPORT) ---
             function importFromCSV(file) {
                 Papa.parse(file, {
                     header: true,
@@ -1086,6 +1086,18 @@
                 });
             }
 
+            // Funktion zum Erstellen des JSON-Backups (ersetzt exportToCSV)
+            function createJsonBackup() {
+                const dataStr = JSON.stringify(allTransactions, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const today = new Date();
+                const dateString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+                const defaultFilename = `aurimea-backup-${dateString}.json`;
+
+                backupFilenameInput.value = defaultFilename;
+                openBackupNameModal();
+            }
+
             // --- CONFIRMATION MODAL & NOTIFICATION LOGIC ---
             function showNotification(message, duration = 3000) {
                 notificationMessage.textContent = message;
@@ -1117,6 +1129,38 @@
                 closeConfirmModal();
             });
             confirmModalOverlay.addEventListener('click', closeConfirmModal);
+
+            // LOGIK FÜR BACKUP-NAMENSMODAL
+            function openBackupNameModal() {
+                backupNameModalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                backupNameModal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+                backupFilenameInput.focus();
+            }
+
+            function closeBackupNameModal() {
+                backupNameModalOverlay.classList.add('opacity-0', 'pointer-events-none');
+                backupNameModal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            }
+
+            backupNameCancelBtn.addEventListener('click', closeBackupNameModal);
+            backupNameConfirmBtn.addEventListener('click', () => {
+                const filename = backupFilenameInput.value.trim();
+                if (filename) {
+                    const dataStr = JSON.stringify(allTransactions, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showNotification('Backup erfolgreich heruntergeladen!');
+                    closeBackupNameModal();
+                } else {
+                    showNotification('Bitte geben Sie einen Dateinamen ein.', 3000);
+                }
+            });
+            backupNameModalOverlay.addEventListener('click', closeBackupNameModal);
 
 
             // --- EVENT LISTENERS ---
@@ -1169,7 +1213,8 @@
                     importFromCSV(e.target.files[0]);
                 }
             });
-            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+            // Der Export-CSV-Button ruft nun createJsonBackup auf
+            document.getElementById('export-csv-btn').addEventListener('click', createJsonBackup);
 
             document.getElementById('delete-all-transactions-btn').addEventListener('click', () => {
                 openConfirmModal(
