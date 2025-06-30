@@ -114,7 +114,6 @@
 
         #add-app-form {
             display: flex;
-            flex-wrap: wrap;
             gap: 0.5rem;
             align-items: center;
         }
@@ -132,7 +131,7 @@
         .icon-btn {
             background-color: var(--primary-color);
             color: white;
-            padding: 0.5rem 0.75rem;
+            padding: 0.5rem;
             border-radius: 0.5rem;
             border: none;
             cursor: pointer;
@@ -140,7 +139,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
             font-weight: 500;
             flex-shrink: 0;
         }
@@ -307,7 +305,9 @@
         }
 
         @media (max-width: 1024px) {
-            .header-container {
+
+            .header-container,
+            #add-app-form {
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -371,20 +371,16 @@
                     <input type="text" id="new-app-name" placeholder="App-Name..." required>
                     <input type="url" id="new-app-icon-url" placeholder="Icon-URL (optional)...">
                     <button type="submit" id="add-app-btn" class="icon-btn" title="Hinzufügen">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                        <span>Hinzufügen</span>
+                        <i data-lucide="plus" class="w-5 h-5"></i>
                     </button>
                     <button type="button" id="import-btn" class="icon-btn secondary" title="Importieren">
-                        <i data-lucide="file-up" class="w-4 h-4"></i>
-                        <span>Import</span>
+                        <i data-lucide="file-up" class="w-5 h-5"></i>
                     </button>
                     <button type="button" id="export-btn" class="icon-btn secondary" title="Exportieren">
-                        <i data-lucide="file-down" class="w-4 h-4"></i>
-                        <span>Export</span>
+                        <i data-lucide="file-down" class="w-5 h-5"></i>
                     </button>
                     <button type="button" id="delete-all-btn" class="icon-btn danger" title="Alle löschen">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        <span>Alles löschen</span>
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
                     </button>
                 </form>
             </div>
@@ -774,7 +770,7 @@
                 if (apps.some(app => app.url === url)) { alert("Diese App existiert bereits in deiner Liste."); return; }
 
                 addAppBtn.disabled = true;
-                addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin"></i><span>Hinzufügen</span>';
+                addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin w-5 h-5"></i>';
                 lucide.createIcons();
 
                 const iconUrl = customIconUrl || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
@@ -784,7 +780,7 @@
                 renderAll(searchInput.value);
                 addAppForm.reset();
                 addAppBtn.disabled = false;
-                addAppBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Hinzufügen</span>';
+                addAppBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5"></i>';
                 lucide.createIcons();
             });
 
