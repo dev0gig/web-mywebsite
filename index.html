@@ -380,7 +380,8 @@
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
             <iframe id="frame-appdrawer" src="tabs/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
-            <iframe id="frame-widgets" src="tabs/widgets-iframe.html" class="content-iframe" data-key="widgets"></iframe>
+            <iframe id="frame-widgets" src="tabs/widgets-iframe.html" class="content-iframe"
+                data-key="widgets"></iframe>
             <iframe id="frame-readlater" src="tabs/readlater.html" class="content-iframe" data-key="readlater"></iframe>
             <iframe id="frame-rss" src="tabs/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
             <iframe id="frame-aurimea" src="tabs/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
@@ -497,11 +498,14 @@
             const restoreAllInput = document.getElementById('restore-all-input');
             const deleteAllBtn = document.getElementById('delete-all-btn');
 
+            // --- START: MODIFIED BACKUP LOGIC VARIABLES ---
             let backupData = {};
             const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
             let expectedResponses = 0;
             let receivedResponses = 0;
             let backupInProgress = false;
+            let backupTimeoutId = null; // To hold the timeout ID
+            // --- END: MODIFIED BACKUP LOGIC VARIABLES ---
 
             const confirmModal = document.getElementById('confirm-modal');
             const confirmModalTitle = document.getElementById('confirm-modal-title');
@@ -542,36 +546,51 @@
                 }
             };
 
+            // --- START: MODIFIED BACKUP FUNCTIONS ---
             const backupAllData = () => {
                 if (backupInProgress) return;
+
                 backupInProgress = true;
                 backupData = {};
                 expectedResponses = backupFrames.length;
                 receivedResponses = 0;
+
                 if (expectedResponses === 0) {
                     showToast('Keine Apps zum Sichern gefunden.', 'info');
                     backupInProgress = false;
                     return;
                 }
+
                 showToast('Backup wird gestartet...', 'info', 0);
                 backupFrames.forEach(frame => {
                     frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*');
                 });
-                setTimeout(() => {
-                    if (receivedResponses < expectedResponses) {
-                        if (receivedResponses > 0) {
-                            showToast('Backup-Timeout: Teil-Backup wird erstellt.', 'error');
-                            createAndDownloadZip();
-                        } else {
-                            showToast('Backup-Fehler: Keine App hat geantwortet.', 'error');
-                            backupInProgress = false;
-                        }
+
+                // Set a timeout to handle apps that don't respond.
+                backupTimeoutId = setTimeout(() => {
+                    if (backupInProgress) { // Check if backup is still running
+                        backupInProgress = false; // Stop the process
+                        const respondedKeys = Object.keys(backupData);
+                        const allKeys = backupFrames.map(f => f.dataset.key);
+                        const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
+
+                        let errorMessage = 'Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', ');
+
+                        // IMPORTANT: Do NOT create a partial backup. Just inform the user.
+                        showToast(errorMessage, 'error', 8000); // Show error for longer
                     }
-                }, 10000);
+                }, 10000); // 10-second timeout
             };
 
             const createAndDownloadZip = () => {
-                if (!backupInProgress) return;
+                // The backup was successful, so clear the timeout.
+                if (backupTimeoutId) {
+                    clearTimeout(backupTimeoutId);
+                    backupTimeoutId = null;
+                }
+
+                if (!backupInProgress) return; // Ignore if timeout already happened
+
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
@@ -580,11 +599,14 @@
                         filesAdded++;
                     }
                 }
-                backupInProgress = false;
+
+                backupInProgress = false; // Backup process is now finished.
+
                 if (filesAdded === 0) {
                     showToast('Keine Daten zum Sichern gefunden.', 'info');
                     return;
                 }
+
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
@@ -603,6 +625,8 @@
                         showToast('Backup-Erstellung fehlgeschlagen.', 'error');
                     });
             };
+            // --- END: MODIFIED BACKUP FUNCTIONS ---
+
 
             const restoreAllData = (event) => {
                 const file = event.target.files[0];
@@ -686,13 +710,21 @@
                 if (type === 'favoritesUpdated') {
                     renderAppDock(payload);
                 }
+
+                // --- START: MODIFIED MESSAGE HANDLER FOR BACKUP ---
                 if (type === 'backupDataResponse') {
+                    // Ignore late responses if the backup process has already timed out or finished.
+                    if (!backupInProgress) return;
+
                     if (key) { backupData[key] = data; }
                     receivedResponses++;
+
+                    // Only when all expected apps have responded, create the zip.
                     if (receivedResponses === expectedResponses) {
                         createAndDownloadZip();
                     }
                 }
+                // --- END: MODIFIED MESSAGE HANDLER FOR BACKUP ---
             });
 
             backupAllBtn.addEventListener('click', backupAllData);
