@@ -62,6 +62,11 @@
             position: relative;
             top: 4rem;
             height: calc(100% - 4rem);
+            /* KORREKTUR: Platz für das App-Dock schaffen */
+            padding-bottom: 85px;
+            /* Höhe des Docks + Puffer */
+            box-sizing: border-box;
+            /* Sicherstellen, dass Padding in der Höhe berücksichtigt wird */
         }
 
         @media (min-width: 768px) {
@@ -70,6 +75,7 @@
                 top: 0;
                 height: 100%;
                 margin-left: 4.5rem;
+                /* Padding-bottom bleibt für das Dock bestehen */
             }
         }
 
