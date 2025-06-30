@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dev0gig Desktop</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icons/home-solid-white.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #3d3846;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --topbar-bg: rgba(23, 23, 23, 0.85);
+            --topbar-text: #fafafa;
+            --dropdown-bg: #262626;
+            --accent-color: #7c3aed;
+            --accent-color-hover: #8b5cf6;
+            --window-bg: #302b38;
+            --window-header-bg: #211e25;
+            --dock-bg: rgba(23, 23, 23, 0.7);
+            --dock-border: #404040;
+        }
+
+        html[data-theme='light'] {
+            --bg-color: #f0f0f0;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --topbar-bg: rgba(255, 255, 255, 0.85);
+            --topbar-text: #111827;
+            --dropdown-bg: #ffffff;
+            --window-bg: #fdfdfd;
+            --window-header-bg: #e0e0e0;
+            --dock-bg: rgba(255, 255, 255, 0.7);
+            --dock-border: #e5e7eb;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        body.dynamic-background {
+            background: linear-gradient(-45deg, #0d0221, #241744, #3b2a6b, #4b3a8f);
+            background-size: 400% 400%;
+            animation: gradientAnimation 25s ease infinite;
+        }
+
+        body.static-background {
+            background-color: var(--bg-color);
+            animation: none;
+        }
+
+        #starfield-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+
+        /* Styling for desktop icons based on theme */
+        html[data-theme='dark'] .desktop-icon img,
+        html[data-theme='dark'] .dock-desktop-icon {
+            filter: invert(1);
+        }
+
+        html[data-theme='light'] .desktop-icon img,
+        html[data-theme='light'] .dock-desktop-icon {
+            filter: none;
+        }
+
+        html[data-theme='dark'] .desktop-icon span {
+            color: #FFFFFF;
+        }
+
+        html[data-theme='light'] .desktop-icon span {
+            color: #000000;
+        }
+
+        #top-bar {
+            background-color: var(--topbar-bg);
+            color: var(--topbar-text);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .top-bar-menu {
+            position: relative;
+        }
+
+        .top-bar-menu>button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Styling for Lucide icons */
+        .lucide {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-color-light);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: var(--dropdown-bg);
+            border: 1px solid var(--dock-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10001;
+            width: 200px;
+            overflow: hidden;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .dropdown-item.active {
+            background-color: var(--accent-color-hover);
+            color: white;
+        }
+
+        .dropdown-separator {
+            height: 1px;
+            background-color: var(--dock-border);
+            margin: 4px 0;
+        }
+
+        #desktop {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .desktop-icon {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+        }
+
+        .desktop-icon:hover {
+            background-color: rgba(128, 128, 128, 0.2);
+        }
+
+        .desktop-icon img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 4px;
+        }
+
+        .desktop-icon span {
+            font-size: 12px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-window {
+            position: absolute;
+            background-color: var(--window-bg);
+            border: 1px solid var(--dock-border);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 300px;
+            min-height: 200px;
+            transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+        }
+
+        .app-window-header {
+            background-color: var(--window-header-bg);
+            padding: 4px 12px;
+            cursor: move;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .app-window-header h3 {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .window-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+        }
+
+        .window-control-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .window-control-btn.close:hover {
+            background-color: #ff5f57;
+        }
+
+        .window-control-btn.close:hover .lucide {
+            stroke: #4d0000;
+        }
+
+        .window-control-btn.arrange:hover {
+            background-color: #28c940;
+        }
+
+        .window-control-btn.arrange:hover .lucide {
+            stroke: #003d00;
+        }
+
+        .window-control-btn.minimize:hover {
+            background-color: #ffc107;
+        }
+
+        .window-control-btn.minimize:hover .lucide {
+            stroke: #664d00;
+        }
+
+        .lucide.text-red-500 {
+            stroke: #ef4444;
+        }
+
+        .lucide.text-yellow-400 {
+            stroke: #facc15;
+        }
+
+
+        .app-window-content {
+            flex-grow: 1;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .window-loader {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--window-bg);
+            z-index: 5;
+        }
+
+        .app-window-content iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background-color: transparent;
+        }
+
+        #app-dock {
+            position: fixed;
+            bottom: calc(4px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem;
+            background-color: var(--dock-bg);
+            border: 1px solid var(--dock-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            gap: 1rem;
+            z-index: 9999;
+            transition: background-color 0.3s ease;
+            max-width: 90vw;
+            overflow-x: auto;
+        }
+
+        .dock-app-item {
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .dock-app-item:hover {
+            transform: scale(1.2);
+        }
+
+        .dock-app-item.minimized::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            border: 1px solid var(--text-color);
+        }
+
+        #context-menu {
+            position: fixed;
+            z-index: 10000;
+            width: 200px;
+            background-color: var(--dropdown-bg);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 4px;
+        }
+
+        #notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dropdown-bg);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10003;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        #notification-toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="starfield-canvas"></canvas>
+
+    <!-- NEU: Overlay für die Weiterleitung auf Mobilgeräten -->
+    <div id="mobile-redirect-overlay"
+        class="fixed inset-0 bg-black bg-opacity-80 z-[20000] flex-col items-center justify-center text-white text-center p-8 hidden">
+        <h2 class="text-2xl font-bold mb-4">Desktop-Ansicht nicht verfügbar</h2>
+        <p>Diese Ansicht ist nur für größere Bildschirme optimiert. Sie werden zur mobilen Ansicht weitergeleitet.</p>
+    </div>
+
+    <header id="top-bar" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-2 px-4 h-8 text-sm">
+        <div class="font-bold">dev0gig</div>
+        <div id="clock" class="font-semibold"></div>
+        <div class="flex items-center gap-2">
+            <div class="top-bar-menu">
+                <button id="theme-menu-btn" class="p-1 rounded-full hover:bg-gray-500/20">
+                    <i data-lucide="sun"></i>
+                </button>
+                <div id="theme-dropdown" class="dropdown-menu hidden">
+                    <div class="dropdown-item" data-theme-value="light">
+                        <i data-lucide="sun"></i>
+                        <span>Light</span>
+                    </div>
+                    <div class="dropdown-item" data-theme-value="dark">
+                        <i data-lucide="moon"></i>
+                        <span>Dark</span>
+                    </div>
+                    <div class="dropdown-item" data-theme-value="system">
+                        <i data-lucide="monitor"></i>
+                        <span>System</span>
+                    </div>
+                </div>
+            </div>
+            <div class="top-bar-menu">
+                <button id="design-menu-btn" class="p-1 rounded-full hover:bg-gray-500/20">
+                    <i data-lucide="panel-left"></i>
+                </button>
+                <div id="design-dropdown" class="dropdown-menu hidden">
+                    <div class="dropdown-item active" data-design-value="desktop">
+                        <i data-lucide="grid"></i>
+                        <span>Desktop</span>
+                    </div>
+                    <div class="dropdown-item" data-design-value="sidebar">
+                        <i data-lucide="panel-left"></i>
+                        <span>Seitenleiste</span>
+                    </div>
+                </div>
+            </div>
+            <div class="top-bar-menu">
+                <button id="data-menu-btn" class="p-1 rounded-full hover:bg-gray-500/20">
+                    <i data-lucide="database"></i>
+                </button>
+                <div id="data-dropdown" class="dropdown-menu hidden">
+                    <div id="backup-btn" class="dropdown-item">
+                        <i data-lucide="download"></i>
+                        <span>Backup All</span>
+                    </div>
+                    <label for="restore-input" id="restore-btn" class="dropdown-item">
+                        <i data-lucide="upload"></i>
+                        <span>Restore All</span>
+                    </label>
+                    <input type="file" id="restore-input" class="hidden" accept=".zip">
+                    <div class="dropdown-separator"></div>
+                    <div id="delete-btn" class="dropdown-item text-red-500 hover:!bg-red-500 hover:!text-white">
+                        <i data-lucide="trash-2"></i>
+                        <span>Delete All</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="desktop">
+        <!-- Desktop icons will be generated here -->
+    </main>
+
+    <div id="app-dock">
+        <!-- Favorite apps will be generated here -->
+    </div>
+
+    <div id="confirm-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 z-[10002] flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--dropdown-bg);">
+            <h3 id="confirm-modal-title" class="text-xl font-bold mb-4" style="color: var(--text-color);"></h3>
+            <p id="confirm-modal-text" class="mb-6" style="color: var(--text-color-light);"></p>
+            <div class="flex justify-end gap-4">
+                <button id="confirm-modal-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                    style="background-color: var(--dock-border); color: var(--text-color);">Abbrechen</button>
+                <button id="confirm-modal-confirm-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-toast"></div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            // NEU: Umleitung für mobile Geräte
+            if (window.innerWidth < 1024) {
+                const overlay = document.getElementById('mobile-redirect-overlay');
+                if (overlay) overlay.style.display = 'flex'; // Zeige die Nachricht an
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000); // 3 Sekunden warten, damit der Benutzer die Nachricht lesen kann
+                return; // Verhindert die Ausführung des restlichen Desktop-Skripts
+            }
+
+            const desktop = document.getElementById('desktop');
+            const appDock = document.getElementById('app-dock');
+            const clockElement = document.getElementById('clock');
+            const notificationToast = document.getElementById('notification-toast');
+
+            // Lucide Icons nach dem Laden des DOM initialisieren
+            lucide.createIcons();
+
+            const apps = [
+                { id: 'appdrawer', name: 'Appdrawer', icon: 'assets/icons/appdrawer.svg', src: 'tabs/appdrawer.html' },
+                { id: 'widgets', name: 'Widgets', icon: 'assets/icons/widgets.svg', src: 'tabs/widgets-iframe.html' },
+                { id: 'readlater', name: 'ReadlateR', icon: 'assets/icons/readlater.svg', src: 'tabs/readlater.html' },
+                { id: 'rss', name: 'RSS Reader', icon: 'assets/icons/rss.svg', src: 'tabs/rss-reader.html' },
+                { id: 'aurimea', name: 'AuriMea', icon: 'assets/icons/aurimea.svg', src: 'tabs/aurimea.html' },
+                { id: 'memomea', name: 'MemoMea', icon: 'assets/icons/memomea.svg', src: 'tabs/memomea.html' },
+            ];
+
+            let highestZIndex = 100;
+            let iconPositions = JSON.parse(localStorage.getItem('desktopIconPositions')) || {};
+            // Set zum Speichern der IDs minimierter Fenster
+            let minimizedWindows = new Set();
+
+            function showNotification(message, duration = 3000) {
+                notificationToast.textContent = message;
+                notificationToast.classList.add('show');
+                setTimeout(() => {
+                    notificationToast.classList.remove('show');
+                }, duration);
+            }
+
+            const openConfirmModal = (title, text, onConfirm) => {
+                const confirmModal = document.getElementById('confirm-modal');
+                document.getElementById('confirm-modal-title').textContent = title;
+                document.getElementById('confirm-modal-text').textContent = text;
+
+                const confirmBtn = document.getElementById('confirm-modal-confirm-btn');
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+                newConfirmBtn.addEventListener('click', () => {
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                    closeConfirmModal();
+                });
+                confirmModal.classList.remove('hidden');
+            };
+
+            const closeConfirmModal = () => {
+                document.getElementById('confirm-modal').classList.add('hidden');
+            };
+            document.getElementById('confirm-modal-cancel-btn').addEventListener('click', closeConfirmModal);
+
+
+            function updateClock() {
+                const now = new Date();
+                const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+                const timeOptions = { hour: '2-digit', minute: '2-digit' };
+                const dateString = now.toLocaleDateString('de-DE', dateOptions);
+                const timeString = now.toLocaleTimeString('de-DE', timeOptions);
+                clockElement.textContent = `${dateString} | ${timeString}`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            function createWindow(app) {
+                const existingWindow = document.getElementById(`window-${app.id}`);
+                if (existingWindow) {
+                    bringToFront(existingWindow);
+                    // Wenn das Fenster bereits existiert und minimiert ist, wiederherstellen
+                    if (minimizedWindows.has(app.id)) {
+                        restoreWindow(app.id);
+                    }
+                    return;
+                }
+
+                const appWindow = document.createElement('div');
+                appWindow.id = `window-${app.id}`;
+                appWindow.className = 'app-window';
+
+                const header = document.createElement('div');
+                header.className = 'app-window-header';
+
+                const title = document.createElement('h3');
+                title.textContent = app.name;
+
+                const controls = document.createElement('div');
+                controls.className = 'window-controls';
+
+                // Minimieren-Button hinzufügen
+                const minimizeBtn = document.createElement('button');
+                minimizeBtn.className = 'window-control-btn minimize';
+                minimizeBtn.innerHTML = `<i data-lucide="minus"></i>`;
+                minimizeBtn.title = 'Minimieren';
+                minimizeBtn.onclick = () => minimizeWindow(appWindow, app.id);
+                controls.appendChild(minimizeBtn); // Vor Arrange-Button einfügen
+
+                const arrangeBtn = document.createElement('button');
+                arrangeBtn.className = 'window-control-btn arrange';
+                arrangeBtn.innerHTML = `<i data-lucide="maximize"></i>`;
+                controls.appendChild(arrangeBtn);
+
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'window-control-btn close';
+                closeBtn.innerHTML = `<i data-lucide="x"></i>`;
+                closeBtn.onclick = () => {
+                    appWindow.remove();
+                    minimizedWindows.delete(app.id); // Minimierten Status entfernen, falls vorhanden
+                    renderAppDock(); // Dock aktualisieren
+                };
+
+                controls.appendChild(closeBtn);
+                header.appendChild(title);
+                header.appendChild(controls);
+
+                const content = document.createElement('div');
+                content.className = 'app-window-content';
+
+                const loader = document.createElement('div');
+                loader.className = 'window-loader';
+                const loaderImg = document.createElement('img');
+                loaderImg.src = 'assets/loading/zzz-loading.gif';
+                loaderImg.alt = 'Ladeanimation';
+                loaderImg.className = 'w-20';
+                loader.appendChild(loaderImg);
+                content.appendChild(loader);
+
+                const iframe = document.createElement('iframe');
+                iframe.src = app.src;
+                iframe.dataset.key = app.id;
+                iframe.onload = () => {
+                    setTimeout(() => { loader.remove(); }, 200);
+                    const savedTheme = localStorage.getItem('theme') || 'system';
+                    let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
+                    applyThemeToFrame(iframe, effectiveTheme);
+                    if (app.id === 'appdrawer') {
+                        iframe.contentWindow.postMessage('getFavorites', '*');
+                    }
+                };
+                content.appendChild(iframe);
+
+                appWindow.appendChild(header);
+                appWindow.appendChild(content);
+
+                desktop.appendChild(appWindow);
+                snapWindow(appWindow, 'fullscreen');
+                bringToFront(appWindow);
+
+                appWindow.addEventListener('mousedown', () => bringToFront(appWindow), true);
+
+                const arrangeMenu = document.createElement('div');
+                arrangeMenu.className = 'dropdown-menu hidden';
+                arrangeMenu.style.width = 'auto';
+                arrangeMenu.style.right = '4px';
+                arrangeMenu.style.zIndex = '10002'; // Sicherstellen, dass es über dem Fenster liegt
+                arrangeMenu.innerHTML = `
+                    <div class="dropdown-item" data-snap="left"><i data-lucide="align-left"></i><span>Snap Left</span></div>
+                    <div class="dropdown-item" data-snap="right"><i data-lucide="align-right"></i><span>Snap Right</span></div>
+                    <div class="dropdown-item" data-snap="fullscreen"><i data-lucide="maximize"></i><span>Fullscreen</span></div>
+                `;
+                arrangeBtn.parentElement.appendChild(arrangeMenu);
+
+                arrangeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+                        if (m !== arrangeMenu) m.classList.add('hidden');
+                    });
+                    arrangeMenu.classList.toggle('hidden');
+                    // Lucide Icons im neuen Menü neu erstellen
+                    lucide.createIcons();
+                });
+
+                arrangeMenu.addEventListener('click', (e) => {
+                    const snapTarget = e.target.closest('.dropdown-item');
+                    if (snapTarget) {
+                        snapWindow(appWindow, snapTarget.dataset.snap);
+                        arrangeMenu.classList.add('hidden');
+                    }
+                });
+                // Lucide Icons für die neuen Fenster-Steuerelemente neu erstellen
+                lucide.createIcons();
+            }
+
+            function minimizeWindow(element, appId) {
+                element.style.display = 'none'; // Fenster ausblenden
+                minimizedWindows.add(appId); // App als minimiert markieren
+                renderAppDock(); // Dock aktualisieren, um blauen Punkt anzuzeigen
+            }
+
+            function restoreWindow(appId) {
+                const appWindow = document.getElementById(`window-${appId}`);
+                if (appWindow) {
+                    appWindow.style.display = 'flex'; // Fenster wieder einblenden
+                    bringToFront(appWindow); // Fenster in den Vordergrund bringen
+                    minimizedWindows.delete(appId); // App als nicht mehr minimiert markieren
+                    renderAppDock(); // Dock aktualisieren, um blauen Punkt zu entfernen
+                }
+            }
+
+            function bringToFront(el) {
+                highestZIndex++;
+                el.style.zIndex = highestZIndex;
+            }
+
+            function snapWindow(element, direction) {
+                const topBarHeight = 32;
+                // Die berechnete Höhe des App-Docks abrufen
+                const appDockHeight = appDock.offsetHeight;
+
+                if (direction === 'left') {
+                    element.style.left = '0px';
+                    element.style.top = `${topBarHeight}px`;
+                    element.style.width = '50vw';
+                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
+                    element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
+                } else if (direction === 'right') {
+                    element.style.left = '50vw';
+                    element.style.top = `${topBarHeight}px`;
+                    element.style.width = '50vw';
+                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
+                    element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
+                } else if (direction === 'fullscreen') {
+                    element.style.top = `${topBarHeight}px`;
+                    element.style.left = '0px';
+                    element.style.width = '100vw';
+                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
+                    element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
+                }
+            }
+
+            function makeIconDraggable(icon, app) {
+                let hasMoved = false;
+                let startX, startY;
+                const DRAG_THRESHOLD = 5; // Pixel, bevor eine Bewegung als "Drag" erkannt wird
+
+                icon.onmousedown = (e) => {
+                    if (e.button !== 0) return; // Nur auf Linksklick reagieren
+                    e.preventDefault(); // Verhindert Standard-Browser-Drag-Verhalten und Textauswahl
+                    hasMoved = false;
+                    startX = e.clientX;
+                    startY = e.clientY;
+
+                    // Event-Listener für Mausbewegung und Maustaste loslassen hinzufügen
+                    document.addEventListener('mousemove', elementDrag);
+                    document.addEventListener('mouseup', closeDragElement);
+                };
+
+                function elementDrag(moveEvent) {
+                    moveEvent.preventDefault(); // Verhindert Standard-Browser-Drag-Verhalten während des Ziehens
+
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+
+                    // Prüfen, ob die Maus den Schwellenwert für eine Bewegung überschritten hat
+                    if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+                        hasMoved = true;
+                    }
+
+                    // Icon nur verschieben, wenn eine Bewegung erkannt wurde
+                    if (hasMoved) {
+                        icon.style.left = `${icon.offsetLeft + dx}px`;
+                        icon.style.top = `${icon.offsetTop + dy}px`;
+                        startX = moveEvent.clientX; // Startpunkt für die nächste Bewegung aktualisieren
+                        startY = moveEvent.clientY;
+                    }
+                }
+
+                function closeDragElement() {
+                    document.removeEventListener('mousemove', elementDrag);
+                    document.removeEventListener('mouseup', closeDragElement);
+
+                    if (hasMoved) {
+                        // Wenn das Icon verschoben wurde, Position speichern
+                        iconPositions[icon.id] = { top: icon.style.top, left: icon.style.left };
+                        localStorage.setItem('desktopIconPositions', JSON.stringify(iconPositions));
+                    } else {
+                        // Wenn keine signifikante Bewegung (Drag) stattfand, die Anwendung öffnen
+                        createWindow(app);
+                    }
+                }
+
+                icon.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    showContextMenu(e.clientX, e.clientY, app.id, true);
+                });
+            }
+
+            function createDesktopIcons() {
+                apps.forEach((app, index) => {
+                    const icon = document.createElement('div');
+                    icon.id = `icon-${app.id}`;
+                    icon.className = 'desktop-icon';
+
+                    const img = document.createElement('img');
+                    img.src = app.icon;
+                    img.alt = app.name;
+
+                    const span = document.createElement('span');
+                    span.textContent = app.name;
+
+                    icon.appendChild(img);
+                    icon.appendChild(span);
+
+                    if (iconPositions[icon.id]) {
+                        icon.style.top = iconPositions[icon.id].top;
+                        icon.style.left = iconPositions[icon.id].left;
+                    } else {
+                        icon.style.top = `${50 + (index % 8) * 100}px`;
+                        icon.style.left = `${50 + Math.floor(index / 8) * 100}px`;
+                    }
+
+                    desktop.appendChild(icon);
+                    makeIconDraggable(icon, app);
+                });
+            }
+
+            function applyThemeToFrame(frame, theme) {
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage(`set-theme-${theme}`, '*');
+                }
+            }
+
+            function applyTheme(theme) {
+                let effectiveTheme = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+                if (effectiveTheme === 'light') {
+                    document.body.classList.remove('dynamic-background');
+                    document.body.classList.add('static-background');
+                } else {
+                    document.body.classList.add('dynamic-background');
+                    document.body.classList.remove('static-background');
+                }
+
+                const themeIcon = document.querySelector('#theme-menu-btn .lucide');
+                if (effectiveTheme === 'light') themeIcon.setAttribute('data-lucide', 'sun');
+                else themeIcon.setAttribute('data-lucide', 'moon');
+                lucide.createIcons(); // Lucide Icons nach dem Ändern des data-lucide-Attributs neu rendern
+
+
+                // Thema auf Desktop-Icons (auf dem Desktop selbst) anwenden
+                document.querySelectorAll('.desktop-icon img').forEach(img => {
+                    if (effectiveTheme === 'dark') {
+                        img.style.filter = 'invert(1)';
+                    } else {
+                        img.style.filter = 'none';
+                    }
+                });
+
+                // Thema auf Dock-Icons anwenden, die Desktop-Apps sind (nicht abgerundet)
+                document.querySelectorAll('.dock-desktop-icon').forEach(img => {
+                    if (effectiveTheme === 'dark') {
+                        img.style.filter = 'invert(1)';
+                    } else {
+                        img.style.filter = 'none';
+                    }
+                });
+
+                document.querySelectorAll('.app-window iframe').forEach(frame => {
+                    applyThemeToFrame(frame, effectiveTheme);
+                });
+            }
+
+            function setupDropdowns() {
+                const menus = [
+                    { btn: 'theme-menu-btn', dropdown: 'theme-dropdown' },
+                    { btn: 'design-menu-btn', dropdown: 'design-dropdown' },
+                    { btn: 'data-menu-btn', dropdown: 'data-dropdown' },
+                ];
+
+                menus.forEach(menu => {
+                    const btn = document.getElementById(menu.btn);
+                    const dropdown = document.getElementById(menu.dropdown);
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menus.forEach(otherMenu => {
+                            if (otherMenu.dropdown !== menu.dropdown) {
+                                document.getElementById(otherMenu.dropdown).classList.add('hidden');
+                            }
+                        });
+                        dropdown.classList.toggle('hidden');
+                        // Lucide Icons im geöffneten Dropdown neu erstellen
+                        lucide.createIcons();
+                    });
+                });
+
+                window.addEventListener('click', () => {
+                    menus.forEach(menu => document.getElementById(menu.dropdown).classList.add('hidden'));
+                });
+            }
+
+            document.querySelectorAll('#theme-dropdown .dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const theme = item.dataset.themeValue;
+                    localStorage.setItem('theme', theme);
+                    applyTheme(theme);
+                });
+            });
+
+            document.querySelectorAll('#design-dropdown .dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (item.dataset.designValue === 'sidebar') {
+                        window.location.href = 'index.html';
+                    }
+                });
+            });
+
+            // --- DATA MANAGEMENT FUNCTIONS ---
+
+            const createAndDownloadZip = (backupData) => {
+                const zip = new JSZip();
+                let filesAdded = 0;
+                for (const key in backupData) {
+                    if (backupData[key] !== null && backupData[key] !== undefined) {
+                        zip.file(`${key}.json`, JSON.stringify(backupData[key], null, 2));
+                        filesAdded++;
+                    }
+                }
+                if (filesAdded === 0) {
+                    showNotification('Keine Daten zum Sichern gefunden.');
+                    return;
+                }
+                zip.generateAsync({ type: "blob" })
+                    .then(content => {
+                        const link = document.createElement('a');
+                        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                        link.href = URL.createObjectURL(content);
+                        link.download = `dev0gig-backup-${timestamp}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        showNotification('Backup erfolgreich heruntergeladen!');
+                    })
+                    .catch(err => {
+                        console.error('Zip generation failed:', err);
+                        showNotification('Backup-Erstellung fehlgeschlagen.');
+                    });
+            };
+
+            document.getElementById('backup-btn').addEventListener('click', async () => {
+                showNotification('Backup wird vorbereitet...');
+
+                const backupData = {
+                    shell_settings: {
+                        theme: localStorage.getItem('theme') || 'system',
+                        desktopIconPositions: JSON.parse(localStorage.getItem('desktopIconPositions') || '{}')
+                    }
+                };
+
+                const tempContainer = document.createElement('div');
+                tempContainer.style.display = 'none';
+                document.body.appendChild(tempContainer);
+
+                const appsToBackup = apps.filter(app => app.id !== 'widgets');
+                let receivedResponses = 0;
+
+                showNotification(`Backup wird erstellt... 0/${appsToBackup.length} Apps gesichert.`);
+
+                const messageListener = (event) => {
+                    const { type, key, data } = event.data;
+                    if (type === 'backupDataResponse' && key) {
+                        backupData[key] = data;
+                        receivedResponses++;
+                        showNotification(`Backup wird erstellt... ${receivedResponses}/${appsToBackup.length} Apps gesichert.`);
+
+                        if (receivedResponses === appsToBackup.length) {
+                            window.removeEventListener('message', messageListener);
+                            if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
+                            createAndDownloadZip(backupData);
+                        }
+                    }
+                };
+                window.addEventListener('message', messageListener);
+
+                appsToBackup.forEach(app => {
+                    const iframe = document.createElement('iframe');
+                    iframe.dataset.key = app.id;
+                    iframe.src = app.src;
+                    iframe.onload = () => {
+                        iframe.contentWindow.postMessage({ type: 'getBackupData' }, '*');
+                    };
+                    tempContainer.appendChild(iframe);
+                });
+
+                setTimeout(() => {
+                    if (receivedResponses < appsToBackup.length) {
+                        window.removeEventListener('message', messageListener);
+                        if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
+                        showNotification(`Backup-Timeout. Es wurden ${receivedResponses}/${appsToBackup.length} Apps gesichert.`, 5000);
+                        createAndDownloadZip(backupData);
+                    }
+                }, 15000);
+            });
+
+            document.getElementById('restore-input').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                openConfirmModal('Daten wiederherstellen?', 'Dies wird alle aktuellen Einstellungen überschreiben und die Seite neu laden. Fortfahren?', async () => {
+                    showNotification('Wiederherstellung wird gestartet...');
+                    try {
+                        const zip = await JSZip.loadAsync(file);
+                        let restoredAppsCount = 0;
+                        const filesInZip = Object.keys(zip.files);
+
+                        const shellFile = zip.file('shell_settings.json');
+                        if (shellFile) {
+                            const content = await shellFile.async('string');
+                            const settings = JSON.parse(content);
+                            for (const key in settings) {
+                                const value = settings[key];
+                                localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
+                            }
+                        }
+
+                        const appDrawerFile = zip.file('appdrawer.json');
+                        if (appDrawerFile) {
+                            const content = await appDrawerFile.async('string');
+                            const appDrawerData = JSON.parse(content);
+                            if (appDrawerData.apps) {
+                                localStorage.setItem('userApps', JSON.stringify(appDrawerData.apps));
+                            }
+                            if (appDrawerData.favorites) {
+                                localStorage.setItem('favoriteApps', JSON.stringify(appDrawerData.favorites));
+                            }
+                        }
+
+                        const tempContainer = document.createElement('div');
+                        tempContainer.style.display = 'none';
+                        document.body.appendChild(tempContainer);
+
+                        const restorePromises = [];
+
+                        for (const filename of filesInZip) {
+                            if (filename.endsWith('.json') && filename !== 'shell_settings.json' && filename !== 'appdrawer.json') {
+                                const key = filename.replace('.json', '');
+                                const appToRestore = apps.find(app => app.id === key);
+
+                                if (appToRestore) {
+                                    const content = await zip.file(filename).async('string');
+                                    const dataToRestore = JSON.parse(content);
+
+                                    const promise = new Promise((resolve, reject) => {
+                                        const iframe = document.createElement('iframe');
+                                        iframe.dataset.key = key;
+                                        iframe.src = appToRestore.src;
+
+                                        iframe.onload = () => {
+                                            iframe.contentWindow.postMessage({ type: 'restoreBackupData', data: dataToRestore }, '*');
+                                            restoredAppsCount++;
+                                            resolve();
+                                        };
+                                        iframe.onerror = reject;
+                                        tempContainer.appendChild(iframe);
+                                    });
+                                    restorePromises.push(promise);
+                                }
+                            }
+                        }
+
+                        await Promise.all(restorePromises);
+
+                        if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
+                        showNotification(`Wiederherstellung abgeschlossen. ${restoredAppsCount} App-Daten verarbeitet. Seite wird neu geladen.`, 4000);
+                        setTimeout(() => window.location.reload(), 4000);
+
+                    } catch (err) {
+                        console.error('Restore failed:', err);
+                        showNotification('Wiederherstellung fehlgeschlagen. Ungültige Datei?', 5000);
+                    } finally {
+                        event.target.value = '';
+                    }
+                });
+            });
+
+
+            document.getElementById('delete-btn').addEventListener('click', () => {
+                openConfirmModal(
+                    'Alle Daten löschen?',
+                    'Möchten Sie wirklich ALLE Anwendungsdaten und Einstellungen aus Ihrem Browser löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
+                    () => {
+                        localStorage.clear();
+                        showNotification('Alle Daten wurden gelöscht. Seite wird neu geladen.', 3000);
+                        setTimeout(() => window.location.reload(), 3000);
+                    }
+                );
+            });
+
+            function renderAppDock() {
+                const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
+                const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+
+                // Vordefinierte Apps und vom Benutzer hinzugefügte Apps zu einer einzigen Quelle zusammenführen
+                const allAvailableApps = [...apps, ...userApps];
+
+                // Favoriten-Apps aus der kombinierten Liste filtern
+                const favoriteApps = favoriteIds.map(favId =>
+                    allAvailableApps.find(app => app.id === favId)
+                ).filter(Boolean); // Undefinierte Elemente filtern, falls eine favoriteId keiner App entspricht
+
+                appDock.innerHTML = '';
+                if (favoriteApps.length === 0) {
+                    appDock.style.display = 'none';
+                    return;
+                }
+                appDock.style.display = 'flex';
+
+                favoriteApps.forEach(app => {
+                    // Ein Div-Element für das Dock-Element erstellen, kein Anker-Tag
+                    const item = document.createElement('div');
+                    item.className = 'dock-app-item';
+                    item.title = app.name;
+                    item.dataset.appId = app.id;
+
+                    const icon = document.createElement('img');
+                    // app.icon für vordefinierte Apps, app.iconUrl für vom Benutzer hinzugefügte Apps verwenden
+                    icon.src = app.icon || app.iconUrl;
+
+                    // Feststellen, ob es sich um eine vordefinierte Desktop-App oder eine vom Benutzer hinzugefügte App handelt
+                    // Vordefinierte Apps haben 'src', vom Benutzer hinzugefügte Apps aus appdrawer.html haben 'url'
+                    const isDesktopApp = apps.some(desktopApp => desktopApp.id === app.id);
+
+                    if (isDesktopApp) {
+                        // Desktop-App im Dock: keine Abrundung, keine Schattierung, Theme-Filter-Klasse anwenden
+                        icon.className = 'w-12 h-12 pointer-events-none dock-desktop-icon';
+                    } else {
+                        // Vom Benutzer hinzugefügte App aus appdrawer.html: abgerundet beibehalten
+                        icon.className = 'w-12 h-12 rounded-full shadow-lg pointer-events-none';
+                    }
+
+                    icon.onerror = function () { this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`; };
+
+                    item.appendChild(icon);
+                    appDock.appendChild(item);
+
+                    // Blauen Punkt hinzufügen, wenn die App minimiert ist
+                    if (minimizedWindows.has(app.id)) {
+                        item.classList.add('minimized');
+                    } else {
+                        item.classList.remove('minimized');
+                    }
+
+                    // Klick-Listener zum Öffnen/Wiederherstellen der App hinzufügen
+                    item.addEventListener('click', () => {
+                        if (minimizedWindows.has(app.id)) {
+                            restoreWindow(app.id);
+                        } else {
+                            // Wenn die App eine 'src'-Eigenschaft hat (interne App), in einem neuen Fenster öffnen
+                            if (app.src) {
+                                createWindow(app);
+                            } else if (app.url) { // Wenn die App eine 'url'-Eigenschaft hat (externe App), in einem neuen Tab öffnen
+                                window.open(app.url, '_blank');
+                            }
+                        }
+                    });
+
+                    item.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        // false für isDesktopIcon übergeben, da es sich um Dock-Elemente handelt
+                        showContextMenu(e.clientX, e.clientY, app.id, false);
+                    });
+                });
+                // Nach dem Rendern das aktuelle Thema anwenden, um die richtigen Farben sicherzustellen
+                applyTheme(localStorage.getItem('theme') || 'system');
+            }
+
+            function showContextMenu(x, y, appId, isDesktopIcon) {
+                const existingMenu = document.getElementById('context-menu');
+                if (existingMenu) existingMenu.remove();
+
+                const menu = document.createElement('div');
+                menu.id = 'context-menu';
+                menu.style.top = `${y}px`;
+                menu.style.left = `${x}px`;
+
+                let favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+                const isFavorited = favorites.includes(appId);
+
+                const toggleFavoriteItem = document.createElement('div');
+                toggleFavoriteItem.className = 'dropdown-item';
+
+                if (isFavorited) {
+                    toggleFavoriteItem.innerHTML = `<i data-lucide="star-off" class="text-red-500"></i><span class="${isDesktopIcon ? '' : 'text-red-500'}">Remove Favorite</span>`;
+                } else {
+                    toggleFavoriteItem.innerHTML = `<i data-lucide="star" class="text-yellow-400"></i><span>Add to Favorites</span>`;
+                }
+
+                toggleFavoriteItem.onclick = () => {
+                    if (isFavorited) {
+                        favorites = favorites.filter(id => id !== appId);
+                    } else {
+                        favorites.push(appId);
+                    }
+                    localStorage.setItem('favoriteApps', JSON.stringify(favorites));
+                    renderAppDock();
+                    menu.remove();
+                };
+
+                menu.appendChild(toggleFavoriteItem);
+                document.body.appendChild(menu);
+
+                setTimeout(() => {
+                    window.addEventListener('click', () => menu.remove(), { once: true });
+                }, 0);
+                // Lucide Icons für das neue Kontextmenü neu erstellen
+                lucide.createIcons();
+            }
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'favoriteApps' || e.key === 'userApps') {
+                    renderAppDock();
+                }
+            });
+
+            // Globale Tastenkombinationen
+            document.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+
+                if (e.altKey && (key === 'q' || key === 'l' || key === 'r' || key === 'v')) {
+                    e.preventDefault();
+                    let activeWindow = null;
+                    let maxZIndex = -1;
+
+                    document.querySelectorAll('.app-window').forEach(windowEl => {
+                        if (windowEl.style.display !== 'none') {
+                            const currentZIndex = parseInt(windowEl.style.zIndex || 0, 10);
+                            if (currentZIndex > maxZIndex) {
+                                maxZIndex = currentZIndex;
+                                activeWindow = windowEl;
+                            }
+                        }
+                    });
+
+                    if (activeWindow) {
+                        switch (key) {
+                            case 'q':
+                                const appId = activeWindow.id.replace('window-', '');
+                                activeWindow.remove();
+                                minimizedWindows.delete(appId);
+                                renderAppDock();
+                                break;
+                            case 'l':
+                                snapWindow(activeWindow, 'left');
+                                break;
+                            case 'r':
+                                snapWindow(activeWindow, 'right');
+                                break;
+                            case 'v':
+                                snapWindow(activeWindow, 'fullscreen');
+                                break;
+                        }
+                    }
+                }
+            });
+
+            // --- Sternenhimmel-Logik ---
+            const starfieldCanvas = document.getElementById('starfield-canvas');
+            const ctx = starfieldCanvas.getContext('2d');
+            let stars = [];
+
+            function setupStarfield() {
+                starfieldCanvas.width = window.innerWidth;
+                starfieldCanvas.height = window.innerHeight;
+                stars = [];
+                const numStars = 150; // Weniger Sterne für einen dezenteren Look
+                for (let i = 0; i < numStars; i++) {
+                    stars.push({
+                        x: Math.random() * starfieldCanvas.width,
+                        y: Math.random() * starfieldCanvas.height,
+                        radius: Math.random() * 1.2 + 0.3, // Kleinere Sterne
+                        alpha: Math.random() * 0.3 + 0.2, // Geringere maximale Deckkraft
+                        vx: (Math.random() - 0.5) * 0.2, // Langsame horizontale Bewegung
+                        vy: (Math.random() - 0.5) * 0.2  // Langsame vertikale Bewegung
+                    });
+                }
+            }
+
+            function animateStarfield() {
+                ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+
+                stars.forEach(star => {
+                    // Position aktualisieren
+                    star.x += star.vx;
+                    star.y += star.vy;
+
+                    // Wenn Sterne den Bildschirm verlassen, auf der anderen Seite wieder erscheinen lassen
+                    if (star.x < 0) star.x = starfieldCanvas.width;
+                    if (star.x > starfieldCanvas.width) star.x = 0;
+                    if (star.y < 0) star.y = starfieldCanvas.height;
+                    if (star.y > starfieldCanvas.height) star.y = 0;
+
+                    ctx.globalAlpha = star.alpha;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1; // Alpha zurücksetzen
+
+                requestAnimationFrame(animateStarfield);
+            }
+
+            window.addEventListener('resize', setupStarfield);
+
+            // Initialisierung
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            applyTheme(savedTheme);
+
+            createDesktopIcons();
+            renderAppDock();
+            setupDropdowns();
+            setupStarfield();
+            animateStarfield();
+        });
+    </script>
+</body>
+
+</html>

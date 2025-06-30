@@ -44,7 +44,6 @@
             --dock-border: #404040;
         }
 
-        /* UPDATED: Removed #app-dock img from this filter */
         html[data-theme='dark'] #mobile-menu img,
         html[data-theme='dark'] #sidebar img {
             filter: invert(1) brightness(1.5) contrast(1.2);
@@ -59,13 +58,10 @@
             overflow: hidden;
         }
 
-        /* UPDATED: Removed padding-bottom to allow iframes to go behind the dock */
         #main-content {
             position: relative;
             top: 4rem;
-            /* Same as mobile header height */
             height: calc(100% - 4rem);
-            /* Adjust height to account for mobile header */
         }
 
         @media (min-width: 768px) {
@@ -75,24 +71,6 @@
                 height: 100%;
                 margin-left: 4.5rem;
             }
-        }
-
-
-        #content-loader {
-            position: absolute;
-            inset: 0;
-            background-color: var(--bg-color);
-            z-index: 10;
-            opacity: 1;
-            transition: opacity 0.3s ease-in-out;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #content-loader.hidden {
-            opacity: 0;
         }
 
         .content-iframe {
@@ -185,13 +163,15 @@
             z-index: 100;
         }
 
-        .theme-radio-label {
+        .theme-radio-label,
+        .select-label {
             border: 2px solid var(--sidebar-border);
             color: var(--text-color-light);
             transition: background-color 0.2s, color 0.2s;
         }
 
-        .theme-radio-label:hover {
+        .theme-radio-label:hover,
+        .select-label:hover {
             background-color: var(--sidebar-border);
             color: var(--header-text-color);
         }
@@ -202,11 +182,20 @@
             background-color: transparent;
         }
 
-        .theme-radio-peer:checked~.theme-radio-label:hover {
-            background-color: var(--sidebar-border);
+        .select-input {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            cursor: pointer;
+            color: var(--text-color);
         }
 
-        /* Notification Toast */
+        .select-input option {
+            background: var(--modal-bg);
+            color: var(--text-color);
+        }
+
         #notification-toast {
             position: fixed;
             bottom: -100px;
@@ -224,7 +213,6 @@
             bottom: 20px;
         }
 
-        /* App Dock Styles */
         #app-dock {
             position: fixed;
             bottom: calc(10px + env(safe-area-inset-bottom));
@@ -237,24 +225,13 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            display: flex;
+            display: none;
+            /* Initially hidden */
             gap: 1rem;
             z-index: 90;
-            /* High z-index to float above iframes */
             transition: background-color 0.3s ease;
             max-width: 90vw;
             overflow-x: auto;
-        }
-
-        #app-dock::-webkit-scrollbar {
-            display: none;
-        }
-
-        #app-dock {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
         }
 
         .dock-app-item {
@@ -265,6 +242,7 @@
             text-decoration: none;
             color: var(--text-color);
             transition: transform 0.2s ease;
+            cursor: pointer;
         }
 
         .dock-app-item:hover {
@@ -377,21 +355,22 @@
 
     <main id="main-content" class="h-full">
         <div class="relative w-full h-full">
-            <div id="content-loader">
+            <div id="iframe-loader" class="hidden absolute inset-0 z-10 flex items-center justify-center">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <iframe id="frame-appdrawer" src="tabs/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
-            <iframe id="frame-widgets" src="tabs/widgets-iframe.html" class="content-iframe"
+            <iframe id="frame-appdrawer" data-src="tabs/appdrawer.html" class="content-iframe"
+                data-key="appdrawer"></iframe>
+            <iframe id="frame-widgets" data-src="tabs/widgets-iframe.html" class="content-iframe"
                 data-key="widgets"></iframe>
-            <iframe id="frame-readlater" src="tabs/readlater.html" class="content-iframe" data-key="readlater"></iframe>
-            <iframe id="frame-rss" src="tabs/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
-            <iframe id="frame-aurimea" src="tabs/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
-            <iframe id="frame-memomea" src="tabs/memomea.html" class="content-iframe" data-key="memomea"></iframe>
+            <iframe id="frame-readlater" data-src="tabs/readlater.html" class="content-iframe"
+                data-key="readlater"></iframe>
+            <iframe id="frame-rss" data-src="tabs/rss-reader.html" class="content-iframe" data-key="rss"></iframe>
+            <iframe id="frame-aurimea" data-src="tabs/aurimea.html" class="content-iframe" data-key="aurimea"></iframe>
+            <iframe id="frame-memomea" data-src="tabs/memomea.html" class="content-iframe" data-key="memomea"></iframe>
         </div>
     </main>
 
     <div id="app-dock"></div>
-
 
     <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50"></div>
     <div id="settings-modal"
@@ -434,6 +413,22 @@
                 </fieldset>
             </div>
             <div>
+                <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Design</h3>
+                <div>
+                    <label for="nav-design-select" class="sr-only">Navigationsdesign auswählen</label>
+                    <div class="select-label relative flex items-center w-full p-3 rounded-lg">
+                        <i data-lucide="layout-panel-left" class="w-5 h-5 mr-2"></i>
+                        <select id="nav-design-select" name="nav-design"
+                            class="select-input appearance-none w-full bg-transparent">
+                            <option value="sidebar">Seitenleiste</option>
+                            <option value="desktop">Desktop</option>
+                        </select>
+                        <i data-lucide="chevron-down"
+                            class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <h3 class="text-lg font-semibold mb-3" style="color: var(--header-text-color);">Datenverwaltung</h3>
                 <div class="flex flex-col space-y-4">
                     <div class="flex flex-col sm:flex-row gap-4">
@@ -449,7 +444,6 @@
                         </label>
                         <input type="file" id="restore-all-input" class="hidden" accept=".zip">
                     </div>
-
                     <button id="delete-all-btn"
                         class="w-full text-white bg-red-600 hover:bg-red-700 font-semibold rounded-md px-6 py-2.5 transition duration-200 flex items-center justify-center gap-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -460,7 +454,6 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div id="confirm-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-70 z-[110] flex items-center justify-center p-4">
         <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--modal-bg);">
@@ -479,11 +472,8 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
-            const contentLoader = document.getElementById('content-loader');
-            const contentFrames = document.querySelectorAll('.content-iframe');
-            const appdrawerFrame = document.getElementById('frame-appdrawer');
+            const iframeLoader = document.getElementById('iframe-loader');
             const appDock = document.getElementById('app-dock');
-            const desktopNavLinks = document.querySelectorAll('#sidebar #nav-links a, #sidebar #nav-links button');
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -494,46 +484,35 @@
             const modalOverlay = document.getElementById('modal-overlay');
             const closeModalBtn = document.getElementById('close-modal-btn');
             const notificationToast = document.getElementById('notification-toast');
-
             const backupAllBtn = document.getElementById('backup-all-btn');
             const restoreAllInput = document.getElementById('restore-all-input');
             const deleteAllBtn = document.getElementById('delete-all-btn');
-
-            // --- START: MODIFIED BACKUP LOGIC VARIABLES ---
-            let backupData = {};
-            const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
-            let expectedResponses = 0;
-            let receivedResponses = 0;
-            let backupInProgress = false;
-            let backupTimeoutId = null; // To hold the timeout ID
-            // --- END: MODIFIED BACKUP LOGIC VARIABLES ---
-
-            const confirmModal = document.getElementById('confirm-modal');
-            const confirmModalTitle = document.getElementById('confirm-modal-title');
-            const confirmModalText = document.getElementById('confirm-modal-text');
-            const confirmCancelBtn = document.getElementById('confirm-modal-cancel-btn');
-            const confirmConfirmBtn = document.getElementById('confirm-modal-confirm-btn');
-            let confirmCallback = null;
+            const navDesignSelect = document.getElementById('nav-design-select');
+            const themeRadios = document.querySelectorAll('input[name="theme"]');
 
             const openConfirmModal = (title, text, onConfirm) => {
-                confirmModalTitle.textContent = title;
-                confirmModalText.textContent = text;
-                confirmCallback = onConfirm;
+                const confirmModal = document.getElementById('confirm-modal');
+                document.getElementById('confirm-modal-title').textContent = title;
+                document.getElementById('confirm-modal-text').textContent = text;
+
+                const confirmBtn = document.getElementById('confirm-modal-confirm-btn');
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+                newConfirmBtn.addEventListener('click', () => {
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                    closeConfirmModal();
+                });
                 confirmModal.classList.remove('hidden');
             };
 
             const closeConfirmModal = () => {
-                confirmModal.classList.add('hidden');
-                confirmCallback = null;
+                document.getElementById('confirm-modal').classList.add('hidden');
             };
 
-            confirmCancelBtn.addEventListener('click', closeConfirmModal);
-            confirmConfirmBtn.addEventListener('click', () => {
-                if (typeof confirmCallback === 'function') {
-                    confirmCallback();
-                }
-                closeConfirmModal();
-            });
+            document.getElementById('confirm-modal-cancel-btn').addEventListener('click', closeConfirmModal);
 
             const showToast = (message, type = 'success', duration = 3000) => {
                 notificationToast.textContent = message;
@@ -547,51 +526,49 @@
                 }
             };
 
-            // --- START: MODIFIED BACKUP FUNCTIONS ---
             const backupAllData = () => {
-                if (backupInProgress) return;
-
-                backupInProgress = true;
-                backupData = {};
-                expectedResponses = backupFrames.length;
-                receivedResponses = 0;
+                let backupData = {};
+                const contentFrames = document.querySelectorAll('.content-iframe');
+                const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets' && f.src);
+                let expectedResponses = backupFrames.length;
+                let receivedResponses = 0;
 
                 if (expectedResponses === 0) {
-                    showToast('Keine Apps zum Sichern gefunden.', 'info');
-                    backupInProgress = false;
+                    showToast('Keine geladenen Apps zum Sichern gefunden.', 'info');
                     return;
                 }
 
                 showToast('Backup wird gestartet...', 'info', 0);
-                backupFrames.forEach(frame => {
-                    frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*');
-                });
 
-                // Set a timeout to handle apps that don't respond.
-                backupTimeoutId = setTimeout(() => {
-                    if (backupInProgress) { // Check if backup is still running
-                        backupInProgress = false; // Stop the process
-                        const respondedKeys = Object.keys(backupData);
-                        const allKeys = backupFrames.map(f => f.dataset.key);
-                        const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
-
-                        let errorMessage = 'Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', ');
-
-                        // IMPORTANT: Do NOT create a partial backup. Just inform the user.
-                        showToast(errorMessage, 'error', 8000); // Show error for longer
+                const backupTimeoutId = setTimeout(() => {
+                    const respondedKeys = Object.keys(backupData);
+                    const allKeys = backupFrames.map(f => f.dataset.key);
+                    const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
+                    if (missingKeys.length > 0) {
+                        showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
                     }
-                }, 10000); // 10-second timeout
+                }, 10000);
+
+                const messageListener = (event) => {
+                    const { type, key, data } = event.data;
+                    if (type === 'backupDataResponse') {
+                        if (key) { backupData[key] = data; }
+                        receivedResponses++;
+                        if (receivedResponses === expectedResponses) {
+                            clearTimeout(backupTimeoutId);
+                            window.removeEventListener('message', messageListener);
+                            createAndDownloadZip(backupData);
+                        }
+                    }
+                };
+                window.addEventListener('message', messageListener);
+
+                backupFrames.forEach(frame => {
+                    frame.contentWindow.postMessage({ type: 'getBackupData' }, '*');
+                });
             };
 
-            const createAndDownloadZip = () => {
-                // The backup was successful, so clear the timeout.
-                if (backupTimeoutId) {
-                    clearTimeout(backupTimeoutId);
-                    backupTimeoutId = null;
-                }
-
-                if (!backupInProgress) return; // Ignore if timeout already happened
-
+            const createAndDownloadZip = (backupData) => {
                 const zip = new JSZip();
                 let filesAdded = 0;
                 for (const key in backupData) {
@@ -600,14 +577,10 @@
                         filesAdded++;
                     }
                 }
-
-                backupInProgress = false; // Backup process is now finished.
-
                 if (filesAdded === 0) {
                     showToast('Keine Daten zum Sichern gefunden.', 'info');
                     return;
                 }
-
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
@@ -619,15 +592,12 @@
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
                         showToast('Backup erfolgreich heruntergeladen!', 'success');
-                        localStorage.removeItem('sessionInProgress');
                     })
                     .catch(err => {
                         console.error('Zip generation failed:', err);
                         showToast('Backup-Erstellung fehlgeschlagen.', 'error');
                     });
             };
-            // --- END: MODIFIED BACKUP FUNCTIONS ---
-
 
             const restoreAllData = (event) => {
                 const file = event.target.files[0];
@@ -637,22 +607,36 @@
                     try {
                         const zip = await JSZip.loadAsync(e.target.result);
                         let restoredCount = 0;
-                        for (const filename in zip.files) {
+                        const zipFiles = Object.keys(zip.files);
+
+                        for (const filename of zipFiles) {
                             if (filename.endsWith('.json')) {
                                 const key = filename.replace('.json', '');
                                 const frame = document.querySelector(`.content-iframe[data-key="${key}"]`);
-                                if (frame && frame.contentWindow) {
+                                if (frame) {
                                     const content = await zip.file(filename).async('string');
-                                    frame.contentWindow.postMessage({
-                                        type: 'restoreBackupData',
-                                        data: JSON.parse(content)
-                                    }, '*');
+                                    const dataToRestore = JSON.parse(content);
+
+                                    const sendMessageOnLoad = () => {
+                                        frame.contentWindow.postMessage({
+                                            type: 'restoreBackupData',
+                                            data: dataToRestore
+                                        }, '*');
+                                        frame.removeEventListener('load', sendMessageOnLoad);
+                                    };
+
+                                    if (!frame.src) {
+                                        frame.addEventListener('load', sendMessageOnLoad);
+                                        frame.src = frame.dataset.src;
+                                    } else {
+                                        sendMessageOnLoad();
+                                    }
                                     restoredCount++;
                                 }
                             }
                         }
                         showToast(`${restoredCount} App(s) erfolgreich wiederhergestellt. Die Seiten werden neu geladen.`, 'success');
-                        setTimeout(() => window.location.reload(), 1500);
+                        setTimeout(() => window.location.reload(), 2000);
                     } catch (err) {
                         console.error('Restore failed:', err);
                         showToast('Wiederherstellung fehlgeschlagen. Ist es eine gültige Backup-Datei?', 'error');
@@ -707,35 +691,10 @@
             };
 
             window.addEventListener('message', (event) => {
-                const { type, payload, key, data } = event.data;
-                if (type === 'favoritesUpdated') {
-                    renderAppDock(payload);
+                if (event.data.type === 'favoritesUpdated') {
+                    renderAppDock(event.data.payload);
                 }
-
-                // --- START: MODIFIED MESSAGE HANDLER FOR BACKUP ---
-                if (type === 'backupDataResponse') {
-                    // Ignore late responses if the backup process has already timed out or finished.
-                    if (!backupInProgress) return;
-
-                    if (key) { backupData[key] = data; }
-                    receivedResponses++;
-
-                    // Only when all expected apps have responded, create the zip.
-                    if (receivedResponses === expectedResponses) {
-                        createAndDownloadZip();
-                    }
-                }
-                // --- END: MODIFIED MESSAGE HANDLER FOR BACKUP ---
             });
-
-            backupAllBtn.addEventListener('click', backupAllData);
-            restoreAllInput.addEventListener('change', restoreAllData);
-            deleteAllBtn.addEventListener('click', deleteAllData);
-
-            if (localStorage.getItem('sessionInProgress') === 'true') {
-                showToast('Willkommen zurück! Ihre letzte Sitzung wurde geladen.', 'info', 5000);
-            }
-            localStorage.setItem('sessionInProgress', 'true');
 
             const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
             const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };
@@ -746,35 +705,82 @@
             };
             const closeSettingsModal = () => { settingsModal.classList.add('hidden'); modalOverlay.classList.add('hidden'); };
 
+            function applyThemeToFrame(frame, theme) {
+                let effectiveTheme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage(`set-theme-${effectiveTheme}`, '*');
+                }
+            }
+
+            function applyTheme(theme) {
+                let effectiveTheme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+                document.querySelectorAll('.content-iframe').forEach(frame => {
+                    if (frame.src) {
+                        applyThemeToFrame(frame, theme);
+                    }
+                });
+            }
+
+            function activateTab(frameId) {
+                const targetFrame = document.getElementById(frameId);
+                const currentActiveFrame = document.querySelector('.content-iframe.active');
+
+                if (!targetFrame || (currentActiveFrame && currentActiveFrame.id === frameId)) {
+                    return;
+                }
+
+                currentActiveFrame?.classList.remove('active');
+                document.querySelectorAll('.sidebar-link.active').forEach(l => l.classList.remove('active'));
+
+                const targetLink = document.querySelector(`[data-target="${frameId}"]`);
+                if (targetLink) {
+                    document.querySelectorAll(`a[data-target="${frameId}"], button[data-target="${frameId}"]`).forEach(l => l.classList.add('active'));
+                    mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || targetLink.querySelector('span')?.textContent || targetLink.title || 'Dashboard';
+                }
+
+                if (!targetFrame.src) {
+                    iframeLoader.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--bg-color');
+                    iframeLoader.classList.remove('hidden');
+
+                    targetFrame.addEventListener('load', () => {
+                        setTimeout(() => {
+                            iframeLoader.classList.add('hidden');
+                            targetFrame.classList.add('active');
+                        }, 500);
+
+                        const savedTheme = localStorage.getItem('theme') || 'system';
+                        applyThemeToFrame(targetFrame, savedTheme);
+                        if (targetFrame.id === 'frame-appdrawer' && targetFrame.contentWindow) {
+                            targetFrame.contentWindow.postMessage('getFavorites', '*');
+                        }
+                    }, { once: true });
+
+                    targetFrame.src = targetFrame.dataset.src;
+                } else {
+                    targetFrame.classList.add('active');
+                }
+            }
+
             function handleNavLinkClick(e) {
                 const target = e.currentTarget;
                 if (target.closest('#settings-btn')) {
                     e.preventDefault();
                     openSettingsModal();
                 } else if (target.target === '_blank') {
+                    // Let external links open
                 } else {
                     e.preventDefault();
                     const targetFrameId = target.dataset.target;
                     if (!targetFrameId) return;
+
                     localStorage.setItem('lastActiveTab', targetFrameId);
-                    const targetFrame = document.getElementById(targetFrameId);
-                    if (targetFrame && !targetFrame.classList.contains('active')) {
-                        document.querySelector('.content-iframe.active')?.classList.remove('active');
-                        targetFrame.classList.add('active');
-                        document.querySelectorAll('#nav-links .sidebar-link, #nav-links button, #mobile-nav-links .sidebar-link, #mobile-nav-links button').forEach(l => l.classList.remove('active'));
-                        document.querySelectorAll(`a[data-target="${targetFrameId}"], button#settings-btn`).forEach(l => {
-                            if (target.id === 'settings-btn' && l.id === 'settings-btn') {
-                                l.classList.add('active');
-                            } else if (l.dataset && l.dataset.target === targetFrameId) {
-                                l.classList.add('active');
-                            }
-                        });
-                        mobileHeaderTitle.textContent = target.querySelector('.sidebar-text')?.textContent || target.querySelector('span')?.textContent || 'Dashboard';
-                    }
+                    activateTab(targetFrameId);
                 }
                 if (mobileMenu.classList.contains('open')) closeMobileMenu();
             }
 
+            // --- INITIALIZATION ---
             document.querySelectorAll('#sidebar > ul > li').forEach(li => {
                 const newLi = li.cloneNode(true);
                 const linkOrButton = newLi.querySelector('a, button');
@@ -786,11 +792,11 @@
                     sidebarTextSpan.classList.add('ml-3');
                 }
                 linkOrButton.classList.add('w-full');
-                mobileNavLinksContainer.appendChild(newLi);
                 linkOrButton.addEventListener('click', handleNavLinkClick);
+                mobileNavLinksContainer.appendChild(newLi);
             });
 
-            desktopNavLinks.forEach(link => link.addEventListener('click', handleNavLinkClick));
+            document.querySelectorAll('#sidebar #nav-links a, #sidebar #nav-links button').forEach(link => link.addEventListener('click', handleNavLinkClick));
 
             hamburgerBtn.addEventListener('click', openMobileMenu);
             closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
@@ -799,14 +805,10 @@
             closeModalBtn.addEventListener('click', closeSettingsModal);
             modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
 
-            const themeRadios = document.querySelectorAll('input[name="theme"]');
-            function applyTheme(theme) {
-                let effectiveTheme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
-                document.documentElement.setAttribute('data-theme', effectiveTheme);
-                contentFrames.forEach(frame => {
-                    frame.contentWindow?.postMessage(`set-theme-${effectiveTheme}`, '*');
-                });
-            }
+            backupAllBtn.addEventListener('click', backupAllData);
+            restoreAllInput.addEventListener('change', restoreAllData);
+            deleteAllBtn.addEventListener('click', deleteAllData);
+
             themeRadios.forEach(radio => radio.addEventListener('change', (e) => {
                 const selectedTheme = e.target.value;
                 localStorage.setItem('theme', selectedTheme);
@@ -814,45 +816,18 @@
             }));
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('theme') === 'system') applyTheme('system'); });
 
-            let loadedFrames = 0;
-            const totalFrames = contentFrames.length;
-            if (totalFrames > 0) {
-                contentFrames.forEach(frame => {
-                    frame.addEventListener('load', () => {
-                        loadedFrames++;
-                        const savedTheme = localStorage.getItem('theme') || 'system';
-                        applyTheme(savedTheme);
-
-                        if (frame.id === 'frame-appdrawer') {
-                            frame.contentWindow.postMessage('getFavorites', '*');
-                        }
-
-                        if (loadedFrames >= totalFrames) {
-                            setTimeout(() => contentLoader.classList.add('hidden'), 200);
-                        }
-                    });
-                });
-            } else {
-                contentLoader.classList.add('hidden');
-            }
+            navDesignSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'desktop') {
+                    window.location.href = 'index_desktop.html';
+                }
+            });
 
             const savedTheme = localStorage.getItem('theme') || 'system';
             document.querySelector(`input[name="theme"][value="${savedTheme}"]`)?.setAttribute('checked', 'true');
             applyTheme(savedTheme);
 
             const lastActiveTabId = localStorage.getItem('lastActiveTab') || 'frame-appdrawer';
-            const targetFrame = document.getElementById(lastActiveTabId);
-            const targetLink = document.querySelector(`a[data-target="${lastActiveTabId}"], button[data-target="${lastActiveTabId}"]`);
-            if (targetFrame && targetLink) {
-                targetFrame.classList.add('active');
-                document.querySelectorAll(`a[data-target="${lastActiveTabId}"], button[data-target="${lastActiveTabId}"]`).forEach(l => l.classList.add('active'));
-                mobileHeaderTitle.textContent = targetLink.querySelector('.sidebar-text')?.textContent || targetLink.querySelector('span')?.textContent || 'Dashboard';
-            } else {
-                localStorage.removeItem('lastActiveTab');
-                document.getElementById('frame-appdrawer')?.classList.add('active');
-                document.querySelector('a[data-target="frame-appdrawer"]')?.classList.add('active');
-                mobileHeaderTitle.textContent = 'Appdrawer';
-            }
+            activateTab(lastActiveTabId);
 
             lucide.createIcons();
         });

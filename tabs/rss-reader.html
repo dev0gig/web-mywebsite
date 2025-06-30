@@ -120,12 +120,24 @@
             text-decoration: underline;
         }
 
+        /* Ensure images inside reader-body are responsive and styled */
         #reader-body img {
             max-width: 100%;
             height: auto;
             border-radius: 0.5rem;
             margin: 1rem 0;
         }
+
+        /* Specific style for the single image shown below the text */
+        #reader-body-image {
+            display: block;
+            /* Ensure it takes its own line */
+            margin-top: 1.5rem;
+            /* More space above the image */
+            margin-bottom: 1.5rem;
+            /* More space below the image */
+        }
+
 
         #reader-body h1,
         #reader-body h2,
@@ -212,7 +224,8 @@
                     <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
                         neuesten Beiträge anzuzeigen.</p>
                 </div>
-                <div class="flex space-x-2">
+                <!-- Adjusted button container for responsive two-row layout -->
+                <div class="flex flex-wrap gap-2 md:flex-nowrap md:space-x-2">
                     <button id="export-btn-top"
                         class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors"
                         style="background-color: #3b82f6; hover:background-color: #2563eb;" title="Feeds exportieren">
@@ -316,44 +329,52 @@
                         <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate"
                             style="color: var(--text-color);"></h3>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <!-- Font Size Controls -->
-                        <div class="flex items-center space-x-1">
-                            <button id="font-size-decrease" title="Schriftgröße verkleinern"
-                                class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                                style="color: var(--text-color-light);">
-                                <i data-lucide="minus" class="h-5 w-5"></i>
-                            </button>
-                            <button id="font-size-increase" title="Schriftgröße vergrößern"
-                                class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                                style="color: var(--text-color-light);">
-                                <i data-lucide="plus" class="h-5 w-5"></i>
-                            </button>
-                        </div>
-                        <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
-                            title="Originalartikel öffnen"
-                            class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                            style="color: var(--text-color-light);">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                        </a>
-                        <button id="reader-close-btn" title="Schließen"
-                            class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                            style="color: var(--text-color-light);">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
                 </div>
                 <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
             </header>
-            <div id="reader-body" class="p-6 overflow-y-auto" style="color: var(--text-color);">
+            <div id="reader-body" class="p-6 overflow-y-auto flex-grow" style="color: var(--text-color);">
                 <!-- Article content and image go here -->
+            </div>
+            <!-- New fixed-position container for reader mode buttons at the bottom -->
+            <div id="reader-controls-bottom"
+                class="flex flex-wrap justify-center gap-2 p-4 border-t sticky bottom-0 left-0 right-0 z-10"
+                style="border-color: var(--border-color); background-color: var(--card-bg);">
+                <!-- Font Size Controls -->
+                <div class="flex items-center space-x-1">
+                    <button id="font-size-decrease" title="Schriftgröße verkleinern"
+                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                        style="color: var(--text-color-light);">
+                        <i data-lucide="minus" class="h-5 w-5"></i>
+                    </button>
+                    <button id="font-size-increase" title="Schriftgröße vergrößern"
+                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                        style="color: var(--text-color-light);">
+                        <i data-lucide="plus" class="h-5 w-5"></i>
+                    </button>
+                </div>
+                <!-- Favorite Button in Reader Mode -->
+                <button id="reader-favorite-btn"
+                    class="favorite-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    title="Als Favorit markieren/entfernen">
+                    <i data-lucide="star" class="h-6 w-6"></i>
+                </button>
+                <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
+                    title="Originalartikel öffnen" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    style="color: var(--text-color-light);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                </a>
+                <button id="reader-close-btn" title="Schließen"
+                    class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    style="color: var(--text-color-light);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -468,6 +489,7 @@
             const readerPrevBtn = document.getElementById('reader-prev-btn');
             const readerNextBtn = document.getElementById('reader-next-btn');
             const readerFavicon = document.getElementById('reader-favicon'); // Reader favicon element
+            const readerFavoriteBtn = document.getElementById('reader-favorite-btn'); // New favorite button in reader mode
 
 
             // Font size controls
@@ -482,7 +504,14 @@
 
 
             // --- HELPER FUNCTIONS (EARLY) ---
-            const getFaviconUrl = (url) => { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch (e) { return placeholderFavicon; } };
+            const getFaviconUrl = (url) => {
+                try {
+                    const domain = new URL(url).hostname;
+                    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                } catch (e) {
+                    return placeholderFavicon;
+                }
+            };
 
             // --- STATE MANAGEMENT ---
             const feedsStorageKey = 'savedRssFeeds';
@@ -525,19 +554,34 @@
             const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
             const saveFavoriteLinks = () => localStorage.setItem(favoritesKey, JSON.stringify(Array.from(favoriteLinks)));
             const saveReaderFontSize = () => localStorage.setItem(readerFontSizeKey, currentReaderFontSize.toString()); // Save font size
-            const showLoading = () => { feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`; };
-            const showMessage = (message, isError = false) => { const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);'; feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`; };
+            const showLoading = () => {
+                feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`;
+            };
+            const showMessage = (message, isError = false) => {
+                const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);';
+                feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`;
+            };
 
             // --- SIDEBAR LOGIC ---
-            const openMobileSidebar = () => { sidebarBackdrop.classList.remove('hidden'); mobileSidebar.classList.remove('translate-x-full'); };
-            const closeMobileSidebar = () => { sidebarBackdrop.classList.add('hidden'); mobileSidebar.classList.add('translate-x-full'); };
+            const openMobileSidebar = () => {
+                sidebarBackdrop.classList.remove('hidden');
+                mobileSidebar.classList.remove('translate-x-full');
+            };
+            const closeMobileSidebar = () => {
+                sidebarBackdrop.classList.add('hidden');
+                mobileSidebar.classList.add('translate-x-full');
+            };
             const setActiveSidebarItem = (url) => {
                 activeUrl = url;
                 document.querySelectorAll('.sidebar-item-active').forEach(el => el.classList.remove('sidebar-item-active'));
                 let activeItems = [];
-                if (url === 'all') { activeItems = document.querySelectorAll('.show-all-btn'); }
-                else if (url === 'favorites') { activeItems = document.querySelectorAll('.show-favorites-btn'); }
-                else { activeItems = document.querySelectorAll(`.sidebar-item[data-url="${url}"]`); }
+                if (url === 'all') {
+                    activeItems = document.querySelectorAll('.show-all-btn');
+                } else if (url === 'favorites') {
+                    activeItems = document.querySelectorAll('.show-favorites-btn');
+                } else {
+                    activeItems = document.querySelectorAll(`.sidebar-item[data-url="${url}"]`);
+                }
                 activeItems.forEach(item => item.classList.add('sidebar-item-active'));
             };
 
@@ -616,8 +660,14 @@
             };
 
             const addSidebarEventListeners = () => {
-                document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => { loadAllFeeds(); closeMobileSidebar(); }));
-                document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => { loadFavorites(); closeMobileSidebar(); }));
+                document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => {
+                    loadAllFeeds();
+                    closeMobileSidebar();
+                }));
+                document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => {
+                    loadFavorites();
+                    closeMobileSidebar();
+                }));
 
                 document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', (e) => {
                     // Check if the click was on the delete button itself
@@ -636,7 +686,7 @@
 
                     // Provide visual feedback
                     btn.disabled = true;
-                    btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+                    btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 A7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
                     savedFeeds.splice(index, 1);
                     await cleanupOrphanedFavorites();
@@ -689,7 +739,12 @@
             const rerenderArticleList = () => {
                 const articlesWrapper = document.getElementById('articles-wrapper');
                 if (!articlesWrapper) return;
-                articlesToDisplay = currentArticles.filter(item => { const isVisited = visitedLinks.has(item.link); if (currentFilter === 'unread') return !isVisited; if (currentFilter === 'read') return isVisited; return true; });
+                articlesToDisplay = currentArticles.filter(item => {
+                    const isVisited = visitedLinks.has(item.link);
+                    if (currentFilter === 'unread') return !isVisited;
+                    if (currentFilter === 'read') return isVisited;
+                    return true;
+                });
                 const unreadCount = currentArticles.filter(i => !visitedLinks.has(i.link)).length;
                 const readCount = currentArticles.length - unreadCount;
                 const unreadEl = document.getElementById('unread-count');
@@ -760,13 +815,24 @@
                 feedContainer.appendChild(wrapper);
 
                 if (showFilters) {
-                    document.getElementById('filter-unread-btn').addEventListener('click', () => { currentFilter = 'unread'; updateFilterButtons(); rerenderArticleList(); });
-                    document.getElementById('filter-read-btn').addEventListener('click', () => { currentFilter = 'read'; updateFilterButtons(); rerenderArticleList(); });
+                    document.getElementById('filter-unread-btn').addEventListener('click', () => {
+                        currentFilter = 'unread';
+                        updateFilterButtons();
+                        rerenderArticleList();
+                    });
+                    document.getElementById('filter-read-btn').addEventListener('click', () => {
+                        currentFilter = 'read';
+                        updateFilterButtons();
+                        rerenderArticleList();
+                    });
                     updateFilterButtons();
                 }
 
                 // Create lucide icons for the newly added content
-                lucide.createIcons({ container: wrapper, attributes: { 'stroke-width': 2 } });
+                lucide.createIcons({
+                    container: wrapper,
+                    attributes: { 'stroke-width': 2 }
+                });
             }
 
             const updateFilterButtons = () => {
@@ -810,28 +876,29 @@
                     readerSourceTitle.classList.add('hidden');
                 }
 
-                // Create a temporary image element for the reader body content
-                const tempImageElement = document.createElement('img');
-                tempImageElement.id = 'reader-body-image'; // Give it a unique ID for styling within the body
-                tempImageElement.alt = 'Artikelbild';
-                tempImageElement.className = 'w-full h-auto mb-4 rounded-lg'; // Apply existing styling
-                tempImageElement.onerror = function () { this.classList.add('hidden'); }; // Hide on error
+                // Create a temporary div to parse the article content
+                const tempContentDiv = document.createElement('div');
+                tempContentDiv.innerHTML = item.content || item.description;
 
-                // Add article content first
-                const contentDiv = document.createElement('div');
-                contentDiv.innerHTML = item.content || item.description;
-                readerBody.appendChild(contentDiv); // Append the actual article content
+                // Remove all img tags from the content
+                tempContentDiv.querySelectorAll('img').forEach(img => img.remove());
+
+                // Append the cleaned content to readerBody
+                readerBody.appendChild(tempContentDiv);
 
                 // Add image if available, AFTER the text content
                 const articleImageUrl = findImageInFeedItem(item);
                 if (articleImageUrl) {
-                    tempImageElement.src = articleImageUrl;
-                    tempImageElement.classList.remove('hidden');
-                    readerBody.appendChild(tempImageElement); // Append the image element after the text
-                } else {
-                    tempImageElement.classList.add('hidden');
+                    const imgElement = document.createElement('img');
+                    imgElement.src = articleImageUrl;
+                    imgElement.alt = 'Artikelbild';
+                    imgElement.className = 'w-full h-auto mb-4 rounded-lg'; // Apply existing styling
+                    imgElement.id = 'reader-body-image'; // Assign ID for specific styling
+                    imgElement.onerror = function () {
+                        this.classList.add('hidden');
+                    }; // Hide on error
+                    readerBody.appendChild(imgElement); // Append the image element after the text
                 }
-
 
                 readerBody.scrollTop = 0;
                 readerOriginalLink.href = item.link;
@@ -843,6 +910,14 @@
                 } else {
                     readerFavicon.classList.add('hidden');
                 }
+
+                // Update favorite button state in reader mode
+                if (favoriteLinks.has(item.link)) {
+                    readerFavoriteBtn.classList.add('is-favorite');
+                } else {
+                    readerFavoriteBtn.classList.remove('is-favorite');
+                }
+                readerFavoriteBtn.dataset.link = item.link; // Set the link for the favorite button
 
                 // Apply the saved font size when opening the reader mode
                 applyReaderFontSize();
@@ -859,9 +934,9 @@
                     readerModal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                 }
-                // Re-create lucide icons for font size buttons
+                // Re-create lucide icons for font size buttons and favorite button
                 lucide.createIcons({
-                    container: readerModalContent,
+                    container: document.getElementById('reader-controls-bottom'), // Target the new container
                     attributes: { 'stroke-width': 2 }
                 });
             };
@@ -959,7 +1034,10 @@
 
             // --- CORE LOGIC & EVENT HANDLERS ---
             const loadAllFeeds = async () => {
-                if (savedFeeds.length === 0) { showMessage('Es sind keine Feeds zum Anzeigen gespeichert.'); return; }
+                if (savedFeeds.length === 0) {
+                    showMessage('Es sind keine Feeds zum Anzeigen gespeichert.');
+                    return;
+                }
                 currentFilter = 'unread';
                 setActiveSidebarItem('all');
                 showLoading();
@@ -1006,7 +1084,11 @@
                             rerenderArticleList();
 
                             urlInput.value = '';
-                            if (!savedFeeds.some(feed => feed.url === rssUrl)) { savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: getFaviconUrl(rssUrl) }); saveFeeds(); renderSidebar(); }
+                            if (!savedFeeds.some(feed => feed.url === rssUrl)) {
+                                savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: getFaviconUrl(rssUrl) });
+                                saveFeeds();
+                                renderSidebar();
+                            }
 
                             resolve();
                         } else {
@@ -1029,7 +1111,10 @@
                 const defaultFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
                 exportFilenameInput.value = defaultFilename; // Set default value in input
                 renameExportModal.classList.remove('hidden'); // Show the modal
-                lucide.createIcons({ container: renameExportModal, attributes: { 'stroke-width': 2 } }); // Re-render icons for modal
+                lucide.createIcons({
+                    container: renameExportModal,
+                    attributes: { 'stroke-width': 2 }
+                }); // Re-render icons for modal
             };
 
             // Function to perform the actual download based on the provided filename
@@ -1072,13 +1157,24 @@
                         try {
                             const importedData = JSON.parse(event.target.result);
                             if (Array.isArray(importedData)) {
-                                savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) })); visitedLinks = new Set(); favoriteLinks = new Set();
+                                savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
+                                visitedLinks = new Set();
+                                favoriteLinks = new Set();
                             } else if (typeof importedData === 'object' && importedData.feeds) {
-                                savedFeeds = (importedData.feeds || []).map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) })); visitedLinks = new Set(importedData.visited || []); favoriteLinks = new Set(importedData.favorites || []);
-                            } else { throw new Error('Ungültiges Dateiformat.'); }
-                            saveFeeds(); saveVisitedLinks(); saveFavoriteLinks();
-                            renderSidebar(); showMessage(`${savedFeeds.length} Feed(s) und zugehörige Daten erfolgreich importiert.`, false);
-                        } catch (error) { showMessage(`Import fehlgeschlagen: ${error.message}`, true); }
+                                savedFeeds = (importedData.feeds || []).map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
+                                visitedLinks = new Set(importedData.visited || []);
+                                favoriteLinks = new Set(importedData.favorites || []);
+                            } else {
+                                throw new Error('Ungültiges Dateiformat.');
+                            }
+                            saveFeeds();
+                            saveVisitedLinks();
+                            saveFavoriteLinks();
+                            renderSidebar();
+                            showMessage(`${savedFeeds.length} Feed(s) und zugehörige Daten erfolgreich importiert.`, false);
+                        } catch (error) {
+                            showMessage(`Import fehlgeschlagen: ${error.message}`, true);
+                        }
                     };
                     reader.readAsText(file);
                 };
@@ -1087,7 +1183,9 @@
 
             // --- GLOBAL EVENT LISTENERS ---
             loadBtn.addEventListener('click', () => loadFeed(urlInput.value).catch(err => console.error(err)));
-            urlInput.addEventListener('keypress', e => { if (e.key === 'Enter') loadFeed(urlInput.value).catch(err => console.error(err)); });
+            urlInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter') loadFeed(urlInput.value).catch(err => console.error(err));
+            });
 
             fabOpenSidebar.addEventListener('click', openMobileSidebar);
             sidebarBackdrop.addEventListener('click', closeMobileSidebar);
@@ -1117,22 +1215,57 @@
 
             // Reader Modal Listeners
             readerCloseBtn.addEventListener('click', closeReaderMode);
-            readerPrevBtn.addEventListener('click', showPreviousArticle);
-            readerNextBtn.addEventListener('click', showNextArticle);
+            readerPrevBtn.addEventListener('click', showPreviousArticle); // Corrected order for prev/next
+            readerNextBtn.addEventListener('click', showNextArticle);     // Corrected order for prev/next
             fontSizeDecreaseBtn.addEventListener('click', () => adjustReaderFontSize(-1)); // Decrease by 1px
             fontSizeIncreaseBtn.addEventListener('click', () => adjustReaderFontSize(1)); // Increase by 1px
 
-            document.addEventListener('keydown', (e) => { if (!readerModal.classList.contains('hidden')) { if (e.key === 'ArrowRight') showNextArticle(); if (e.key === 'ArrowLeft') showPreviousArticle(); if (e.key === 'Escape') closeReaderMode(); } });
+            // New listener for the favorite button in reader mode
+            readerFavoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const link = readerFavoriteBtn.dataset.link;
+                if (!link) return;
+                if (favoriteLinks.has(link)) {
+                    favoriteLinks.delete(link);
+                } else {
+                    favoriteLinks.add(link);
+                }
+                saveFavoriteLinks();
+                updateSidebarCounts();
+                readerFavoriteBtn.classList.toggle('is-favorite');
+            });
+
+
+            document.addEventListener('keydown', (e) => {
+                if (!readerModal.classList.contains('hidden')) {
+                    if (e.key === 'ArrowRight') showNextArticle();
+                    if (e.key === 'ArrowLeft') showPreviousArticle();
+                    if (e.key === 'Escape') closeReaderMode();
+                }
+            });
 
             let touchStartX = 0;
             let touchEndX = 0;
-            readerModalContent.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-            readerModalContent.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
-            const handleSwipe = () => { if (touchEndX < touchStartX - 50) showNextArticle(); if (touchEndX > touchStartX + 50) showPreviousArticle(); };
+            readerModalContent.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            readerModalContent.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+            const handleSwipe = () => {
+                if (touchEndX < touchStartX - 50) showNextArticle();
+                if (touchEndX > touchStartX + 50) showPreviousArticle();
+            };
 
             // Import Modal Listeners
-            document.getElementById('confirm-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); triggerImport(); });
-            document.getElementById('cancel-import-btn').addEventListener('click', () => { document.getElementById('import-modal').classList.add('hidden'); });
+            document.getElementById('confirm-import-btn').addEventListener('click', () => {
+                document.getElementById('import-modal').classList.add('hidden');
+                triggerImport();
+            });
+            document.getElementById('cancel-import-btn').addEventListener('click', () => {
+                document.getElementById('import-modal').classList.add('hidden');
+            });
 
             // Event listeners for the new top-right import/export buttons
             document.getElementById('import-btn-top').addEventListener('click', () => {
