@@ -739,49 +739,38 @@
                 lucide.createIcons();
             };
 
-            // === CORRECTED FUNCTION ===
             function handleDateClick(e) {
                 const dateString = e.currentTarget.dataset.date;
                 const wasJustCreated = journalEntries[dateString] === undefined;
 
-                // Create new entry if it doesn't exist
                 if (wasJustCreated) {
                     journalEntries[dateString] = '';
                     saveEntries(journalEntries);
                 }
 
-                // Reset filter and search
                 activeTagFilters = [];
                 activeSearchTerm = '';
                 searchInput.value = '';
 
-                // Find the correct page for the clicked date
                 const sortedDates = Object.keys(journalEntries).sort().reverse();
                 const entryIndex = sortedDates.indexOf(dateString);
 
                 if (entryIndex !== -1) {
                     currentPage = Math.floor(entryIndex / ENTRIES_PER_PAGE) + 1;
                 } else {
-                    // Fallback if date not found (shouldn't happen)
                     currentPage = 1;
                 }
 
-                // Re-render journal with the correct page
                 updateAll();
-
-                // Close mobile calendar view
                 closeCalendarSidebar();
 
-                // Small delay to ensure page is rendered before scrolling
                 setTimeout(() => {
                     const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         if (wasJustCreated) {
-                            // Open editor for the new entry
                             element.click();
                         } else {
-                            // Highlight existing entry
                             element.classList.add('ring-2', 'ring-blue-400');
                             setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
                         }
@@ -815,7 +804,6 @@
 
                     datesToDisplay = datesToDisplay.filter(date => {
                         const content = journalEntries[date].toLowerCase();
-                        // Ensure tags are checked with full, correctly recognized form
                         return activeTagFilters.every(tag => content.includes(tag));
                     });
 
@@ -830,7 +818,7 @@
                     filterHeader.classList.add('flex');
                     document.getElementById('clear-filter').addEventListener('click', () => {
                         searchInput.value = '';
-                        clearSearchBtn.classList.add('hidden'); // Also hide the clear search button
+                        clearSearchBtn.classList.add('hidden');
                         activeSearchTerm = '';
                         currentPage = 1;
                         updateAll();
@@ -845,12 +833,6 @@
                 } else {
                     filterHeader.classList.add('hidden');
                     filterHeader.classList.remove('flex');
-                    const todayString = formatDate(new Date());
-
-                    if (journalEntries[todayString] === undefined) {
-                        journalEntries[todayString] = '';
-                        saveEntries(journalEntries);
-                    }
                 }
 
                 const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
@@ -897,7 +879,6 @@
                 paginationControls.append(prevButton, pageInfo, nextButton);
             };
 
-            // Custom confirmation dialog elements
             const createConfirmModal = () => {
                 const modal = document.createElement('div');
                 modal.id = 'custom-confirm-modal';
@@ -936,7 +917,7 @@
                 }
 
                 document.getElementById('confirm-modal-message').textContent = message;
-                document.getElementById('confirm-modal-title').textContent = 'Bestätigung'; // Set a default title or pass it
+                document.getElementById('confirm-modal-title').textContent = 'Bestätigung';
                 confirmModal.classList.remove('hidden');
 
                 confirmCallback = onConfirm;
@@ -962,18 +943,27 @@
                 cancelButton.addEventListener('click', handleCancel);
             };
 
+            // ===== FIX START =====
+            // This function now runs every time the view is updated.
+            // It ensures an entry for the current day always exists.
             const updateAll = () => {
+                const todayString = formatDate(new Date());
+                if (journalEntries[todayString] === undefined) {
+                    journalEntries[todayString] = '';
+                    saveEntries(journalEntries);
+                }
+
                 renderJournal();
                 renderCalendar();
                 renderTagCloud();
             };
+            // ===== FIX END =====
 
-            // --- EVENT LISTENER FOR SEARCH ---
             searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value;
                 clearSearchBtn.classList.toggle('hidden', !searchTerm);
                 activeSearchTerm = searchTerm;
-                activeTagFilters = []; // Search overrides tag filters
+                activeTagFilters = [];
                 currentPage = 1;
                 updateAll();
             });
@@ -994,7 +984,6 @@
                 let importedCount = 0;
                 const importedDates = [];
 
-                // Function to process a single text file (.md or .txt)
                 const processTextFile = (file) => {
                     return new Promise((resolve, reject) => {
                         const reader = new FileReader();
@@ -1004,7 +993,7 @@
                                 resolve({ date: dateMatch[1], content: e.target.result });
                             } else {
                                 console.warn(`Could not extract date from filename: ${file.name}`);
-                                resolve(null); // Ignore files without date in name
+                                resolve(null);
                             }
                         };
                         reader.onerror = (e) => {
@@ -1015,13 +1004,11 @@
                     });
                 };
 
-                // Function to process a ZIP file
                 const processZipFile = async (zipFile) => {
                     let zipPromises = [];
                     try {
                         const zip = await JSZip.loadAsync(zipFile);
                         zip.forEach((relativePath, zipEntry) => {
-                            // Process only Markdown files that are not directories
                             if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.md')) {
                                 zipPromises.push(zipEntry.async('string').then(content => {
                                     const dateMatch = relativePath.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -1038,7 +1025,7 @@
                     } catch (error) {
                         console.error("Error loading or processing ZIP file:", zipFile.name, error);
                         showNotification(`Error importing ZIP file "${zipFile.name}".`, 'error');
-                        return []; // Return empty array to continue import
+                        return [];
                     }
                 };
 
@@ -1070,7 +1057,7 @@
                     let newestImportedDate = '';
                     if (importedDates.length > 0) {
                         newestImportedDate = importedDates.sort().reverse()[0];
-                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z'); // Use UTC
+                        calendarDate = new Date(newestImportedDate + 'T00:00:00Z');
                     }
                     currentPage = 1;
                     updateAll();
@@ -1088,7 +1075,7 @@
                 } else {
                     showNotification('No valid entries found to import.', 'warning');
                 }
-                importInput.value = ''; // Reset input field
+                importInput.value = '';
             });
 
 
@@ -1102,7 +1089,6 @@
                     startDateInput.value = today;
                     endDateInput.value = today;
                 }
-                // Set default filename based on current date
                 exportFilenameInput.value = `Journal-Export_${formatDate(new Date())}`;
                 exportModal.classList.remove('hidden');
             });
@@ -1113,7 +1099,7 @@
             confirmExportButton.addEventListener('click', () => {
                 const startDate = startDateInput.value;
                 const endDate = endDateInput.value;
-                const filename = exportFilenameInput.value.trim(); // Get filename from input
+                const filename = exportFilenameInput.value.trim();
 
                 if (!startDate || !endDate || startDate > endDate) return showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
                 if (!filename) return showNotification('Bitte geben Sie einen Dateinamen ein.', 'warning');
@@ -1124,7 +1110,7 @@
                 Object.keys(journalEntries).forEach(dateString => {
                     if (dateString >= startDate && dateString <= endDate) {
                         const content = journalEntries[dateString];
-                        if (content?.trim()) { // Only export entries with content
+                        if (content?.trim()) {
                             zip.file(`${dateString}.md`, content);
                             filesAdded++;
                         }
@@ -1137,7 +1123,7 @@
                     .then(content => {
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(content);
-                        link.download = `${filename}.zip`; // Use the custom filename
+                        link.download = `${filename}.zip`;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
@@ -1159,7 +1145,6 @@
                 });
             });
 
-            // --- CALENDAR SIDEBAR LOGIC (NEW) ---
             function openCalendarSidebar() {
                 calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
                 calendarSidebar.classList.remove('translate-x-full');
@@ -1182,7 +1167,6 @@
 
 <script>
     window.addEventListener('message', (event) => {
-        // Security check: only respond to messages from the parent window
         if (event.source !== window.parent) {
             return;
         }
@@ -1190,28 +1174,18 @@
         const message = event.data;
 
         if (message && message.type === 'getBackupData') {
-            // Collect journal entries from localStorage.
             const journalData = localStorage.getItem('markdownJournalEntries');
-
-            // Send data back to the main window (index.html).
-            // The 'key' must match the 'data-key' of the iframe.
             window.parent.postMessage({
                 type: 'backupDataResponse',
                 key: 'memomea',
-                data: JSON.parse(journalData || '{}') // Ensure valid JSON is sent (an object).
-            }, '*'); // In a real application, you should specify the exact URL of the parent here.
+                data: JSON.parse(journalData || '{}')
+            }, '*');
         }
 
         if (message && message.type === 'restoreBackupData') {
-            // Receive data to be restored.
             const restoredEntries = message.data;
-
-            // Check if the restored data is an object.
             if (typeof restoredEntries === 'object' && restoredEntries !== null) {
-                // Save the restored data in localStorage.
                 localStorage.setItem('markdownJournalEntries', JSON.stringify(restoredEntries));
-
-                // Reload the page so changes are visible.
                 window.location.reload();
             }
         }
