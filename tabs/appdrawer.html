@@ -39,18 +39,23 @@
             font-family: 'Inter', sans-serif;
         }
 
-        body::-webkit-scrollbar {
-            width: 8px;
+        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
+        ::-webkit-scrollbar {
+            width: 12px;
         }
 
-        body::-webkit-scrollbar-track {
-            background: transparent;
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
         }
 
-        body::-webkit-scrollbar-thumb {
-            background-color: var(--text-color-light);
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
             border-radius: 10px;
-            border: 2px solid var(--bg-color);
+            border: 3px solid var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-color-light);
         }
 
         .header-container {

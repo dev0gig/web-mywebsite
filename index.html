@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Dashboard</title>
+    <title>AxisMea (sidebar)</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icons/home-solid-white.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -288,6 +288,33 @@
         .dock-app-item:hover .dock-app-icon {
             box-shadow: var(--app-shadow-hover);
         }
+
+        /* Context Menu Styling */
+        #context-menu {
+            position: fixed;
+            z-index: 10000;
+            width: 200px;
+            background-color: var(--modal-bg);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            border: 1px solid var(--sidebar-border);
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            color: var(--text-color);
+            border-radius: 4px;
+        }
+
+        .context-menu-item:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -481,6 +508,13 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
+            // Redirect if necessary based on saved design preference
+            const savedDesign = localStorage.getItem('navigationDesign');
+            if (savedDesign === 'desktop' && window.innerWidth >= 1024) {
+                window.location.replace('index_desktop.html');
+                return; // Stop further execution
+            }
+
             const iframeLoader = document.getElementById('iframe-loader');
             const appDock = document.getElementById('app-dock');
             const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -667,6 +701,53 @@
                 );
             };
 
+            function showContextMenu(e, appId) {
+                e.preventDefault();
+                const existingMenu = document.getElementById('context-menu');
+                if (existingMenu) existingMenu.remove();
+
+                const menu = document.createElement('div');
+                menu.id = 'context-menu';
+
+                const menuWidth = 200; // As defined in CSS
+                let leftPos = e.clientX - menuWidth;
+                if (leftPos < 5) { // Add a small margin
+                    leftPos = 5;
+                }
+                menu.style.top = `${e.clientY}px`;
+                menu.style.left = `${leftPos}px`;
+
+                const removeItem = document.createElement('div');
+                removeItem.className = 'context-menu-item text-red-500 hover:!bg-red-500 hover:!text-white';
+                removeItem.innerHTML = `<i data-lucide="star-off" class="w-4 h-4 mr-2"></i><span>Favorit entfernen</span>`;
+
+                removeItem.onclick = () => {
+                    let favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+                    const newFavorites = favorites.filter(id => id !== appId);
+                    localStorage.setItem('favoriteApps', JSON.stringify(newFavorites));
+
+                    // The appdrawer iframe will listen for this message, and then it should
+                    // send a 'favoritesUpdated' message back to the shell with the full
+                    // app objects, which will trigger the dock to re-render correctly.
+                    const appdrawerFrame = document.getElementById('frame-appdrawer');
+                    if (appdrawerFrame && appdrawerFrame.contentWindow) {
+                        appdrawerFrame.contentWindow.postMessage({ type: 'favoritesChanged', payload: newFavorites }, '*');
+                    }
+
+                    menu.remove();
+                };
+
+                menu.appendChild(removeItem);
+                document.body.appendChild(menu);
+                lucide.createIcons();
+
+                const closeMenu = () => menu.remove();
+                setTimeout(() => {
+                    window.addEventListener('click', closeMenu, { once: true });
+                    window.addEventListener('contextmenu', closeMenu, { once: true });
+                }, 0);
+            }
+
             const renderAppDock = (favoriteApps = []) => {
                 const body = document.body;
                 appDock.innerHTML = '';
@@ -682,12 +763,19 @@
 
                 favoriteApps.forEach(app => {
                     const item = document.createElement('a');
-                    item.href = app.url;
-                    item.target = '_blank';
-                    item.rel = 'noopener noreferrer';
+                    // Use a placeholder href to make it a valid link, but handle click via JS
+                    item.href = '#';
                     item.className = 'dock-app-item';
                     item.setAttribute('aria-label', app.name);
                     item.title = app.name;
+
+                    item.onclick = (e) => {
+                        e.preventDefault();
+                        window.open(app.url, '_blank', 'noopener,noreferrer');
+                    };
+
+                    item.addEventListener('contextmenu', (e) => showContextMenu(e, app.id));
+
                     const iconWrapper = document.createElement('div');
                     iconWrapper.className = 'dock-app-icon-wrapper';
                     const icon = document.createElement('img');
@@ -838,9 +926,13 @@
                 }
             });
 
+            // Set initial values from localStorage
             const savedTheme = localStorage.getItem('theme') || 'system';
             document.querySelector(`input[name="theme"][value="${savedTheme}"]`)?.setAttribute('checked', 'true');
             applyTheme(savedTheme);
+
+            const savedNavDesign = localStorage.getItem('navigationDesign') || 'sidebar';
+            navDesignSelect.value = savedNavDesign;
 
             const lastActiveTabId = localStorage.getItem('lastActiveTab') || 'frame-appdrawer';
             activateTab(lastActiveTabId);

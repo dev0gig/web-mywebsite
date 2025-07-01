@@ -54,18 +54,23 @@
             overflow-x: hidden;
         }
 
+        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
 
         ::-webkit-scrollbar-track {
-            background: transparent;
+            background: var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb {
-            background-color: var(--text-color-light);
+            background-color: var(--border-color);
             border-radius: 10px;
-            border: 2px solid var(--bg-color);
+            border: 3px solid var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-color-light);
         }
 
         .sidebar {

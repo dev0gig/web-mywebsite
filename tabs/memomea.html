@@ -21,32 +21,19 @@
         /* Theming Variablen für Light & Dark Mode */
         :root {
             --bg-color: #f8fafc;
-            /* slate-50 */
             --text-color: #1e293b;
-            /* slate-800 */
             --text-color-light: #64748b;
-            /* slate-500 */
             --text-color-heading: #334155;
-            /* slate-700 */
             --border-color: #e2e8f0;
-            /* slate-200 */
             --card-bg: #ffffff;
-            /* white */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --button-primary-bg: #1e293b;
-            /* slate-800 */
             --button-primary-text: #ffffff;
-            /* white */
             --button-primary-hover-bg: #334155;
-            /* slate-700 */
             --button-secondary-bg: #ffffff;
-            /* white */
             --button-secondary-border: #cbd5e1;
-            /* slate-300 */
             --button-secondary-text: #334155;
-            /* slate-700 */
             --button-secondary-hover-bg: #f8fafc;
-            /* slate-50 */
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --prose-blockquote-border: #cbd5e1;
@@ -54,37 +41,28 @@
             --prose-code-bg: #e2e8f0;
             --prose-pre-bg: #f1f5f9;
             --tag-bg: #e0e7ff;
-            /* indigo-100 */
             --tag-text: #3730a3;
-            /* indigo-800 */
             --scrollbar-thumb-bg: rgba(0, 0, 0, 0.1);
-            /* Dezenter Scrollbalken für Light-Theme */
             --scrollbar-thumb-hover-bg: rgba(0, 0, 0, 0.2);
+            --link-color: #2563eb;
+            --link-hover-color: #1d4ed8;
+            --highlight-bg: #fef08a;
+            --highlight-text: #854d0e;
         }
 
         html[data-theme='dark'] {
             --bg-color: #171717;
-            /* neutral-900 */
             --text-color: #e5e5e5;
-            /* neutral-200 */
             --text-color-light: #a3a3a3;
-            /* neutral-400 */
             --text-color-heading: #fafafa;
-            /* neutral-50 */
             --border-color: #404040;
-            /* neutral-700 */
             --card-bg: #262626;
-            /* neutral-800 */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
             --button-primary-bg: #f5f5f5;
-            /* neutral-100 */
             --button-primary-text: #171717;
-            /* neutral-900 */
             --button-primary-hover-bg: #e5e5e5;
-            /* neutral-200 */
             --button-secondary-bg: #262626;
             --button-secondary-border: #525252;
-            /* neutral-600 */
             --button-secondary-text: #e5e5e5;
             --button-secondary-hover-bg: #404040;
             --input-bg: #404040;
@@ -94,15 +72,15 @@
             --prose-code-bg: #404040;
             --prose-pre-bg: #171717;
             --tag-bg: #3730a3;
-            /* indigo-800 */
             --tag-text: #e0e7ff;
-            /* indigo-100 */
             --scrollbar-thumb-bg: rgba(255, 255, 255, 0.1);
-            /* Dezenter Scrollbalken für Dark-Theme */
             --scrollbar-thumb-hover-bg: rgba(255, 255, 255, 0.2);
+            --link-color: #60a5fa;
+            --link-hover-color: #93c5fd;
+            --highlight-bg: #422006;
+            --highlight-text: #fef3c7;
         }
 
-        /* Basis-Styling für den Body */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
@@ -110,7 +88,54 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Überschreiben von Tailwind-Klassen mit CSS-Variablen */
+        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea übernommen) --- */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+            border: 3px solid var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-color-light);
+            /* subtle-text in AuriMea */
+        }
+
+        .prose-preview mark {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-text);
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+        }
+
+        .prose-preview .task-list-item {
+            list-style-type: none;
+            padding-left: 0.2rem;
+        }
+
+        .prose-preview .task-list-item-checkbox {
+            margin-right: 0.5em;
+            cursor: pointer;
+            width: 1em;
+            height: 1em;
+            vertical-align: middle;
+        }
+
+        .journal-entry textarea {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+
         .main-header {
             border-color: var(--border-color);
         }
@@ -128,12 +153,6 @@
         .journal-entry h2 {
             color: var(--text-color-light);
             border-color: var(--border-color);
-        }
-
-        .journal-entry textarea {
-            background-color: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-color);
         }
 
         #tag-cloud-container {
@@ -163,7 +182,6 @@
             background-color: var(--button-primary-hover-bg);
         }
 
-        /* Markdown-Vorschau-Stile */
         .prose-preview h1 {
             color: var(--text-color-heading);
             font-size: 1.875rem;
@@ -197,6 +215,27 @@
         .prose-preview ol {
             padding-left: 1.5em;
             margin-bottom: 1em;
+            list-style-position: outside;
+        }
+
+        .prose-preview ul {
+            list-style-type: disc;
+        }
+
+        .prose-preview ol {
+            list-style-type: decimal;
+        }
+
+        .prose-preview a {
+            color: var(--link-color);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+            transition: color 0.2s;
+        }
+
+        .prose-preview a:hover {
+            color: var(--link-hover-color);
         }
 
         .prose-preview blockquote {
@@ -230,7 +269,6 @@
             cursor: pointer;
         }
 
-        /* Tag-Styling */
         .tag {
             background-color: var(--tag-bg);
             color: var(--tag-text);
@@ -243,10 +281,8 @@
             border: 2px solid transparent;
         }
 
-        /* Hover-Effekt für Tags */
         .tag:hover {
             background-color: var(--tag-text);
-            /* Tausche Farben auf Hover */
             color: var(--tag-bg);
             border-color: var(--tag-text);
         }
@@ -261,7 +297,6 @@
             border-color: var(--tag-text);
         }
 
-        /* Tag Cloud Styling */
         .tag-cloud-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -273,7 +308,6 @@
             transition: transform 0.2s;
         }
 
-        /* Eigene Scrollbar-Stile */
         #tag-cloud::-webkit-scrollbar {
             width: 8px;
         }
@@ -284,16 +318,13 @@
 
         #tag-cloud::-webkit-scrollbar-thumb {
             background-color: var(--scrollbar-thumb-bg);
-            /* Verwende die neue dezente Variable */
             border-radius: 10px;
         }
 
         #tag-cloud::-webkit-scrollbar-thumb:hover {
             background-color: var(--scrollbar-thumb-hover-bg);
-            /* Verwende die neue dezente Variable für Hover */
         }
 
-        /* Kalender-Stile */
         .calendar-day-has-entry {
             position: relative;
         }
@@ -314,19 +345,16 @@
             background-color: #60a5fa;
         }
 
-        /* Notification-Stile (ANGEPASST) */
         #notification.show {
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
         }
 
-        /* Styling for the delete button */
         .delete-entry-button {
             color: var(--text-color-light);
         }
 
-        /* Positionierung des schwebenden Kalender-Buttons unter Berücksichtigung der Safe Area */
         #fab-open-calendar {
             bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
@@ -335,11 +363,9 @@
 
 <body class="transition-colors duration-300">
 
-    <!-- Padding unten (pb-20) hinzugefügt, um Platz für den FAB auf Mobilgeräten zu schaffen -->
     <div class="container mx-auto max-w-7xl px-4 py-8 pb-20 lg:pb-8">
         <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b gap-4">
             <h1 class="text-3xl font-bold">MemoMea</h1>
-            <!-- NEU: Suchfeld -->
             <div class="relative flex-grow max-w-xl w-full">
                 <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
                     style="color: var(--text-color-light)"></i>
@@ -355,7 +381,6 @@
                     class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
                 </label>
-                <!-- Erlaubt jetzt .md, .txt und .zip Dateien -->
                 <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt,.zip">
 
                 <button id="export-button"
@@ -420,7 +445,6 @@
                                 class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
-                        <!-- NEU: Eingabefeld für Dateinamen -->
                         <div>
                             <label for="export-filename" class="text-left block text-sm font-medium"
                                 style="color: var(--text-color-heading);">Dateiname (ohne .zip)</label>
@@ -444,7 +468,7 @@
         </div>
     </div>
 
-    <!-- Notification Element (ANGEPASST) -->
+    <!-- Notification Element -->
     <div id="notification"
         class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12 z-50">
         <p id="notification-message"></p>
@@ -466,7 +490,6 @@
                 </button>
             </div>
             <div id="calendar-container-mobile" class="flex flex-col w-full h-full">
-                <!-- Mobile Calendar will be rendered here by JS -->
             </div>
         </div>
     </div>
@@ -496,7 +519,7 @@
             const cancelExportButton = document.getElementById('cancel-export-button');
             const startDateInput = document.getElementById('start-date');
             const endDateInput = document.getElementById('end-date');
-            const exportFilenameInput = document.getElementById('export-filename'); // NEU: Dateiname Input
+            const exportFilenameInput = document.getElementById('export-filename');
             const deleteAllButton = document.getElementById('delete-all-button');
 
             const calendarSidebar = document.getElementById('calendar-sidebar');
@@ -556,15 +579,19 @@
                 if (!markdownText) {
                     return defaultText;
                 }
-                let html = marked.parse(markdownText);
-                // Updated regex to correctly capture tags with special characters including French/Spanish ones
-                // \p{L} matches any Unicode letter, \p{N} matches any Unicode number
-                // The 'u' flag enables Unicode support for the regex
+
+                let html = marked.parse(markdownText.replace(/==(.*?)==/g, '<mark>$1</mark>'), { gfm: true, breaks: true });
+                html = html.replace(/<input type="checkbox" disabled="">/g, '<input type="checkbox" class="task-list-item-checkbox">');
+
+                // NEU: Sorgt dafür, dass Links in einem neuen Tab geöffnet werden.
+                html = html.replace(/<a href/g, '<a target="_blank" rel="noopener noreferrer" href');
+
                 html = html.replace(/(^|\s|>)(#[\p{L}\p{N}_-]+)/gu, (match, p1, p2) => {
                     const tag = p2.toLowerCase();
                     const isActive = activeTagFilters.includes(tag) ? ' active' : '';
                     return `${p1}<span class="tag${isActive}" data-tag="${tag}">${p2}</span>`;
                 });
+
                 return html;
             };
 
@@ -573,9 +600,9 @@
                 const index = activeTagFilters.indexOf(normalizedTag);
 
                 if (index > -1) {
-                    activeTagFilters.splice(index, 1); // Remove tag
+                    activeTagFilters.splice(index, 1);
                 } else {
-                    activeTagFilters.push(normalizedTag); // Add tag
+                    activeTagFilters.push(normalizedTag);
                 }
 
                 activeSearchTerm = '';
@@ -600,8 +627,133 @@
 
                 const textArea = document.createElement('textarea');
                 textArea.value = content;
-                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
+                textArea.className = 'hidden w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300';
                 textArea.setAttribute('rows', '8');
+
+                textArea.addEventListener('input', function (e) {
+                    const start = this.selectionStart;
+                    const value = this.value;
+                    let lineStart = start;
+                    while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                        lineStart--;
+                    }
+                    const textBeforeCursor = value.substring(lineStart, start);
+
+                    if (textBeforeCursor.trim() === '/todo') {
+                        const replacement = '[ ] ';
+                        this.value = value.substring(0, start - 5) + replacement + value.substring(start);
+                        this.selectionStart = this.selectionEnd = start - 5 + replacement.length;
+                        return;
+                    }
+                });
+
+                textArea.addEventListener('keydown', function (e) {
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const value = this.value;
+
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        let lineStart = start;
+                        while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                            lineStart--;
+                        }
+                        const currentLine = value.substring(lineStart, start);
+                        const indentationMatch = currentLine.match(/^\s*/);
+                        const indentation = indentationMatch ? indentationMatch[0] : '';
+
+                        if (currentLine.trim() === '-') {
+                            this.value = value.substring(0, lineStart) + value.substring(end);
+                            this.selectionStart = this.selectionEnd = lineStart;
+                            return;
+                        }
+
+                        const textToInsert = '\n' + indentation + '- ';
+                        this.value = value.substring(0, start) + textToInsert + value.substring(end);
+                        this.selectionStart = this.selectionEnd = start + textToInsert.length;
+                        return;
+                    }
+
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        let lineStart = start;
+                        while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                            lineStart--;
+                        }
+                        let lineEnd = end;
+                        if (end > start && value[end - 1] === '\n') {
+                            lineEnd--;
+                        }
+                        while (lineEnd < value.length && value[lineEnd] !== '\n') {
+                            lineEnd++;
+                        }
+
+                        const selectedText = value.substring(lineStart, lineEnd);
+                        const lines = selectedText.split('\n');
+                        let change = 0;
+
+                        const getIndentLevel = (line) => (line.match(/^\t*/)?.[0].length || 0);
+
+                        let prevLineIndent = 0;
+                        if (lineStart > 0) {
+                            let prevLineStart = value.lastIndexOf('\n', lineStart - 2) + 1;
+                            const prevLine = value.substring(prevLineStart, lineStart - 1);
+                            prevLineIndent = getIndentLevel(prevLine);
+                        }
+
+                        const newLines = lines.map(line => {
+                            if (e.shiftKey) {
+                                if (line.startsWith('\t')) {
+                                    change--;
+                                    return line.substring(1);
+                                }
+                            } else {
+                                const currentIndent = getIndentLevel(line);
+                                if (line.trim() !== '' && currentIndent <= prevLineIndent) {
+                                    change++;
+                                    return '\t' + line;
+                                }
+                            }
+                            return line;
+                        });
+
+                        const newText = newLines.join('\n');
+                        this.value = value.substring(0, lineStart) + newText + value.substring(lineEnd);
+
+                        if (start === end) {
+                            const indentChange = e.shiftKey ? (selectedText.startsWith('\t') ? -1 : 0) : (getIndentLevel(selectedText) <= prevLineIndent && selectedText.trim() !== '' ? 1 : 0);
+                            this.selectionStart = this.selectionEnd = start + indentChange;
+                        } else {
+                            this.selectionStart = start;
+                            this.selectionEnd = end + change;
+                        }
+                        return;
+                    }
+
+                    const bracketMap = { '(': ')', '[': ']', '{': '}' };
+                    const wrapChar = e.key;
+                    const selectedText = value.substring(start, end);
+
+                    if (bracketMap[wrapChar] || wrapChar === '=') {
+                        e.preventDefault();
+                        if (selectedText) {
+                            const closingChar = bracketMap[wrapChar] || wrapChar;
+                            const newText = (wrapChar === '=' ? '==' : wrapChar) + selectedText + (wrapChar === '=' ? '==' : closingChar);
+                            this.value = value.substring(0, start) + newText + value.substring(end);
+                            this.selectionStart = start;
+                            this.selectionEnd = start + newText.length;
+                        } else if (bracketMap[wrapChar]) {
+                            const closingChar = bracketMap[wrapChar];
+                            this.value = value.substring(0, start) + wrapChar + closingChar + value.substring(end);
+                            this.selectionStart = this.selectionEnd = start + 1;
+                        } else {
+                            this.value = value.substring(0, start) + wrapChar + value.substring(end);
+                            this.selectionStart = this.selectionEnd = start + 1;
+                        }
+                        return;
+                    }
+                });
+
 
                 entryDiv.append(header, previewDiv, textArea);
 
@@ -611,7 +763,6 @@
                 deleteButton.title = 'Eintrag löschen';
                 deleteButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // Custom modal for confirmation instead of confirm()
                     showCustomConfirm('Möchten Sie diesen Eintrag wirklich löschen?', () => {
                         delete journalEntries[dateString];
                         saveEntries(journalEntries);
@@ -623,11 +774,32 @@
                 entryDiv.appendChild(deleteButton);
 
                 entryDiv.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('tag')) {
-                        const tag = e.target.dataset.tag;
-                        if (tag) {
-                            handleTagClick(tag);
-                        }
+                    if (e.target.classList.contains('task-list-item-checkbox')) {
+                        const allCheckboxes = Array.from(previewDiv.querySelectorAll('.task-list-item-checkbox'));
+                        const checkboxIndex = allCheckboxes.indexOf(e.target);
+                        let currentContent = journalEntries[dateString];
+                        let count = -1;
+
+                        const newContent = currentContent.replace(/-\s\[[ x]\]/g, (match) => {
+                            count++;
+                            if (count === checkboxIndex) {
+                                return match.includes('[ ]') ? '- [x]' : '- [ ]';
+                            }
+                            return match;
+                        });
+
+                        journalEntries[dateString] = newContent;
+                        saveEntries(journalEntries);
+
+                        previewDiv.innerHTML = parseAndStyleContent(newContent);
+                        textArea.value = newContent;
+                        return;
+                    }
+
+                    if (e.target.closest('a')) return;
+                    if (e.target.closest('.tag')) {
+                        const tag = e.target.closest('.tag').dataset.tag;
+                        if (tag) handleTagClick(tag);
                         return;
                     }
 
@@ -656,7 +828,6 @@
 
             const renderTagCloud = () => {
                 const tagCounts = {};
-                // Updated regex to correctly capture tags with special characters including French/Spanish ones
                 const tagRegex = /#([\p{L}\p{N}_-]+)/gu;
 
                 Object.values(journalEntries).forEach(content => {
@@ -714,13 +885,13 @@
 
                     const firstDayOfMonth = new Date(year, month, 1).getDay();
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Monday is 1, Sunday is 0
+                    const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
                     for (let i = 0; i < dayOffset; i++) { grid.innerHTML += '<div></div>'; }
 
                     const todayString = formatDate(new Date());
 
                     for (let day = 1; day <= daysInMonth; day++) {
-                        const currentDate = new Date(Date.UTC(year, month, day)); // Use UTC to avoid timezone issues
+                        const currentDate = new Date(Date.UTC(year, month, day));
                         const dateString = formatDate(currentDate);
                         const dayButton = document.createElement('button');
                         dayButton.textContent = day;
@@ -744,7 +915,7 @@
                 const wasJustCreated = journalEntries[dateString] === undefined;
 
                 if (wasJustCreated) {
-                    journalEntries[dateString] = '';
+                    journalEntries[dateString] = '- ';
                     saveEntries(journalEntries);
                 }
 
@@ -768,11 +939,10 @@
                     const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        if (wasJustCreated) {
-                            element.click();
-                        } else {
-                            element.classList.add('ring-2', 'ring-blue-400');
-                            setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                        element.click();
+                        const textarea = element.querySelector('textarea');
+                        if (textarea) {
+                            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
                         }
                     }
                 }, 100);
@@ -943,13 +1113,10 @@
                 cancelButton.addEventListener('click', handleCancel);
             };
 
-            // ===== FIX START =====
-            // This function now runs every time the view is updated.
-            // It ensures an entry for the current day always exists.
             const updateAll = () => {
                 const todayString = formatDate(new Date());
                 if (journalEntries[todayString] === undefined) {
-                    journalEntries[todayString] = '';
+                    journalEntries[todayString] = '- ';
                     saveEntries(journalEntries);
                 }
 
@@ -957,7 +1124,6 @@
                 renderCalendar();
                 renderTagCloud();
             };
-            // ===== FIX END =====
 
             searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value;
@@ -1104,10 +1270,12 @@
                 if (!startDate || !endDate || startDate > endDate) return showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
                 if (!filename) return showNotification('Bitte geben Sie einen Dateinamen ein.', 'warning');
 
-
                 const zip = new JSZip();
                 let filesAdded = 0;
-                Object.keys(journalEntries).forEach(dateString => {
+
+                const sortedDates = Object.keys(journalEntries).sort();
+
+                sortedDates.forEach(dateString => {
                     if (dateString >= startDate && dateString <= endDate) {
                         const content = journalEntries[dateString];
                         if (content?.trim()) {
@@ -1147,13 +1315,13 @@
 
             function openCalendarSidebar() {
                 calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                calendarSidebar.classList.remove('translate-x-full');
+                calendarSidebar.classList.remove('-translate-x-full');
                 lucide.createIcons();
             }
 
             function closeCalendarSidebar() {
                 calendarSidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                calendarSidebar.classList.add('translate-x-full');
+                calendarSidebar.classList.add('-translate-x-full');
             }
 
             openCalendarBtn.addEventListener('click', openCalendarSidebar);

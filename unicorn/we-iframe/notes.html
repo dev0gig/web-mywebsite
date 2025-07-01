@@ -21,32 +21,19 @@
         /* Theming Variablen für Light & Dark Mode */
         :root {
             --bg-color: #f8fafc;
-            /* slate-50 */
             --text-color: #1e293b;
-            /* slate-800 */
             --text-color-light: #64748b;
-            /* slate-500 */
             --text-color-heading: #334155;
-            /* slate-700 */
             --border-color: #e2e8f0;
-            /* slate-200 */
             --card-bg: #ffffff;
-            /* white */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --button-primary-bg: #1e293b;
-            /* slate-800 */
             --button-primary-text: #ffffff;
-            /* white */
             --button-primary-hover-bg: #334155;
-            /* slate-700 */
             --button-secondary-bg: #ffffff;
-            /* white */
             --button-secondary-border: #cbd5e1;
-            /* slate-300 */
             --button-secondary-text: #334155;
-            /* slate-700 */
             --button-secondary-hover-bg: #f8fafc;
-            /* slate-50 */
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --prose-blockquote-border: #cbd5e1;
@@ -54,37 +41,28 @@
             --prose-code-bg: #e2e8f0;
             --prose-pre-bg: #f1f5f9;
             --tag-bg: #e0e7ff;
-            /* indigo-100 */
             --tag-text: #3730a3;
-            /* indigo-800 */
             --scrollbar-thumb-bg: rgba(0, 0, 0, 0.1);
-            /* Dezenter Scrollbalken für Light-Theme */
             --scrollbar-thumb-hover-bg: rgba(0, 0, 0, 0.2);
+            --link-color: #2563eb;
+            --link-hover-color: #1d4ed8;
+            --highlight-bg: #fef08a;
+            --highlight-text: #854d0e;
         }
 
         html[data-theme='dark'] {
             --bg-color: #171717;
-            /* neutral-900 */
             --text-color: #e5e5e5;
-            /* neutral-200 */
             --text-color-light: #a3a3a3;
-            /* neutral-400 */
             --text-color-heading: #fafafa;
-            /* neutral-50 */
             --border-color: #404040;
-            /* neutral-700 */
             --card-bg: #262626;
-            /* neutral-800 */
             --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
             --button-primary-bg: #f5f5f5;
-            /* neutral-100 */
             --button-primary-text: #171717;
-            /* neutral-900 */
             --button-primary-hover-bg: #e5e5e5;
-            /* neutral-200 */
             --button-secondary-bg: #262626;
             --button-secondary-border: #525252;
-            /* neutral-600 */
             --button-secondary-text: #e5e5e5;
             --button-secondary-hover-bg: #404040;
             --input-bg: #404040;
@@ -94,15 +72,15 @@
             --prose-code-bg: #404040;
             --prose-pre-bg: #171717;
             --tag-bg: #3730a3;
-            /* indigo-800 */
             --tag-text: #e0e7ff;
-            /* indigo-100 */
             --scrollbar-thumb-bg: rgba(255, 255, 255, 0.1);
-            /* Dezenter Scrollbalken für Dark-Theme */
             --scrollbar-thumb-hover-bg: rgba(255, 255, 255, 0.2);
+            --link-color: #60a5fa;
+            --link-hover-color: #93c5fd;
+            --highlight-bg: #422006;
+            --highlight-text: #fef3c7;
         }
 
-        /* Basis-Styling für den Body */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
@@ -110,7 +88,34 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Überschreiben von Tailwind-Klassen mit CSS-Variablen */
+        .prose-preview mark {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-text);
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+        }
+
+        .prose-preview .task-list-item {
+            list-style-type: none;
+            padding-left: 0.2rem;
+        }
+
+        .prose-preview .task-list-item-checkbox {
+            margin-right: 0.5em;
+            cursor: pointer;
+            width: 1em;
+            height: 1em;
+            vertical-align: middle;
+        }
+
+        .journal-entry textarea {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+
         .main-header {
             border-color: var(--border-color);
         }
@@ -128,12 +133,6 @@
         .journal-entry h2 {
             color: var(--text-color-light);
             border-color: var(--border-color);
-        }
-
-        .journal-entry textarea {
-            background-color: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-color);
         }
 
         #tag-cloud-container {
@@ -163,7 +162,6 @@
             background-color: var(--button-primary-hover-bg);
         }
 
-        /* Markdown-Vorschau-Stile */
         .prose-preview h1 {
             color: var(--text-color-heading);
             font-size: 1.875rem;
@@ -197,6 +195,27 @@
         .prose-preview ol {
             padding-left: 1.5em;
             margin-bottom: 1em;
+            list-style-position: outside;
+        }
+
+        .prose-preview ul {
+            list-style-type: disc;
+        }
+
+        .prose-preview ol {
+            list-style-type: decimal;
+        }
+
+        .prose-preview a {
+            color: var(--link-color);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+            transition: color 0.2s;
+        }
+
+        .prose-preview a:hover {
+            color: var(--link-hover-color);
         }
 
         .prose-preview blockquote {
@@ -230,7 +249,6 @@
             cursor: pointer;
         }
 
-        /* Tag-Styling */
         .tag {
             background-color: var(--tag-bg);
             color: var(--tag-text);
@@ -243,10 +261,8 @@
             border: 2px solid transparent;
         }
 
-        /* Hover-Effekt für Tags */
         .tag:hover {
             background-color: var(--tag-text);
-            /* Tausche Farben auf Hover */
             color: var(--tag-bg);
             border-color: var(--tag-text);
         }
@@ -261,7 +277,6 @@
             border-color: var(--tag-text);
         }
 
-        /* Tag Cloud Styling */
         .tag-cloud-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -273,7 +288,6 @@
             transition: transform 0.2s;
         }
 
-        /* Eigene Scrollbar-Stile */
         #tag-cloud::-webkit-scrollbar {
             width: 8px;
         }
@@ -284,16 +298,13 @@
 
         #tag-cloud::-webkit-scrollbar-thumb {
             background-color: var(--scrollbar-thumb-bg);
-            /* Verwende die neue dezente Variable */
             border-radius: 10px;
         }
 
         #tag-cloud::-webkit-scrollbar-thumb:hover {
             background-color: var(--scrollbar-thumb-hover-bg);
-            /* Verwende die neue dezente Variable für Hover */
         }
 
-        /* Kalender-Stile */
         .calendar-day-has-entry {
             position: relative;
         }
@@ -314,19 +325,16 @@
             background-color: #60a5fa;
         }
 
-        /* Notification-Stile (ANGEPASST) */
         #notification.show {
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
         }
 
-        /* Styling for the delete button */
         .delete-entry-button {
             color: var(--text-color-light);
         }
 
-        /* Positionierung des schwebenden Kalender-Buttons unter Berücksichtigung der Safe Area */
         #fab-open-calendar {
             bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
@@ -335,11 +343,9 @@
 
 <body class="transition-colors duration-300">
 
-    <!-- Padding unten (pb-20) hinzugefügt, um Platz für den FAB auf Mobilgeräten zu schaffen -->
     <div class="container mx-auto max-w-7xl px-4 py-8 pb-20 lg:pb-8">
         <header class="main-header flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b gap-4">
             <h1 class="text-3xl font-bold">Meine Notizen</h1>
-            <!-- NEU: Suchfeld -->
             <div class="relative flex-grow max-w-xl w-full">
                 <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
                     style="color: var(--text-color-light)"></i>
@@ -351,7 +357,6 @@
                 </button>
             </div>
             <div class="flex items-center space-x-2">
-                <!-- GEÄNDERTER ANLEITUNGS-BUTTON -->
                 <button id="anleitung-button"
                     class="bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="help-circle" class="mr-2 h-4 w-4"></i> Anleitung
@@ -360,7 +365,6 @@
                     class="modal-button inline-flex items-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 cursor-pointer">
                     <i data-lucide="upload" class="mr-2 h-4 w-4"></i> Importieren
                 </label>
-                <!-- Erlaubt jetzt .md, .txt und .zip Dateien -->
                 <input type="file" id="import-files" class="hidden" multiple accept=".md,.txt,.zip">
 
                 <button id="export-button"
@@ -400,7 +404,6 @@
         </div>
     </div>
 
-    <!-- GEKÜRZTES ANLEITUNGS-MODAL -->
     <div id="anleitung-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md"
             style="background-color: var(--card-bg); border-color: var(--border-color);">
@@ -440,7 +443,7 @@
         </div>
     </div>
 
-    <!-- Export Date Range Modal -->
+    <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md"
             style="background-color: var(--card-bg); border-color: var(--border-color);">
@@ -448,8 +451,8 @@
                 <h3 class="text-lg leading-6 font-medium" style="color: var(--text-color-heading);">Einträge exportieren
                 </h3>
                 <div class="mt-2 px-7 py-3">
-                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich für den
-                        Export.</p>
+                    <p class="text-sm" style="color: var(--text-color-light);">Wählen Sie den Datumsbereich und den
+                        Dateinamen für den Export.</p>
                     <div class="space-y-4 mt-4">
                         <div>
                             <label for="start-date" class="text-left block text-sm font-medium"
@@ -465,12 +468,19 @@
                                 class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
                         </div>
+                        <div>
+                            <label for="export-filename" class="text-left block text-sm font-medium"
+                                style="color: var(--text-color-heading);">Dateiname (ohne .zip)</label>
+                            <input type="text" id="export-filename" value="Journal-Export"
+                                class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                        </div>
                     </div>
                 </div>
                 <div class="items-center px-4 py-3 space-x-2">
                     <button id="confirm-export-button"
                         class="primary-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm">
-                        Weiter
+                        Export starten
                     </button>
                     <button id="cancel-export-button"
                         class="modal-button px-4 py-2 text-base font-medium rounded-md w-auto shadow-sm border">
@@ -481,26 +491,7 @@
         </div>
     </div>
 
-    <!-- NEU: Export Rename Modal -->
-    <div id="export-rename-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center p-4">
-        <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--card-bg);">
-            <h3 class="text-xl font-bold mb-4" style="color: var(--text-color-heading);">Export benennen</h3>
-            <p class="mb-4" style="color: var(--text-color-light);">Geben Sie einen Dateinamen für Ihren Export ein.</p>
-            <input type="text" id="export-filename-input" class="w-full p-2 rounded-md mb-6"
-                style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color)">
-            <div class="flex justify-end gap-4">
-                <button id="export-rename-cancel-btn"
-                    class="font-bold py-2 px-4 rounded-lg transition modal-button">Abbrechen</button>
-                <button id="export-rename-confirm-btn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">OK &
-                    Exportieren</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Notification Element (ANGEPASST) -->
+    <!-- Notification Element -->
     <div id="notification"
         class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12 z-50">
         <p id="notification-message"></p>
@@ -522,7 +513,6 @@
                 </button>
             </div>
             <div id="calendar-container-mobile" class="flex flex-col w-full h-full">
-                <!-- Mobile Calendar will be rendered here by JS -->
             </div>
         </div>
     </div>
@@ -549,20 +539,13 @@
             const exportButton = document.getElementById('export-button');
             const deleteAllButton = document.getElementById('delete-all-button');
 
-            // Elemente für Export-Modals
             const exportModal = document.getElementById('export-modal');
             const confirmExportButton = document.getElementById('confirm-export-button');
             const cancelExportButton = document.getElementById('cancel-export-button');
             const startDateInput = document.getElementById('start-date');
             const endDateInput = document.getElementById('end-date');
+            const exportFilenameInput = document.getElementById('export-filename');
 
-            // NEU: Elemente für Umbenennungs-Modal
-            const exportRenameModal = document.getElementById('export-rename-modal');
-            const exportFilenameInput = document.getElementById('export-filename-input');
-            const exportRenameCancelBtn = document.getElementById('export-rename-cancel-btn');
-            const exportRenameConfirmBtn = document.getElementById('export-rename-confirm-btn');
-
-            // NEUE ELEMENTE FÜR ANLEITUNGS-MODAL
             const anleitungButton = document.getElementById('anleitung-button');
             const anleitungModal = document.getElementById('anleitung-modal');
             const cancelAnleitungButton = document.getElementById('cancel-anleitung-button');
@@ -574,15 +557,13 @@
             const openCalendarBtn = document.getElementById('fab-open-calendar');
             const closeCalendarBtn = document.getElementById('close-calendar-sidebar-btn');
 
+            // ANGEPASST: Storage Key für diese App
             const STORAGE_KEY = 'markdownNotesEntries_work';
             const ENTRIES_PER_PAGE = 20;
             let currentPage = 1;
             let calendarDate = new Date();
             let activeTagFilters = [];
             let activeSearchTerm = '';
-
-            // NEU: Globale Variablen zum Speichern des Datumsbereichs für den Export
-            let exportStartDate, exportEndDate;
 
             window.addEventListener('message', (event) => {
                 if (typeof event.data === 'string' && event.data.startsWith('set-theme-')) {
@@ -624,17 +605,24 @@
                 }, duration);
             };
 
+            // ÜBERNOMMEN & ANGEPASST: Logik aus MemoMea
             const parseAndStyleContent = (markdownText) => {
                 const defaultText = '<p style="color: var(--text-color-light)">Klicken, um zu schreiben...</p>';
                 if (!markdownText) {
                     return defaultText;
                 }
-                let html = marked.parse(markdownText);
+
+                let html = marked.parse(markdownText.replace(/==(.*?)==/g, '<mark>$1</mark>'), { gfm: true, breaks: true });
+                html = html.replace(/<input type="checkbox" disabled="">/g, '<input type="checkbox" class="task-list-item-checkbox">');
+
+                html = html.replace(/<a href/g, '<a target="_blank" rel="noopener noreferrer" href');
+
                 html = html.replace(/(^|\s|>)(#[\p{L}\p{N}_-]+)/gu, (match, p1, p2) => {
                     const tag = p2.toLowerCase();
                     const isActive = activeTagFilters.includes(tag) ? ' active' : '';
                     return `${p1}<span class="tag${isActive}" data-tag="${tag}">${p2}</span>`;
                 });
+
                 return html;
             };
 
@@ -643,9 +631,9 @@
                 const index = activeTagFilters.indexOf(normalizedTag);
 
                 if (index > -1) {
-                    activeTagFilters.splice(index, 1); // Tag entfernen
+                    activeTagFilters.splice(index, 1);
                 } else {
-                    activeTagFilters.push(normalizedTag); // Tag hinzufügen
+                    activeTagFilters.push(normalizedTag);
                 }
 
                 activeSearchTerm = '';
@@ -654,6 +642,7 @@
                 updateAll();
             };
 
+            // ÜBERNOMMEN & ANGEPASST: Logik aus MemoMea
             const createEntryElement = (dateString, content) => {
                 const entryDiv = document.createElement('div');
                 entryDiv.classList.add('journal-entry', 'mb-6', 'p-6', 'rounded-lg', 'transition-all', 'duration-300');
@@ -670,8 +659,133 @@
 
                 const textArea = document.createElement('textarea');
                 textArea.value = content;
-                textArea.classList.add('hidden', 'w-full', 'p-2', 'border', 'rounded-md', 'focus:ring-2', 'focus:ring-indigo-500', 'focus:outline-none', 'transition-all', 'duration-300');
+                textArea.className = 'hidden w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300';
                 textArea.setAttribute('rows', '8');
+
+                textArea.addEventListener('input', function (e) {
+                    const start = this.selectionStart;
+                    const value = this.value;
+                    let lineStart = start;
+                    while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                        lineStart--;
+                    }
+                    const textBeforeCursor = value.substring(lineStart, start);
+
+                    if (textBeforeCursor.trim() === '/todo') {
+                        const replacement = '[ ] ';
+                        this.value = value.substring(0, start - 5) + replacement + value.substring(start);
+                        this.selectionStart = this.selectionEnd = start - 5 + replacement.length;
+                        return;
+                    }
+                });
+
+                textArea.addEventListener('keydown', function (e) {
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const value = this.value;
+
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        let lineStart = start;
+                        while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                            lineStart--;
+                        }
+                        const currentLine = value.substring(lineStart, start);
+                        const indentationMatch = currentLine.match(/^\s*/);
+                        const indentation = indentationMatch ? indentationMatch[0] : '';
+
+                        if (currentLine.trim() === '-') {
+                            this.value = value.substring(0, lineStart) + value.substring(end);
+                            this.selectionStart = this.selectionEnd = lineStart;
+                            return;
+                        }
+
+                        const textToInsert = '\n' + indentation + '- ';
+                        this.value = value.substring(0, start) + textToInsert + value.substring(end);
+                        this.selectionStart = this.selectionEnd = start + textToInsert.length;
+                        return;
+                    }
+
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        let lineStart = start;
+                        while (lineStart > 0 && value[lineStart - 1] !== '\n') {
+                            lineStart--;
+                        }
+                        let lineEnd = end;
+                        if (end > start && value[end - 1] === '\n') {
+                            lineEnd--;
+                        }
+                        while (lineEnd < value.length && value[lineEnd] !== '\n') {
+                            lineEnd++;
+                        }
+
+                        const selectedText = value.substring(lineStart, lineEnd);
+                        const lines = selectedText.split('\n');
+                        let change = 0;
+
+                        const getIndentLevel = (line) => (line.match(/^\t*/)?.[0].length || 0);
+
+                        let prevLineIndent = 0;
+                        if (lineStart > 0) {
+                            let prevLineStart = value.lastIndexOf('\n', lineStart - 2) + 1;
+                            const prevLine = value.substring(prevLineStart, lineStart - 1);
+                            prevLineIndent = getIndentLevel(prevLine);
+                        }
+
+                        const newLines = lines.map(line => {
+                            if (e.shiftKey) {
+                                if (line.startsWith('\t')) {
+                                    change--;
+                                    return line.substring(1);
+                                }
+                            } else {
+                                const currentIndent = getIndentLevel(line);
+                                if (line.trim() !== '' && currentIndent <= prevLineIndent) {
+                                    change++;
+                                    return '\t' + line;
+                                }
+                            }
+                            return line;
+                        });
+
+                        const newText = newLines.join('\n');
+                        this.value = value.substring(0, lineStart) + newText + value.substring(lineEnd);
+
+                        if (start === end) {
+                            const indentChange = e.shiftKey ? (selectedText.startsWith('\t') ? -1 : 0) : (getIndentLevel(selectedText) <= prevLineIndent && selectedText.trim() !== '' ? 1 : 0);
+                            this.selectionStart = this.selectionEnd = start + indentChange;
+                        } else {
+                            this.selectionStart = start;
+                            this.selectionEnd = end + change;
+                        }
+                        return;
+                    }
+
+                    const bracketMap = { '(': ')', '[': ']', '{': '}' };
+                    const wrapChar = e.key;
+                    const selectedText = value.substring(start, end);
+
+                    if (bracketMap[wrapChar] || wrapChar === '=') {
+                        e.preventDefault();
+                        if (selectedText) {
+                            const closingChar = bracketMap[wrapChar] || wrapChar;
+                            const newText = (wrapChar === '=' ? '==' : wrapChar) + selectedText + (wrapChar === '=' ? '==' : closingChar);
+                            this.value = value.substring(0, start) + newText + value.substring(end);
+                            this.selectionStart = start;
+                            this.selectionEnd = start + newText.length;
+                        } else if (bracketMap[wrapChar]) {
+                            const closingChar = bracketMap[wrapChar];
+                            this.value = value.substring(0, start) + wrapChar + closingChar + value.substring(end);
+                            this.selectionStart = this.selectionEnd = start + 1;
+                        } else {
+                            this.value = value.substring(0, start) + wrapChar + value.substring(end);
+                            this.selectionStart = this.selectionEnd = start + 1;
+                        }
+                        return;
+                    }
+                });
+
 
                 entryDiv.append(header, previewDiv, textArea);
 
@@ -692,11 +806,32 @@
                 entryDiv.appendChild(deleteButton);
 
                 entryDiv.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('tag')) {
-                        const tag = e.target.dataset.tag;
-                        if (tag) {
-                            handleTagClick(tag);
-                        }
+                    if (e.target.classList.contains('task-list-item-checkbox')) {
+                        const allCheckboxes = Array.from(previewDiv.querySelectorAll('.task-list-item-checkbox'));
+                        const checkboxIndex = allCheckboxes.indexOf(e.target);
+                        let currentContent = journalEntries[dateString];
+                        let count = -1;
+
+                        const newContent = currentContent.replace(/-\s\[[ x]\]/g, (match) => {
+                            count++;
+                            if (count === checkboxIndex) {
+                                return match.includes('[ ]') ? '- [x]' : '- [ ]';
+                            }
+                            return match;
+                        });
+
+                        journalEntries[dateString] = newContent;
+                        saveEntries(journalEntries);
+
+                        previewDiv.innerHTML = parseAndStyleContent(newContent);
+                        textArea.value = newContent;
+                        return;
+                    }
+
+                    if (e.target.closest('a')) return;
+                    if (e.target.closest('.tag')) {
+                        const tag = e.target.closest('.tag').dataset.tag;
+                        if (tag) handleTagClick(tag);
                         return;
                     }
 
@@ -812,7 +947,7 @@
                 const wasJustCreated = journalEntries[dateString] === undefined;
 
                 if (wasJustCreated) {
-                    journalEntries[dateString] = '';
+                    journalEntries[dateString] = '- ';
                     saveEntries(journalEntries);
                 }
 
@@ -836,11 +971,10 @@
                     const element = document.querySelector(`.journal-entry[data-date="${dateString}"]`);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        if (wasJustCreated) {
-                            element.click();
-                        } else {
-                            element.classList.add('ring-2', 'ring-blue-400');
-                            setTimeout(() => element.classList.remove('ring-2', 'ring-blue-400'), 2500);
+                        element.click();
+                        const textarea = element.querySelector('textarea');
+                        if (textarea) {
+                            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
                         }
                     }
                 }, 100);
@@ -901,12 +1035,6 @@
                 } else {
                     filterHeader.classList.add('hidden');
                     filterHeader.classList.remove('flex');
-                    const todayString = formatDate(new Date());
-
-                    if (journalEntries[todayString] === undefined) {
-                        journalEntries[todayString] = '';
-                        saveEntries(journalEntries);
-                    }
                 }
 
                 const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
@@ -1018,6 +1146,12 @@
             };
 
             const updateAll = () => {
+                const todayString = formatDate(new Date());
+                if (journalEntries[todayString] === undefined) {
+                    journalEntries[todayString] = '- ';
+                    saveEntries(journalEntries);
+                }
+
                 renderJournal();
                 renderCalendar();
                 renderTagCloud();
@@ -1056,10 +1190,14 @@
                             if (dateMatch) {
                                 resolve({ date: dateMatch[1], content: e.target.result });
                             } else {
+                                console.warn(`Could not extract date from filename: ${file.name}`);
                                 resolve(null);
                             }
                         };
-                        reader.onerror = (e) => reject(e);
+                        reader.onerror = (e) => {
+                            console.error("Error reading file:", file.name, e);
+                            reject(e);
+                        };
                         reader.readAsText(file);
                     });
                 };
@@ -1075,6 +1213,7 @@
                                     if (dateMatch) {
                                         return { date: dateMatch[1], content: content };
                                     } else {
+                                        console.warn(`Could not extract date from filename in ZIP: ${relativePath}`);
                                         return null;
                                     }
                                 }));
@@ -1082,7 +1221,8 @@
                         });
                         return Promise.all(zipPromises);
                     } catch (error) {
-                        showNotification(`Fehler beim Importieren der ZIP-Datei "${zipFile.name}".`, 'error');
+                        console.error("Error loading or processing ZIP file:", zipFile.name, error);
+                        showNotification(`Error importing ZIP file "${zipFile.name}".`, 'error');
                         return [];
                     }
                 };
@@ -1104,6 +1244,8 @@
                             importedDates.push(result.date);
                             importedCount++;
                         }
+                    } else {
+                        console.warn(`File type not supported or invalid filename: ${file.name}`);
                     }
                 }
 
@@ -1117,7 +1259,7 @@
                     }
                     currentPage = 1;
                     updateAll();
-                    showNotification(`${importedCount} Eintrag/Einträge erfolgreich importiert.`, 'success');
+                    showNotification(`${importedCount} entry/entries successfully imported.`, 'success');
                     if (newestImportedDate) {
                         setTimeout(() => {
                             const element = document.querySelector(`.journal-entry[data-date="${newestImportedDate}"]`);
@@ -1129,51 +1271,11 @@
                         }, 100);
                     }
                 } else {
-                    showNotification('Keine gültigen Einträge zum Importieren gefunden.', 'warning');
+                    showNotification('No valid entries found to import.', 'warning');
                 }
                 importInput.value = '';
             });
 
-            // --- NEUE EXPORT-LOGIK ---
-
-            // Schritt 1: Funktion zum Erstellen der ZIP-Datei (extrahiert)
-            const createZipAndDownload = (filename, startDate, endDate) => {
-                const zip = new JSZip();
-                let filesAdded = 0;
-                Object.keys(journalEntries).forEach(dateString => {
-                    if (dateString >= startDate && dateString <= endDate) {
-                        const content = journalEntries[dateString];
-                        if (content?.trim()) {
-                            zip.file(`${dateString}.md`, content);
-                            filesAdded++;
-                        }
-                    }
-                });
-
-                if (filesAdded === 0) {
-                    showNotification('Keine Einträge im ausgewählten Zeitraum gefunden.', 'warning');
-                    return;
-                }
-
-                zip.generateAsync({ type: "blob" })
-                    .then(content => {
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(content);
-                        // Verwende den übergebenen Dateinamen
-                        link.download = `${filename}.zip`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(link.href);
-                        showNotification('Export erfolgreich!', 'success');
-                    })
-                    .catch(error => {
-                        console.error("Fehler beim Generieren der ZIP-Datei:", error);
-                        showNotification('Fehler beim Exportieren der Einträge.', 'error');
-                    });
-            };
-
-            // Schritt 2: Event Listener für den "Exportieren"-Button (öffnet Datums-Modal)
             exportButton.addEventListener('click', () => {
                 const dates = Object.keys(journalEntries).sort();
                 if (dates.length > 0) {
@@ -1184,41 +1286,53 @@
                     startDateInput.value = today;
                     endDateInput.value = today;
                 }
+                exportFilenameInput.value = `Notizen-Export_${formatDate(new Date())}`;
                 exportModal.classList.remove('hidden');
             });
 
             cancelExportButton.addEventListener('click', () => exportModal.classList.add('hidden'));
+            window.addEventListener('click', (event) => { if (event.target == exportModal) exportModal.classList.add('hidden'); });
 
-            // Schritt 3: Event Listener für den "Weiter"-Button (öffnet Umbenennungs-Modal)
             confirmExportButton.addEventListener('click', () => {
-                exportStartDate = startDateInput.value;
-                exportEndDate = endDateInput.value;
-                if (!exportStartDate || !exportEndDate || exportStartDate > exportEndDate) {
-                    showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
-                    return;
-                }
-
-                const defaultFilename = `Notizen_${exportStartDate}_bis_${exportEndDate}`;
-                exportFilenameInput.value = defaultFilename;
-
-                exportModal.classList.add('hidden');
-                exportRenameModal.classList.remove('hidden');
-                exportFilenameInput.focus();
-            });
-
-            // Schritt 4: Event Listener für das Umbenennungs-Modal
-            exportRenameCancelBtn.addEventListener('click', () => {
-                exportRenameModal.classList.add('hidden');
-            });
-
-            exportRenameConfirmBtn.addEventListener('click', () => {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
                 const filename = exportFilenameInput.value.trim();
-                if (filename) {
-                    createZipAndDownload(filename, exportStartDate, exportEndDate);
-                    exportRenameModal.classList.add('hidden');
-                } else {
-                    showNotification('Bitte geben Sie einen gültigen Dateinamen an.', 'error');
-                }
+
+                if (!startDate || !endDate || startDate > endDate) return showNotification('Bitte wählen Sie einen gültigen Datumsbereich.', 'warning');
+                if (!filename) return showNotification('Bitte geben Sie einen Dateinamen ein.', 'warning');
+
+                const zip = new JSZip();
+                let filesAdded = 0;
+
+                const sortedDates = Object.keys(journalEntries).sort();
+
+                sortedDates.forEach(dateString => {
+                    if (dateString >= startDate && dateString <= endDate) {
+                        const content = journalEntries[dateString];
+                        if (content?.trim()) {
+                            zip.file(`${dateString}.md`, content);
+                            filesAdded++;
+                        }
+                    }
+                });
+
+                if (filesAdded === 0) return showNotification('Keine Einträge im ausgewählten Zeitraum gefunden.', 'warning');
+
+                zip.generateAsync({ type: "blob" })
+                    .then(content => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(content);
+                        link.download = `${filename}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    })
+                    .catch(error => {
+                        console.error("Error generating ZIP file:", error);
+                        showNotification('Fehler beim Exportieren der Einträge.', 'error');
+                    });
+                exportModal.classList.add('hidden');
             });
 
 
@@ -1240,12 +1354,6 @@
             anleitungButton.addEventListener('click', openAnleitungModal);
             cancelAnleitungButton.addEventListener('click', closeAnleitungModal);
             closeAnleitungButton.addEventListener('click', closeAnleitungModal);
-
-            window.addEventListener('click', (event) => {
-                if (event.target == exportModal) exportModal.classList.add('hidden');
-                if (event.target == anleitungModal) anleitungModal.classList.add('hidden');
-                if (event.target == exportRenameModal) exportRenameModal.classList.add('hidden'); // Schließt auch das neue Modal
-            });
 
             function openCalendarSidebar() {
                 calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');

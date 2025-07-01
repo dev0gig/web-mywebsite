@@ -41,9 +41,9 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Custom scrollbar */
+        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
 
         ::-webkit-scrollbar-track {
@@ -51,12 +51,13 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--text-color-light);
-            border-radius: 4px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            border: 3px solid var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
+            background-color: var(--text-color-light);
         }
 
         .visually-hidden {

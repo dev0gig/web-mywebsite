@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Hinzufügen einer serifen Schriftart für den Lesemodus -->
+    <!-- Add a serif font for reader mode -->
     <link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
@@ -62,9 +62,9 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Custom scrollbar */
+        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
 
         ::-webkit-scrollbar-track {
@@ -72,12 +72,13 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--text-color-light);
-            border-radius: 4px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            border: 3px solid var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
+            background-color: var(--text-color-light);
         }
 
         /* Style for visited links */
@@ -330,7 +331,11 @@
                             style="color: var(--text-color);"></h3>
                     </div>
                 </div>
-                <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
+                <div class="flex justify-between items-center">
+                    <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
+                    <!-- Article counter display -->
+                    <p id="article-counter" class="text-sm" style="color: var(--text-color-light);"></p>
+                </div>
             </header>
             <div id="reader-body" class="p-6 overflow-y-auto flex-grow" style="color: var(--text-color);">
                 <!-- Article content and image go here -->
@@ -490,7 +495,7 @@
             const readerNextBtn = document.getElementById('reader-next-btn');
             const readerFavicon = document.getElementById('reader-favicon'); // Reader favicon element
             const readerFavoriteBtn = document.getElementById('reader-favorite-btn'); // New favorite button in reader mode
-
+            const articleCounterElement = document.getElementById('article-counter'); // Article counter element
 
             // Font size controls
             const fontSizeDecreaseBtn = document.getElementById('font-size-decrease');
@@ -499,7 +504,7 @@
             // Export/Rename Modal Elements
             const renameExportModal = document.getElementById('rename-export-modal');
             const exportFilenameInput = document.getElementById('export-filename-input');
-            const confirmExportNameBtn = document.getElementById('confirm-export-name-btn');
+            const confirmExportNameBtn = document = document.getElementById('confirm-export-name-btn');
             const cancelExportNameBtn = document.getElementById('cancel-export-name-btn');
 
 
@@ -542,10 +547,18 @@
             let visitedLinks = new Set(JSON.parse(localStorage.getItem(visitedLinksKey)) || []);
             let favoriteLinks = new Set(JSON.parse(localStorage.getItem(favoritesKey)) || []);
             let activeUrl = null;
-            let currentArticles = [];
-            let articlesToDisplay = [];
-            let currentArticleIndex = -1;
+            let currentArticles = []; // All articles fetched for the current feed/view (before filtering/pagination)
+            let filteredArticles = []; // All articles after applying read/unread filter (before pagination)
+            let articlesToDisplay = []; // Articles to display on the current page
+            let currentReaderGlobalIndex = -1; // Global index of the article currently open in reader mode.
+
             let currentFilter = 'unread';
+
+            // Pagination state
+            let articlesPerPage = 10;
+            let currentPage = 1;
+            let totalFilteredArticles = 0; // Total articles after applying filters (read/unread)
+
             // Load saved font size or default to 20.0 (representing 20px)
             let currentReaderFontSize = parseFloat(localStorage.getItem(readerFontSizeKey) || 20.0);
 
@@ -739,18 +752,31 @@
             const rerenderArticleList = () => {
                 const articlesWrapper = document.getElementById('articles-wrapper');
                 if (!articlesWrapper) return;
-                articlesToDisplay = currentArticles.filter(item => {
+
+                // Apply filters to get the set of articles relevant to the current view (read/unread/all)
+                filteredArticles = currentArticles.filter(item => {
                     const isVisited = visitedLinks.has(item.link);
                     if (currentFilter === 'unread') return !isVisited;
                     if (currentFilter === 'read') return isVisited;
-                    return true;
+                    return true; // 'all' filter
                 });
+
+                totalFilteredArticles = filteredArticles.length;
+
+                // Calculate pagination indices
+                const startIndex = (currentPage - 1) * articlesPerPage;
+                const endIndex = Math.min(startIndex + articlesPerPage, totalFilteredArticles);
+
+                // Slice the articles for the current page
+                articlesToDisplay = filteredArticles.slice(startIndex, endIndex);
+
                 const unreadCount = currentArticles.filter(i => !visitedLinks.has(i.link)).length;
                 const readCount = currentArticles.length - unreadCount;
                 const unreadEl = document.getElementById('unread-count');
                 const readEl = document.getElementById('read-count');
                 if (unreadEl) unreadEl.textContent = unreadCount;
                 if (readEl) readEl.textContent = readCount;
+
                 if (articlesToDisplay.length > 0) {
                     articlesWrapper.innerHTML = articlesToDisplay.map((item, index) => `<article class="border-b py-6 last:border-b-0 group" style="border-color: var(--border-color);">${createArticleHtml(item, index)}</article>`).join('');
                 } else {
@@ -758,6 +784,9 @@
                     if (activeUrl === 'favorites') message = 'Du hast noch keine Favoriten markiert.';
                     articlesWrapper.innerHTML = `<p class="text-center py-4" style="color: var(--text-color-light);">${message}</p>`;
                 }
+
+                // Update pagination controls
+                updatePaginationControls();
 
                 // Re-create icons after injecting HTML
                 lucide.createIcons({
@@ -809,24 +838,45 @@
                     filterWrapper.innerHTML = `<button id="filter-unread-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Ungelesen (<span id="unread-count">0</span>)</button><button id="filter-read-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Gelesen (<span id="read-count">0</span>)</button>`;
                     wrapper.appendChild(filterWrapper);
                 }
+
                 const articlesWrapper = document.createElement('div');
                 articlesWrapper.id = 'articles-wrapper';
                 wrapper.appendChild(articlesWrapper);
+
+                // Pagination controls
+                const paginationWrapper = document.createElement('div');
+                paginationWrapper.id = 'pagination-controls';
+                paginationWrapper.className = 'flex justify-center items-center gap-4 mt-6 pt-4 border-t';
+                paginationWrapper.style.borderColor = 'var(--border-color)';
+                paginationWrapper.innerHTML = `
+                    <button id="prev-page-btn" class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors" style="background-color: var(--accent-color); hover:background-color: var(--accent-color-hover);">Zurück</button>
+                    <span id="page-info" class="text-sm" style="color: var(--text-color-light);">Seite 1 / 1</span>
+                    <button id="next-page-btn" class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors" style="background-color: var(--accent-color); hover:background-color: var(--accent-color-hover);">Weiter</button>
+                `;
+                wrapper.appendChild(paginationWrapper);
+
                 feedContainer.appendChild(wrapper);
 
                 if (showFilters) {
                     document.getElementById('filter-unread-btn').addEventListener('click', () => {
                         currentFilter = 'unread';
+                        currentPage = 1; // Reset to first page on filter change
                         updateFilterButtons();
                         rerenderArticleList();
                     });
                     document.getElementById('filter-read-btn').addEventListener('click', () => {
                         currentFilter = 'read';
+                        currentPage = 1; // Reset to first page on filter change
                         updateFilterButtons();
                         rerenderArticleList();
                     });
                     updateFilterButtons();
                 }
+
+                // Add event listeners for pagination buttons
+                document.getElementById('prev-page-btn').addEventListener('click', prevPage);
+                document.getElementById('next-page-btn').addEventListener('click', nextPage);
+
 
                 // Create lucide icons for the newly added content
                 lucide.createIcons({
@@ -842,6 +892,46 @@
                 unreadBtn.classList.toggle('filter-btn-active', currentFilter === 'unread');
                 readBtn.classList.toggle('filter-btn-active', currentFilter === 'read');
             };
+
+            const updatePaginationControls = () => {
+                const pageInfo = document.getElementById('page-info');
+                const prevBtn = document.getElementById('prev-page-btn');
+                const nextBtn = document.getElementById('next-page-btn');
+
+                const totalPages = Math.ceil(totalFilteredArticles / articlesPerPage);
+
+                if (pageInfo) {
+                    pageInfo.textContent = `Seite ${currentPage} / ${totalPages || 1}`;
+                }
+
+                if (prevBtn) {
+                    prevBtn.disabled = currentPage === 1;
+                    prevBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
+                    prevBtn.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
+                }
+                if (nextBtn) {
+                    nextBtn.disabled = currentPage >= totalPages;
+                    nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+                    nextBtn.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
+                }
+            };
+
+            const goToPage = (page) => {
+                const totalPages = Math.ceil(totalFilteredArticles / articlesPerPage);
+                if (page < 1) currentPage = 1;
+                else if (page > totalPages) currentPage = totalPages;
+                else currentPage = page;
+                rerenderArticleList();
+            };
+
+            const nextPage = () => {
+                goToPage(currentPage + 1);
+            };
+
+            const prevPage = () => {
+                goToPage(currentPage - 1);
+            };
+
 
             // --- READER MODAL LOGIC ---
             const applyReaderFontSize = () => {
@@ -859,11 +949,20 @@
                 saveReaderFontSize();
             };
 
-            const openReaderMode = (index) => {
-                if (index < 0 || index >= articlesToDisplay.length) return;
+            const updateArticleCounter = (globalIndex, totalCount) => {
+                if (articleCounterElement && totalCount > 0) {
+                    articleCounterElement.textContent = `Artikel ${globalIndex + 1} / ${totalCount}`;
+                } else if (articleCounterElement) {
+                    articleCounterElement.textContent = ''; // Clear if no articles
+                }
+            };
 
-                currentArticleIndex = index;
-                const item = articlesToDisplay[currentArticleIndex];
+            const openReaderMode = (globalArticleIndex) => {
+                if (globalArticleIndex < 0 || globalArticleIndex >= filteredArticles.length) return;
+
+                currentReaderGlobalIndex = globalArticleIndex; // Set the global index
+
+                const item = filteredArticles[currentReaderGlobalIndex]; // Get item using global index
 
                 readerTitle.textContent = item.title;
                 readerBody.innerHTML = ''; // Clear existing content first
@@ -900,7 +999,7 @@
                     readerBody.appendChild(imgElement); // Append the image element after the text
                 }
 
-                readerBody.scrollTop = 0;
+                readerBody.scrollTop = 0; // Scroll to top when opening a new article
                 readerOriginalLink.href = item.link;
 
                 // Set favicon if available
@@ -927,8 +1026,12 @@
                     saveVisitedLinks();
                 }
 
-                readerPrevBtn.classList.toggle('hidden', currentArticleIndex === 0);
-                readerNextBtn.classList.toggle('hidden', currentArticleIndex === articlesToDisplay.length - 1);
+                // Update previous/next buttons for reader mode based on global index
+                readerPrevBtn.classList.toggle('hidden', currentReaderGlobalIndex === 0);
+                readerNextBtn.classList.toggle('hidden', currentReaderGlobalIndex === filteredArticles.length - 1);
+
+                // Update the article counter with global position
+                updateArticleCounter(currentReaderGlobalIndex, filteredArticles.length);
 
                 if (readerModal.classList.contains('hidden')) {
                     readerModal.classList.remove('hidden');
@@ -941,22 +1044,36 @@
                 });
             };
 
-            const showNextArticle = () => {
-                if (currentArticleIndex + 1 < articlesToDisplay.length) {
-                    openReaderMode(currentArticleIndex + 1);
+            const showNextArticle = async () => {
+                if (currentReaderGlobalIndex + 1 < filteredArticles.length) {
+                    const nextGlobalIndex = currentReaderGlobalIndex + 1;
+                    const nextPageIndex = Math.floor(nextGlobalIndex / articlesPerPage) + 1;
+
+                    if (nextPageIndex !== currentPage) {
+                        currentPage = nextPageIndex;
+                        await rerenderArticleList(); // Ensure articlesToDisplay is updated for the new page
+                    }
+                    openReaderMode(nextGlobalIndex);
                 }
             };
 
-            const showPreviousArticle = () => {
-                if (currentArticleIndex - 1 >= 0) {
-                    openReaderMode(currentArticleIndex - 1);
+            const showPreviousArticle = async () => {
+                if (currentReaderGlobalIndex > 0) {
+                    const prevGlobalIndex = currentReaderGlobalIndex - 1;
+                    const prevPageIndex = Math.floor(prevGlobalIndex / articlesPerPage) + 1;
+
+                    if (prevPageIndex !== currentPage) {
+                        currentPage = prevPageIndex;
+                        await rerenderArticleList(); // Ensure articlesToDisplay is updated for the new page
+                    }
+                    openReaderMode(prevGlobalIndex);
                 }
             };
 
             const closeReaderMode = () => {
                 readerModal.classList.add('hidden');
                 document.body.style.overflow = '';
-                rerenderArticleList();
+                rerenderArticleList(); // Re-render the list to update visited status
                 if (document.getElementById('filter-unread-btn')) updateFilterButtons();
             };
 
@@ -979,10 +1096,11 @@
                         console.error(`Error fetching feed ${savedFeeds[index]?.url || 'unknown'}:`, result.reason);
                     }
                 });
-                return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate)).slice(0, 100);
+                // Removed the .slice(0, 100) limitation here
+                return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
             }
 
-            // --- NEW: CLEANUP LOGIC ---
+            // --- CLEANUP LOGIC ---
             const cleanupOrphanedFavorites = async () => {
                 // This function ensures that the `favoriteLinks` set only contains links
                 // from articles that are actually in the user's saved feeds.
@@ -1027,6 +1145,11 @@
                 } catch (error) {
                     console.error("Failed to refresh feed(s):", error);
                     // The error message will be shown by the loadFeed/showMessage function.
+                } finally {
+                    if (icon) {
+                        icon.classList.remove('animate-spin');
+                    }
+                    refreshBtn.disabled = false;
                 }
             };
             window.handleRefresh = handleRefresh;
@@ -1042,13 +1165,14 @@
                 setActiveSidebarItem('all');
                 showLoading();
                 currentArticles = await fetchAllArticles();
+                currentPage = 1; // Reset to first page
                 const allFeedsIcon = `<i data-lucide="book-open" class="h-8 w-8" style="color: var(--accent-color);"></i>`;
                 renderFeedLayout('Alle Feeds (Neueste zuerst)', allFeedsIcon);
                 rerenderArticleList();
             };
 
             const loadFavorites = async () => {
-                currentFilter = 'all';
+                currentFilter = 'all'; // Favorites view shows all (read/unread) favorites
                 setActiveSidebarItem('favorites');
                 showLoading();
                 // First, ensure favorites are clean
@@ -1057,8 +1181,9 @@
 
                 const allArticles = await fetchAllArticles();
                 currentArticles = allArticles.filter(item => favoriteLinks.has(item.link));
+                currentPage = 1; // Reset to first page
                 const favIcon = `<i data-lucide="star" class="h-8 w-8" style="color: var(--favorite-color);"></i>`;
-                renderFeedLayout('Favoriten', favIcon, false);
+                renderFeedLayout('Favoriten', favIcon, false); // No filters for favorites view
                 rerenderArticleList();
             };
 
@@ -1079,6 +1204,7 @@
                         if (data.status === 'ok') {
                             const iconHtml = `<img src="${getFaviconUrl(data.feed.url || rssUrl)}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">`;
                             currentArticles = (data.items || []).map(item => ({ ...item, sourceTitle: data.feed.title, sourceFavicon: getFaviconUrl(data.feed.url || rssUrl), sourceUrl: rssUrl }));
+                            currentPage = 1; // Reset to first page
 
                             renderFeedLayout(data.feed.title, iconHtml);
                             rerenderArticleList();
@@ -1204,19 +1330,26 @@
                     saveFavoriteLinks();
                     updateSidebarCounts();
                     favoriteBtn.classList.toggle('is-favorite');
-                    if (activeUrl === 'favorites') loadFavorites();
+                    if (activeUrl === 'favorites') loadFavorites(); // Re-load favorites to update list if needed
                     return;
                 }
                 const articleContent = e.target.closest('.article-item-content');
                 if (!articleContent) return;
-                const index = parseInt(articleContent.dataset.index, 10);
-                openReaderMode(index);
+                const clickedLocalIndex = parseInt(articleContent.dataset.index, 10);
+                const clickedItem = articlesToDisplay[clickedLocalIndex];
+                const globalIndex = filteredArticles.findIndex(a => a.link === clickedItem.link);
+
+                if (globalIndex !== -1) {
+                    openReaderMode(globalIndex);
+                } else {
+                    console.error("Clicked article not found in filteredArticles.");
+                }
             });
 
             // Reader Modal Listeners
             readerCloseBtn.addEventListener('click', closeReaderMode);
-            readerPrevBtn.addEventListener('click', showPreviousArticle); // Corrected order for prev/next
-            readerNextBtn.addEventListener('click', showNextArticle);     // Corrected order for prev/next
+            readerPrevBtn.addEventListener('click', showPreviousArticle);
+            readerNextBtn.addEventListener('click', showNextArticle);
             fontSizeDecreaseBtn.addEventListener('click', () => adjustReaderFontSize(-1)); // Decrease by 1px
             fontSizeIncreaseBtn.addEventListener('click', () => adjustReaderFontSize(1)); // Increase by 1px
 
@@ -1233,6 +1366,14 @@
                 saveFavoriteLinks();
                 updateSidebarCounts();
                 readerFavoriteBtn.classList.toggle('is-favorite');
+            });
+
+            // Auto-advance on scroll to end
+            readerBody.addEventListener('scroll', () => {
+                const scrollThreshold = 100; // Pixels from the bottom to trigger next article
+                if (readerBody.scrollTop + readerBody.clientHeight >= readerBody.scrollHeight - scrollThreshold) {
+                    showNextArticle();
+                }
             });
 
 
@@ -1293,10 +1434,10 @@
     </script>
 </body>
 
-<!-- Füge dies am Ende des <body>-Tags in rss-reader.html ein -->
+<!-- Add this at the end of the <body> tag in rss-reader.html -->
 <script>
     window.addEventListener('message', (event) => {
-        // Sicherheitsüberprüfung: nur auf Nachrichten vom Parent-Window reagieren
+        // Security check: only respond to messages from the parent window
         if (event.source !== window.parent) {
             return;
         }
@@ -1304,38 +1445,38 @@
         const message = event.data;
 
         if (message && message.type === 'getBackupData') {
-            // Sammle alle relevanten Daten für den RSS-Reader.
+            // Collect all relevant data for the RSS reader.
             const feedsData = localStorage.getItem('savedRssFeeds');
             const visitedData = localStorage.getItem('rssVisitedLinks');
             const favoritesData = localStorage.getItem('rssFavoriteLinks');
 
-            // Bündle alle Daten in einem einzigen Objekt.
+            // Bundle all data into a single object.
             const backupPayload = {
                 feeds: JSON.parse(feedsData || '[]'),
                 visited: JSON.parse(visitedData || '[]'),
                 favorites: JSON.parse(favoritesData || '[]')
             };
 
-            // Sende das Objekt zurück an das Hauptfenster (index.html).
+            // Send the object back to the main window (index.html).
             window.parent.postMessage({
                 type: 'backupDataResponse',
                 key: 'rss',
                 data: backupPayload
-            }, '*'); // In einer echten Anwendung solltest du hier die genaue URL des Parents angeben.
+            }, '*'); // In a real application, you should specify the exact URL of the parent here.
         }
 
         if (message && message.type === 'restoreBackupData') {
-            // Empfange das wiederherzustellende Datenobjekt.
+            // Receive the data object to be restored.
             const restoredData = message.data;
 
-            // Überprüfe, ob die wiederhergestellten Daten das erwartete Format haben.
+            // Check if the restored data has the expected format.
             if (typeof restoredData === 'object' && restoredData !== null && 'feeds' in restoredData && 'visited' in restoredData && 'favorites' in restoredData) {
-                // Speichere jeden Teil der Daten in seinem jeweiligen localStorage-Eintrag.
+                // Store each part of the data in its respective localStorage entry.
                 localStorage.setItem('savedRssFeeds', JSON.stringify(restoredData.feeds || []));
                 localStorage.setItem('rssVisitedLinks', JSON.stringify(restoredData.visited || []));
                 localStorage.setItem('rssFavoriteLinks', JSON.stringify(restoredData.favorites || []));
 
-                // Lade die Seite neu, damit die Änderungen sichtbar werden.
+                // Reload the page so that the changes become visible.
                 window.location.reload();
             }
         }
