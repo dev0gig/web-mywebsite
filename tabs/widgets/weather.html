@@ -32,19 +32,80 @@
         .forecast-day.selected {
             background-color: rgba(255, 255, 255, 0.3);
         }
+
+        /* Stil für den Info-Button und das Modal */
+        .info-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 10;
+        }
+
+        .info-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .info-modal-content {
+            background-color: var(--bg-color, #4A5568);
+            color: var(--text-color, #FFFFFF);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .info-modal-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color, #FFFFFF);
+        }
     </style>
 </head>
 
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="weather-card rounded-2xl w-full max-w-lg p-6">
+    <div class="weather-card rounded-2xl w-full max-w-lg p-6 relative">
+        <!-- Info-Button für Fehleranzeige -->
+        <button id="error-info-button" class="info-button hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+        </button>
 
-        <!-- Lade- und Fehleranzeige -->
+        <!-- Ladeanzeige -->
         <div id="loader" class="text-center py-10">
             <p>Ermittle Standort und lade Wetterdaten...</p>
-        </div>
-        <div id="error-message" class="text-center py-10 text-red-300 hidden">
-            <p>Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.</p>
         </div>
 
         <!-- Haupt-Wetteranzeige -->
@@ -91,13 +152,24 @@
         </div>
     </div>
 
+    <!-- Info-Modal -->
+    <div id="info-modal" class="info-modal hidden">
+        <div class="info-modal-content">
+            <button id="info-modal-close" class="info-modal-close">&times;</button>
+            <p id="info-modal-message"></p>
+        </div>
+    </div>
+
     <script>
         class WeatherWidget {
             constructor() {
                 // DOM-Elemente
                 this.card = document.querySelector('.weather-card');
                 this.loader = document.getElementById('loader');
-                this.errorMessage = document.getElementById('error-message');
+                this.errorInfoButton = document.getElementById('error-info-button');
+                this.infoModal = document.getElementById('info-modal');
+                this.infoModalMessage = document.getElementById('info-modal-message');
+                this.infoModalClose = document.getElementById('info-modal-close');
                 this.weatherContent = document.getElementById('weather-content');
 
                 this.locationEl = document.getElementById('location');
@@ -116,11 +188,13 @@
                 // Datenspeicher
                 this.currentData = null;
                 this.dailyData = null;
+                this.errorMessageText = "Ort konnte nicht ermittelt werden. Zeige Wetter für Wien."; // Standard-Fehlermeldung
 
                 // Standard-Ort (Wien)
                 this.defaultCoords = { latitude: 48.2082, longitude: 16.3738, name: "Wien" };
 
                 this.init();
+                this.addEventListeners();
             }
 
             init() {
@@ -137,8 +211,18 @@
                 }
             }
 
+            addEventListeners() {
+                this.errorInfoButton.addEventListener('click', () => this.showInfoModal(true, this.errorMessageText));
+                this.infoModalClose.addEventListener('click', () => this.showInfoModal(false));
+                this.infoModal.addEventListener('click', (event) => {
+                    if (event.target === this.infoModal) {
+                        this.showInfoModal(false);
+                    }
+                });
+            }
+
             async fetchWeatherData(lat, lon, knownCityName = null, isErrorCase = false) {
-                if (isErrorCase) this.showError(true);
+                if (isErrorCase) this.showErrorButton(true);
 
                 try {
                     let cityName = knownCityName;
@@ -161,7 +245,7 @@
                     this.displayDayDetails(0); // Zeigt initial das heutige Wetter an
 
                 } catch (error) {
-                    this.showError(true, "Wetterdaten konnten nicht geladen werden.");
+                    this.showErrorButton(true, "Wetterdaten konnten nicht geladen werden.");
                     console.error("Fehler beim Abrufen der Wetterdaten:", error);
                 } finally {
                     this.showLoading(false);
@@ -252,16 +336,21 @@
                 this.loader.style.display = isLoading ? 'block' : 'none';
                 this.weatherContent.style.display = isLoading ? 'none' : 'block';
                 if (isLoading) {
-                    this.errorMessage.classList.add('hidden');
+                    this.showErrorButton(false); // Verstecke den Fehler-Button beim Laden
                 }
             }
 
-            showError(isError, message = "Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.") {
-                if (isError) {
-                    this.errorMessage.querySelector('p').textContent = message;
-                    this.errorMessage.classList.remove('hidden');
+            showErrorButton(isError, message = "Ort konnte nicht ermittelt werden. Zeige Wetter für Wien.") {
+                this.errorMessageText = message;
+                this.errorInfoButton.classList.toggle('hidden', !isError);
+            }
+
+            showInfoModal(show, message = "") {
+                if (show) {
+                    this.infoModalMessage.textContent = message;
+                    this.infoModal.classList.remove('hidden');
                 } else {
-                    this.errorMessage.classList.add('hidden');
+                    this.infoModal.classList.add('hidden');
                 }
             }
         }

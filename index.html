@@ -62,11 +62,14 @@
             position: relative;
             top: 4rem;
             height: calc(100% - 4rem);
-            /* KORREKTUR: Platz für das App-Dock schaffen */
-            padding-bottom: 85px;
-            /* Höhe des Docks + Puffer */
             box-sizing: border-box;
-            /* Sicherstellen, dass Padding in der Höhe berücksichtigt wird */
+            transition: padding-right 0.3s ease-in-out;
+        }
+
+        /* NEU: Abstand rechts, wenn das Dock sichtbar ist */
+        body.dock-visible #main-content {
+            padding-right: 90px;
+            /* Breite des Docks + Puffer */
         }
 
         @media (min-width: 768px) {
@@ -75,7 +78,6 @@
                 top: 0;
                 height: 100%;
                 margin-left: 4.5rem;
-                /* Padding-bottom bleibt für das Dock bestehen */
             }
         }
 
@@ -219,12 +221,13 @@
             bottom: 20px;
         }
 
+        /* Vertikales Dock rechts */
         #app-dock {
             position: fixed;
-            bottom: calc(10px + env(safe-area-inset-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.75rem;
+            top: 50%;
+            right: calc(10px + env(safe-area-inset-right));
+            transform: translateY(-50%);
+            padding: 1rem;
             background-color: var(--dock-bg);
             border: 1px solid var(--dock-border);
             border-radius: 1.5rem;
@@ -232,12 +235,24 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: none;
-            /* Initially hidden */
-            gap: 1rem;
+            flex-direction: column;
+            gap: 1.5rem;
             z-index: 90;
             transition: background-color 0.3s ease;
-            max-width: 90vw;
-            overflow-x: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 80px;
+        }
+
+        /* UPDATED: Hide dock on mobile */
+        @media (max-width: 767px) {
+            #app-dock {
+                display: none !important;
+            }
+
+            body.dock-visible #main-content {
+                padding-right: 0 !important;
+            }
         }
 
         .dock-app-item {
@@ -252,7 +267,7 @@
         }
 
         .dock-app-item:hover {
-            transform: translateY(-5px) scale(1.1);
+            transform: scale(1.1);
         }
 
         .dock-app-icon-wrapper {
@@ -324,18 +339,6 @@
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <img src="assets/icons/unicorn.svg" alt="Unicorn Icon" class="w-7 h-7 flex-shrink-0">
                     <span class="sidebar-text font-medium">Unicorn</span></a></li>
-            <li><a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/calendar.svg" alt="Google Kalender Icon" class="w-7 h-7 flex-shrink-0">
-                    <span class="sidebar-text font-medium">Google Kalender</span></a></li>
-            <li><a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/drive.svg" alt="Google Drive Icon" class="w-7 h-7 flex-shrink-0">
-                    <span class="sidebar-text font-medium">Google Drive</span></a></li>
-            <li><a href="https://keep.google.com/" target="_blank" rel="noopener noreferrer"
-                    class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="assets/icons/notes.svg" alt="Google Notizen Icon" class="w-7 h-7 flex-shrink-0">
-                    <span class="sidebar-text font-medium">Google Notizen</span></a></li>
             <li class="mt-auto"><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg ">
                     <img src="assets/icons/settings.svg" alt="Einstellungen Icon" class="w-8 h-8 flex-shrink-0">
                     <span class="sidebar-text font-medium">Einstellungen</span></button></li>
@@ -360,7 +363,7 @@
     </nav>
 
     <main id="main-content" class="h-full">
-        <div class="relative w-full h-full">
+        <div id="iframe-wrapper" class="relative w-full h-full">
             <div id="iframe-loader" class="hidden absolute inset-0 z-10 flex items-center justify-center">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
@@ -665,12 +668,17 @@
             };
 
             const renderAppDock = (favoriteApps = []) => {
+                const body = document.body;
                 appDock.innerHTML = '';
+
                 if (favoriteApps.length === 0) {
                     appDock.style.display = 'none';
+                    body.classList.remove('dock-visible');
                     return;
                 }
+
                 appDock.style.display = 'flex';
+                body.classList.add('dock-visible');
 
                 favoriteApps.forEach(app => {
                     const item = document.createElement('a');
@@ -823,7 +831,9 @@
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('theme') === 'system') applyTheme('system'); });
 
             navDesignSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'desktop') {
+                const designValue = e.target.value;
+                localStorage.setItem('navigationDesign', designValue);
+                if (designValue === 'desktop') {
                     window.location.href = 'index_desktop.html';
                 }
             });

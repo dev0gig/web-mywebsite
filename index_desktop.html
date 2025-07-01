@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dev0gig Desktop</title>
+    <title>AxisMea (desktop)</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icons/home-solid-white.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -327,7 +327,7 @@
             z-index: 9999;
             transition: background-color 0.3s ease;
             max-width: 90vw;
-            overflow-x: auto;
+            overflow: hidden;
         }
 
         .dock-app-item {
@@ -336,20 +336,34 @@
         }
 
         .dock-app-item:hover {
-            transform: scale(1.2);
+            transform: translateY(-10px);
         }
 
-        .dock-app-item.minimized::after {
+        .dock-app-item::after {
             content: '';
             position: absolute;
-            bottom: 4px;
-            right: 4px;
-            width: 8px;
-            height: 8px;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
             background-color: #3b82f6;
             border-radius: 50%;
             border: 1px solid var(--text-color);
+            display: none;
         }
+
+        .dock-app-item.open::after,
+        .dock-app-item.minimized::after {
+            display: block;
+        }
+
+        .dock-separator {
+            width: 1px;
+            background-color: var(--dock-border);
+            margin: -0.75rem 0;
+        }
+
 
         #context-menu {
             position: fixed;
@@ -385,9 +399,17 @@
 </head>
 
 <body>
+    <script>
+        (function () {
+            const savedDesign = localStorage.getItem('navigationDesign');
+            if (savedDesign === 'sidebar') {
+                window.location.replace('index.html');
+            }
+        })();
+    </script>
+
     <canvas id="starfield-canvas"></canvas>
 
-    <!-- NEU: Overlay für die Weiterleitung auf Mobilgeräten -->
     <div id="mobile-redirect-overlay"
         class="fixed inset-0 bg-black bg-opacity-80 z-[20000] flex-col items-center justify-center text-white text-center p-8 hidden">
         <h2 class="text-2xl font-bold mb-4">Desktop-Ansicht nicht verfügbar</h2>
@@ -461,7 +483,7 @@
     </main>
 
     <div id="app-dock">
-        <!-- Favorite apps will be generated here -->
+        <!-- Favorite and open apps will be generated here -->
     </div>
 
     <div id="confirm-modal"
@@ -482,14 +504,13 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
-            // NEU: Umleitung für mobile Geräte
             if (window.innerWidth < 1024) {
                 const overlay = document.getElementById('mobile-redirect-overlay');
-                if (overlay) overlay.style.display = 'flex'; // Zeige die Nachricht an
+                if (overlay) overlay.style.display = 'flex';
                 setTimeout(() => {
                     window.location.href = 'index.html';
-                }, 3000); // 3 Sekunden warten, damit der Benutzer die Nachricht lesen kann
-                return; // Verhindert die Ausführung des restlichen Desktop-Skripts
+                }, 3000);
+                return;
             }
 
             const desktop = document.getElementById('desktop');
@@ -497,7 +518,6 @@
             const clockElement = document.getElementById('clock');
             const notificationToast = document.getElementById('notification-toast');
 
-            // Lucide Icons nach dem Laden des DOM initialisieren
             lucide.createIcons();
 
             const apps = [
@@ -511,8 +531,10 @@
 
             let highestZIndex = 100;
             let iconPositions = JSON.parse(localStorage.getItem('desktopIconPositions')) || {};
-            // Set zum Speichern der IDs minimierter Fenster
+
+            let openWindows = new Set();
             let minimizedWindows = new Set();
+
 
             function showNotification(message, duration = 3000) {
                 notificationToast.textContent = message;
@@ -560,13 +582,15 @@
             function createWindow(app) {
                 const existingWindow = document.getElementById(`window-${app.id}`);
                 if (existingWindow) {
-                    bringToFront(existingWindow);
-                    // Wenn das Fenster bereits existiert und minimiert ist, wiederherstellen
                     if (minimizedWindows.has(app.id)) {
                         restoreWindow(app.id);
                     }
+                    bringToFront(existingWindow);
                     return;
                 }
+
+                openWindows.add(app.id);
+                renderAppDock();
 
                 const appWindow = document.createElement('div');
                 appWindow.id = `window-${app.id}`;
@@ -581,13 +605,12 @@
                 const controls = document.createElement('div');
                 controls.className = 'window-controls';
 
-                // Minimieren-Button hinzufügen
                 const minimizeBtn = document.createElement('button');
                 minimizeBtn.className = 'window-control-btn minimize';
                 minimizeBtn.innerHTML = `<i data-lucide="minus"></i>`;
                 minimizeBtn.title = 'Minimieren';
-                minimizeBtn.onclick = () => minimizeWindow(appWindow, app.id);
-                controls.appendChild(minimizeBtn); // Vor Arrange-Button einfügen
+                minimizeBtn.onclick = () => minimizeWindow(app.id);
+                controls.appendChild(minimizeBtn);
 
                 const arrangeBtn = document.createElement('button');
                 arrangeBtn.className = 'window-control-btn arrange';
@@ -599,8 +622,9 @@
                 closeBtn.innerHTML = `<i data-lucide="x"></i>`;
                 closeBtn.onclick = () => {
                     appWindow.remove();
-                    minimizedWindows.delete(app.id); // Minimierten Status entfernen, falls vorhanden
-                    renderAppDock(); // Dock aktualisieren
+                    openWindows.delete(app.id);
+                    minimizedWindows.delete(app.id);
+                    renderAppDock();
                 };
 
                 controls.appendChild(closeBtn);
@@ -646,7 +670,7 @@
                 arrangeMenu.className = 'dropdown-menu hidden';
                 arrangeMenu.style.width = 'auto';
                 arrangeMenu.style.right = '4px';
-                arrangeMenu.style.zIndex = '10002'; // Sicherstellen, dass es über dem Fenster liegt
+                arrangeMenu.style.zIndex = '10002';
                 arrangeMenu.innerHTML = `
                     <div class="dropdown-item" data-snap="left"><i data-lucide="align-left"></i><span>Snap Left</span></div>
                     <div class="dropdown-item" data-snap="right"><i data-lucide="align-right"></i><span>Snap Right</span></div>
@@ -660,7 +684,6 @@
                         if (m !== arrangeMenu) m.classList.add('hidden');
                     });
                     arrangeMenu.classList.toggle('hidden');
-                    // Lucide Icons im neuen Menü neu erstellen
                     lucide.createIcons();
                 });
 
@@ -671,23 +694,27 @@
                         arrangeMenu.classList.add('hidden');
                     }
                 });
-                // Lucide Icons für die neuen Fenster-Steuerelemente neu erstellen
                 lucide.createIcons();
             }
 
-            function minimizeWindow(element, appId) {
-                element.style.display = 'none'; // Fenster ausblenden
-                minimizedWindows.add(appId); // App als minimiert markieren
-                renderAppDock(); // Dock aktualisieren, um blauen Punkt anzuzeigen
+            function minimizeWindow(appId) {
+                const appWindow = document.getElementById(`window-${appId}`);
+                if (appWindow) {
+                    appWindow.style.display = 'none';
+                    minimizedWindows.add(appId);
+                    openWindows.delete(appId);
+                    renderAppDock();
+                }
             }
 
             function restoreWindow(appId) {
                 const appWindow = document.getElementById(`window-${appId}`);
                 if (appWindow) {
-                    appWindow.style.display = 'flex'; // Fenster wieder einblenden
-                    bringToFront(appWindow); // Fenster in den Vordergrund bringen
-                    minimizedWindows.delete(appId); // App als nicht mehr minimiert markieren
-                    renderAppDock(); // Dock aktualisieren, um blauen Punkt zu entfernen
+                    appWindow.style.display = 'flex';
+                    bringToFront(appWindow);
+                    minimizedWindows.delete(appId);
+                    openWindows.add(appId);
+                    renderAppDock();
                 }
             }
 
@@ -698,26 +725,22 @@
 
             function snapWindow(element, direction) {
                 const topBarHeight = 32;
-                // Die berechnete Höhe des App-Docks abrufen
                 const appDockHeight = appDock.offsetHeight;
 
                 if (direction === 'left') {
                     element.style.left = '0px';
                     element.style.top = `${topBarHeight}px`;
                     element.style.width = '50vw';
-                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
                     element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
                 } else if (direction === 'right') {
                     element.style.left = '50vw';
                     element.style.top = `${topBarHeight}px`;
                     element.style.width = '50vw';
-                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
                     element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
                 } else if (direction === 'fullscreen') {
                     element.style.top = `${topBarHeight}px`;
                     element.style.left = '0px';
                     element.style.width = '100vw';
-                    // Höhe anpassen, um am oberen Rand des App-Docks zu enden
                     element.style.height = `calc(100vh - ${topBarHeight}px - ${appDockHeight}px - 8px)`;
                 }
             }
@@ -725,36 +748,32 @@
             function makeIconDraggable(icon, app) {
                 let hasMoved = false;
                 let startX, startY;
-                const DRAG_THRESHOLD = 5; // Pixel, bevor eine Bewegung als "Drag" erkannt wird
+                const DRAG_THRESHOLD = 5;
 
                 icon.onmousedown = (e) => {
-                    if (e.button !== 0) return; // Nur auf Linksklick reagieren
-                    e.preventDefault(); // Verhindert Standard-Browser-Drag-Verhalten und Textauswahl
+                    if (e.button !== 0) return;
+                    e.preventDefault();
                     hasMoved = false;
                     startX = e.clientX;
                     startY = e.clientY;
 
-                    // Event-Listener für Mausbewegung und Maustaste loslassen hinzufügen
                     document.addEventListener('mousemove', elementDrag);
                     document.addEventListener('mouseup', closeDragElement);
                 };
 
                 function elementDrag(moveEvent) {
-                    moveEvent.preventDefault(); // Verhindert Standard-Browser-Drag-Verhalten während des Ziehens
-
+                    moveEvent.preventDefault();
                     const dx = moveEvent.clientX - startX;
                     const dy = moveEvent.clientY - startY;
 
-                    // Prüfen, ob die Maus den Schwellenwert für eine Bewegung überschritten hat
                     if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
                         hasMoved = true;
                     }
 
-                    // Icon nur verschieben, wenn eine Bewegung erkannt wurde
                     if (hasMoved) {
                         icon.style.left = `${icon.offsetLeft + dx}px`;
                         icon.style.top = `${icon.offsetTop + dy}px`;
-                        startX = moveEvent.clientX; // Startpunkt für die nächste Bewegung aktualisieren
+                        startX = moveEvent.clientX;
                         startY = moveEvent.clientY;
                     }
                 }
@@ -764,19 +783,12 @@
                     document.removeEventListener('mouseup', closeDragElement);
 
                     if (hasMoved) {
-                        // Wenn das Icon verschoben wurde, Position speichern
                         iconPositions[icon.id] = { top: icon.style.top, left: icon.style.left };
                         localStorage.setItem('desktopIconPositions', JSON.stringify(iconPositions));
                     } else {
-                        // Wenn keine signifikante Bewegung (Drag) stattfand, die Anwendung öffnen
                         createWindow(app);
                     }
                 }
-
-                icon.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    showContextMenu(e.clientX, e.clientY, app.id, true);
-                });
             }
 
             function createDesktopIcons() {
@@ -818,6 +830,15 @@
                 let effectiveTheme = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
                 document.documentElement.setAttribute('data-theme', effectiveTheme);
 
+                // UPDATED: Highlight active theme in dropdown
+                document.querySelectorAll('#theme-dropdown .dropdown-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.themeValue === theme) {
+                        item.classList.add('active');
+                    }
+                });
+
+
                 if (effectiveTheme === 'light') {
                     document.body.classList.remove('dynamic-background');
                     document.body.classList.add('static-background');
@@ -829,10 +850,9 @@
                 const themeIcon = document.querySelector('#theme-menu-btn .lucide');
                 if (effectiveTheme === 'light') themeIcon.setAttribute('data-lucide', 'sun');
                 else themeIcon.setAttribute('data-lucide', 'moon');
-                lucide.createIcons(); // Lucide Icons nach dem Ändern des data-lucide-Attributs neu rendern
+                lucide.createIcons();
 
 
-                // Thema auf Desktop-Icons (auf dem Desktop selbst) anwenden
                 document.querySelectorAll('.desktop-icon img').forEach(img => {
                     if (effectiveTheme === 'dark') {
                         img.style.filter = 'invert(1)';
@@ -841,7 +861,6 @@
                     }
                 });
 
-                // Thema auf Dock-Icons anwenden, die Desktop-Apps sind (nicht abgerundet)
                 document.querySelectorAll('.dock-desktop-icon').forEach(img => {
                     if (effectiveTheme === 'dark') {
                         img.style.filter = 'invert(1)';
@@ -873,7 +892,6 @@
                             }
                         });
                         dropdown.classList.toggle('hidden');
-                        // Lucide Icons im geöffneten Dropdown neu erstellen
                         lucide.createIcons();
                     });
                 });
@@ -893,7 +911,9 @@
 
             document.querySelectorAll('#design-dropdown .dropdown-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    if (item.dataset.designValue === 'sidebar') {
+                    const designValue = item.dataset.designValue;
+                    localStorage.setItem('navigationDesign', designValue);
+                    if (designValue === 'sidebar') {
                         window.location.href = 'index.html';
                     }
                 });
@@ -1083,67 +1103,49 @@
 
             function renderAppDock() {
                 const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
-                const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
-
-                // Vordefinierte Apps und vom Benutzer hinzugefügte Apps zu einer einzigen Quelle zusammenführen
+                const favoriteIds = new Set(JSON.parse(localStorage.getItem('favoriteApps') || '[]'));
                 const allAvailableApps = [...apps, ...userApps];
 
-                // Favoriten-Apps aus der kombinierten Liste filtern
-                const favoriteApps = favoriteIds.map(favId =>
-                    allAvailableApps.find(app => app.id === favId)
-                ).filter(Boolean); // Undefinierte Elemente filtern, falls eine favoriteId keiner App entspricht
-
                 appDock.innerHTML = '';
-                if (favoriteApps.length === 0) {
+
+                const favoriteApps = [...favoriteIds].map(id => allAvailableApps.find(app => app.id === id)).filter(Boolean);
+                const openNonFavoriteApps = [...openWindows, ...minimizedWindows]
+                    .filter(id => !favoriteIds.has(id))
+                    .map(id => allAvailableApps.find(app => app.id === id))
+                    .filter(Boolean);
+
+                if (favoriteApps.length === 0 && openNonFavoriteApps.length === 0) {
                     appDock.style.display = 'none';
                     return;
                 }
                 appDock.style.display = 'flex';
 
-                favoriteApps.forEach(app => {
-                    // Ein Div-Element für das Dock-Element erstellen, kein Anker-Tag
+                const createDockItem = (app) => {
                     const item = document.createElement('div');
                     item.className = 'dock-app-item';
                     item.title = app.name;
                     item.dataset.appId = app.id;
 
                     const icon = document.createElement('img');
-                    // app.icon für vordefinierte Apps, app.iconUrl für vom Benutzer hinzugefügte Apps verwenden
                     icon.src = app.icon || app.iconUrl;
-
-                    // Feststellen, ob es sich um eine vordefinierte Desktop-App oder eine vom Benutzer hinzugefügte App handelt
-                    // Vordefinierte Apps haben 'src', vom Benutzer hinzugefügte Apps aus appdrawer.html haben 'url'
                     const isDesktopApp = apps.some(desktopApp => desktopApp.id === app.id);
-
-                    if (isDesktopApp) {
-                        // Desktop-App im Dock: keine Abrundung, keine Schattierung, Theme-Filter-Klasse anwenden
-                        icon.className = 'w-12 h-12 pointer-events-none dock-desktop-icon';
-                    } else {
-                        // Vom Benutzer hinzugefügte App aus appdrawer.html: abgerundet beibehalten
-                        icon.className = 'w-12 h-12 rounded-full shadow-lg pointer-events-none';
-                    }
-
+                    icon.className = isDesktopApp ? 'w-12 h-12 pointer-events-none dock-desktop-icon' : 'w-12 h-12 rounded-full shadow-lg pointer-events-none';
                     icon.onerror = function () { this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`; };
-
                     item.appendChild(icon);
-                    appDock.appendChild(item);
 
-                    // Blauen Punkt hinzufügen, wenn die App minimiert ist
-                    if (minimizedWindows.has(app.id)) {
-                        item.classList.add('minimized');
-                    } else {
-                        item.classList.remove('minimized');
-                    }
+                    if (openWindows.has(app.id)) item.classList.add('open');
+                    if (minimizedWindows.has(app.id)) item.classList.add('minimized');
 
-                    // Klick-Listener zum Öffnen/Wiederherstellen der App hinzufügen
                     item.addEventListener('click', () => {
                         if (minimizedWindows.has(app.id)) {
                             restoreWindow(app.id);
+                        } else if (openWindows.has(app.id)) {
+                            const windowEl = document.getElementById(`window-${app.id}`);
+                            if (windowEl) bringToFront(windowEl);
                         } else {
-                            // Wenn die App eine 'src'-Eigenschaft hat (interne App), in einem neuen Fenster öffnen
                             if (app.src) {
                                 createWindow(app);
-                            } else if (app.url) { // Wenn die App eine 'url'-Eigenschaft hat (externe App), in einem neuen Tab öffnen
+                            } else if (app.url) {
                                 window.open(app.url, '_blank');
                             }
                         }
@@ -1151,15 +1153,26 @@
 
                     item.addEventListener('contextmenu', (e) => {
                         e.preventDefault();
-                        // false für isDesktopIcon übergeben, da es sich um Dock-Elemente handelt
-                        showContextMenu(e.clientX, e.clientY, app.id, false);
+                        showContextMenu(e.clientX, e.clientY, app.id);
                     });
-                });
-                // Nach dem Rendern das aktuelle Thema anwenden, um die richtigen Farben sicherzustellen
+
+                    return item;
+                };
+
+                favoriteApps.forEach(app => appDock.appendChild(createDockItem(app)));
+
+                if (favoriteApps.length > 0 && openNonFavoriteApps.length > 0) {
+                    const separator = document.createElement('div');
+                    separator.className = 'dock-separator';
+                    appDock.appendChild(separator);
+                }
+
+                openNonFavoriteApps.forEach(app => appDock.appendChild(createDockItem(app)));
+
                 applyTheme(localStorage.getItem('theme') || 'system');
             }
 
-            function showContextMenu(x, y, appId, isDesktopIcon) {
+            function showContextMenu(x, y, appId) {
                 const existingMenu = document.getElementById('context-menu');
                 if (existingMenu) existingMenu.remove();
 
@@ -1175,7 +1188,7 @@
                 toggleFavoriteItem.className = 'dropdown-item';
 
                 if (isFavorited) {
-                    toggleFavoriteItem.innerHTML = `<i data-lucide="star-off" class="text-red-500"></i><span class="${isDesktopIcon ? '' : 'text-red-500'}">Remove Favorite</span>`;
+                    toggleFavoriteItem.innerHTML = `<i data-lucide="star-off" class="text-red-500"></i><span class="text-red-500">Remove Favorite</span>`;
                 } else {
                     toggleFavoriteItem.innerHTML = `<i data-lucide="star" class="text-yellow-400"></i><span>Add to Favorites</span>`;
                 }
@@ -1197,7 +1210,6 @@
                 setTimeout(() => {
                     window.addEventListener('click', () => menu.remove(), { once: true });
                 }, 0);
-                // Lucide Icons für das neue Kontextmenü neu erstellen
                 lucide.createIcons();
             }
 
@@ -1207,7 +1219,6 @@
                 }
             });
 
-            // Globale Tastenkombinationen
             document.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
 
@@ -1227,10 +1238,11 @@
                     });
 
                     if (activeWindow) {
+                        const appId = activeWindow.id.replace('window-', '');
                         switch (key) {
                             case 'q':
-                                const appId = activeWindow.id.replace('window-', '');
                                 activeWindow.remove();
+                                openWindows.delete(appId);
                                 minimizedWindows.delete(appId);
                                 renderAppDock();
                                 break;
@@ -1257,15 +1269,15 @@
                 starfieldCanvas.width = window.innerWidth;
                 starfieldCanvas.height = window.innerHeight;
                 stars = [];
-                const numStars = 150; // Weniger Sterne für einen dezenteren Look
+                const numStars = 150;
                 for (let i = 0; i < numStars; i++) {
                     stars.push({
                         x: Math.random() * starfieldCanvas.width,
                         y: Math.random() * starfieldCanvas.height,
-                        radius: Math.random() * 1.2 + 0.3, // Kleinere Sterne
-                        alpha: Math.random() * 0.3 + 0.2, // Geringere maximale Deckkraft
-                        vx: (Math.random() - 0.5) * 0.2, // Langsame horizontale Bewegung
-                        vy: (Math.random() - 0.5) * 0.2  // Langsame vertikale Bewegung
+                        radius: Math.random() * 1.2 + 0.3,
+                        alpha: Math.random() * 0.3 + 0.2,
+                        vx: (Math.random() - 0.5) * 0.2,
+                        vy: (Math.random() - 0.5) * 0.2
                     });
                 }
             }
@@ -1275,11 +1287,9 @@
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
 
                 stars.forEach(star => {
-                    // Position aktualisieren
                     star.x += star.vx;
                     star.y += star.vy;
 
-                    // Wenn Sterne den Bildschirm verlassen, auf der anderen Seite wieder erscheinen lassen
                     if (star.x < 0) star.x = starfieldCanvas.width;
                     if (star.x > starfieldCanvas.width) star.x = 0;
                     if (star.y < 0) star.y = starfieldCanvas.height;
@@ -1290,7 +1300,7 @@
                     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                     ctx.fill();
                 });
-                ctx.globalAlpha = 1; // Alpha zurücksetzen
+                ctx.globalAlpha = 1;
 
                 requestAnimationFrame(animateStarfield);
             }
