@@ -424,7 +424,7 @@
             color: white;
             font-weight: 500;
             transition: bottom 0.5s ease-in-out;
-            z-index: 200;
+            z-index: 25000;
         }
 
         #notification-toast.show {
@@ -1589,13 +1589,31 @@
                 setupStarfield(); // Re-setup starfield on resize
             });
 
+            // *** ADDED: Preload appdrawer to get favorites for the dock ***
+            function preloadAppDrawerForDock() {
+                const tempFrame = document.createElement('iframe');
+                tempFrame.src = 'tabs/appdrawer.html';
+                tempFrame.style.display = 'none';
+                tempFrame.onload = () => {
+                    // The appdrawer's script updates localStorage. The 'storage' event listener
+                    // will then trigger renderAppDock().
+                    console.log("Appdrawer preloaded for dock data.");
+                    // The temp frame can be removed after a short delay.
+                    setTimeout(() => {
+                        tempFrame.remove();
+                    }, 5000);
+                };
+                document.body.appendChild(tempFrame);
+            }
+
 
             // --- INITIALIZATION ---
             const savedTheme = localStorage.getItem('theme') || 'system';
             applyTheme(savedTheme); // Apply saved theme
 
             createDesktopIcons(); // Create desktop icons
-            renderAppDock(); // Render the app dock
+            renderAppDock(); // Render the app dock initially
+            preloadAppDrawerForDock(); // Preload appdrawer to update dock with favorites
             setupDropdowns(); // Setup top bar dropdowns
             loadAndRestoreWindowState(); // Restore windows from previous session
             setupStarfield(); // Initialize starfield

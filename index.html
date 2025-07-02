@@ -207,7 +207,7 @@
             color: white;
             font-weight: 500;
             transition: bottom 0.5s ease-in-out;
-            z-index: 200;
+            z-index: 25000;
         }
 
         #notification-toast.show {
@@ -416,8 +416,8 @@
             <div id="iframe-loader" class="hidden absolute inset-0 z-10 flex items-center justify-center">
                 <img src="assets/loading/zzz-loading.gif" alt="Ladeanimation" class="w-30">
             </div>
-            <iframe id="frame-appdrawer" data-src="tabs/appdrawer.html" class="content-iframe"
-                data-key="appdrawer"></iframe>
+            <!-- MODIFIED: Eagerly load appdrawer for dock favorites -->
+            <iframe id="frame-appdrawer" src="tabs/appdrawer.html" class="content-iframe" data-key="appdrawer"></iframe>
             <iframe id="frame-widgets" data-src="tabs/widgets-iframe.html" class="content-iframe"
                 data-key="widgets"></iframe>
             <iframe id="frame-readlater" data-src="tabs/readlater.html" class="content-iframe"
@@ -622,7 +622,6 @@
                     });
             };
 
-            // *** MODIFIED: Backup logic to ensure all iframes are loaded ***
             const backupAllData = async () => {
                 showToast('Backup wird gestartet...', 'info', 0);
 
@@ -634,7 +633,6 @@
                     return;
                 }
 
-                // Step 1: Ensure all relevant iframes are loaded by creating a loading promise for each.
                 const loadingPromises = framesToBackup.map(frame => {
                     return new Promise((resolve, reject) => {
                         if (frame.src && frame.contentWindow) {
@@ -648,13 +646,11 @@
                 });
 
                 try {
-                    // Wait for all iframes to finish loading, with a timeout.
                     await Promise.race([
                         Promise.all(loadingPromises),
                         new Promise((_, reject) => setTimeout(() => reject(new Error('Iframe loading timed out')), 10000))
                     ]);
 
-                    // Step 2: Collect data from all now-loaded iframes.
                     let backupData = {};
                     let expectedResponses = framesToBackup.length;
                     let receivedResponses = 0;
@@ -668,7 +664,6 @@
                         if (missingKeys.length > 0) {
                             showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
                         }
-                        // Still create a zip with what was received.
                         if (Object.keys(backupData).length > 0) {
                             createAndDownloadZip(backupData);
                         }
@@ -759,7 +754,6 @@
                 );
             };
 
-            // *** CHANGED: Updated context menu logic for removing favorites ***
             function showContextMenu(e, appId) {
                 e.preventDefault();
                 const existingMenu = document.getElementById('context-menu');
@@ -772,7 +766,6 @@
                 let leftPos = e.clientX;
                 let topPos = e.clientY;
 
-                // Adjust position to prevent going off-screen
                 if (leftPos + menuWidth > window.innerWidth) {
                     leftPos = window.innerWidth - menuWidth - 5;
                 }
@@ -788,7 +781,6 @@
                     const newFavorites = favorites.filter(id => id !== appId);
                     localStorage.setItem('favoriteApps', JSON.stringify(newFavorites));
 
-                    // Manually update the dock right after changing localStorage
                     const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
                     const favoriteAppsData = userApps.filter(app => newFavorites.includes(app.id));
                     renderAppDock(favoriteAppsData);
@@ -840,7 +832,6 @@
                 });
             };
 
-            // *** CHANGED: Combined message and storage listeners for robust sync ***
             window.addEventListener('message', (event) => {
                 if (event.data.type === 'favoritesUpdated') {
                     renderAppDock(event.data.payload);
@@ -849,7 +840,6 @@
 
             window.addEventListener('storage', (e) => {
                 if (e.key === 'favoriteApps') {
-                    console.log('Sidebar view detected favoriteApps change via storage, re-rendering dock.');
                     const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                     const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
                     const favoriteAppsData = userApps.filter(app => favoriteIds.includes(app.id));
@@ -960,6 +950,17 @@
                 linkOrButton.addEventListener('click', handleNavLinkClick);
                 mobileNavLinksContainer.appendChild(newLi);
             });
+
+            // *** ADDED: Eagerly load appdrawer and get favorites on initial load ***
+            const appdrawerFrame = document.getElementById('frame-appdrawer');
+            appdrawerFrame.addEventListener('load', () => {
+                if (appdrawerFrame.contentWindow) {
+                    appdrawerFrame.contentWindow.postMessage('getFavorites', '*');
+                }
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                applyThemeToFrame(appdrawerFrame, savedTheme);
+            }, { once: true });
+
 
             document.querySelectorAll('#sidebar #nav-links a, #sidebar #nav-links button').forEach(link => link.addEventListener('click', handleNavLinkClick));
 
