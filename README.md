@@ -15,7 +15,7 @@ Dieses Projekt umfasst eine Reihe von Tools und Anwendungen, die in einer einhei
 * **AuriMea:** Ein Finanz-Dashboard zur Verfolgung von Einnahmen und Ausgaben. Es bietet Diagramme zur Visualisierung von Daten nach Kategorie und Konto.
 * **MemoMea:** Eine Notiz- und Tagebuchanwendung, die Markdown-Formatierung unterstützt. Notizen können nach Tags und Datum gefiltert werden.
 * **Unicorn (Arbeits-Tools):** Ein spezieller Bereich für arbeitsbezogene Werkzeuge, der Folgendes umfasst:
-    * Ein **Dashboard** mit schnellen Links zu Systemen wie DCCP, iTWIIN, PAM und mehr.
+    * Ein **Dashboard** mit schnellen Links.
     * **Mail-Vorlagen** für verschiedene Kundenservice-Szenarien, die das schnelle Kopieren von Standardantworten ermöglichen.
     * Eine Übersicht wichtiger **Kontakte** und Abteilungen.
     * Ein Tool zur Verwaltung von **Evidenzfällen**.
