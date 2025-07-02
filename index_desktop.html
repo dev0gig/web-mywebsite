@@ -1095,7 +1095,7 @@
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
-                        const date = new Date().toISOString().slice(0, 10); // Format date as<x_bin_342>-MM-DD
+                        const date = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
                         link.href = URL.createObjectURL(content);
                         link.download = `dashboard-backup-${date}.zip`; // Filename for download
                         document.body.appendChild(link);
@@ -1402,6 +1402,14 @@
 
                 // Apply current theme to dock icons
                 applyTheme(localStorage.getItem('theme') || 'system');
+
+                // <<< KORREKTUR HIER EINGEFÜGT >>>
+                // Force a resize/resnap of all visible windows to account for dock height changes.
+                document.querySelectorAll('.app-window').forEach(appWindow => {
+                    if (appWindow.style.display !== 'none' && appWindow.dataset.snapState) {
+                        snapWindow(appWindow, appWindow.dataset.snapState);
+                    }
+                });
             }
 
             /**
@@ -1576,7 +1584,7 @@
 
                 // Create all previously open/minimized windows
                 const allAppIds = [...new Set([...savedState.open, ...savedState.minimized])];
-                allAppIds.forEach(appId => {
+                allAppids.forEach(appId => {
                     const app = apps.find(a => a.id === appId);
                     if (app) {
                         createWindow(app); // Create the window
