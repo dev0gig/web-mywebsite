@@ -568,6 +568,7 @@
                 { id: 'rss', name: 'RSS Reader', icon: 'assets/icons/rss.svg', src: 'tabs/rss-reader.html' },
                 { id: 'aurimea', name: 'AuriMea', icon: 'assets/icons/aurimea.svg', src: 'tabs/aurimea.html' },
                 { id: 'memomea', name: 'MemoMea', icon: 'assets/icons/memomea.svg', src: 'tabs/memomea.html' },
+                { id: 'unicorn', name: 'Unicorn', icon: 'assets/icons/unicorn.svg', url: 'unicorn/work-tools.html' },
             ];
 
             let highestZIndex = 100; // Z-index for managing window stacking
@@ -903,8 +904,12 @@
                         iconPositions[icon.id] = { top: icon.style.top, left: icon.style.left };
                         localStorage.setItem('desktopIconPositions', JSON.stringify(iconPositions));
                     } else {
-                        // Open window if not dragged (i.e., a click)
-                        createWindow(app);
+                        // Open window or link if not dragged (i.e., a click)
+                        if (app.url) {
+                            window.open(app.url, '_blank', 'noopener,noreferrer');
+                        } else if (app.src) {
+                            createWindow(app);
+                        }
                     }
                 }
             }
@@ -933,8 +938,17 @@
                         icon.style.top = iconPositions[icon.id].top;
                         icon.style.left = iconPositions[icon.id].left;
                     } else {
-                        icon.style.top = `${50 + (index % 8) * 100}px`;
-                        icon.style.left = `${50 + Math.floor(index / 8) * 100}px`;
+                        const topOffset = 50; // Space from top bar
+                        const leftOffset = 20; // Space from left edge
+                        const iconSpacingX = 100; // Horizontal space between icons
+                        const iconSpacingY = 100; // Vertical space between icons
+                        const iconsPerRow = 4;
+
+                        const row = Math.floor(index / iconsPerRow);
+                        const col = index % iconsPerRow;
+
+                        icon.style.top = `${topOffset + row * iconSpacingY}px`;
+                        icon.style.left = `${leftOffset + col * iconSpacingX}px`;
                     }
 
                     desktop.appendChild(icon);
@@ -1081,7 +1095,7 @@
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
-                        const date = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+                        const date = new Date().toISOString().slice(0, 10); // Format date as<x_bin_342>-MM-DD
                         link.href = URL.createObjectURL(content);
                         link.download = `dashboard-backup-${date}.zip`; // Filename for download
                         document.body.appendChild(link);
