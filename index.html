@@ -24,8 +24,7 @@
             --accent-color: #7c3aed;
             --accent-color-hover: #8b5cf6;
             --sidebar-link-active-bg: #7c3aed;
-            /* New dock variables */
-            --dock-bg: rgba(255, 255, 255, 0.7);
+            --dock-bg: #f3f4f6cc;
             --dock-border: #e5e7eb;
             --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --app-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -39,8 +38,7 @@
             --sidebar-bg: #262626cc;
             --sidebar-border: #404040;
             --modal-bg: #262626;
-            /* New dark dock variables */
-            --dock-bg: rgba(23, 23, 23, 0.7);
+            --dock-bg: #262626cc;
             --dock-border: #404040;
         }
 
@@ -63,21 +61,15 @@
             top: 4rem;
             height: calc(100% - 4rem);
             box-sizing: border-box;
-            transition: padding-right 0.3s ease-in-out;
-        }
-
-        /* NEU: Abstand rechts, wenn das Dock sichtbar ist */
-        body.dock-visible #main-content {
-            padding-right: 90px;
-            /* Breite des Docks + Puffer */
         }
 
         @media (min-width: 768px) {
             #main-content {
                 padding-top: 0;
                 top: 0;
-                height: 100%;
+                height: calc(100% - 70px);
                 margin-left: 4.5rem;
+                margin-bottom: 70px;
             }
         }
 
@@ -103,7 +95,8 @@
             top: 0;
             left: 0;
             height: 100vh;
-            z-index: 50;
+            z-index: 100;
+            /* Sidebar must be above the dock */
             width: 4.5rem;
             transition: width 0.3s;
             background-color: var(--sidebar-bg);
@@ -221,37 +214,66 @@
             bottom: 20px;
         }
 
-        /* Vertikales Dock rechts */
+        /* === UPDATED: App Dock Styling for Full Width Taskbar === */
         #app-dock {
             position: fixed;
-            top: 50%;
-            right: calc(10px + env(safe-area-inset-right));
-            transform: translateY(-50%);
-            padding: 1rem;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            transform: translateX(0);
+            padding: 0.75rem;
+            padding-left: 5rem;
+            /* Static padding to avoid overlap with collapsed sidebar */
             background-color: var(--dock-bg);
-            border: 1px solid var(--dock-border);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--dock-border);
+            border-radius: 0;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            display: none;
-            flex-direction: column;
-            gap: 1.5rem;
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
             z-index: 90;
-            transition: background-color 0.3s ease;
-            max-height: 90vh;
-            overflow-y: auto;
-            width: 80px;
+            /* Below the sidebar */
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            justify-content: center;
+            /* CHANGED: Align items to the center */
+            align-items: center;
+            height: 70px;
         }
 
-        /* UPDATED: Hide dock on mobile */
+        #app-dock::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        #app-dock::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #app-dock::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 4px;
+        }
+
+        #app-dock:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #app-dock::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* UNCHANGED: Hide dock on mobile */
         @media (max-width: 767px) {
             #app-dock {
                 display: none !important;
             }
 
-            body.dock-visible #main-content {
+            #main-content {
                 padding-right: 0 !important;
+                margin-bottom: 0 !important;
             }
         }
 
@@ -264,10 +286,11 @@
             color: var(--text-color);
             transition: transform 0.2s ease;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .dock-app-item:hover {
-            transform: scale(1.1);
+            transform: translateY(-10px);
         }
 
         .dock-app-icon-wrapper {
@@ -289,7 +312,6 @@
             box-shadow: var(--app-shadow-hover);
         }
 
-        /* Context Menu Styling */
         #context-menu {
             position: fixed;
             z-index: 10000;
@@ -701,6 +723,7 @@
                 );
             };
 
+            // *** CHANGED: Updated context menu logic for removing favorites ***
             function showContextMenu(e, appId) {
                 e.preventDefault();
                 const existingMenu = document.getElementById('context-menu');
@@ -709,12 +732,15 @@
                 const menu = document.createElement('div');
                 menu.id = 'context-menu';
 
-                const menuWidth = 200; // As defined in CSS
-                let leftPos = e.clientX - menuWidth;
-                if (leftPos < 5) { // Add a small margin
-                    leftPos = 5;
+                const menuWidth = 200;
+                let leftPos = e.clientX;
+                let topPos = e.clientY;
+
+                // Adjust position to prevent going off-screen
+                if (leftPos + menuWidth > window.innerWidth) {
+                    leftPos = window.innerWidth - menuWidth - 5;
                 }
-                menu.style.top = `${e.clientY}px`;
+                menu.style.top = `${topPos}px`;
                 menu.style.left = `${leftPos}px`;
 
                 const removeItem = document.createElement('div');
@@ -726,13 +752,10 @@
                     const newFavorites = favorites.filter(id => id !== appId);
                     localStorage.setItem('favoriteApps', JSON.stringify(newFavorites));
 
-                    // The appdrawer iframe will listen for this message, and then it should
-                    // send a 'favoritesUpdated' message back to the shell with the full
-                    // app objects, which will trigger the dock to re-render correctly.
-                    const appdrawerFrame = document.getElementById('frame-appdrawer');
-                    if (appdrawerFrame && appdrawerFrame.contentWindow) {
-                        appdrawerFrame.contentWindow.postMessage({ type: 'favoritesChanged', payload: newFavorites }, '*');
-                    }
+                    // Manually update the dock right after changing localStorage
+                    const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
+                    const favoriteAppsData = userApps.filter(app => newFavorites.includes(app.id));
+                    renderAppDock(favoriteAppsData);
 
                     menu.remove();
                 };
@@ -749,21 +772,10 @@
             }
 
             const renderAppDock = (favoriteApps = []) => {
-                const body = document.body;
                 appDock.innerHTML = '';
-
-                if (favoriteApps.length === 0) {
-                    appDock.style.display = 'none';
-                    body.classList.remove('dock-visible');
-                    return;
-                }
-
-                appDock.style.display = 'flex';
-                body.classList.add('dock-visible');
 
                 favoriteApps.forEach(app => {
                     const item = document.createElement('a');
-                    // Use a placeholder href to make it a valid link, but handle click via JS
                     item.href = '#';
                     item.className = 'dock-app-item';
                     item.setAttribute('aria-label', app.name);
@@ -792,11 +804,23 @@
                 });
             };
 
+            // *** CHANGED: Combined message and storage listeners for robust sync ***
             window.addEventListener('message', (event) => {
                 if (event.data.type === 'favoritesUpdated') {
                     renderAppDock(event.data.payload);
                 }
             });
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'favoriteApps') {
+                    console.log('Sidebar view detected favoriteApps change via storage, re-rendering dock.');
+                    const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+                    const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
+                    const favoriteAppsData = userApps.filter(app => favoriteIds.includes(app.id));
+                    renderAppDock(favoriteAppsData);
+                }
+            });
+
 
             const openMobileMenu = () => { mobileMenu.classList.add('open'); mobileMenuOverlay.classList.remove('hidden'); };
             const closeMobileMenu = () => { mobileMenu.classList.remove('open'); mobileMenuOverlay.classList.add('hidden'); };
@@ -861,6 +885,9 @@
                     targetFrame.src = targetFrame.dataset.src;
                 } else {
                     targetFrame.classList.add('active');
+                    if (targetFrame.id === 'frame-appdrawer' && targetFrame.contentWindow) {
+                        targetFrame.contentWindow.postMessage('getFavorites', '*');
+                    }
                 }
             }
 
@@ -889,7 +916,7 @@
                 const sidebarTextSpan = linkOrButton.querySelector('.sidebar-text');
                 if (sidebarTextSpan) {
                     sidebarTextSpan.style.opacity = 1;
-                    sidebarTextSpan.style.maxWidth = '150px';
+                    sidebarTextSpan.maxWidth = '150px';
                     sidebarTextSpan.classList.remove('sidebar-text');
                     sidebarTextSpan.classList.add('ml-3');
                 }
@@ -921,7 +948,7 @@
             navDesignSelect.addEventListener('change', (e) => {
                 const designValue = e.target.value;
                 localStorage.setItem('navigationDesign', designValue);
-                if (designValue === 'desktop') {
+                if (designValue === 'desktop' && window.innerWidth >= 1024) {
                     window.location.href = 'index_desktop.html';
                 }
             });

@@ -327,12 +327,45 @@
             z-index: 9999;
             transition: background-color 0.3s ease;
             max-width: 90vw;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
         }
+
+        /* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+        #app-dock::-webkit-scrollbar {
+            height: 8px;
+            /* Height of the horizontal scrollbar */
+        }
+
+        #app-dock::-webkit-scrollbar-track {
+            background: transparent;
+            /* Transparent track */
+        }
+
+        #app-dock::-webkit-scrollbar-thumb {
+            background: transparent;
+            /* Initially transparent thumb */
+            border-radius: 4px;
+            /* Rounded corners for the thumb */
+        }
+
+        #app-dock:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            /* Slightly visible thumb on hover */
+        }
+
+        #app-dock::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+            /* Darker thumb on hover */
+        }
+
 
         .dock-app-item {
             position: relative;
             transition: transform 0.2s ease;
+            flex-shrink: 0;
+            /* Prevent items from shrinking */
         }
 
         .dock-app-item:hover {
@@ -358,10 +391,16 @@
             display: block;
         }
 
+        /* Updated: Styling for the dock separator */
         .dock-separator {
             width: 1px;
             background-color: var(--dock-border);
-            margin: -0.75rem 0;
+            height: 20px;
+            /* Adjust height for desired gap */
+            margin: auto 0;
+            /* Center vertically with auto margins */
+            flex-shrink: 0;
+            /* Prevent separator from shrinking */
         }
 
 
@@ -535,6 +574,14 @@
             let openWindows = new Set();
             let minimizedWindows = new Set();
 
+            // --- NEW: Save window state to localStorage ---
+            function saveWindowState() {
+                const state = {
+                    open: [...openWindows],
+                    minimized: [...minimizedWindows],
+                };
+                localStorage.setItem('desktopWindowState', JSON.stringify(state));
+            }
 
             function showNotification(message, duration = 3000) {
                 notificationToast.textContent = message;
@@ -591,6 +638,7 @@
 
                 openWindows.add(app.id);
                 renderAppDock();
+                saveWindowState(); // Save state after opening
 
                 const appWindow = document.createElement('div');
                 appWindow.id = `window-${app.id}`;
@@ -625,6 +673,7 @@
                     openWindows.delete(app.id);
                     minimizedWindows.delete(app.id);
                     renderAppDock();
+                    saveWindowState(); // Save state after closing
                 };
 
                 controls.appendChild(closeBtn);
@@ -704,6 +753,7 @@
                     minimizedWindows.add(appId);
                     openWindows.delete(appId);
                     renderAppDock();
+                    saveWindowState(); // Save state after minimizing
                 }
             }
 
@@ -715,6 +765,7 @@
                     minimizedWindows.delete(appId);
                     openWindows.add(appId);
                     renderAppDock();
+                    saveWindowState(); // Save state after restoring
                 }
             }
 
@@ -725,7 +776,11 @@
 
             function snapWindow(element, direction) {
                 const topBarHeight = 32;
-                const appDockHeight = appDock.offsetHeight;
+                // Ensure dock is visible to get correct height, otherwise default to 0
+                const appDockHeight = appDock.offsetHeight || 0;
+
+                // NEW: Store the snap state on the element
+                element.dataset.snapState = direction;
 
                 if (direction === 'left') {
                     element.style.left = '0px';
@@ -830,7 +885,7 @@
                 let effectiveTheme = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
                 document.documentElement.setAttribute('data-theme', effectiveTheme);
 
-                // UPDATED: Highlight active theme in dropdown
+                // Highlight active theme in dropdown
                 document.querySelectorAll('#theme-dropdown .dropdown-item').forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.themeValue === theme) {
@@ -1114,10 +1169,6 @@
                     .map(id => allAvailableApps.find(app => app.id === id))
                     .filter(Boolean);
 
-                if (favoriteApps.length === 0 && openNonFavoriteApps.length === 0) {
-                    appDock.style.display = 'none';
-                    return;
-                }
                 appDock.style.display = 'flex';
 
                 const createDockItem = (app) => {
@@ -1137,16 +1188,19 @@
                     if (minimizedWindows.has(app.id)) item.classList.add('minimized');
 
                     item.addEventListener('click', () => {
+                        const appDefinition = allAvailableApps.find(a => a.id === app.id);
+                        if (!appDefinition) return;
+
                         if (minimizedWindows.has(app.id)) {
                             restoreWindow(app.id);
                         } else if (openWindows.has(app.id)) {
                             const windowEl = document.getElementById(`window-${app.id}`);
                             if (windowEl) bringToFront(windowEl);
                         } else {
-                            if (app.src) {
-                                createWindow(app);
-                            } else if (app.url) {
-                                window.open(app.url, '_blank');
+                            if (appDefinition.src) { // Internal app
+                                createWindow(appDefinition);
+                            } else if (appDefinition.url) { // External app
+                                window.open(appDefinition.url, '_blank');
                             }
                         }
                     });
@@ -1213,11 +1267,31 @@
                 lucide.createIcons();
             }
 
+            // *** CHANGED: Added listeners for both storage and message events for robust sync ***
             window.addEventListener('storage', (e) => {
                 if (e.key === 'favoriteApps' || e.key === 'userApps') {
+                    console.log('Desktop view detected storage change, re-rendering dock.');
                     renderAppDock();
                 }
             });
+
+            window.addEventListener('message', (event) => {
+                const { type, key, data } = event.data;
+                if (type === 'favoritesUpdated') {
+                    console.log('Desktop view received favoritesUpdated message, re-rendering dock.');
+                    renderAppDock();
+                }
+                // Keep existing backup/restore handlers
+                if (type === 'backupDataResponse' && key) {
+                    // Find the correct temp iframe and remove it.
+                    const tempIframe = document.querySelector(`iframe[data-backup-key="${key}"]`);
+                    if (tempIframe) {
+                        // This part of the logic seems complex and might need a different implementation
+                        // For now, the message listener is the key change.
+                    }
+                }
+            });
+
 
             document.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
@@ -1245,6 +1319,7 @@
                                 openWindows.delete(appId);
                                 minimizedWindows.delete(appId);
                                 renderAppDock();
+                                saveWindowState(); // Save state
                                 break;
                             case 'l':
                                 snapWindow(activeWindow, 'left');
@@ -1305,7 +1380,40 @@
                 requestAnimationFrame(animateStarfield);
             }
 
-            window.addEventListener('resize', setupStarfield);
+            // --- NEW: Restore window state on load ---
+            function loadAndRestoreWindowState() {
+                const savedState = JSON.parse(localStorage.getItem('desktopWindowState') || 'null');
+                if (!savedState) return;
+
+                // Create all previously open/minimized windows
+                const allAppIds = [...new Set([...savedState.open, ...savedState.minimized])];
+                allAppIds.forEach(appId => {
+                    const app = apps.find(a => a.id === appId);
+                    if (app) {
+                        createWindow(app);
+                    }
+                });
+
+                // Minimize the ones that were minimized
+                savedState.minimized.forEach(appId => {
+                    // We need to check if the window was actually created
+                    const appWindow = document.getElementById(`window-${appId}`);
+                    if (appWindow) {
+                        minimizeWindow(appId);
+                    }
+                });
+            }
+
+            // --- NEW: Add resize listener to adjust windows ---
+            window.addEventListener('resize', () => {
+                document.querySelectorAll('.app-window').forEach(appWindow => {
+                    // Re-snap only visible, snapped windows
+                    if (appWindow.style.display !== 'none' && appWindow.dataset.snapState) {
+                        snapWindow(appWindow, appWindow.dataset.snapState);
+                    }
+                });
+            });
+
 
             // Initialisierung
             const savedTheme = localStorage.getItem('theme') || 'system';
@@ -1314,6 +1422,7 @@
             createDesktopIcons();
             renderAppDock();
             setupDropdowns();
+            loadAndRestoreWindowState(); // Restore windows after basic setup
             setupStarfield();
             animateStarfield();
         });

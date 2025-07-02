@@ -39,7 +39,7 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
+        /* --- Benutzerdefinierte Scrollbar-Stile --- */
         ::-webkit-scrollbar {
             width: 12px;
         }
@@ -113,26 +113,7 @@
             border: none;
         }
 
-        #add-app-form-wrapper {
-            padding: 1.5rem 2rem 0;
-        }
-
-        #add-app-form {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        #add-app-form input {
-            border: 1px solid var(--dock-border);
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            flex-grow: 1;
-            min-width: 150px;
-        }
-
+        /* --- Button Styles --- */
         .icon-btn {
             background-color: var(--primary-color);
             color: white;
@@ -178,7 +159,7 @@
             background-color: var(--danger-color-hover);
         }
 
-
+        /* --- Main Layout --- */
         .main-layout {
             display: flex;
             justify-content: center;
@@ -216,7 +197,7 @@
             height: 550px;
         }
 
-
+        /* --- App Grid --- */
         #app-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -309,10 +290,9 @@
             stroke: #9ca3af;
         }
 
+        /* --- Responsive Design --- */
         @media (max-width: 1024px) {
-
-            .header-container,
-            #add-app-form {
+            .header-container {
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -369,24 +349,53 @@
 
     <div class="main-layout">
         <div class="app-drawer-container">
-            <!-- Add App Form Container -->
-            <div id="add-app-form-wrapper">
-                <form id="add-app-form">
-                    <input type="url" id="new-app-url" placeholder="Link einfügen..." required>
-                    <input type="text" id="new-app-name" placeholder="App-Name..." required>
-                    <input type="url" id="new-app-icon-url" placeholder="Icon-URL (optional)...">
-                    <button type="submit" id="add-app-btn" class="icon-btn" title="Hinzufügen">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
-                    </button>
-                    <button type="button" id="import-btn" class="icon-btn secondary" title="Importieren">
-                        <i data-lucide="file-up" class="w-5 h-5"></i>
-                    </button>
-                    <button type="button" id="export-btn" class="icon-btn secondary" title="Exportieren">
-                        <i data-lucide="file-down" class="w-5 h-5"></i>
-                    </button>
-                    <button type="button" id="delete-all-btn" class="icon-btn danger" title="Alle löschen">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
+            <!-- Add App Form Container (REWORKED) -->
+            <div id="add-app-form-wrapper" class="px-4 sm:px-6 py-4">
+                <form id="add-app-form" class="flex flex-col lg:flex-row lg:items-end gap-4">
+                    <!-- App Inputs Group -->
+                    <div class="w-full flex-grow flex flex-col sm:flex-row gap-4">
+                        <div class="flex-grow">
+                            <label for="new-app-url" class="block text-sm font-medium mb-1"
+                                style="color: var(--text-color-light);">Link</label>
+                            <input type="url" id="new-app-url" placeholder="https://beispiel.de" required
+                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
+                        </div>
+                        <div class="flex-grow">
+                            <label for="new-app-name" class="block text-sm font-medium mb-1"
+                                style="color: var(--text-color-light);">App-Name</label>
+                            <input type="text" id="new-app-name" placeholder="Meine App" required
+                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
+                        </div>
+                        <div class="flex-grow">
+                            <label for="new-app-icon-url" class="block text-sm font-medium mb-1"
+                                style="color: var(--text-color-light);">Icon-URL (optional)</label>
+                            <input type="url" id="new-app-icon-url" placeholder="https://beispiel.de/icon.png"
+                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons Group -->
+                    <div class="w-full lg:w-auto flex items-center justify-start gap-2 flex-shrink-0">
+                        <button type="submit" id="add-app-btn" class="icon-btn flex-grow lg:flex-grow-0"
+                            title="Hinzufügen">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                        <button type="button" id="import-btn" class="icon-btn secondary flex-grow lg:flex-grow-0"
+                            title="Importieren">
+                            <i data-lucide="file-up" class="w-5 h-5"></i>
+                        </button>
+                        <button type="button" id="export-btn" class="icon-btn secondary flex-grow lg:flex-grow-0"
+                            title="Exportieren">
+                            <i data-lucide="file-down" class="w-5 h-5"></i>
+                        </button>
+                        <button type="button" id="delete-all-btn" class="icon-btn danger flex-grow lg:flex-grow-0"
+                            title="Alle löschen">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
                 </form>
             </div>
             <div id="app-grid"></div>
@@ -399,7 +408,7 @@
         </div>
     </div>
 
-    <!-- MODAL SECTION: Updated for consistent styling -->
+    <!-- MODAL SECTION -->
     <div id="confirmation-overlay"
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
@@ -586,7 +595,7 @@
             // --- DATA MANAGEMENT ---
             function saveApps() {
                 localStorage.setItem('userApps', JSON.stringify(apps));
-                notifyParentOfFavoritesChange();
+                // No need to notify here, adding an app doesn't change favorites
             }
             function saveFavorites() {
                 localStorage.setItem('favoriteApps', JSON.stringify(favorites));
@@ -619,6 +628,10 @@
                 const filteredApps = apps.filter(app =>
                     app.name && app.name.toLowerCase().includes(lowerCaseSearchTerm)
                 ).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+                // Refresh favorites from localStorage before rendering
+                favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+
                 filteredApps.forEach(app => {
                     appGrid.appendChild(createAppElement(app, favorites.includes(app.id)));
                 });
@@ -659,8 +672,11 @@
             // --- ACTIONS ---
             function toggleFavorite(appId) {
                 const index = favorites.indexOf(appId);
-                if (index > -1) favorites.splice(index, 1);
-                else favorites.push(appId);
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                } else {
+                    favorites.push(appId);
+                }
                 saveFavorites();
                 renderAll(searchInput.value);
             };
@@ -668,6 +684,7 @@
                 apps = apps.filter(app => app.id !== appId);
                 favorites = favorites.filter(favId => favId !== appId);
                 saveApps();
+                saveFavorites(); // Save favorites as well, as the app is gone
                 renderAll(searchInput.value);
             }
             function deleteAllApps() {
@@ -822,6 +839,18 @@
                 searchInput.value = '';
                 renderAll();
                 clearSearchBtn.classList.add('hidden');
+            });
+
+            // *** CHANGED: Add storage event listener for cross-tab synchronization ***
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'userApps' || e.key === 'favoriteApps') {
+                    console.log('AppDrawer detected storage change, re-rendering grid.');
+                    // Re-read data from localStorage and render the grid
+                    // No need to call initializeData() which re-imports defaults
+                    apps = JSON.parse(localStorage.getItem('userApps') || '[]');
+                    favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
+                    renderAll(searchInput.value);
+                }
             });
 
             // Initial Load
