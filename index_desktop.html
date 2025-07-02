@@ -40,17 +40,17 @@
             --dock-border: #e5e7eb;
         }
 
-        @keyframes gradientAnimation {
+        @keyframes wavyBackground {
             0% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
 
             50% {
-                background-position: 100% 50%;
+                background-position: 100% 100%;
             }
 
             100% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
         }
 
@@ -61,10 +61,11 @@
             overflow: hidden;
         }
 
+        /* MODIFIED: Darker gradient and slower animation */
         body.dynamic-background {
-            background: linear-gradient(-45deg, #0d0221, #241744, #3b2a6b, #4b3a8f);
-            background-size: 400% 400%;
-            animation: gradientAnimation 25s ease infinite;
+            background: linear-gradient(120deg, #0d0221, #1e1b4b, #581c87, #312e81, #1e1b4b, #0d0221);
+            background-size: 300% 300%;
+            animation: wavyBackground 60s ease infinite;
         }
 
         body.static-background {
@@ -395,7 +396,7 @@
         .dock-separator {
             width: 1px;
             background-color: var(--dock-border);
-            height: 20px;
+            height: 50px;
             /* Adjust height for desired gap */
             margin: auto 0;
             /* Center vertically with auto margins */
@@ -1095,7 +1096,7 @@
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
-                        const date = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+                        const date = new Date().toISOString().slice(0, 10); // Format date as<x_bin_342>-MM-DD
                         link.href = URL.createObjectURL(content);
                         link.download = `dashboard-backup-${date}.zip`; // Filename for download
                         document.body.appendChild(link);
@@ -1527,34 +1528,37 @@
             const starfieldCanvas = document.getElementById('starfield-canvas');
             const ctx = starfieldCanvas.getContext('2d');
             let stars = [];
+            const cyberpunkColors = ['#00ffff', '#ff00ff', '#7df9ff', '#ffffff'];
 
             /**
-             * Sets up the starfield canvas and initializes stars.
+             * Sets up the enhanced starfield canvas and initializes stars.
              */
             function setupStarfield() {
                 starfieldCanvas.width = window.innerWidth;
                 starfieldCanvas.height = window.innerHeight;
                 stars = [];
-                const numStars = 150; // Number of stars
+                const numStars = window.innerWidth < 768 ? 100 : 200; // Fewer stars on smaller screens
                 for (let i = 0; i < numStars; i++) {
+                    const radius = Math.random() * 1.5 + 0.5;
                     stars.push({
                         x: Math.random() * starfieldCanvas.width,
                         y: Math.random() * starfieldCanvas.height,
-                        radius: Math.random() * 1.2 + 0.3, // Random size
-                        alpha: Math.random() * 0.3 + 0.2, // Random transparency
-                        vx: (Math.random() - 0.5) * 0.2, // Random horizontal velocity
-                        vy: (Math.random() - 0.5) * 0.2 // Random vertical velocity
+                        radius: radius,
+                        vx: (Math.random() - 0.5) * 0.1 * radius,
+                        vy: (Math.random() - 0.5) * 0.1 * radius,
+                        color: cyberpunkColors[Math.floor(Math.random() * cyberpunkColors.length)],
+                        alpha: Math.random() * 0.5 + 0.2
                     });
                 }
             }
 
             /**
-             * Animates the starfield, updating star positions and redrawing them.
+             * Animates the starfield with stabilized connecting lines.
              */
             function animateStarfield() {
-                ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height); // Clear canvas
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Star color
+                ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
 
+                // Draw stars and update their positions
                 stars.forEach(star => {
                     star.x += star.vx;
                     star.y += star.vy;
@@ -1565,15 +1569,38 @@
                     if (star.y < 0) star.y = starfieldCanvas.height;
                     if (star.y > starfieldCanvas.height) star.y = 0;
 
-                    ctx.globalAlpha = star.alpha; // Apply star transparency
+                    ctx.globalAlpha = star.alpha;
+                    ctx.fillStyle = star.color;
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                     ctx.fill();
                 });
+
+                // Draw connecting lines for a "network" effect
+                ctx.beginPath();
+                const maxDistance = 100; // Max distance to connect stars
+                for (let i = 0; i < stars.length; i++) {
+                    for (let j = i + 1; j < stars.length; j++) {
+                        const dx = stars[i].x - stars[j].x;
+                        const dy = stars[i].y - stars[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        // MODIFIED: Add a probability check to make line flickering more organic
+                        if (distance < maxDistance && Math.random() > 0.05) {
+                            const opacity = 1 - (distance / maxDistance);
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.3})`;
+                            ctx.moveTo(stars[i].x, stars[i].y);
+                            ctx.lineTo(stars[j].x, stars[j].y);
+                        }
+                    }
+                }
+                ctx.lineWidth = 0.4;
+                ctx.stroke();
                 ctx.globalAlpha = 1; // Reset global alpha
 
                 requestAnimationFrame(animateStarfield); // Loop animation
             }
+
 
             /**
              * Loads and restores the previous window state (open and minimized windows).
@@ -1584,7 +1611,7 @@
 
                 // Create all previously open/minimized windows
                 const allAppIds = [...new Set([...savedState.open, ...savedState.minimized])];
-                allAppids.forEach(appId => {
+                allAppIds.forEach(appId => {
                     const app = apps.find(a => a.id === appId);
                     if (app) {
                         createWindow(app); // Create the window
