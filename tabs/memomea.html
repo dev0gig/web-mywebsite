@@ -358,6 +358,30 @@
         #fab-open-calendar {
             bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
+
+        /* Initial hidden state for sidebar */
+        #calendar-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        /* Open state for sidebar */
+        #calendar-sidebar.is-open {
+            transform: translateX(0);
+        }
+
+        /* Initial hidden state for overlay */
+        #calendar-sidebar-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* Open state for overlay */
+        #calendar-sidebar-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 
@@ -475,11 +499,9 @@
     </div>
 
     <!-- Kalender Seitenleiste (Mobile) -->
-    <div id="calendar-sidebar-overlay"
-        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+    <div id="calendar-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 lg:hidden">
     </div>
-    <div id="calendar-sidebar"
-        class="fixed top-0 right-0 h-full w-full max-w-xs shadow-xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden"
+    <div id="calendar-sidebar" class="fixed top-0 right-0 h-full w-full max-w-xs shadow-xl z-50 lg:hidden"
         style="background-color: var(--card-bg);">
         <div class="p-4 flex flex-col h-full">
             <div class="flex justify-between items-center mb-4 w-full flex-shrink-0">
@@ -1314,14 +1336,14 @@
             });
 
             function openCalendarSidebar() {
-                calendarSidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                calendarSidebar.classList.remove('-translate-x-full');
+                calendarSidebarOverlay.classList.add('is-open');
+                calendarSidebar.classList.add('is-open');
                 lucide.createIcons();
             }
 
             function closeCalendarSidebar() {
-                calendarSidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
-                calendarSidebar.classList.add('-translate-x-full');
+                calendarSidebarOverlay.classList.remove('is-open');
+                calendarSidebar.classList.remove('is-open');
             }
 
             openCalendarBtn.addEventListener('click', openCalendarSidebar);
