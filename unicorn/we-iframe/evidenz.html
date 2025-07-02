@@ -163,19 +163,22 @@
         <i data-lucide="plus" class="h-8 w-8"></i>
     </button>
 
-    <!-- Modal for new entry -->
+    <!-- Modal for new/edit entry -->
     <div id="entry-modal" class="modal-overlay fixed inset-0 h-full w-full hidden z-40 items-center justify-center">
         <div class="modal-content relative p-8 border w-full max-w-lg shadow-lg rounded-md m-4">
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-6 pb-3 border-b"
                     style="border-color: var(--border-color);">
-                    <h3 class="text-xl leading-6 font-medium" style="color: var(--text-color-heading);">Neuer
+                    <h3 id="modal-title" class="text-xl leading-6 font-medium"
+                        style="color: var(--text-color-heading);">Neuer
                         Evidenzfall</h3>
                     <button id="close-modal-button" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
                 <form id="entry-form" class="space-y-4">
+                    <!-- Hidden input to store timestamp for editing -->
+                    <input type="hidden" id="entry-timestamp" name="entry-timestamp">
                     <div>
                         <label for="phone-number" class="block text-sm font-medium"
                             style="color: var(--text-color-heading);">Telefonnummer</label>
@@ -249,9 +252,11 @@
             const evidenceContainer = document.getElementById('evidence-container');
             const addEntryFab = document.getElementById('add-entry-fab');
             const entryModal = document.getElementById('entry-modal');
+            const modalTitle = document.getElementById('modal-title');
             const closeModalButton = document.getElementById('close-modal-button');
             const cancelButton = document.getElementById('cancel-button');
             const entryForm = document.getElementById('entry-form');
+            const entryTimestampInput = document.getElementById('entry-timestamp');
             const noEntriesMessage = document.getElementById('no-entries-message');
             const exportButton = document.getElementById('export-button');
             const importButton = document.getElementById('import-button');
@@ -300,9 +305,14 @@
                     card.innerHTML = `
                         <div class="evidence-card-header flex justify-between items-center text-sm font-medium mb-3 pb-2 border-b">
                             <span>${displayDate} Uhr</span>
-                            <button class="delete-entry-button p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900" data-timestamp="${entry.timestamp}" title="Diesen Fall löschen">
-                                <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-entry-button p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" data-timestamp="${entry.timestamp}" title="Diesen Fall bearbeiten">
+                                    <i data-lucide="file-pen-line" class="w-4 h-4 text-blue-500"></i>
+                                </button>
+                                <button class="delete-entry-button p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900" data-timestamp="${entry.timestamp}" title="Diesen Fall löschen">
+                                    <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="space-y-3">
                             ${entry.phone ? `<p><strong class="font-semibold" style="color: var(--text-color-heading);">Tel:</strong> ${entry.phone}</p>` : ''}
@@ -313,6 +323,18 @@
                     evidenceContainer.appendChild(card);
                 });
 
+                // Add event listener for edit buttons
+                document.querySelectorAll('.edit-entry-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const timestamp = parseInt(e.currentTarget.dataset.timestamp);
+                        const entryToEdit = evidenceEntries.find(entry => entry.timestamp === timestamp);
+                        if (entryToEdit) {
+                            showModal(entryToEdit);
+                        }
+                    });
+                });
+
+                // Add event listener for delete buttons
                 document.querySelectorAll('.delete-entry-button').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const timestamp = e.currentTarget.dataset.timestamp;
@@ -338,13 +360,23 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(evidenceEntries));
             };
 
-            const showModal = () => {
+            const showModal = (entryToEdit = null) => {
+                if (entryToEdit) {
+                    modalTitle.textContent = 'Eintrag bearbeiten';
+                    entryTimestampInput.value = entryToEdit.timestamp;
+                    document.getElementById('phone-number').value = entryToEdit.phone || '';
+                    document.getElementById('customer-id').value = entryToEdit.customerId || '';
+                    document.getElementById('entry-text').value = entryToEdit.text || '';
+                } else {
+                    modalTitle.textContent = 'Neuer Evidenzfall';
+                }
                 entryModal.classList.remove('hidden');
                 entryModal.classList.add('flex');
             };
 
             const hideModal = () => {
                 entryForm.reset();
+                entryTimestampInput.value = ''; // Clear the hidden timestamp
                 entryModal.classList.add('hidden');
                 entryModal.classList.remove('flex');
             };
@@ -372,7 +404,6 @@
                 confirmModal.classList.remove('hidden');
                 confirmModal.classList.add('flex');
                 confirmCallback = onConfirm;
-                // Change button text for confirmation
                 confirmModalOk.textContent = title.includes("löschen") ? "Löschen" : "Bestätigen";
             };
 
@@ -415,7 +446,6 @@
                             return;
                         }
 
-                        // Create a Set of existing timestamps for quick lookup to avoid duplicates.
                         const existingTimestamps = new Set(evidenceEntries.map(entry => entry.timestamp));
                         const newUniqueEntries = importedEntries.filter(entry => !existingTimestamps.has(entry.timestamp));
 
@@ -429,7 +459,6 @@
                             'Backup importieren',
                             `Es wurden ${newUniqueEntries.length} neue Einträge gefunden. Möchten Sie diese zu Ihren bestehenden Fällen hinzufügen?`,
                             () => {
-                                // Add the new unique entries to the existing ones
                                 evidenceEntries = [...evidenceEntries, ...newUniqueEntries];
                                 saveEntries();
                                 renderEntries();
@@ -447,7 +476,7 @@
             };
 
             // --- Event Listeners ---
-            addEntryFab.addEventListener('click', showModal);
+            addEntryFab.addEventListener('click', () => showModal()); // Pass no argument for new entry
             closeModalButton.addEventListener('click', hideModal);
             cancelButton.addEventListener('click', hideModal);
             entryModal.addEventListener('click', (e) => { if (e.target === entryModal) hideModal(); });
@@ -457,16 +486,32 @@
                 const phone = document.getElementById('phone-number').value.trim();
                 const customerId = document.getElementById('customer-id').value.trim();
                 const text = document.getElementById('entry-text').value.trim();
+                const timestamp = parseInt(entryTimestampInput.value);
+
                 if (!phone && !customerId) {
                     showNotification('Bitte geben Sie entweder eine Telefonnummer oder eine GP/VK-Nr. ein.', 'warning');
                     return;
                 }
-                const newEntry = { timestamp: Date.now(), phone, customerId, text };
-                evidenceEntries.push(newEntry);
+
+                if (timestamp) {
+                    // Editing existing entry
+                    const entryIndex = evidenceEntries.findIndex(entry => entry.timestamp === timestamp);
+                    if (entryIndex > -1) {
+                        evidenceEntries[entryIndex].phone = phone;
+                        evidenceEntries[entryIndex].customerId = customerId;
+                        evidenceEntries[entryIndex].text = text;
+                        showNotification('Fall erfolgreich aktualisiert.', 'success');
+                    }
+                } else {
+                    // Creating new entry
+                    const newEntry = { timestamp: Date.now(), phone, customerId, text };
+                    evidenceEntries.push(newEntry);
+                    showNotification('Neuer Fall erfolgreich gespeichert.', 'success');
+                }
+
                 saveEntries();
                 renderEntries();
                 hideModal();
-                showNotification('Neuer Fall erfolgreich gespeichert.', 'success');
             });
 
             confirmModalOk.addEventListener('click', () => {
