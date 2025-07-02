@@ -591,48 +591,6 @@
                 }
             };
 
-            const backupAllData = () => {
-                let backupData = {};
-                const contentFrames = document.querySelectorAll('.content-iframe');
-                const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.dataset.key !== 'widgets' && f.src);
-                let expectedResponses = backupFrames.length;
-                let receivedResponses = 0;
-
-                if (expectedResponses === 0) {
-                    showToast('Keine geladenen Apps zum Sichern gefunden.', 'info');
-                    return;
-                }
-
-                showToast('Backup wird gestartet...', 'info', 0);
-
-                const backupTimeoutId = setTimeout(() => {
-                    const respondedKeys = Object.keys(backupData);
-                    const allKeys = backupFrames.map(f => f.dataset.key);
-                    const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
-                    if (missingKeys.length > 0) {
-                        showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
-                    }
-                }, 10000);
-
-                const messageListener = (event) => {
-                    const { type, key, data } = event.data;
-                    if (type === 'backupDataResponse') {
-                        if (key) { backupData[key] = data; }
-                        receivedResponses++;
-                        if (receivedResponses === expectedResponses) {
-                            clearTimeout(backupTimeoutId);
-                            window.removeEventListener('message', messageListener);
-                            createAndDownloadZip(backupData);
-                        }
-                    }
-                };
-                window.addEventListener('message', messageListener);
-
-                backupFrames.forEach(frame => {
-                    frame.contentWindow.postMessage({ type: 'getBackupData' }, '*');
-                });
-            };
-
             const createAndDownloadZip = (backupData) => {
                 const zip = new JSZip();
                 let filesAdded = 0;
@@ -662,6 +620,84 @@
                         console.error('Zip generation failed:', err);
                         showToast('Backup-Erstellung fehlgeschlagen.', 'error');
                     });
+            };
+
+            // *** MODIFIED: Backup logic to ensure all iframes are loaded ***
+            const backupAllData = async () => {
+                showToast('Backup wird gestartet...', 'info', 0);
+
+                const framesToBackup = Array.from(document.querySelectorAll('.content-iframe'))
+                    .filter(f => f.dataset.key && f.dataset.key !== 'widgets');
+
+                if (framesToBackup.length === 0) {
+                    showToast('Keine Apps zum Sichern gefunden.', 'info');
+                    return;
+                }
+
+                // Step 1: Ensure all relevant iframes are loaded by creating a loading promise for each.
+                const loadingPromises = framesToBackup.map(frame => {
+                    return new Promise((resolve, reject) => {
+                        if (frame.src && frame.contentWindow) {
+                            resolve(frame);
+                        } else {
+                            frame.addEventListener('load', () => resolve(frame), { once: true });
+                            frame.addEventListener('error', () => reject(new Error(`Failed to load ${frame.dataset.key}`)), { once: true });
+                            frame.src = frame.dataset.src;
+                        }
+                    });
+                });
+
+                try {
+                    // Wait for all iframes to finish loading, with a timeout.
+                    await Promise.race([
+                        Promise.all(loadingPromises),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('Iframe loading timed out')), 10000))
+                    ]);
+
+                    // Step 2: Collect data from all now-loaded iframes.
+                    let backupData = {};
+                    let expectedResponses = framesToBackup.length;
+                    let receivedResponses = 0;
+                    let messageListener;
+
+                    const backupTimeoutId = setTimeout(() => {
+                        window.removeEventListener('message', messageListener);
+                        const respondedKeys = Object.keys(backupData);
+                        const allKeys = framesToBackup.map(f => f.dataset.key);
+                        const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
+                        if (missingKeys.length > 0) {
+                            showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
+                        }
+                        // Still create a zip with what was received.
+                        if (Object.keys(backupData).length > 0) {
+                            createAndDownloadZip(backupData);
+                        }
+                    }, 10000);
+
+                    messageListener = (event) => {
+                        const { type, key, data } = event.data;
+                        if (type === 'backupDataResponse') {
+                            if (key) { backupData[key] = data; }
+                            receivedResponses++;
+                            if (receivedResponses === expectedResponses) {
+                                clearTimeout(backupTimeoutId);
+                                window.removeEventListener('message', messageListener);
+                                createAndDownloadZip(backupData);
+                            }
+                        }
+                    };
+                    window.addEventListener('message', messageListener);
+
+                    framesToBackup.forEach(frame => {
+                        if (frame.contentWindow) {
+                            frame.contentWindow.postMessage({ type: 'getBackupData' }, '*');
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Backup failed:', error);
+                    showToast(`Fehler beim Laden der Apps für das Backup: ${error.message}`, 'error');
+                }
             };
 
             const restoreAllData = (event) => {
