@@ -524,7 +524,8 @@
 
     <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[10001]"></div>
     <div id="confirm-modal"
-        class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6 z-[10002]">
+        class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6 z-[10002]"
+        style="background-color: var(--window-bg);">
         <div class="flex items-center justify-between mb-4">
             <h3 id="confirm-modal-title" class="text-xl font-bold" style="color: var(--text-color);"></h3>
             <button id="close-confirm-modal-btn" class="hover:text-white text-2xl"
@@ -1096,7 +1097,7 @@
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
-                        const date = new Date().toISOString().slice(0, 10); // Format date as<x_bin_342>-MM-DD
+                        const date = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
                         link.href = URL.createObjectURL(content);
                         link.download = `dashboard-backup-${date}.zip`; // Filename for download
                         document.body.appendChild(link);
