@@ -416,23 +416,19 @@
 
         #notification-toast {
             position: fixed;
-            bottom: 20px;
+            bottom: -100px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: var(--dropdown-bg);
-            color: var(--text-color);
             padding: 12px 24px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            z-index: 10003;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            color: white;
+            font-weight: 500;
+            transition: bottom 0.5s ease-in-out;
+            z-index: 200;
         }
 
         #notification-toast.show {
-            opacity: 1;
-            visibility: visible;
+            bottom: 20px;
         }
     </style>
 </head>
@@ -525,17 +521,20 @@
         <!-- Favorite and open apps will be generated here -->
     </div>
 
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[10001]"></div>
     <div id="confirm-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-70 z-[10002] flex items-center justify-center p-4">
-        <div class="w-full max-w-md rounded-lg shadow-2xl p-6" style="background-color: var(--dropdown-bg);">
-            <h3 id="confirm-modal-title" class="text-xl font-bold mb-4" style="color: var(--text-color);"></h3>
-            <p id="confirm-modal-text" class="mb-6" style="color: var(--text-color-light);"></p>
-            <div class="flex justify-end gap-4">
-                <button id="confirm-modal-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
-                    style="background-color: var(--dock-border); color: var(--text-color);">Abbrechen</button>
-                <button id="confirm-modal-confirm-btn"
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
-            </div>
+        class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-lg shadow-2xl p-6 z-[10002]">
+        <div class="flex items-center justify-between mb-4">
+            <h3 id="confirm-modal-title" class="text-xl font-bold" style="color: var(--text-color);"></h3>
+            <button id="close-confirm-modal-btn" class="hover:text-white text-2xl"
+                style="color: var(--text-color-light);">&times;</button>
+        </div>
+        <p id="confirm-modal-text" class="mb-6" style="color: var(--text-color-light);"></p>
+        <div class="flex justify-end gap-4">
+            <button id="confirm-modal-cancel-btn" class="font-bold py-2 px-4 rounded-lg transition"
+                style="background-color: var(--dock-border); color: var(--text-color);">Abbrechen</button>
+            <button id="confirm-modal-confirm-btn"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
         </div>
     </div>
 
@@ -543,6 +542,7 @@
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
+            // Redirect to mobile view if screen width is too small
             if (window.innerWidth < 1024) {
                 const overlay = document.getElementById('mobile-redirect-overlay');
                 if (overlay) overlay.style.display = 'flex';
@@ -556,9 +556,11 @@
             const appDock = document.getElementById('app-dock');
             const clockElement = document.getElementById('clock');
             const notificationToast = document.getElementById('notification-toast');
+            const modalOverlay = document.getElementById('modal-overlay');
 
             lucide.createIcons();
 
+            // Define the applications available on the desktop
             const apps = [
                 { id: 'appdrawer', name: 'Appdrawer', icon: 'assets/icons/appdrawer.svg', src: 'tabs/appdrawer.html' },
                 { id: 'widgets', name: 'Widgets', icon: 'assets/icons/widgets.svg', src: 'tabs/widgets-iframe.html' },
@@ -568,13 +570,15 @@
                 { id: 'memomea', name: 'MemoMea', icon: 'assets/icons/memomea.svg', src: 'tabs/memomea.html' },
             ];
 
-            let highestZIndex = 100;
-            let iconPositions = JSON.parse(localStorage.getItem('desktopIconPositions')) || {};
+            let highestZIndex = 100; // Z-index for managing window stacking
+            let iconPositions = JSON.parse(localStorage.getItem('desktopIconPositions')) || {}; // Saved desktop icon positions
 
-            let openWindows = new Set();
-            let minimizedWindows = new Set();
+            let openWindows = new Set(); // Set of currently open window IDs
+            let minimizedWindows = new Set(); // Set of currently minimized window IDs
 
-            // --- NEW: Save window state to localStorage ---
+            /**
+             * Saves the current state of open and minimized windows to localStorage.
+             */
             function saveWindowState() {
                 const state = {
                     open: [...openWindows],
@@ -583,19 +587,36 @@
                 localStorage.setItem('desktopWindowState', JSON.stringify(state));
             }
 
-            function showNotification(message, duration = 3000) {
+            /**
+             * Displays a toast notification.
+             * @param {string} message - The message to display.
+             * @param {'success'|'error'|'info'} type - The type of notification (determines color).
+             * @param {number} duration - How long the toast should be visible in milliseconds (0 for indefinite).
+             */
+            const showToast = (message, type = 'success', duration = 3000) => {
                 notificationToast.textContent = message;
-                notificationToast.classList.add('show');
-                setTimeout(() => {
-                    notificationToast.classList.remove('show');
-                }, duration);
-            }
+                notificationToast.className = 'show'; // Show the toast
+                if (type === 'success') notificationToast.style.backgroundColor = '#22c55e';
+                else if (type === 'error') notificationToast.style.backgroundColor = '#ef4444';
+                else notificationToast.style.backgroundColor = '#525252';
 
+                if (duration > 0) {
+                    setTimeout(() => { notificationToast.className = ''; }, duration); // Hide after duration
+                }
+            };
+
+            /**
+             * Opens a confirmation modal.
+             * @param {string} title - The title of the confirmation modal.
+             * @param {string} text - The main text message of the confirmation.
+             * @param {function} onConfirm - Callback function to execute if the user confirms.
+             */
             const openConfirmModal = (title, text, onConfirm) => {
                 const confirmModal = document.getElementById('confirm-modal');
                 document.getElementById('confirm-modal-title').textContent = title;
                 document.getElementById('confirm-modal-text').textContent = text;
 
+                // Clone and replace the confirm button to remove old event listeners
                 const confirmBtn = document.getElementById('confirm-modal-confirm-btn');
                 const newConfirmBtn = confirmBtn.cloneNode(true);
                 confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
@@ -607,14 +628,23 @@
                     closeConfirmModal();
                 });
                 confirmModal.classList.remove('hidden');
+                modalOverlay.classList.remove('hidden'); // Show overlay when modal is open
             };
 
+            /**
+             * Closes the confirmation modal.
+             */
             const closeConfirmModal = () => {
                 document.getElementById('confirm-modal').classList.add('hidden');
+                modalOverlay.classList.add('hidden'); // Hide overlay when modal is closed
             };
             document.getElementById('confirm-modal-cancel-btn').addEventListener('click', closeConfirmModal);
+            document.getElementById('close-confirm-modal-btn').addEventListener('click', closeConfirmModal);
 
 
+            /**
+             * Updates the clock display in the top bar.
+             */
             function updateClock() {
                 const now = new Date();
                 const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -623,21 +653,25 @@
                 const timeString = now.toLocaleTimeString('de-DE', timeOptions);
                 clockElement.textContent = `${dateString} | ${timeString}`;
             }
-            setInterval(updateClock, 1000);
-            updateClock();
+            setInterval(updateClock, 1000); // Update clock every second
+            updateClock(); // Initial call to display clock immediately
 
+            /**
+             * Creates and displays an application window.
+             * @param {object} app - The application object containing id, name, and src.
+             */
             function createWindow(app) {
                 const existingWindow = document.getElementById(`window-${app.id}`);
                 if (existingWindow) {
                     if (minimizedWindows.has(app.id)) {
-                        restoreWindow(app.id);
+                        restoreWindow(app.id); // Restore if minimized
                     }
-                    bringToFront(existingWindow);
+                    bringToFront(existingWindow); // Bring to front if already open
                     return;
                 }
 
-                openWindows.add(app.id);
-                renderAppDock();
+                openWindows.add(app.id); // Add to open windows set
+                renderAppDock(); // Update the dock
                 saveWindowState(); // Save state after opening
 
                 const appWindow = document.createElement('div');
@@ -653,6 +687,7 @@
                 const controls = document.createElement('div');
                 controls.className = 'window-controls';
 
+                // Minimize button
                 const minimizeBtn = document.createElement('button');
                 minimizeBtn.className = 'window-control-btn minimize';
                 minimizeBtn.innerHTML = `<i data-lucide="minus"></i>`;
@@ -660,19 +695,21 @@
                 minimizeBtn.onclick = () => minimizeWindow(app.id);
                 controls.appendChild(minimizeBtn);
 
+                // Arrange/Snap button
                 const arrangeBtn = document.createElement('button');
                 arrangeBtn.className = 'window-control-btn arrange';
                 arrangeBtn.innerHTML = `<i data-lucide="maximize"></i>`;
                 controls.appendChild(arrangeBtn);
 
+                // Close button
                 const closeBtn = document.createElement('button');
                 closeBtn.className = 'window-control-btn close';
                 closeBtn.innerHTML = `<i data-lucide="x"></i>`;
                 closeBtn.onclick = () => {
-                    appWindow.remove();
-                    openWindows.delete(app.id);
-                    minimizedWindows.delete(app.id);
-                    renderAppDock();
+                    appWindow.remove(); // Remove window from DOM
+                    openWindows.delete(app.id); // Remove from open set
+                    minimizedWindows.delete(app.id); // Ensure it's not in minimized set
+                    renderAppDock(); // Update dock
                     saveWindowState(); // Save state after closing
                 };
 
@@ -683,6 +720,7 @@
                 const content = document.createElement('div');
                 content.className = 'app-window-content';
 
+                // Loader for iframe content
                 const loader = document.createElement('div');
                 loader.className = 'window-loader';
                 const loaderImg = document.createElement('img');
@@ -694,14 +732,14 @@
 
                 const iframe = document.createElement('iframe');
                 iframe.src = app.src;
-                iframe.dataset.key = app.id;
+                iframe.dataset.key = app.id; // Store app ID for messaging
                 iframe.onload = () => {
-                    setTimeout(() => { loader.remove(); }, 200);
+                    setTimeout(() => { loader.remove(); }, 200); // Remove loader after content loads
                     const savedTheme = localStorage.getItem('theme') || 'system';
                     let effectiveTheme = savedTheme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : savedTheme;
-                    applyThemeToFrame(iframe, effectiveTheme);
+                    applyThemeToFrame(iframe, effectiveTheme); // Apply theme to iframe content
                     if (app.id === 'appdrawer') {
-                        iframe.contentWindow.postMessage('getFavorites', '*');
+                        iframe.contentWindow.postMessage('getFavorites', '*'); // Request favorites from appdrawer
                     }
                 };
                 content.appendChild(iframe);
@@ -710,11 +748,12 @@
                 appWindow.appendChild(content);
 
                 desktop.appendChild(appWindow);
-                snapWindow(appWindow, 'fullscreen');
-                bringToFront(appWindow);
+                snapWindow(appWindow, 'fullscreen'); // Default to fullscreen
+                bringToFront(appWindow); // Bring new window to front
 
-                appWindow.addEventListener('mousedown', () => bringToFront(appWindow), true);
+                appWindow.addEventListener('mousedown', () => bringToFront(appWindow), true); // Bring to front on click
 
+                // Arrange/Snap menu for window positioning
                 const arrangeMenu = document.createElement('div');
                 arrangeMenu.className = 'dropdown-menu hidden';
                 arrangeMenu.style.width = 'auto';
@@ -728,58 +767,75 @@
                 arrangeBtn.parentElement.appendChild(arrangeMenu);
 
                 arrangeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Prevent document click from closing immediately
                     document.querySelectorAll('.dropdown-menu').forEach(m => {
-                        if (m !== arrangeMenu) m.classList.add('hidden');
+                        if (m !== arrangeMenu) m.classList.add('hidden'); // Hide other dropdowns
                     });
-                    arrangeMenu.classList.toggle('hidden');
-                    lucide.createIcons();
+                    arrangeMenu.classList.toggle('hidden'); // Toggle visibility of this menu
+                    lucide.createIcons(); // Re-render icons for the menu
                 });
 
                 arrangeMenu.addEventListener('click', (e) => {
                     const snapTarget = e.target.closest('.dropdown-item');
                     if (snapTarget) {
-                        snapWindow(appWindow, snapTarget.dataset.snap);
-                        arrangeMenu.classList.add('hidden');
+                        snapWindow(appWindow, snapTarget.dataset.snap); // Snap window based on selection
+                        arrangeMenu.classList.add('hidden'); // Hide menu after selection
                     }
                 });
                 lucide.createIcons();
             }
 
+            /**
+             * Minimizes an application window.
+             * @param {string} appId - The ID of the application to minimize.
+             */
             function minimizeWindow(appId) {
                 const appWindow = document.getElementById(`window-${appId}`);
                 if (appWindow) {
-                    appWindow.style.display = 'none';
-                    minimizedWindows.add(appId);
-                    openWindows.delete(appId);
-                    renderAppDock();
+                    appWindow.style.display = 'none'; // Hide the window
+                    minimizedWindows.add(appId); // Add to minimized set
+                    openWindows.delete(appId); // Remove from open set
+                    renderAppDock(); // Update dock
                     saveWindowState(); // Save state after minimizing
                 }
             }
 
+            /**
+             * Restores a minimized application window.
+             * @param {string} appId - The ID of the application to restore.
+             */
             function restoreWindow(appId) {
                 const appWindow = document.getElementById(`window-${appId}`);
                 if (appWindow) {
-                    appWindow.style.display = 'flex';
-                    bringToFront(appWindow);
-                    minimizedWindows.delete(appId);
-                    openWindows.add(appId);
-                    renderAppDock();
+                    appWindow.style.display = 'flex'; // Show the window
+                    bringToFront(appWindow); // Bring to front
+                    minimizedWindows.delete(appId); // Remove from minimized set
+                    openWindows.add(appId); // Add to open set
+                    renderAppDock(); // Update dock
                     saveWindowState(); // Save state after restoring
                 }
             }
 
+            /**
+             * Brings a given element (window) to the front by updating its z-index.
+             * @param {HTMLElement} el - The element to bring to front.
+             */
             function bringToFront(el) {
                 highestZIndex++;
                 el.style.zIndex = highestZIndex;
             }
 
+            /**
+             * Snaps a window to a specific position (left, right, fullscreen).
+             * @param {HTMLElement} element - The window element to snap.
+             * @param {'left'|'right'|'fullscreen'} direction - The direction to snap the window.
+             */
             function snapWindow(element, direction) {
-                const topBarHeight = 32;
+                const topBarHeight = 32; // Height of the top bar
                 // Ensure dock is visible to get correct height, otherwise default to 0
                 const appDockHeight = appDock.offsetHeight || 0;
 
-                // NEW: Store the snap state on the element
+                // Store the snap state on the element for resize handling
                 element.dataset.snapState = direction;
 
                 if (direction === 'left') {
@@ -800,13 +856,18 @@
                 }
             }
 
+            /**
+             * Makes a desktop icon draggable and handles opening the app on click.
+             * @param {HTMLElement} icon - The icon element.
+             * @param {object} app - The application object associated with the icon.
+             */
             function makeIconDraggable(icon, app) {
                 let hasMoved = false;
                 let startX, startY;
-                const DRAG_THRESHOLD = 5;
+                const DRAG_THRESHOLD = 5; // Minimum distance to consider it a drag
 
                 icon.onmousedown = (e) => {
-                    if (e.button !== 0) return;
+                    if (e.button !== 0) return; // Only left-click
                     e.preventDefault();
                     hasMoved = false;
                     startX = e.clientX;
@@ -838,14 +899,19 @@
                     document.removeEventListener('mouseup', closeDragElement);
 
                     if (hasMoved) {
+                        // Save new position if dragged
                         iconPositions[icon.id] = { top: icon.style.top, left: icon.style.left };
                         localStorage.setItem('desktopIconPositions', JSON.stringify(iconPositions));
                     } else {
+                        // Open window if not dragged (i.e., a click)
                         createWindow(app);
                     }
                 }
             }
 
+            /**
+             * Creates and positions desktop icons.
+             */
             function createDesktopIcons() {
                 apps.forEach((app, index) => {
                     const icon = document.createElement('div');
@@ -862,6 +928,7 @@
                     icon.appendChild(img);
                     icon.appendChild(span);
 
+                    // Apply saved position or default position
                     if (iconPositions[icon.id]) {
                         icon.style.top = iconPositions[icon.id].top;
                         icon.style.left = iconPositions[icon.id].left;
@@ -875,13 +942,23 @@
                 });
             }
 
+            /**
+             * Applies the selected theme to an iframe's content.
+             * @param {HTMLIFrameElement} frame - The iframe element.
+             * @param {string} theme - The theme to apply ('light', 'dark', or 'system').
+             */
             function applyThemeToFrame(frame, theme) {
                 if (frame && frame.contentWindow) {
                     frame.contentWindow.postMessage(`set-theme-${theme}`, '*');
                 }
             }
 
+            /**
+             * Applies the selected theme to the entire document and all open iframes.
+             * @param {string} theme - The theme to apply ('light', 'dark', or 'system').
+             */
             function applyTheme(theme) {
+                // Determine effective theme for 'system' setting
                 let effectiveTheme = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
                 document.documentElement.setAttribute('data-theme', effectiveTheme);
 
@@ -893,7 +970,7 @@
                     }
                 });
 
-
+                // Apply dynamic or static background based on theme
                 if (effectiveTheme === 'light') {
                     document.body.classList.remove('dynamic-background');
                     document.body.classList.add('static-background');
@@ -902,12 +979,13 @@
                     document.body.classList.remove('static-background');
                 }
 
+                // Update theme icon in top bar
                 const themeIcon = document.querySelector('#theme-menu-btn .lucide');
                 if (effectiveTheme === 'light') themeIcon.setAttribute('data-lucide', 'sun');
                 else themeIcon.setAttribute('data-lucide', 'moon');
-                lucide.createIcons();
+                lucide.createIcons(); // Re-render Lucide icons
 
-
+                // Apply theme to desktop icons and dock icons
                 document.querySelectorAll('.desktop-icon img').forEach(img => {
                     if (effectiveTheme === 'dark') {
                         img.style.filter = 'invert(1)';
@@ -924,11 +1002,15 @@
                     }
                 });
 
+                // Apply theme to all open iframes
                 document.querySelectorAll('.app-window iframe').forEach(frame => {
                     applyThemeToFrame(frame, effectiveTheme);
                 });
             }
 
+            /**
+             * Sets up dropdown menus in the top bar.
+             */
             function setupDropdowns() {
                 const menus = [
                     { btn: 'theme-menu-btn', dropdown: 'theme-dropdown' },
@@ -940,42 +1022,49 @@
                     const btn = document.getElementById(menu.btn);
                     const dropdown = document.getElementById(menu.dropdown);
                     btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent click from bubbling to window and closing dropdown
                         menus.forEach(otherMenu => {
                             if (otherMenu.dropdown !== menu.dropdown) {
-                                document.getElementById(otherMenu.dropdown).classList.add('hidden');
+                                document.getElementById(otherMenu.dropdown).classList.add('hidden'); // Hide other dropdowns
                             }
                         });
-                        dropdown.classList.toggle('hidden');
-                        lucide.createIcons();
+                        dropdown.classList.toggle('hidden'); // Toggle visibility of current dropdown
+                        lucide.createIcons(); // Re-render icons
                     });
                 });
 
+                // Close all dropdowns when clicking anywhere else on the window
                 window.addEventListener('click', () => {
                     menus.forEach(menu => document.getElementById(menu.dropdown).classList.add('hidden'));
                 });
             }
 
+            // Event listeners for theme selection in dropdown
             document.querySelectorAll('#theme-dropdown .dropdown-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const theme = item.dataset.themeValue;
-                    localStorage.setItem('theme', theme);
-                    applyTheme(theme);
+                    localStorage.setItem('theme', theme); // Save selected theme
+                    applyTheme(theme); // Apply selected theme
                 });
             });
 
+            // Event listeners for design selection in dropdown
             document.querySelectorAll('#design-dropdown .dropdown-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const designValue = item.dataset.designValue;
-                    localStorage.setItem('navigationDesign', designValue);
+                    localStorage.setItem('navigationDesign', designValue); // Save selected design
                     if (designValue === 'sidebar') {
-                        window.location.href = 'index.html';
+                        window.location.href = 'index.html'; // Redirect to sidebar view
                     }
                 });
             });
 
             // --- DATA MANAGEMENT FUNCTIONS ---
 
+            /**
+             * Creates a ZIP file containing backup data and triggers its download.
+             * @param {object} backupData - The data object to be backed up.
+             */
             const createAndDownloadZip = (backupData) => {
                 const zip = new JSZip();
                 let filesAdded = 0;
@@ -986,103 +1075,115 @@
                     }
                 }
                 if (filesAdded === 0) {
-                    showNotification('Keine Daten zum Sichern gefunden.');
+                    showToast('Keine Daten zum Sichern gefunden.', 'info');
                     return;
                 }
                 zip.generateAsync({ type: "blob" })
                     .then(content => {
                         const link = document.createElement('a');
-                        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                        const date = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
                         link.href = URL.createObjectURL(content);
-                        link.download = `dev0gig-backup-${timestamp}.zip`;
+                        link.download = `dashboard-backup-${date}.zip`; // Filename for download
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
-                        showNotification('Backup erfolgreich heruntergeladen!');
+                        showToast('Backup erfolgreich heruntergeladen!', 'success');
                     })
                     .catch(err => {
                         console.error('Zip generation failed:', err);
-                        showNotification('Backup-Erstellung fehlgeschlagen.');
+                        showToast('Backup-Erstellung fehlgeschlagen.', 'error');
                     });
             };
 
-            document.getElementById('backup-btn').addEventListener('click', async () => {
-                showNotification('Backup wird vorbereitet...');
-
-                const backupData = {
-                    shell_settings: {
-                        theme: localStorage.getItem('theme') || 'system',
-                        desktopIconPositions: JSON.parse(localStorage.getItem('desktopIconPositions') || '{}')
-                    }
-                };
-
-                const tempContainer = document.createElement('div');
-                tempContainer.style.display = 'none';
-                document.body.appendChild(tempContainer);
-
-                const appsToBackup = apps.filter(app => app.id !== 'widgets');
+            // Event listener for the "Backup All" button
+            document.getElementById('backup-btn').addEventListener('click', () => {
+                let backupData = {};
+                const contentFrames = document.querySelectorAll('.app-window iframe');
+                // Filter for iframes that have a data-key and a src (i.e., loaded apps)
+                const backupFrames = Array.from(contentFrames).filter(f => f.dataset.key && f.src);
+                let expectedResponses = backupFrames.length;
                 let receivedResponses = 0;
 
-                showNotification(`Backup wird erstellt... 0/${appsToBackup.length} Apps gesichert.`);
+                // Include shell settings and appdrawer data directly
+                backupData['shell_settings'] = {
+                    theme: localStorage.getItem('theme') || 'system',
+                    desktopIconPositions: JSON.parse(localStorage.getItem('desktopIconPositions') || '{}')
+                };
+                // Get appdrawer data from localStorage directly, as it's not in an iframe
+                backupData['appdrawer'] = {
+                    apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
+                    favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
+                };
 
+                // If no iframes to backup (only shell/appdrawer data), proceed directly
+                if (expectedResponses === 0) {
+                    showToast('Keine geladenen Apps zum Sichern gefunden. Nur Systemdaten werden gesichert.', 'info');
+                    createAndDownloadZip(backupData);
+                    return;
+                }
+
+                showToast('Backup wird gestartet...', 'info', 0); // Indefinite toast
+
+                // Timeout for unresponsive iframes
+                const backupTimeoutId = setTimeout(() => {
+                    const respondedKeys = Object.keys(backupData);
+                    const allKeys = backupFrames.map(f => f.dataset.key);
+                    const missingKeys = allKeys.filter(k => !respondedKeys.includes(k));
+                    if (missingKeys.length > 0) {
+                        showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
+                    }
+                    // Even if timeout, generate zip with what's available
+                    createAndDownloadZip(backupData);
+                }, 10000); // 10 seconds timeout
+
+                // Message listener for backup data responses from iframes
                 const messageListener = (event) => {
                     const { type, key, data } = event.data;
-                    if (type === 'backupDataResponse' && key) {
-                        backupData[key] = data;
+                    if (type === 'backupDataResponse') {
+                        if (key) { backupData[key] = data; } // Store data by app key
                         receivedResponses++;
-                        showNotification(`Backup wird erstellt... ${receivedResponses}/${appsToBackup.length} Apps gesichert.`);
-
-                        if (receivedResponses === appsToBackup.length) {
-                            window.removeEventListener('message', messageListener);
-                            if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
+                        // If all expected responses received, clear timeout and create zip
+                        if (receivedResponses === expectedResponses) {
+                            clearTimeout(backupTimeoutId);
+                            window.removeEventListener('message', messageListener); // Remove listener
                             createAndDownloadZip(backupData);
                         }
                     }
                 };
                 window.addEventListener('message', messageListener);
 
-                appsToBackup.forEach(app => {
-                    const iframe = document.createElement('iframe');
-                    iframe.dataset.key = app.id;
-                    iframe.src = app.src;
-                    iframe.onload = () => {
-                        iframe.contentWindow.postMessage({ type: 'getBackupData' }, '*');
-                    };
-                    tempContainer.appendChild(iframe);
+                // Request backup data from each iframe
+                backupFrames.forEach(frame => {
+                    frame.contentWindow.postMessage({ type: 'getBackupData' }, '*');
                 });
-
-                setTimeout(() => {
-                    if (receivedResponses < appsToBackup.length) {
-                        window.removeEventListener('message', messageListener);
-                        if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
-                        showNotification(`Backup-Timeout. Es wurden ${receivedResponses}/${appsToBackup.length} Apps gesichert.`, 5000);
-                        createAndDownloadZip(backupData);
-                    }
-                }, 15000);
             });
 
+            // Event listener for the "Restore All" input (file selection)
             document.getElementById('restore-input').addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
 
-                openConfirmModal('Daten wiederherstellen?', 'Dies wird alle aktuellen Einstellungen überschreiben und die Seite neu laden. Fortfahren?', async () => {
-                    showNotification('Wiederherstellung wird gestartet...');
+                openConfirmModal('Daten wiederherstellen?', 'Dies wird alle aktuellen Einstellungen und Anwendungsdaten überschreiben und die Seite neu laden. Fortfahren?', async () => {
+                    showToast('Wiederherstellung wird gestartet...', 'info', 0); // Indefinite toast
                     try {
                         const zip = await JSZip.loadAsync(file);
-                        let restoredAppsCount = 0;
-                        const filesInZip = Object.keys(zip.files);
+                        let restoredCount = 0;
+                        const zipFiles = Object.keys(zip.files);
 
+                        // Process shell settings first
                         const shellFile = zip.file('shell_settings.json');
                         if (shellFile) {
                             const content = await shellFile.async('string');
                             const settings = JSON.parse(content);
                             for (const key in settings) {
                                 const value = settings[key];
+                                // Handle desktopIconPositions which is an object
                                 localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
                             }
                         }
 
+                        // Process appdrawer data (userApps and favoriteApps)
                         const appDrawerFile = zip.file('appdrawer.json');
                         if (appDrawerFile) {
                             const content = await appDrawerFile.async('string');
@@ -1095,82 +1196,99 @@
                             }
                         }
 
+                        // Create a temporary container for iframes used during restore
                         const tempContainer = document.createElement('div');
                         tempContainer.style.display = 'none';
                         document.body.appendChild(tempContainer);
 
-                        const restorePromises = [];
+                        const restorePromises = []; // To track all iframe restore operations
 
-                        for (const filename of filesInZip) {
+                        for (const filename of zipFiles) {
+                            // Only process JSON files that are not shell_settings or appdrawer
                             if (filename.endsWith('.json') && filename !== 'shell_settings.json' && filename !== 'appdrawer.json') {
                                 const key = filename.replace('.json', '');
-                                const appToRestore = apps.find(app => app.id === key);
+                                const appToRestore = apps.find(app => app.id === key); // Find the corresponding app definition
 
                                 if (appToRestore) {
                                     const content = await zip.file(filename).async('string');
                                     const dataToRestore = JSON.parse(content);
 
+                                    // Create a promise for each iframe restore operation
                                     const promise = new Promise((resolve, reject) => {
                                         const iframe = document.createElement('iframe');
-                                        iframe.dataset.key = key;
-                                        iframe.src = appToRestore.src;
+                                        iframe.dataset.key = key; // Set data-key for identification
+                                        iframe.src = appToRestore.src; // Load the app into the iframe
 
                                         iframe.onload = () => {
+                                            // Once iframe is loaded, send the restore data
                                             iframe.contentWindow.postMessage({ type: 'restoreBackupData', data: dataToRestore }, '*');
-                                            restoredAppsCount++;
-                                            resolve();
+                                            restoredCount++;
+                                            resolve(); // Resolve the promise
                                         };
-                                        iframe.onerror = reject;
-                                        tempContainer.appendChild(iframe);
+                                        iframe.onerror = reject; // Reject on error
+                                        tempContainer.appendChild(iframe); // Add iframe to temporary container
                                     });
                                     restorePromises.push(promise);
                                 }
                             }
                         }
 
-                        await Promise.all(restorePromises);
+                        await Promise.all(restorePromises); // Wait for all iframe restores to complete
 
+                        // Clean up temporary container
                         if (document.body.contains(tempContainer)) document.body.removeChild(tempContainer);
-                        showNotification(`Wiederherstellung abgeschlossen. ${restoredAppsCount} App-Daten verarbeitet. Seite wird neu geladen.`, 4000);
-                        setTimeout(() => window.location.reload(), 4000);
+                        showToast(`${restoredCount} App(s) erfolgreich wiederhergestellt. Die Seite wird neu geladen.`, 'success');
+                        setTimeout(() => window.location.reload(), 2000); // Reload after successful restore
 
                     } catch (err) {
                         console.error('Restore failed:', err);
-                        showNotification('Wiederherstellung fehlgeschlagen. Ungültige Datei?', 5000);
+                        showToast('Wiederherstellung fehlgeschlagen. Ist es eine gültige Backup-Datei?', 'error');
                     } finally {
-                        event.target.value = '';
+                        event.target.value = ''; // Clear the file input
                     }
                 });
             });
 
 
+            // Event listener for the "Delete All" button
             document.getElementById('delete-btn').addEventListener('click', () => {
                 openConfirmModal(
                     'Alle Daten löschen?',
                     'Möchten Sie wirklich ALLE Anwendungsdaten und Einstellungen aus Ihrem Browser löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
                     () => {
-                        localStorage.clear();
-                        showNotification('Alle Daten wurden gelöscht. Seite wird neu geladen.', 3000);
-                        setTimeout(() => window.location.reload(), 3000);
+                        localStorage.clear(); // Clear all localStorage data
+                        showToast('Alle Daten wurden gelöscht. Die Seite wird neu geladen.', 'success');
+                        setTimeout(() => window.location.reload(), 1500); // Reload after deletion
                     }
                 );
             });
 
+            /**
+             * Renders or updates the application dock.
+             */
             function renderAppDock() {
                 const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
                 const favoriteIds = new Set(JSON.parse(localStorage.getItem('favoriteApps') || '[]'));
+                // Combine desktop apps and user-added apps to get all available apps
                 const allAvailableApps = [...apps, ...userApps];
 
-                appDock.innerHTML = '';
+                appDock.innerHTML = ''; // Clear current dock content
 
+                // Filter for favorite apps
                 const favoriteApps = [...favoriteIds].map(id => allAvailableApps.find(app => app.id === id)).filter(Boolean);
+                // Filter for open/minimized non-favorite apps
                 const openNonFavoriteApps = [...openWindows, ...minimizedWindows]
                     .filter(id => !favoriteIds.has(id))
                     .map(id => allAvailableApps.find(app => app.id === id))
                     .filter(Boolean);
 
-                appDock.style.display = 'flex';
+                appDock.style.display = 'flex'; // Ensure dock is visible
 
+                /**
+                 * Creates a single dock item element.
+                 * @param {object} app - The application object.
+                 * @returns {HTMLElement} The created dock item element.
+                 */
                 const createDockItem = (app) => {
                     const item = document.createElement('div');
                     item.className = 'dock-app-item';
@@ -1178,33 +1296,36 @@
                     item.dataset.appId = app.id;
 
                     const icon = document.createElement('img');
-                    icon.src = app.icon || app.iconUrl;
+                    icon.src = app.icon || app.iconUrl; // Use app.icon for desktop apps, app.iconUrl for user apps
                     const isDesktopApp = apps.some(desktopApp => desktopApp.id === app.id);
                     icon.className = isDesktopApp ? 'w-12 h-12 pointer-events-none dock-desktop-icon' : 'w-12 h-12 rounded-full shadow-lg pointer-events-none';
                     icon.onerror = function () { this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`; };
                     item.appendChild(icon);
 
+                    // Add 'open' or 'minimized' class if applicable
                     if (openWindows.has(app.id)) item.classList.add('open');
                     if (minimizedWindows.has(app.id)) item.classList.add('minimized');
 
+                    // Click handler for dock items
                     item.addEventListener('click', () => {
                         const appDefinition = allAvailableApps.find(a => a.id === app.id);
                         if (!appDefinition) return;
 
                         if (minimizedWindows.has(app.id)) {
-                            restoreWindow(app.id);
+                            restoreWindow(app.id); // Restore if minimized
                         } else if (openWindows.has(app.id)) {
                             const windowEl = document.getElementById(`window-${app.id}`);
-                            if (windowEl) bringToFront(windowEl);
+                            if (windowEl) bringToFront(windowEl); // Bring to front if already open
                         } else {
-                            if (appDefinition.src) { // Internal app
+                            if (appDefinition.src) { // Internal app (opens in a window)
                                 createWindow(appDefinition);
-                            } else if (appDefinition.url) { // External app
+                            } else if (appDefinition.url) { // External app (opens in new tab)
                                 window.open(appDefinition.url, '_blank');
                             }
                         }
                     });
 
+                    // Context menu handler for dock items
                     item.addEventListener('contextmenu', (e) => {
                         e.preventDefault();
                         showContextMenu(e.clientX, e.clientY, app.id);
@@ -1213,22 +1334,32 @@
                     return item;
                 };
 
+                // Add favorite apps to the dock
                 favoriteApps.forEach(app => appDock.appendChild(createDockItem(app)));
 
+                // Add a separator if both favorite and non-favorite open apps exist
                 if (favoriteApps.length > 0 && openNonFavoriteApps.length > 0) {
                     const separator = document.createElement('div');
                     separator.className = 'dock-separator';
                     appDock.appendChild(separator);
                 }
 
+                // Add open/minimized non-favorite apps to the dock
                 openNonFavoriteApps.forEach(app => appDock.appendChild(createDockItem(app)));
 
+                // Apply current theme to dock icons
                 applyTheme(localStorage.getItem('theme') || 'system');
             }
 
+            /**
+             * Displays a context menu for dock items.
+             * @param {number} x - X coordinate for menu position.
+             * @param {number} y - Y coordinate for menu position.
+             * @param {string} appId - The ID of the app for which the context menu is shown.
+             */
             function showContextMenu(x, y, appId) {
                 const existingMenu = document.getElementById('context-menu');
-                if (existingMenu) existingMenu.remove();
+                if (existingMenu) existingMenu.remove(); // Remove any existing context menu
 
                 const menu = document.createElement('div');
                 menu.id = 'context-menu';
@@ -1238,13 +1369,14 @@
                 let favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                 const isFavorited = favorites.includes(appId);
 
+                // Create "Add/Remove Favorite" item
                 const toggleFavoriteItem = document.createElement('div');
                 toggleFavoriteItem.className = 'dropdown-item';
 
                 if (isFavorited) {
-                    toggleFavoriteItem.innerHTML = `<i data-lucide="star-off" class="text-red-500"></i><span class="text-red-500">Remove Favorite</span>`;
+                    toggleFavoriteItem.innerHTML = `<i data-lucide="star-off" class="text-red-500"></i><span class="text-red-500">Favorit entfernen</span>`;
                 } else {
-                    toggleFavoriteItem.innerHTML = `<i data-lucide="star" class="text-yellow-400"></i><span>Add to Favorites</span>`;
+                    toggleFavoriteItem.innerHTML = `<i data-lucide="star" class="text-yellow-400"></i><span>Zu Favoriten hinzufügen</span>`;
                 }
 
                 toggleFavoriteItem.onclick = () => {
@@ -1253,25 +1385,26 @@
                     } else {
                         favorites.push(appId);
                     }
-                    localStorage.setItem('favoriteApps', JSON.stringify(favorites));
-                    renderAppDock();
-                    menu.remove();
+                    localStorage.setItem('favoriteApps', JSON.stringify(favorites)); // Update favorites in localStorage
+                    renderAppDock(); // Re-render dock to reflect changes
+                    menu.remove(); // Close context menu
                 };
 
                 menu.appendChild(toggleFavoriteItem);
-                document.body.appendChild(menu);
+                document.body.appendChild(menu); // Add menu to body
 
+                // Close menu when clicking outside
                 setTimeout(() => {
                     window.addEventListener('click', () => menu.remove(), { once: true });
                 }, 0);
-                lucide.createIcons();
+                lucide.createIcons(); // Re-render Lucide icons in the menu
             }
 
-            // *** CHANGED: Added listeners for both storage and message events for robust sync ***
+            // Listen for storage changes and messages for robust synchronization
             window.addEventListener('storage', (e) => {
                 if (e.key === 'favoriteApps' || e.key === 'userApps') {
                     console.log('Desktop view detected storage change, re-rendering dock.');
-                    renderAppDock();
+                    renderAppDock(); // Re-render dock if favorite or user apps change
                 }
             });
 
@@ -1279,28 +1412,22 @@
                 const { type, key, data } = event.data;
                 if (type === 'favoritesUpdated') {
                     console.log('Desktop view received favoritesUpdated message, re-rendering dock.');
-                    renderAppDock();
-                }
-                // Keep existing backup/restore handlers
-                if (type === 'backupDataResponse' && key) {
-                    // Find the correct temp iframe and remove it.
-                    const tempIframe = document.querySelector(`iframe[data-backup-key="${key}"]`);
-                    if (tempIframe) {
-                        // This part of the logic seems complex and might need a different implementation
-                        // For now, the message listener is the key change.
-                    }
+                    renderAppDock(); // Re-render dock if favorites are updated via message
                 }
             });
 
-
+            // Keyboard shortcuts for window management
             document.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
 
+                // Alt + Q: Close, Alt + L: Snap Left, Alt + R: Snap Right, Alt + V: Fullscreen
                 if (e.altKey && (key === 'q' || key === 'l' || key === 'r' || key === 'v')) {
-                    e.preventDefault();
+                    e.preventDefault(); // Prevent default browser action
+
                     let activeWindow = null;
                     let maxZIndex = -1;
 
+                    // Find the currently active (highest z-index) window
                     document.querySelectorAll('.app-window').forEach(windowEl => {
                         if (windowEl.style.display !== 'none') {
                             const currentZIndex = parseInt(windowEl.style.zIndex || 0, 10);
@@ -1335,52 +1462,61 @@
                 }
             });
 
-            // --- Sternenhimmel-Logik ---
+            // --- Starfield Background Logic ---
             const starfieldCanvas = document.getElementById('starfield-canvas');
             const ctx = starfieldCanvas.getContext('2d');
             let stars = [];
 
+            /**
+             * Sets up the starfield canvas and initializes stars.
+             */
             function setupStarfield() {
                 starfieldCanvas.width = window.innerWidth;
                 starfieldCanvas.height = window.innerHeight;
                 stars = [];
-                const numStars = 150;
+                const numStars = 150; // Number of stars
                 for (let i = 0; i < numStars; i++) {
                     stars.push({
                         x: Math.random() * starfieldCanvas.width,
                         y: Math.random() * starfieldCanvas.height,
-                        radius: Math.random() * 1.2 + 0.3,
-                        alpha: Math.random() * 0.3 + 0.2,
-                        vx: (Math.random() - 0.5) * 0.2,
-                        vy: (Math.random() - 0.5) * 0.2
+                        radius: Math.random() * 1.2 + 0.3, // Random size
+                        alpha: Math.random() * 0.3 + 0.2, // Random transparency
+                        vx: (Math.random() - 0.5) * 0.2, // Random horizontal velocity
+                        vy: (Math.random() - 0.5) * 0.2 // Random vertical velocity
                     });
                 }
             }
 
+            /**
+             * Animates the starfield, updating star positions and redrawing them.
+             */
             function animateStarfield() {
-                ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height); // Clear canvas
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Star color
 
                 stars.forEach(star => {
                     star.x += star.vx;
                     star.y += star.vy;
 
+                    // Wrap stars around the canvas edges
                     if (star.x < 0) star.x = starfieldCanvas.width;
                     if (star.x > starfieldCanvas.width) star.x = 0;
                     if (star.y < 0) star.y = starfieldCanvas.height;
                     if (star.y > starfieldCanvas.height) star.y = 0;
 
-                    ctx.globalAlpha = star.alpha;
+                    ctx.globalAlpha = star.alpha; // Apply star transparency
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                     ctx.fill();
                 });
-                ctx.globalAlpha = 1;
+                ctx.globalAlpha = 1; // Reset global alpha
 
-                requestAnimationFrame(animateStarfield);
+                requestAnimationFrame(animateStarfield); // Loop animation
             }
 
-            // --- NEW: Restore window state on load ---
+            /**
+             * Loads and restores the previous window state (open and minimized windows).
+             */
             function loadAndRestoreWindowState() {
                 const savedState = JSON.parse(localStorage.getItem('desktopWindowState') || 'null');
                 if (!savedState) return;
@@ -1390,21 +1526,20 @@
                 allAppIds.forEach(appId => {
                     const app = apps.find(a => a.id === appId);
                     if (app) {
-                        createWindow(app);
+                        createWindow(app); // Create the window
                     }
                 });
 
                 // Minimize the ones that were minimized
                 savedState.minimized.forEach(appId => {
-                    // We need to check if the window was actually created
                     const appWindow = document.getElementById(`window-${appId}`);
                     if (appWindow) {
-                        minimizeWindow(appId);
+                        minimizeWindow(appId); // Minimize the window
                     }
                 });
             }
 
-            // --- NEW: Add resize listener to adjust windows ---
+            // Add resize listener to adjust window snapping on screen resize
             window.addEventListener('resize', () => {
                 document.querySelectorAll('.app-window').forEach(appWindow => {
                     // Re-snap only visible, snapped windows
@@ -1412,19 +1547,20 @@
                         snapWindow(appWindow, appWindow.dataset.snapState);
                     }
                 });
+                setupStarfield(); // Re-setup starfield on resize
             });
 
 
-            // Initialisierung
+            // --- INITIALIZATION ---
             const savedTheme = localStorage.getItem('theme') || 'system';
-            applyTheme(savedTheme);
+            applyTheme(savedTheme); // Apply saved theme
 
-            createDesktopIcons();
-            renderAppDock();
-            setupDropdowns();
-            loadAndRestoreWindowState(); // Restore windows after basic setup
-            setupStarfield();
-            animateStarfield();
+            createDesktopIcons(); // Create desktop icons
+            renderAppDock(); // Render the app dock
+            setupDropdowns(); // Setup top bar dropdowns
+            loadAndRestoreWindowState(); // Restore windows from previous session
+            setupStarfield(); // Initialize starfield
+            animateStarfield(); // Start starfield animation
         });
     </script>
 </body>
