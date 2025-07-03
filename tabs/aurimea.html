@@ -555,10 +555,9 @@
                             style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
                             <option value="">Vorlage auswählen...</option>
                         </select>
-                        <!-- NEU: disabled:opacity-50 und disabled:cursor-not-allowed hinzugefügt, 'hidden' entfernt -->
                         <button type="button" id="delete-template-btn"
                             class="p-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Vorlage löschen">
+                            title="Vorlage löschen" disabled>
                             <i data-lucide="trash-2" class="h-4 w-4 pointer-events-none"></i>
                         </button>
                     </div>
@@ -823,19 +822,21 @@
 
             // --- DATA HANDLING ---
             function loadData() {
+                // 1. Lade bestehende Transaktionen
                 const storedTransactions = localStorage.getItem(TRANSACTIONS_STORAGE_KEY);
                 try {
                     allTransactions = storedTransactions ? JSON.parse(storedTransactions) : [];
                     allTransactions.forEach(t => {
                         if (!t.id) t.id = crypto.randomUUID();
                     });
-                    saveTransactions();
+                    saveTransactions(); // Speichert die Daten mit ggf. neuen IDs
                 } catch (e) {
                     console.error("Fehler beim Laden der Transaktionen:", e);
                     allTransactions = [];
                 }
                 transactionDates = new Set(allTransactions.map(t => t.parsedDate).filter(d => d && d.length === 10));
 
+                // 2. Lade explizit gespeicherte Vorlagen
                 const storedTemplates = localStorage.getItem(TEMPLATES_STORAGE_KEY);
                 try {
                     recurringTemplates = storedTemplates ? JSON.parse(storedTemplates) : [];
@@ -843,6 +844,34 @@
                     console.error("Fehler beim Laden der Vorlagen:", e);
                     recurringTemplates = [];
                 }
+
+                // --- NEUE LOGIK START ---
+                // 3. Erstelle ein Set, um doppelte Vorlagen zu vermeiden
+                // Wir nutzen stringify, um Objekte vergleichbar zu machen
+                const uniqueTemplates = new Set(recurringTemplates.map(t => JSON.stringify(t)));
+
+                // 4. Durchsuche alle Transaktionen nach wiederkehrenden Zahlungen
+                allTransactions.forEach(transaction => {
+                    // Überweisungen ausschließen, da sie eine spezielle Logik haben
+                    if (transaction.Wiederkehrend === 'Ja' && transaction.Art !== 'Überweisung') {
+                        const templateData = {
+                            Beschreibung: transaction.Beschreibung,
+                            Betrag: transaction.Betrag,
+                            Art: transaction.Art,
+                            Kategorie: transaction.Kategorie,
+                            Konto: transaction.Konto,
+                            Zahlungsmethode: transaction.Zahlungsmethode,
+                        };
+                        uniqueTemplates.add(JSON.stringify(templateData));
+                    }
+                });
+
+                // 5. Wandle das Set zurück in ein Array von Objekten um
+                recurringTemplates = Array.from(uniqueTemplates).map(str => JSON.parse(str));
+
+                // Optional: Die konsolidierte Liste zurückspeichern, um sie für die Zukunft zu optimieren
+                saveTemplates();
+                // --- NEUE LOGIK ENDE ---
             }
 
             function saveTransactions() {
@@ -1480,11 +1509,13 @@
 
             transVorlageSelect.addEventListener('change', (e) => {
                 const templateIndex = e.target.value;
-                // NEU: Statt hidden zu togglen, wird disabled getogglet
                 deleteTemplateBtn.disabled = (templateIndex === "");
 
                 if (templateIndex === "") {
                     modalForm.reset();
+                    const todayIso = new Date().toISOString().split('T')[0];
+                    transDatumInput.value = todayIso;
+                    transDatumDisplay.value = formatGermanLongDate(todayIso);
                     handleArtChange();
                     return;
                 }
@@ -1525,8 +1556,10 @@
                         saveTemplates();
                         populateTemplatesDropdown();
                         modalForm.reset();
+                        const todayIso = new Date().toISOString().split('T')[0];
+                        transDatumInput.value = todayIso;
+                        transDatumDisplay.value = formatGermanLongDate(todayIso);
                         handleArtChange();
-                        // NEU: Button wird deaktiviert statt versteckt
                         deleteTemplateBtn.disabled = true;
                         showNotification('Vorlage erfolgreich gelöscht.');
                         lucide.createIcons();
@@ -1536,7 +1569,6 @@
 
             function openModal(transactionId = null) {
                 modalForm.reset();
-                // NEU: Button wird initial deaktiviert
                 deleteTemplateBtn.disabled = true;
                 document.getElementById('trans-zahlungsmethode-karte').checked = true;
                 populateTemplatesDropdown();
