@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="de" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActaMea - Dein Logbuch</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Configuration for Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable dark mode using a class
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* A little extra style for smooth transitions */
+        body,
+        .modal-bg,
+        .modal-box {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen font-sans flex flex-col items-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+
+    <div class="w-full max-w-3xl mx-auto">
+        <!-- Header Section -->
+        <header class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">ActaMea</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">Ein einfacher Ort, um alles Wichtige festzuhalten.</p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0 mt-1">
+                <input type="file" id="import-file-input" class="hidden" accept=".json" />
+                <button id="import-button"
+                    class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                    title="Importieren"><i data-lucide="upload" class="w-4 h-4 mr-2"></i>Import</button>
+                <button id="export-button"
+                    class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+                    title="Exportieren"><i data-lucide="download" class="w-4 h-4 mr-2"></i>Export</button>
+                <button id="theme-toggle-button"
+                    class="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title="Theme wechseln">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:inline-block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 inline-block dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Message Banners -->
+        <div id="error-banner"
+            class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+            role="alert"></div>
+        <div id="success-banner"
+            class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4"
+            role="alert"></div>
+
+        <!-- Input Section -->
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10">
+            <div class="flex items-start space-x-3">
+                <textarea id="new-entry-textarea" placeholder="Was hast du heute gemacht?"
+                    class="flex-grow p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none h-28"></textarea>
+                <div class="flex flex-col space-y-2">
+                    <button id="mic-button"
+                        class="p-3 h-12 w-12 flex items-center justify-center rounded-lg transition-colors duration-200 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        aria-label="Aufnahme starten/stoppen"><i data-lucide="mic" class="w-6 h-6"></i></button>
+                    <button id="add-entry-button"
+                        class="p-3 h-12 w-12 flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200"
+                        aria-label="Eintrag hinzufügen"><i data-lucide="send" class="w-6 h-6"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and List Section -->
+        <main class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg">
+            <div class="flex items-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                <i data-lucide="search" class="w-5 h-5 text-gray-400 dark:text-gray-500 mr-3"></i>
+                <input id="search-input" type="text" placeholder="Einträge durchsuchen..."
+                    class="w-full bg-transparent focus:outline-none text-lg text-gray-900 dark:text-gray-100" />
+            </div>
+
+            <ul id="entries-list" class="space-y-2"></ul>
+            <div id="no-entries-message" class="hidden text-center py-8 text-gray-500 dark:text-gray-400"></div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+        <div class="modal-box bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Eintrag bearbeiten</h2>
+                <button id="edit-modal-close-button"
+                    class="p-2 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><i
+                        data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="edit-modal-timestamp"
+                class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-6"></div>
+            <textarea id="edit-modal-textarea"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none mb-6"
+                rows="6"></textarea>
+            <div class="flex justify-end space-x-4">
+                <button id="edit-modal-cancel-button"
+                    class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Abbrechen</button>
+                <button id="edit-modal-save-button"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Confirmation Modal -->
+    <div id="import-confirm-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+        <div class="modal-box bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 sm:p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Import bestätigen</h2>
+            <p id="import-confirm-text" class="text-gray-600 dark:text-gray-300 mb-6"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="import-confirm-cancel-button"
+                    class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Abbrechen</button>
+                <button id="import-confirm-import-button"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Ja,
+                    importieren</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Initialize Lucide Icons ---
+            lucide.createIcons();
+
+            // --- DOM Element Selection ---
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const newEntryTextarea = document.getElementById('new-entry-textarea');
+            const addEntryButton = document.getElementById('add-entry-button');
+            const micButton = document.getElementById('mic-button');
+            const entriesList = document.getElementById('entries-list');
+            const searchInput = document.getElementById('search-input');
+            const noEntriesMessage = document.getElementById('no-entries-message');
+            const errorBanner = document.getElementById('error-banner');
+            const successBanner = document.getElementById('success-banner');
+            const exportButton = document.getElementById('export-button');
+            const importButton = document.getElementById('import-button');
+            const importFileInput = document.getElementById('import-file-input');
+
+            // Edit Modal Elements
+            const editModal = document.getElementById('edit-modal');
+            const editModalCloseButton = document.getElementById('edit-modal-close-button');
+            const editModalTimestamp = document.getElementById('edit-modal-timestamp');
+            const editModalTextarea = document.getElementById('edit-modal-textarea');
+            const editModalCancelButton = document.getElementById('edit-modal-cancel-button');
+            const editModalSaveButton = document.getElementById('edit-modal-save-button');
+
+            // Import Confirm Modal Elements
+            const importConfirmModal = document.getElementById('import-confirm-modal');
+            const importConfirmText = document.getElementById('import-confirm-text');
+            const importConfirmCancelButton = document.getElementById('import-confirm-cancel-button');
+            const importConfirmImportButton = document.getElementById('import-confirm-import-button');
+
+            // --- App State ---
+            const STORAGE_KEY = 'actamea-entries';
+            let allEntries = [];
+            let isListening = false;
+            let selectedEntryForEdit = null;
+            let dataToImport = null;
+
+            // --- Speech Recognition ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'de-DE';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = (event) => {
+                    newEntryTextarea.value = event.results[0][0].transcript;
+                    stopListening();
+                };
+                recognition.onerror = (event) => {
+                    showMessage(`Fehler bei der Spracherkennung: ${event.error}`, 'error');
+                    stopListening();
+                };
+                recognition.onend = () => stopListening();
+            } else {
+                micButton.disabled = true;
+            }
+
+            // --- Helper Functions ---
+            function showMessage(message, type = 'success') {
+                const banner = type === 'error' ? errorBanner : successBanner;
+                const otherBanner = type === 'error' ? successBanner : errorBanner;
+
+                banner.textContent = message;
+                banner.classList.remove('hidden');
+                otherBanner.classList.add('hidden');
+
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 4000);
+            }
+
+            function formatDate(isoString, part) {
+                if (!isoString) return '...';
+                const date = new Date(isoString);
+                if (part === 'date') return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                if (part === 'time') return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                return date.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            function startListening() {
+                if (!recognition) return;
+                isListening = true;
+                micButton.classList.add('bg-red-500', 'animate-pulse');
+                micButton.classList.remove('bg-blue-500');
+                recognition.start();
+            }
+
+            function stopListening() {
+                if (!recognition) return;
+                isListening = false;
+                micButton.classList.remove('bg-red-500', 'animate-pulse');
+                micButton.classList.add('bg-blue-500');
+                recognition.stop();
+            }
+
+            // --- Data Persistence ---
+            function loadEntries() {
+                const entriesJSON = localStorage.getItem(STORAGE_KEY);
+                try {
+                    allEntries = entriesJSON ? JSON.parse(entriesJSON) : [];
+                    // Ensure entries are sorted on load
+                    allEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                } catch (e) {
+                    showMessage('Fehler beim Laden der gespeicherten Einträge.', 'error');
+                    allEntries = [];
+                }
+                renderEntries();
+            }
+
+            function saveEntries() {
+                // Ensure entries are sorted before saving
+                allEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allEntries));
+            }
+
+            // --- Rendering ---
+            function renderEntries() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredEntries = allEntries.filter(entry => entry.text.toLowerCase().includes(searchTerm));
+
+                entriesList.innerHTML = ''; // Clear existing list
+
+                if (filteredEntries.length === 0) {
+                    noEntriesMessage.classList.remove('hidden');
+                    noEntriesMessage.textContent = searchTerm ? 'Keine Einträge für deine Suche gefunden.' : 'Noch keine Einträge vorhanden. Füge deinen ersten hinzu!';
+                } else {
+                    noEntriesMessage.classList.add('hidden');
+                }
+
+                filteredEntries.forEach(entry => {
+                    const li = document.createElement('li');
+                    li.className = 'group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-sm';
+                    li.addEventListener('click', () => openEditModal(entry));
+
+                    li.innerHTML = `
+                        <div class="flex-grow overflow-hidden pr-4">
+                            <p class="text-gray-800 dark:text-gray-200 truncate">${entry.text}</p>
+                        </div>
+                        <div class="flex-shrink-0 ml-4 text-right">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(entry.timestamp)} Uhr</p>
+                        </div>
+                        <button data-id="${entry.id}" class="delete-button ml-2 p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-500/10 rounded-full" aria-label="Eintrag löschen">
+                            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+                        </button>
+                    `;
+                    entriesList.appendChild(li);
+                });
+
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = Number(e.currentTarget.dataset.id);
+                        handleDeleteEntry(id);
+                    });
+                });
+
+                lucide.createIcons();
+            }
+
+            // --- Event Handlers ---
+            function handleAddEntry() {
+                const text = newEntryTextarea.value.trim();
+                if (text === '') return;
+
+                const newEntry = {
+                    id: Date.now(),
+                    text: text,
+                    timestamp: new Date().toISOString()
+                };
+
+                allEntries.unshift(newEntry);
+                saveEntries();
+                renderEntries();
+                newEntryTextarea.value = '';
+            }
+
+            function handleDeleteEntry(id) {
+                allEntries = allEntries.filter(entry => entry.id !== id);
+                saveEntries();
+                renderEntries();
+                if (editModal.classList.contains('hidden') === false && selectedEntryForEdit?.id === id) {
+                    closeEditModal();
+                }
+            }
+
+            function handleUpdateEntry() {
+                const newText = editModalTextarea.value.trim();
+                if (!selectedEntryForEdit || newText === '') return;
+
+                const entryIndex = allEntries.findIndex(entry => entry.id === selectedEntryForEdit.id);
+                if (entryIndex > -1) {
+                    allEntries[entryIndex].text = newText;
+                    saveEntries();
+                    renderEntries();
+                }
+                closeEditModal();
+            }
+
+            // --- Modal Logic ---
+            function openEditModal(entry) {
+                selectedEntryForEdit = entry;
+                editModalTextarea.value = entry.text;
+                editModalTimestamp.innerHTML = `
+                    <div class="flex items-center"><i data-lucide="calendar" class="w-3.5 h-3.5 mr-1.5"></i><span>${formatDate(entry.timestamp, 'date')}</span></div>
+                    <div class="flex items-center"><i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i><span>${formatDate(entry.timestamp, 'time')} Uhr</span></div>
+                `;
+                editModal.classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            function closeEditModal() {
+                selectedEntryForEdit = null;
+                editModal.classList.add('hidden');
+            }
+
+            function openImportConfirmModal() {
+                importConfirmText.innerHTML = `Sie sind dabei, <span class="font-bold">${dataToImport?.length || 0}</span> Einträge zu importieren. Diese Aktion fügt die Einträge zu Ihrem Logbuch hinzu. Sind Sie sicher?`;
+                importConfirmModal.classList.remove('hidden');
+            }
+
+            function closeImportConfirmModal() {
+                dataToImport = null;
+                importConfirmModal.classList.add('hidden');
+            }
+
+            // --- Theme ---
+            function applyTheme(theme) {
+                const sunIcon = themeToggleButton.querySelector('[data-lucide="sun"]');
+                const moonIcon = themeToggleButton.querySelector('[data-lucide="moon"]');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+                localStorage.setItem('actamea-theme', theme);
+            }
+
+            // --- Initial Load & Event Listeners Setup ---
+
+            // Set initial theme
+            const savedTheme = localStorage.getItem('actamea-theme') || 'light';
+            applyTheme(savedTheme);
+
+            // Load data from storage
+            loadEntries();
+
+            themeToggleButton.addEventListener('click', () => {
+                const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+            });
+
+            addEntryButton.addEventListener('click', handleAddEntry);
+            newEntryTextarea.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAddEntry();
+                }
+            });
+
+            micButton.addEventListener('click', () => {
+                if (isListening) stopListening();
+                else startListening();
+            });
+
+            searchInput.addEventListener('input', renderEntries);
+
+            // Edit Modal Listeners
+            editModalCloseButton.addEventListener('click', closeEditModal);
+            editModalCancelButton.addEventListener('click', closeEditModal);
+            editModalSaveButton.addEventListener('click', handleUpdateEntry);
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) closeEditModal();
+            });
+
+            // Import/Export Listeners
+            exportButton.addEventListener('click', () => {
+                if (allEntries.length === 0) {
+                    showMessage("Keine Einträge zum Exportieren vorhanden.", 'error');
+                    return;
+                }
+                const dataStr = JSON.stringify(allEntries, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', 'actamea_backup.json');
+                linkElement.click();
+                showMessage("Daten erfolgreich exportiert.");
+            });
+
+            importButton.addEventListener('click', () => importFileInput.click());
+            importFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const parsedData = JSON.parse(event.target.result);
+                        if (!Array.isArray(parsedData)) throw new Error("Datei hat kein gültiges Format.");
+                        // Basic validation of imported data structure
+                        if (parsedData.length > 0 && (!parsedData[0].id || !parsedData[0].text || !parsedData[0].timestamp)) {
+                            throw new Error("Die Datenstruktur in der Datei ist ungültig.");
+                        }
+                        dataToImport = parsedData;
+                        openImportConfirmModal();
+                    } catch (err) {
+                        showMessage(`Importfehler: ${err.message}`, 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = null;
+            });
+
+            // Import Confirm Modal Listeners
+            importConfirmCancelButton.addEventListener('click', closeImportConfirmModal);
+            importConfirmImportButton.addEventListener('click', () => {
+                if (!dataToImport) return;
+                allEntries = [...allEntries, ...dataToImport];
+                saveEntries();
+                renderEntries();
+                showMessage(`${dataToImport.length} Einträge erfolgreich importiert.`);
+                closeImportConfirmModal();
+            });
+            importConfirmModal.addEventListener('click', (e) => {
+                if (e.target === importConfirmModal) closeImportConfirmModal();
+            });
+        });
+    </script>
+</body>
+
+</html>
