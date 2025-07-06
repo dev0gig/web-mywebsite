@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="">
+<html lang="de" class="h-full" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -9,17 +9,55 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Custom Tailwind Configuration for Dark Mode -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class', // Enable dark mode using a class
-        }
-    </script>
-
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --text-color-light: #6b7280;
+            --header-color: #111827;
+            --card-bg: #ffffff;
+            --card-text: #111827;
+            --subtle-text: #6b7280;
+            --border-color: #e5e7eb;
+            --edit-btn-hover-bg: #3b82f6;
+            /* blue-600 */
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #171717;
+            --text-color: #fafafa;
+            --text-color-light: #a3a3a3;
+            --header-color: #fafafa;
+            --card-bg: #262626;
+            --card-text: #fafafa;
+            --subtle-text: #a3a3a3;
+            --border-color: #404040;
+            --edit-btn-hover-bg: #2563eb;
+            /* blue-700 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .main-title {
+            color: var(--header-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            color: var(--card-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .subtle-text {
+            color: var(--subtle-text);
+        }
+
         /* A little extra style for smooth transitions */
         body,
         .modal-bg,
@@ -30,14 +68,14 @@
 </head>
 
 <body
-    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen font-sans flex flex-col items-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    class="min-h-screen font-sans flex flex-col items-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
 
     <div class="w-full max-w-3xl mx-auto">
         <!-- Header Section -->
         <header class="flex justify-between items-start mb-8">
             <div>
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">ActaMea</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-1">Ein einfacher Ort, um alles Wichtige festzuhalten.</p>
+                <h1 class="text-3xl sm:text-4xl font-bold main-title">ActaMea</h1>
+                <p class="subtle-text mt-1">Ein einfacher Ort, um alles Wichtige festzuhalten.</p>
             </div>
             <div class="flex items-center gap-3 flex-shrink-0 mt-1">
                 <input type="file" id="import-file-input" class="hidden" accept=".json" />
@@ -47,12 +85,6 @@
                 <button id="export-button"
                     class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
                     title="Exportieren"><i data-lucide="download" class="w-4 h-4 mr-2"></i>Export</button>
-                <button id="theme-toggle-button"
-                    class="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    title="Theme wechseln">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:inline-block"></i>
-                    <i data-lucide="moon" class="w-5 h-5 inline-block dark:hidden"></i>
-                </button>
             </div>
         </header>
 
@@ -65,10 +97,11 @@
             role="alert"></div>
 
         <!-- Input Section -->
-        <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10">
+        <div class="card p-4 sm:p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10">
             <div class="flex items-start space-x-3">
                 <textarea id="new-entry-textarea" placeholder="Was hast du heute gemacht?"
-                    class="flex-grow p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none h-28"></textarea>
+                    class="flex-grow p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none h-28"
+                    style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-color);"></textarea>
                 <div class="flex flex-col space-y-2">
                     <button id="mic-button"
                         class="p-3 h-12 w-12 flex items-center justify-center rounded-lg transition-colors duration-200 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -81,35 +114,36 @@
         </div>
 
         <!-- Search and List Section -->
-        <main class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg">
-            <div class="flex items-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                <i data-lucide="search" class="w-5 h-5 text-gray-400 dark:text-gray-500 mr-3"></i>
+        <main class="card p-4 sm:p-6 rounded-2xl shadow-lg">
+            <div class="flex items-center border-b pb-4 mb-4" style="border-color: var(--border-color);">
+                <i data-lucide="search" class="w-5 h-5 subtle-text mr-3"></i>
                 <input id="search-input" type="text" placeholder="Einträge durchsuchen..."
-                    class="w-full bg-transparent focus:outline-none text-lg text-gray-900 dark:text-gray-100" />
+                    class="w-full bg-transparent focus:outline-none text-lg" style="color: var(--text-color);" />
             </div>
 
             <ul id="entries-list" class="space-y-2"></ul>
-            <div id="no-entries-message" class="hidden text-center py-8 text-gray-500 dark:text-gray-400"></div>
+            <div id="no-entries-message" class="hidden text-center py-8 subtle-text"></div>
         </main>
     </div>
 
     <!-- Edit Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-        <div class="modal-box bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6 sm:p-8">
+        <div class="modal-box card rounded-2xl shadow-xl w-full max-w-lg p-6 sm:p-8">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Eintrag bearbeiten</h2>
+                <h2 class="text-2xl font-bold main-title">Eintrag bearbeiten</h2>
                 <button id="edit-modal-close-button"
-                    class="p-2 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><i
+                    class="p-2 rounded-full" style="color: var(--text-color-light);"><i
                         data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <div id="edit-modal-timestamp"
-                class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-6"></div>
+                class="flex items-center space-x-4 text-sm subtle-text mb-6"></div>
             <textarea id="edit-modal-textarea"
-                class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none mb-6"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 resize-none mb-6"
+                style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-color);"
                 rows="6"></textarea>
             <div class="flex justify-end space-x-4">
                 <button id="edit-modal-cancel-button"
-                    class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Abbrechen</button>
+                    class="px-6 py-2 rounded-lg transition-colors" style="background-color: var(--border-color); color: var(--text-color);">Abbrechen</button>
                 <button id="edit-modal-save-button"
                     class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Speichern</button>
             </div>
@@ -119,12 +153,12 @@
     <!-- Import Confirmation Modal -->
     <div id="import-confirm-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-        <div class="modal-box bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 sm:p-8 text-center">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Import bestätigen</h2>
-            <p id="import-confirm-text" class="text-gray-600 dark:text-gray-300 mb-6"></p>
+        <div class="modal-box card rounded-2xl shadow-xl w-full max-w-md p-6 sm:p-8 text-center">
+            <h2 class="text-2xl font-bold main-title mb-4">Import bestätigen</h2>
+            <p id="import-confirm-text" class="subtle-text mb-6"></p>
             <div class="flex justify-center space-x-4">
                 <button id="import-confirm-cancel-button"
-                    class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Abbrechen</button>
+                    class="px-6 py-2 rounded-lg transition-colors" style="background-color: var(--border-color); color: var(--text-color);">Abbrechen</button>
                 <button id="import-confirm-import-button"
                     class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Ja,
                     importieren</button>
@@ -139,7 +173,6 @@
             lucide.createIcons();
 
             // --- DOM Element Selection ---
-            const themeToggleButton = document.getElementById('theme-toggle-button');
             const newEntryTextarea = document.getElementById('new-entry-textarea');
             const addEntryButton = document.getElementById('add-entry-button');
             const micButton = document.getElementById('mic-button');
@@ -270,17 +303,18 @@
 
                 filteredEntries.forEach(entry => {
                     const li = document.createElement('li');
-                    li.className = 'group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-sm';
+                    li.className = 'group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all hover:shadow-sm';
+                    li.style.backgroundColor = 'var(--bg-color)';
                     li.addEventListener('click', () => openEditModal(entry));
 
                     li.innerHTML = `
                         <div class="flex-grow overflow-hidden pr-4">
-                            <p class="text-gray-800 dark:text-gray-200 truncate">${entry.text}</p>
+                            <p class="truncate" style="color: var(--text-color);">${entry.text}</p>
                         </div>
                         <div class="flex-shrink-0 ml-4 text-right">
-                            <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(entry.timestamp)} Uhr</p>
+                            <p class="text-xs subtle-text">${formatDate(entry.timestamp)} Uhr</p>
                         </div>
-                        <button data-id="${entry.id}" class="delete-button ml-2 p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-500/10 rounded-full" aria-label="Eintrag löschen">
+                        <button data-id="${entry.id}" class="delete-button ml-2 p-2 rounded-full" style="color: var(--text-color-light);" aria-label="Eintrag löschen">
                             <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
                         </button>
                     `;
@@ -364,35 +398,10 @@
                 importConfirmModal.classList.add('hidden');
             }
 
-            // --- Theme ---
-            function applyTheme(theme) {
-                const sunIcon = themeToggleButton.querySelector('[data-lucide="sun"]');
-                const moonIcon = themeToggleButton.querySelector('[data-lucide="moon"]');
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    sunIcon.classList.add('hidden');
-                    moonIcon.classList.remove('hidden');
-                }
-                localStorage.setItem('actamea-theme', theme);
-            }
-
             // --- Initial Load & Event Listeners Setup ---
-
-            // Set initial theme
-            const savedTheme = localStorage.getItem('actamea-theme') || 'light';
-            applyTheme(savedTheme);
 
             // Load data from storage
             loadEntries();
-
-            themeToggleButton.addEventListener('click', () => {
-                const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-            });
 
             addEntryButton.addEventListener('click', handleAddEntry);
             newEntryTextarea.addEventListener('keypress', (e) => {
@@ -468,6 +477,40 @@
             importConfirmModal.addEventListener('click', (e) => {
                 if (e.target === importConfirmModal) closeImportConfirmModal();
             });
+
+            window.addEventListener('focus', () => {
+                newEntryTextarea.focus();
+            });
+        });
+
+    </script>
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.source !== window.parent) {
+                return;
+            }
+            const message = event.data;
+            if (typeof message === 'string' && message.startsWith('set-theme-')) {
+                const theme = message.split('-')[2];
+                if (theme === 'light' || theme === 'dark') {
+                    document.documentElement.dataset.theme = theme;
+                }
+            }
+            if (message && message.type === 'getBackupData') {
+                const entriesData = localStorage.getItem('actamea-entries');
+                window.parent.postMessage({
+                    type: 'backupDataResponse',
+                    key: 'actamea',
+                    data: JSON.parse(entriesData || '[]')
+                }, '*');
+            }
+            if (message && message.type === 'restoreBackupData') {
+                const restoredEntries = message.data;
+                if (Array.isArray(restoredEntries)) {
+                    localStorage.setItem('actamea-entries', JSON.stringify(restoredEntries));
+                    window.location.reload();
+                }
+            }
         });
     </script>
 </body>

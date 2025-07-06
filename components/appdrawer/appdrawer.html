@@ -35,7 +35,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Ubuntu', sans-serif;
         }
 
         /* Custom Scrollbar */
@@ -311,6 +311,13 @@
                     document.documentElement.dataset.theme = 'dark';
                 } else if (message === 'set-theme-light') {
                     document.documentElement.dataset.theme = 'light';
+                }
+            });
+
+            // Listen for focus message from parent
+            window.addEventListener('message', (event) => {
+                if (event.data.type === 'focusSearch') {
+                    searchInput.focus();
                 }
             });
 

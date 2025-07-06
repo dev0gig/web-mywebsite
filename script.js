@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { key: 'readlater', target: 'frame-readlater', href: 'components/readlater/readlater.html', icon: 'bookmark', text: 'ReadlateR' },
         { key: 'rss', target: 'frame-rss', href: 'components/rss-reader/rss-reader.html', icon: 'rss_feed', text: 'RSS Reader' },
         { key: 'memomea', target: 'frame-memomea', href: 'components/memomea/memomea.html', icon: 'book_ribbon', text: 'MemoMea' },
+        { key: 'actamea', target: 'frame-actamea', href: 'components/actamea/actamea.html', icon: 'edit_note', text: 'ActaMea' },
         { key: 'widgets', target: 'frame-widgets', href: 'components/widgets-collection/widgets-collection.html', icon: 'widgets', text: 'Widgets' },
         { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'business_center', text: 'Unicorn', isExternal: true },
         { key: 'settings', target: 'settings-modal', icon: 'settings', text: 'Einstellungen' }
@@ -83,9 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 appdrawerFrame.src = appdrawerFrame.dataset.src;
             }
             appdrawerModal.classList.remove('hidden');
+            modalOverlay.classList.remove('hidden'); // Overlay anzeigen
             appdrawerLink?.classList.add('active');
+            // Fokus auf das Suchfeld im Iframe setzen
+            setTimeout(() => {
+                appdrawerFrame.contentWindow.postMessage({ type: 'focusSearch' }, '*');
+            }, 100); // Kleine Verzögerung, um sicherzustellen, dass der Iframe bereit ist
         } else {
             appdrawerModal.classList.add('hidden');
+            modalOverlay.classList.add('hidden'); // Overlay ausblenden
             appdrawerLink?.classList.remove('active');
         }
     };
@@ -455,7 +462,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners for settings
     closeModalBtn.addEventListener('click', closeSettingsModal);
-    modalOverlay.addEventListener('click', () => { if (!settingsModal.classList.contains('hidden')) closeSettingsModal(); });
+    modalOverlay.addEventListener('click', () => {
+        if (!settingsModal.classList.contains('hidden')) {
+            closeSettingsModal();
+        }
+        if (!appdrawerModal.classList.contains('hidden')) {
+            toggleAppdrawer();
+        }
+    });
     backupAllBtn.addEventListener('click', backupAllData);
     restoreAllInput.addEventListener('change', restoreAllData);
     deleteAllBtn.addEventListener('click', deleteAllData);
@@ -479,23 +493,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     activateTab(lastActiveTabId);
 
-    // Event-Listener zum Schließen des Modals bei Klick außerhalb
-    document.addEventListener('click', (e) => {
-        const isModalVisible = !appdrawerModal.classList.contains('hidden');
-        const clickedOnAppdrawerButton = e.target.closest('.dock-link[data-key="appdrawer"]');
-        const clickedInsideModal = e.target.closest('#appdrawer-modal');
-
-        if (isModalVisible && !clickedOnAppdrawerButton && !clickedInsideModal) {
-            toggleAppdrawer();
-        }
-    });
-
-    // Event-Listener zum Schließen des Modals bei Klick IN einen anderen Iframe
-    window.addEventListener('blur', () => {
-        if (document.activeElement.tagName === 'IFRAME') {
-            if (document.activeElement.id !== 'frame-appdrawer' && !appdrawerModal.classList.contains('hidden')) {
-                toggleAppdrawer();
-            }
-        }
-    });
+    // Die alten Event-Listener zum Schließen bei Klick außerhalb werden durch das Overlay überflüssig und können entfernt werden.
 });
