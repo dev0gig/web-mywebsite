@@ -21,10 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuFab = document.getElementById('mobile-menu-fab');
     const mobileSidebar = document.getElementById('mobile-sidebar');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const mobileNavList = document.getElementById('mobile-nav-list');
 
     if (mobileMenuFab && mobileSidebar) {
         mobileMenuFab.addEventListener('click', () => {
-            mobileSidebar.classList.add('open');
+            mobileSidebar.classList.toggle('open');
         });
     }
     if (closeSidebarBtn && mobileSidebar) {
@@ -427,6 +428,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appDock.appendChild(rightGroup);
     };
+    
+    function handleMobileNavLinkClick(e) {
+        handleNavLinkClick(e);
+        if (mobileSidebar.classList.contains('open')) {
+            mobileSidebar.classList.remove('open');
+        }
+    }
+    
+    const renderMobileSidebar = () => {
+        if (!mobileNavList) return;
+        mobileNavList.innerHTML = '';
+    
+        navItems.forEach(item => {
+            const element = document.createElement(item.isExternal ? 'a' : 'button');
+            element.className = 'mobile-nav-link flex items-center w-full p-4 text-lg rounded-lg transition-colors';
+            element.dataset.key = item.key;
+            element.title = item.text;
+    
+            if (item.isExternal) {
+                element.href = item.href;
+                element.target = '_blank';
+                element.rel = 'noopener noreferrer';
+            } else {
+                if (item.target) {
+                    element.dataset.target = item.target;
+                }
+                element.addEventListener('click', handleMobileNavLinkClick);
+            }
+    
+            element.innerHTML = `
+                <span class="material-symbols-outlined mr-4">${item.icon}</span>
+                <span>${item.text}</span>
+            `;
+            mobileNavList.appendChild(element);
+        });
+    };
 
     // --- CLOCK FUNCTION ---
     const startClock = () => {
@@ -458,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
     renderAppDock();
+    renderMobileSidebar();
     startClock();
 
     // Event Listeners for settings

@@ -339,6 +339,17 @@ html[data-theme='dark'] .dock-link.active {
     gap: 0.75rem;
 }
 
+.dock-left-group,
+.dock-right-group {
+    flex-shrink: 0;
+}
+
+.dock-center-group {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
 /* Hide the dock and search bar on small screens */
 @media (max-width: 768px) {
     #app-dock {
@@ -472,4 +483,45 @@ html[data-theme='dark'] .dock-link.active {
 
 .close-sidebar-btn:hover {
     color: var(--header-text-color);
+}
+/* === Mobile Nav Link Styles === */
+.mobile-nav-link {
+    color: var(--text-color);
+    background-color: transparent;
+}
+
+.mobile-nav-link:hover {
+    background-color: var(--sidebar-border);
+    color: var(--header-text-color);
+}
+
+.mobile-nav-link.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+/* === Custom Search Cancel Button === */
+#dock-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    margin-left: 4px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+#dock-search-input::-webkit-search-cancel-button:hover {
+    opacity: 1;
+}
+
+/* Light Theme 'x' Icon */
+html:not([data-theme='dark']) #dock-search-input::-webkit-search-cancel-button {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>");
+}
+
+/* Dark Theme 'x' Icon */
+html[data-theme='dark'] #dock-search-input::-webkit-search-cancel-button {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a3a3a3'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>");
 }
