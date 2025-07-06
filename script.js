@@ -175,7 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const backupAllData = async () => {
         showToast('Backup wird gestartet...', 'info', 0);
-        const framesToBackup = Array.from(document.querySelectorAll('.content-iframe')).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
+        const contentFrames = Array.from(document.querySelectorAll('.content-iframe')).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
+        const appdrawerIframe = document.getElementById('frame-appdrawer');
+        const framesToBackup = [...contentFrames];
+        if (appdrawerIframe) {
+            framesToBackup.push(appdrawerIframe);
+        }
+
         if (framesToBackup.length === 0) {
             showToast('Keine Apps zum Sichern gefunden.', 'info');
             return;
@@ -212,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
             window.addEventListener('message', messageListener);
-            framesToBackup.forEach(frame => frame.contentWindow?.postMessage({ type: 'getBackupData' }, '*'));
+            framesToBackup.forEach(frame => frame.contentWindow?.postMessage({ type: 'backupDataRequest' }, '*'));
         } catch (error) {
             console.error('Backup failed:', error);
             showToast(`Fehler beim Laden der Apps für das Backup: ${error.message}`, 'error');
@@ -230,7 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const filename of Object.keys(zip.files)) {
                     if (filename.endsWith('.json')) {
                         const key = filename.replace('.json', '');
-                        const frame = document.querySelector(`.content-iframe[data-key="${key}"]`);
+                        let frame = document.querySelector(`.content-iframe[data-key="${key}"]`);
+                        if (!frame && key === 'appdrawer') {
+                            frame = document.getElementById('frame-appdrawer');
+                        }
                         if (frame) {
                             const content = await zip.file(filename).async('string');
                             const dataToRestore = JSON.parse(content);
