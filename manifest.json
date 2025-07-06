@@ -1,19 +1,19 @@
 {
-  "name": "Unicorn App",
-  "short_name": "Unicorn",
+  "name": "AxisMeas",
+  "short_name": "AxisMeas",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "Eine PWA-fähige App.",
+  "description": "AxisMea als PWA",
   "icons": [
     {
-      "src": "assets/icons/unicorn-solid-white.png",
+      "src": "assets/icons/home-solid-white.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/unicorn-solid-white.png",
+      "src": "assets/icons/home-solid-white.png",
       "sizes": "512x512",
       "type": "image/png"
     }
