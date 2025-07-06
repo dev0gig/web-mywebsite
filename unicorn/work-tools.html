@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unicorn</title>
     <link rel="icon" href="../assets/icons/unicorn-solid-white.png">
+    <meta name="theme-color" content="#f97316"/>
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -392,6 +394,17 @@
                 currentThemeRadio.checked = true;
             }
             applyTheme(savedTheme);
+
+            // Register Service Worker for Unicorn
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/unicorn/sw.js').then(registration => {
+                        console.log('Unicorn ServiceWorker registration successful with scope: ', registration.scope);
+                    }, err => {
+                        console.log('Unicorn ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
         });
     </script>
 </body>
