@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AppDrawer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -39,7 +38,7 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- Benutzerdefinierte Scrollbar-Stile --- */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 12px;
         }
@@ -49,7 +48,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
+            background-color: var(--dock-border);
             border-radius: 10px;
             border: 3px solid var(--bg-color);
         }
@@ -68,15 +67,10 @@
             flex-wrap: wrap;
         }
 
-        .main-title {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--text-color);
-            flex-shrink: 0;
-        }
-
         .search-container {
             position: relative;
+            width: 100%;
+            /* Ensure it takes full width of the parent */
         }
 
         .search-input {
@@ -113,53 +107,7 @@
             border: none;
         }
 
-        /* --- Button Styles --- */
-        .icon-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            flex-shrink: 0;
-        }
-
-        .icon-btn:hover {
-            background-color: var(--primary-color-hover);
-        }
-
-        .icon-btn:disabled {
-            background-color: var(--text-color-light);
-            cursor: not-allowed;
-        }
-
-        .icon-btn.secondary {
-            background-color: var(--dock-border);
-            color: var(--text-color);
-        }
-
-        html[data-theme='dark'] .icon-btn.secondary {
-            background-color: #404040;
-        }
-
-        .icon-btn.secondary:hover {
-            background-color: #9ca3af;
-        }
-
-        .icon-btn.danger {
-            background-color: var(--danger-color);
-        }
-
-        .icon-btn.danger:hover {
-            background-color: var(--danger-color-hover);
-        }
-
-        /* --- Main Layout --- */
+        /* Main Layout */
         .main-layout {
             display: flex;
             justify-content: center;
@@ -177,27 +125,7 @@
             margin-top: 2rem;
         }
 
-        .widgets-sidebar {
-            flex-direction: column;
-            gap: 1.5rem;
-            width: 500px;
-            display: none;
-            padding-top: 2rem;
-        }
-
-        .widgets-sidebar iframe {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: none;
-            width: 100%;
-            height: 290px;
-        }
-
-        #weather-iframe {
-            height: 550px;
-        }
-
-        /* --- App Grid --- */
+        /* App Grid */
         #app-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -249,70 +177,11 @@
             width: 90px;
         }
 
-        .favorite-star {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 32px;
-            height: 32px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            transform: scale(0.5);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        html[data-theme='dark'] .favorite-star {
-            background-color: rgba(50, 50, 50, 0.9);
-        }
-
-        .app-item:hover .favorite-star {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .favorite-star svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .favorite-star.favorited svg {
-            fill: #facc15;
-            stroke: #facc15;
-        }
-
-        .favorite-star:not(.favorited) svg {
-            stroke: #9ca3af;
-        }
-
-        /* --- Responsive Design --- */
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .header-container {
                 flex-direction: column;
                 align-items: stretch;
-            }
-
-            .main-title {
-                text-align: center;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .main-layout {
-                align-items: stretch;
-            }
-
-            .widgets-sidebar {
-                display: flex;
-            }
-
-            .app-drawer-container {
-                max-width: calc(100% - 500px - 1.5rem);
             }
         }
     </style>
@@ -321,19 +190,7 @@
 <body data-theme="light">
 
     <div class="header-container">
-        <h1 class="main-title">AppDrawer</h1>
-
-        <!-- Search fields -->
-        <div class="search-container flex-grow-[2] min-w-[200px]">
-            <form class="w-full" action="https://www.google.com/search" method="get" target="_blank">
-                <div class="relative">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"
-                        alt="Google Icon" class="search-icon w-6 h-6 object-contain">
-                    <input type="text" name="q" class="search-input w-full" placeholder="Google Suche...">
-                </div>
-            </form>
-        </div>
-        <div class="search-container flex-grow-[1] min-w-[200px]">
+        <div class="search-container">
             <svg class="search-icon w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -349,107 +206,30 @@
 
     <div class="main-layout">
         <div class="app-drawer-container">
-            <!-- Add App Form Container (REWORKED) -->
-            <div id="add-app-form-wrapper" class="px-4 sm:px-6 py-4">
-                <form id="add-app-form" class="flex flex-col lg:flex-row lg:items-end gap-4">
-                    <!-- App Inputs Group -->
-                    <div class="w-full flex-grow flex flex-col sm:flex-row gap-4">
-                        <div class="flex-grow">
-                            <label for="new-app-url" class="block text-sm font-medium mb-1"
-                                style="color: var(--text-color-light);">Link</label>
-                            <input type="url" id="new-app-url" placeholder="https://beispiel.de" required
-                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
-                        </div>
-                        <div class="flex-grow">
-                            <label for="new-app-name" class="block text-sm font-medium mb-1"
-                                style="color: var(--text-color-light);">App-Name</label>
-                            <input type="text" id="new-app-name" placeholder="Meine App" required
-                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
-                        </div>
-                        <div class="flex-grow">
-                            <label for="new-app-icon-url" class="block text-sm font-medium mb-1"
-                                style="color: var(--text-color-light);">Icon-URL (optional)</label>
-                            <input type="url" id="new-app-icon-url" placeholder="https://beispiel.de/icon.png"
-                                class="w-full p-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                                style="border-color: var(--dock-border); background-color: var(--bg-color); color: var(--text-color); --tw-ring-color: var(--primary-color); --tw-ring-offset-color: var(--bg-color);">
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons Group -->
-                    <div class="w-full lg:w-auto flex items-center justify-start gap-2 flex-shrink-0">
-                        <button type="submit" id="add-app-btn" class="icon-btn flex-grow lg:flex-grow-0"
-                            title="Hinzufügen">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </button>
-                        <button type="button" id="import-btn" class="icon-btn secondary flex-grow lg:flex-grow-0"
-                            title="Importieren">
-                            <i data-lucide="file-up" class="w-5 h-5"></i>
-                        </button>
-                        <button type="button" id="export-btn" class="icon-btn secondary flex-grow lg:flex-grow-0"
-                            title="Exportieren">
-                            <i data-lucide="file-down" class="w-5 h-5"></i>
-                        </button>
-                        <button type="button" id="delete-all-btn" class="icon-btn danger flex-grow lg:flex-grow-0"
-                            title="Alle löschen">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
             <div id="app-grid"></div>
-        </div>
-
-        <!-- Widgets-Seitenleiste -->
-        <div class="widgets-sidebar">
-            <iframe src="widgets/clock.html" title="Uhr Widget"></iframe>
-            <iframe src="widgets/weather.html" title="Wetter Widget" id="weather-iframe"></iframe>
         </div>
     </div>
 
-    <!-- MODAL SECTION -->
     <div id="confirmation-overlay"
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
     <div id="confirmation-modal"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-md z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
         <div class="p-6 rounded-xl shadow-lg" style="background-color: var(--card-bg);">
-            <h3 id="modal-title" class="text-xl font-bold mb-4">Aktion bestätigen</h3>
-            <p id="modal-text" class="mb-6" style="color: var(--text-color-light);">Möchten Sie diese Aktion wirklich
-                ausführen?</p>
+            <h3 id="modal-title" class="text-xl font-bold mb-4">App löschen?</h3>
+            <p id="modal-text" class="mb-6" style="color: var(--text-color-light);">Möchtest du diese App dauerhaft
+                löschen? Diese Aktion kann nicht rückgängig gemacht werden.</p>
             <div class="flex justify-end gap-4">
                 <button id="cancel-remove-btn" class="px-4 py-2 rounded-lg font-semibold transition"
                     style="background-color: var(--dock-border); color: var(--text-color);">Abbrechen</button>
                 <button id="confirm-remove-btn"
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Bestätigen</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Export Modal -->
-    <div id="export-overlay"
-        class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
-    </div>
-    <div id="export-modal"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-md z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <div class="p-6 rounded-xl shadow-lg" style="background-color: var(--card-bg);">
-            <h3 class="text-xl font-bold mb-4">Backup exportieren</h3>
-            <p class="mb-4" style="color: var(--text-color-light);">Gib einen Namen für deine Backup-Datei ein.</p>
-            <input type="text" id="export-filename" class="w-full p-2 rounded-lg mb-4"
-                style="background-color: var(--bg-color); border: 1px solid var(--dock-border);"
-                placeholder="appdrawer-backup">
-            <div class="flex justify-end gap-4">
-                <button id="cancel-export-btn" class="px-4 py-2 rounded-lg font-semibold transition"
-                    style="background-color: var(--dock-border); color: var(--text-color);">Abbrechen</button>
-                <button id="confirm-export-btn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Exportieren</button>
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Löschen</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- App Data integrated directly ---
+        // Default app data
         const appsData = [
             { id: "FinanzOnline", iconUrl: "https://play-lh.googleusercontent.com/QQdz7x2gcVhe88tgzfT-2CNfh3nD6YNB8_ATmlvmItBZX4hcavVUUbVrODLyYDqQjmg=w240-h480-rw", targetUrl: "https://finanzonline.bmf.gv.at/fon/", ariaLabel: "FinanzOnline" },
             { id: "Post", iconUrl: "https://play-lh.googleusercontent.com/LCn0zMVjJXauMDNclMVMv8Ht-TNHHLqbCA61Xa7OR3X489dtOgpdFpzXT7H8KM_yTppO=s48-rw", targetUrl: "https://www.post.at/s/sendungsuebersicht#panelEmpfangen", ariaLabel: "Post" },
@@ -521,40 +301,16 @@
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // --- IFRAME COMMUNICATION HANDLER ---
-            const notifyParentOfFavoritesChange = () => {
-                const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
-                const favoriteIds = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
-                const favoriteAppsData = userApps.filter(app => favoriteIds.includes(app.id));
-                if (window.parent) {
-                    window.parent.postMessage({ type: 'favoritesUpdated', payload: favoriteAppsData }, '*');
-                }
-            };
-
+            // --- THEME COMMUNICATION HANDLER ---
             window.addEventListener('message', (event) => {
+                // Ensure the message is from the parent window for security
                 if (event.source !== window.parent) return;
+
                 const message = event.data;
                 if (message === 'set-theme-dark') {
                     document.documentElement.dataset.theme = 'dark';
-                    document.body.dataset.theme = 'dark';
                 } else if (message === 'set-theme-light') {
                     document.documentElement.dataset.theme = 'light';
-                    document.body.dataset.theme = 'light';
-                } else if (message === 'getFavorites') {
-                    notifyParentOfFavoritesChange();
-                } else if (message && message.type === 'getBackupData') {
-                    const backupData = {
-                        apps: JSON.parse(localStorage.getItem('userApps') || '[]'),
-                        favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
-                    };
-                    window.parent.postMessage({ type: 'backupDataResponse', key: 'appdrawer', data: backupData }, '*');
-                } else if (message && message.type === 'restoreBackupData') {
-                    const restoredData = message.data;
-                    if (restoredData && Array.isArray(restoredData.apps) && Array.isArray(restoredData.favorites)) {
-                        localStorage.setItem('userApps', JSON.stringify(restoredData.apps));
-                        localStorage.setItem('favoriteApps', JSON.stringify(restoredData.favorites));
-                        window.location.reload();
-                    }
                 }
             });
 
@@ -563,38 +319,17 @@
             const appGrid = document.getElementById('app-grid');
             const confirmationOverlay = document.getElementById('confirmation-overlay');
             const confirmationModal = document.getElementById('confirmation-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalText = document.getElementById('modal-text');
             const confirmRemoveBtn = document.getElementById('confirm-remove-btn');
             const cancelRemoveBtn = document.getElementById('cancel-remove-btn');
-            const exportOverlay = document.getElementById('export-overlay');
-            const exportModal = document.getElementById('export-modal');
-            const exportFilenameInput = document.getElementById('export-filename');
-            const confirmExportBtn = document.getElementById('confirm-export-btn');
-            const cancelExportBtn = document.getElementById('cancel-export-btn');
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search-btn');
-            const addAppForm = document.getElementById('add-app-form');
-            const newAppUrlInput = document.getElementById('new-app-url');
-            const newAppNameInput = document.getElementById('new-app-name');
-            const newAppIconUrlInput = document.getElementById('new-app-icon-url');
-            const addAppBtn = document.getElementById('add-app-btn');
-            const importBtn = document.getElementById('import-btn');
-            const exportBtn = document.getElementById('export-btn');
-            const deleteAllBtn = document.getElementById('delete-all-btn');
 
             let apps = [];
-            let favorites = [];
             let actionToConfirm = null;
 
             // --- DATA MANAGEMENT ---
             function saveApps() {
                 localStorage.setItem('userApps', JSON.stringify(apps));
-                // No need to notify here, adding an app doesn't change favorites
-            }
-            function saveFavorites() {
-                localStorage.setItem('favoriteApps', JSON.stringify(favorites));
-                notifyParentOfFavoritesChange();
             }
 
             function initializeData() {
@@ -605,15 +340,12 @@
                         name: app.ariaLabel,
                         url: app.targetUrl,
                         iconUrl: app.iconUrl,
-                        metadataStatus: 'completed'
                     }));
                     saveApps();
                 } else {
                     apps = JSON.parse(storedApps);
                 }
-                favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                 renderAll();
-                notifyParentOfFavoritesChange();
             }
 
             // --- UI RENDERING ---
@@ -624,15 +356,12 @@
                     app.name && app.name.toLowerCase().includes(lowerCaseSearchTerm)
                 ).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
-                // Refresh favorites from localStorage before rendering
-                favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
-
                 filteredApps.forEach(app => {
-                    appGrid.appendChild(createAppElement(app, favorites.includes(app.id)));
+                    appGrid.appendChild(createAppElement(app));
                 });
             };
 
-            const createAppElement = (app, isFavorited) => {
+            const createAppElement = (app) => {
                 const item = document.createElement('a');
                 item.href = app.url;
                 item.target = '_blank';
@@ -646,15 +375,11 @@
                 icon.className = 'app-icon';
                 icon.onerror = function () { this.onerror = null; this.src = `https://placehold.co/64x64/e0e0e0/ffffff?text=${(app.name || 'A').charAt(0)}`; };
                 iconWrapper.appendChild(icon);
-                const star = document.createElement('div');
-                star.className = 'favorite-star';
-                if (isFavorited) star.classList.add('favorited');
-                star.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>`;
-                star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(app.id); });
-                iconWrapper.appendChild(star);
+
+                // Context menu to delete the app
                 item.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    openConfirmationModal('deleteApp', app.id);
+                    openConfirmationModal(app.id);
                 });
                 item.appendChild(iconWrapper);
                 const label = document.createElement('span');
@@ -665,29 +390,10 @@
             };
 
             // --- ACTIONS ---
-            function toggleFavorite(appId) {
-                const index = favorites.indexOf(appId);
-                if (index > -1) {
-                    favorites.splice(index, 1);
-                } else {
-                    favorites.push(appId);
-                }
-                saveFavorites();
-                renderAll(searchInput.value);
-            };
             function deleteApp(appId) {
                 apps = apps.filter(app => app.id !== appId);
-                favorites = favorites.filter(favId => favId !== appId);
                 saveApps();
-                saveFavorites(); // Save favorites as well, as the app is gone
                 renderAll(searchInput.value);
-            }
-            function deleteAllApps() {
-                apps = [];
-                favorites = [];
-                localStorage.removeItem('userApps');
-                localStorage.removeItem('favoriteApps');
-                initializeData();
             }
 
             // --- Modal Logic ---
@@ -699,20 +405,8 @@
                 overlay.classList.add('opacity-0', 'pointer-events-none');
                 modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
             };
-            function openConfirmationModal(type, id) {
-                actionToConfirm = { type, id };
-                confirmRemoveBtn.className = 'font-bold py-2 px-4 rounded-lg transition text-white';
-                if (type === 'deleteAllApps') {
-                    modalTitle.textContent = 'Alle Apps löschen?';
-                    modalText.textContent = 'Möchtest du wirklich ALLE Apps und Favoriten dauerhaft löschen? Die Standard-Apps werden danach neu geladen.';
-                    confirmRemoveBtn.textContent = 'Alles löschen';
-                    confirmRemoveBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                } else if (type === 'deleteApp') {
-                    modalTitle.textContent = 'App löschen?';
-                    modalText.textContent = 'Möchtest du diese App dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.';
-                    confirmRemoveBtn.textContent = 'Löschen';
-                    confirmRemoveBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                }
+            function openConfirmationModal(id) {
+                actionToConfirm = { id };
                 openModal(confirmationOverlay, confirmationModal);
             };
             function closeConfirmationModal() {
@@ -721,111 +415,15 @@
             };
             function handleConfirm() {
                 if (!actionToConfirm) return;
-                if (actionToConfirm.type === 'deleteApp') {
-                    deleteApp(actionToConfirm.id);
-                } else if (actionToConfirm.type === 'deleteAllApps') {
-                    deleteAllApps();
-                }
+                deleteApp(actionToConfirm.id);
                 closeConfirmationModal();
             }
 
-            // --- Import/Export Logic ---
-            function handleExport() {
-                const date = new Date();
-                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-                exportFilenameInput.value = `appdrawer-backup-${formattedDate}`;
-                openModal(exportOverlay, exportModal);
-            }
-            function handleImport() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json,application/json';
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-                        try {
-                            const data = JSON.parse(event.target.result);
-                            if (data && Array.isArray(data.apps) && Array.isArray(data.favorites)) {
-                                localStorage.setItem('userApps', JSON.stringify(data.apps));
-                                localStorage.setItem('favoriteApps', JSON.stringify(data.favorites));
-                                window.location.reload();
-                            } else {
-                                alert("Die Datei hat ein ungültiges Format.");
-                            }
-                        } catch (err) {
-                            alert("Fehler beim Lesen der Datei. Bitte stelle sicher, dass es eine gültige Backup-Datei ist.");
-                            console.error(err);
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                input.click();
-            }
-
             // --- Event Listeners ---
-            newAppUrlInput.addEventListener('input', () => {
-                try {
-                    let url = newAppUrlInput.value.trim();
-                    if (!url) { newAppNameInput.value = ''; return; }
-                    if (!url.match(/^https?:\/\//i)) { url = 'https://' + url; }
-                    const hostname = new URL(url).hostname.replace(/^www\./, '');
-                    newAppNameInput.value = hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1);
-                } catch (e) {
-                    newAppNameInput.value = '';
-                }
-            });
-            addAppForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                let url = newAppUrlInput.value.trim();
-                const name = newAppNameInput.value.trim();
-                const customIconUrl = newAppIconUrlInput.value.trim();
-
-                if (!url || !name) return;
-                if (!url.startsWith('http')) url = 'https://' + url;
-                if (apps.some(app => app.url === url)) { alert("Diese App existiert bereits in deiner Liste."); return; }
-
-                addAppBtn.disabled = true;
-                addAppBtn.innerHTML = '<i data-lucide="loader-circle" class="animate-spin w-5 h-5"></i>';
-                lucide.createIcons();
-
-                const iconUrl = customIconUrl || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
-
-                apps.push({ id: `user-${Date.now()}`, name, url, iconUrl });
-                saveApps();
-                renderAll(searchInput.value);
-                addAppForm.reset();
-                addAppBtn.disabled = false;
-                addAppBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5"></i>';
-                lucide.createIcons();
-            });
-
             confirmRemoveBtn.addEventListener('click', handleConfirm);
             cancelRemoveBtn.addEventListener('click', closeConfirmationModal);
             confirmationOverlay.addEventListener('click', closeConfirmationModal);
-            exportBtn.addEventListener('click', handleExport);
-            importBtn.addEventListener('click', handleImport);
-            deleteAllBtn.addEventListener('click', () => { openConfirmationModal('deleteAllApps'); });
-            cancelExportBtn.addEventListener('click', () => closeModal(exportOverlay, exportModal));
-            exportOverlay.addEventListener('click', () => closeModal(exportOverlay, exportModal));
-            confirmExportBtn.addEventListener('click', () => {
-                const userApps = JSON.parse(localStorage.getItem('userApps') || '[]');
-                const dataStr = JSON.stringify({
-                    apps: userApps,
-                    favorites: JSON.parse(localStorage.getItem('favoriteApps') || '[]')
-                });
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                let filename = exportFilenameInput.value.trim();
-                if (!filename) filename = 'appdrawer-backup';
-                link.download = `${filename}.json`;
-                link.href = url;
-                link.click();
-                URL.revokeObjectURL(url);
-                closeModal(exportOverlay, exportModal);
-            });
+
             searchInput.addEventListener('input', () => {
                 renderAll(searchInput.value);
                 clearSearchBtn.classList.toggle('hidden', !searchInput.value);
@@ -836,19 +434,14 @@
                 clearSearchBtn.classList.add('hidden');
             });
 
-            // *** CHANGED: Add storage event listener for cross-tab synchronization ***
             window.addEventListener('storage', (e) => {
-                if (e.key === 'userApps' || e.key === 'favoriteApps') {
+                if (e.key === 'userApps') {
                     console.log('AppDrawer detected storage change, re-rendering grid.');
-                    // Re-read data from localStorage and render the grid
-                    // No need to call initializeData() which re-imports defaults
                     apps = JSON.parse(localStorage.getItem('userApps') || '[]');
-                    favorites = JSON.parse(localStorage.getItem('favoriteApps') || '[]');
                     renderAll(searchInput.value);
                 }
             });
 
-            // Initial Load
             initializeData();
         });
     </script>
