@@ -1,7 +1,7 @@
 {
   "name": "AxisMea",
   "short_name": "AxisMea",
-  "start_url": "/index.html",
+  "start_url": "web-mywebsite/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
