@@ -20,41 +20,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mobileMenuFab = document.getElementById('mobile-menu-fab');
     const mobileSidebar = document.getElementById('mobile-sidebar');
-    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
     const mobileNavList = document.getElementById('mobile-nav-list');
 
-    if (mobileMenuFab && mobileSidebar) {
-        mobileMenuFab.addEventListener('click', () => {
-            mobileSidebar.classList.toggle('open');
+    const openMobileSidebar = () => {
+        mobileSidebar.classList.add('open');
+        mobileSidebarOverlay.classList.remove('hidden');
+    };
+
+    const closeMobileSidebar = () => {
+        mobileSidebar.classList.remove('open');
+        mobileSidebarOverlay.classList.add('hidden');
+    };
+
+    if (mobileMenuFab) {
+        mobileMenuFab.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (mobileSidebar.classList.contains('open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
         });
     }
-    if (closeSidebarBtn && mobileSidebar) {
-        closeSidebarBtn.addEventListener('click', () => {
-            mobileSidebar.classList.remove('open');
-        });
+
+    if (mobileSidebarOverlay) {
+        mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
     }
-    // Optional: Sidebar schließen bei Klick außerhalb
-    document.addEventListener('click', (e) => {
-        if (
-            mobileSidebar.classList.contains('open') &&
-            !e.target.closest('#mobile-sidebar') &&
-            !e.target.closest('#mobile-menu-fab')
-        ) {
-            mobileSidebar.classList.remove('open');
-        }
-    });
 
     // --- NAVIGATION SETUP ---
     const navItems = [
-        { key: 'aurimea', target: 'frame-aurimea', href: 'components/aurimea/aurimea.html', icon: 'savings', text: 'AuriMea' },
-        { key: 'appdrawer', href: 'components/appdrawer/appdrawer.html', icon: 'apps', text: 'Appdrawer' },
-        { key: 'readlater', target: 'frame-readlater', href: 'components/readlater/readlater.html', icon: 'bookmark', text: 'ReadlateR' },
-        { key: 'rss', target: 'frame-rss', href: 'components/rss-reader/rss-reader.html', icon: 'rss_feed', text: 'RSS Reader' },
-        { key: 'memomea', target: 'frame-memomea', href: 'components/memomea/memomea.html', icon: 'book_ribbon', text: 'MemoMea' },
-        { key: 'actamea', target: 'frame-actamea', href: 'components/actamea/actamea.html', icon: 'edit_note', text: 'ActaMea' },
-        { key: 'widgets', target: 'frame-widgets', href: 'components/widgets-collection/widgets-collection.html', icon: 'widgets', text: 'Widgets' },
-        { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'business_center', text: 'Unicorn', isExternal: true },
-        { key: 'settings', target: 'settings-modal', icon: 'settings', text: 'Einstellungen' }
+        { key: 'appdrawer', href: 'components/appdrawer/appdrawer.html', icon: 'assets/icons/appdrawer.svg', text: 'Appdrawer' },
+        { key: 'aurimea', target: 'frame-aurimea', href: 'components/aurimea/aurimea.html', icon: 'assets/icons/aurimea.svg', text: 'AuriMea' },
+        { key: 'readlater', target: 'frame-readlater', href: 'components/readlater/readlater.html', icon: 'assets/icons/readlater.svg', text: 'ReadlateR' },
+        { key: 'rss', target: 'frame-rss', href: 'components/rss-reader/rss-reader.html', icon: 'assets/icons/rss.svg', text: 'RSS Reader' },
+        { key: 'memomea', target: 'frame-memomea', href: 'components/memomea/memomea.html', icon: 'assets/icons/memomea.svg', text: 'MemoMea' },
+        { key: 'actamea', target: 'frame-actamea', href: 'components/actamea/actamea.html', icon: 'assets/icons/notes.svg', text: 'ActaMea' },
+        { key: 'widgets', target: 'frame-widgets', href: 'components/widgets-collection/widgets-collection.html', icon: 'assets/icons/widgets.svg', text: 'Widgets' },
+        { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'assets/icons/unicorn.svg', text: 'Unicorn', isExternal: true },
+        { key: 'settings', target: 'settings-modal', icon: 'assets/icons/settings.svg', text: 'Einstellungen' }
     ];
 
     // --- NEU: Suchfunktion ---
@@ -416,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 element.addEventListener('click', handleNavLinkClick);
             }
 
-            element.innerHTML = `<span class="material-symbols-outlined">${item.icon}</span>`;
+            element.innerHTML = `<img src="${item.icon}" alt="${item.text}" class="dock-icon">`;
             return element;
         };
 
@@ -478,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleMobileNavLinkClick(e) {
         handleNavLinkClick(e);
         if (mobileSidebar.classList.contains('open')) {
-            mobileSidebar.classList.remove('open');
+            closeMobileSidebar();
         }
     }
     
@@ -504,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
     
             element.innerHTML = `
-                <span class="material-symbols-outlined mr-4">${item.icon}</span>
+                <img src="${item.icon}" alt="${item.text}" class="mobile-nav-icon mr-4">
                 <span>${item.text}</span>
             `;
             mobileNavList.appendChild(element);
@@ -567,13 +571,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('theme') === 'system') applyTheme('system'); });
 
     // Set initial state from localStorage
-    const savedTheme = localStorage.getItem('theme') || 'system';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     document.querySelector(`input[name="theme"][value="${savedTheme}"]`)?.setAttribute('checked', 'true');
     applyTheme(savedTheme);
 
     let lastActiveTabId = localStorage.getItem('lastActiveTab');
     if (!lastActiveTabId || lastActiveTabId === 'frame-appdrawer') {
-        lastActiveTabId = 'frame-widgets';
+        lastActiveTabId = 'frame-actamea';
     }
     activateTab(lastActiveTabId);
 

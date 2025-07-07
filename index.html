@@ -7,7 +7,7 @@
     <title>AxisMea</title>
     <meta name="theme-color" content="#000000"/>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="assets/icons/home-solid-white.png">
+    <link rel="icon" href="assets/icons/axismea-favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body data-theme="system">
+<body data-theme="dark">
 
     <main id="main-content" class="h-full">
         <div id="iframe-wrapper" class="relative w-full h-full">
@@ -51,6 +51,7 @@
     <aside id="mobile-sidebar" class="mobile-sidebar">
         <nav id="mobile-nav-list"></nav>
     </aside>
+<div id="mobile-sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-20 z-[10001]"></div>
 
     <div id="appdrawer-modal" class="hidden">
         <div id="appdrawer-loader" class="hidden">

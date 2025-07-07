@@ -263,7 +263,7 @@
                     dayEl.dataset.dayIndex = i;
                     dayEl.innerHTML = `
                         <p class="font-semibold text-sm">${dayName}</p>
-                        <div class="w-10 h-10 mx-auto my-1">${this.getWeatherDetails(this.dailyData.weather_code[i]).icon}</div>
+                        <div class="w-12 h-12 mx-auto my-1">${this.getWeatherDetails(this.dailyData.weather_code[i]).icon}</div>
                         <p class="text-sm">${Math.round(this.dailyData.temperature_2m_min[i])}° - ${Math.round(this.dailyData.temperature_2m_max[i])}°</p>
                     `;
                     dayEl.addEventListener('click', () => this.displayDayDetails(i));
@@ -309,7 +309,7 @@
             getWeatherDetails(code) {
                 // Diese Funktion ordnet Wettercodes Beschreibungen, Icons, Hintergrundfarben und Textfarben zu.
                 // Die Icons werden nun als <img>-Tags mit dem angegebenen Pfad zurückgegeben.
-                const iconPath = '../../assets/weather-icons/'; // Basis-Pfad zu den Icons
+                const iconPath = '../../../assets/weather-icons/'; // Basis-Pfad zu den Icons
 
                 // Hilfsfunktion zur Erstellung des <img>-Tags
                 const createIconTag = (filename, altText) => {

@@ -210,8 +210,10 @@ body {
     flex-shrink: 0;
 }
 
-.dock-link .material-symbols-outlined {
-    font-size: 28px;
+.dock-icon {
+    width: 28px;
+    height: 28px;
+    filter: var(--icon-filter);
 }
 
 .dock-link:hover {
@@ -226,8 +228,12 @@ body {
     transform: translateY(-4px);
 }
 
-.dock-link.active .material-symbols-outlined {
-    font-variation-settings: 'FILL' 1;
+html[data-theme='dark'] .dock-icon {
+    filter: invert(1);
+}
+
+.dock-link.active .dock-icon {
+    filter: invert(48%) sepia(61%) saturate(2000%) hue-rotate(225deg) brightness(95%) contrast(90%);
 }
 
 /* === Clock Style === */
@@ -381,8 +387,8 @@ html[data-theme='dark'] .dock-link.active {
     position: fixed;
     top: 0;
     left: 0;
-    width: 80vw;
-    max-width: 320px;
+    width: 65vw;
+    max-width: 240px;
     height: 100vh;
     background: var(--modal-bg, #fff);
     box-shadow: 2px 0 16px rgba(0, 0, 0, 0.18);
@@ -422,8 +428,18 @@ html[data-theme='dark'] .dock-link.active {
     color: white;
 }
 
-#mobile-sidebar .mobile-nav-item .material-symbols-outlined {
-    font-size: 24px;
+.mobile-nav-icon {
+    width: 24px;
+    height: 24px;
+    filter: var(--icon-filter);
+}
+
+html[data-theme='dark'] .mobile-nav-icon {
+    filter: invert(1);
+}
+
+.mobile-nav-link.active .mobile-nav-icon {
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(145deg) brightness(102%) contrast(102%);
 }
 
 /* FAB Styles */
