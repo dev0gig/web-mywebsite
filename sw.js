@@ -1,4 +1,4 @@
-const CACHE_NAME = 'unicorn-app-cache-v1';
+const CACHE_NAME = 'axismea-app-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -1,11 +1,11 @@
 {
-  "name": "AxisMeas",
-  "short_name": "AxisMeas",
-  "start_url": "/index.html",
+  "name": "AxisMea",
+  "short_name": "AxisMea",
+  "start_url": "web-mywebsite/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "AxisMea als PWA",
+  "description": "AxisMeas als PWA",
   "icons": [
     {
       "src": "assets/icons/home-solid-white.png",
