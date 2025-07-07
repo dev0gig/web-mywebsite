@@ -1,11 +1,11 @@
 {
-  "name": "Unicorn Work Tools",
+  "name": "Unicorn",
   "short_name": "Unicorn",
   "start_url": "/unicorn/work-tools.html",
   "display": "standalone",
   "background_color": "#171717",
   "theme_color": "#f97316",
-  "description": "PWA for Unicorn Work Tools.",
+  "description": "PWA for Unicorn",
   "icons": [
     {
       "src": "../assets/icons/unicorn-solid-white.png",
