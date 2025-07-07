@@ -174,7 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const backupAllData = async () => {
-        showToast('Backup wird gestartet...', 'info', 0);
+        showToast('Backup wird gestartet...', 'info', 0); // Show indefinite toast
+
         const contentFrames = Array.from(document.querySelectorAll('.content-iframe')).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
         const appdrawerIframe = document.getElementById('frame-appdrawer');
         const framesToBackup = [...contentFrames];
@@ -186,42 +187,78 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Keine Apps zum Sichern gefunden.', 'info');
             return;
         }
-        const loadingPromises = framesToBackup.map(frame => new Promise((resolve, reject) => {
-            if (frame.src && frame.contentWindow) resolve(frame);
-            else {
-                frame.addEventListener('load', () => resolve(frame), { once: true });
-                frame.addEventListener('error', () => reject(new Error(`Failed to load ${frame.dataset.key}`)), { once: true });
-                frame.src = frame.dataset.src;
-            }
-        }));
-        try {
-            await Promise.race([Promise.all(loadingPromises), new Promise((_, reject) => setTimeout(() => reject(new Error('Iframe loading timed out')), 10000))]);
-            let backupData = {};
-            let expectedResponses = framesToBackup.length;
-            let receivedResponses = 0;
-            const backupTimeoutId = setTimeout(() => {
-                window.removeEventListener('message', messageListener);
-                const missingKeys = framesToBackup.map(f => f.dataset.key).filter(k => !Object.keys(backupData).includes(k));
-                if (missingKeys.length > 0) showToast('Backup-Timeout. Folgende Apps haben nicht geantwortet: ' + missingKeys.join(', '), 'error', 8000);
-                if (Object.keys(backupData).length > 0) createAndDownloadZip(backupData);
-            }, 10000);
-            const messageListener = (event) => {
-                const { type, key, data } = event.data;
-                if (type === 'backupDataResponse') {
-                    if (key) backupData[key] = data;
-                    receivedResponses++;
-                    if (receivedResponses === expectedResponses) {
-                        clearTimeout(backupTimeoutId);
-                        window.removeEventListener('message', messageListener);
-                        createAndDownloadZip(backupData);
-                    }
+
+        let backupData = {};
+        const failedApps = [];
+
+        // This is a global listener that accumulates data.
+        const messageListener = (event) => {
+            const { type, key, data } = event.data;
+            if (type === 'backupDataResponse') {
+                if (key && data) {
+                    backupData[key] = data;
+                    console.log(`Backup data received for: ${key}`);
                 }
-            };
-            window.addEventListener('message', messageListener);
-            framesToBackup.forEach(frame => frame.contentWindow?.postMessage({ type: 'backupDataRequest' }, '*'));
-        } catch (error) {
-            console.error('Backup failed:', error);
-            showToast(`Fehler beim Laden der Apps für das Backup: ${error.message}`, 'error');
+            }
+        };
+        window.addEventListener('message', messageListener);
+
+        for (const frame of framesToBackup) {
+            const key = frame.dataset.key;
+            showToast(`Sichere ${key}...`, 'info', 0);
+
+            try {
+                // 1. Load iframe if not already loaded
+                if (!frame.src) {
+                    await new Promise((resolve, reject) => {
+                        frame.addEventListener('load', resolve, { once: true });
+                        frame.addEventListener('error', () => reject(new Error(`Failed to load ${key}`)), { once: true });
+                        frame.src = frame.dataset.src;
+                        setTimeout(() => reject(new Error(`Timeout loading ${key}`)), 8000); // 8-second timeout per frame
+                    });
+                }
+
+                // 2. Request backup data and wait for its specific response
+                await new Promise((resolve, reject) => {
+                    const timeoutId = setTimeout(() => {
+                        // Cleanup the specific listener on timeout
+                        window.removeEventListener('message', specificMessageListener);
+                        reject(new Error(`Timeout waiting for backup response from ${key}`));
+                    }, 5000); // 5-second timeout for response
+
+                    const specificMessageListener = (event) => {
+                        const { type, key: responseKey } = event.data;
+                        if (type === 'backupDataResponse' && responseKey === key) {
+                            clearTimeout(timeoutId);
+                            window.removeEventListener('message', specificMessageListener);
+                            resolve();
+                        }
+                    };
+                    
+                    window.addEventListener('message', specificMessageListener);
+                    frame.contentWindow?.postMessage({ type: 'backupDataRequest' }, '*');
+                });
+
+            } catch (error) {
+                console.error(`Failed to backup ${key}:`, error);
+                failedApps.push(key);
+            }
+        }
+
+        // Cleanup global listener
+        window.removeEventListener('message', messageListener);
+
+        // 3. Create ZIP file
+        if (Object.keys(backupData).length > 0) {
+            createAndDownloadZip(backupData);
+        } else {
+            showToast('Keine Daten zum Sichern gefunden.', 'info');
+        }
+
+        if (failedApps.length > 0) {
+            showToast(`Backup abgeschlossen. Fehler bei: ${failedApps.join(', ')}`, 'error', 8000);
+        } else if (Object.keys(backupData).length > 0) {
+            showToast('Backup erfolgreich abgeschlossen!', 'success');
         }
     };
 
