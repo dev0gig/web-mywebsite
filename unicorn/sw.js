@@ -1,22 +1,22 @@
 const CACHE_NAME = 'unicorn-work-tools-cache-v1';
 const urlsToCache = [
-  '/unicorn/',
-  '/unicorn/work-tools.html',
-  '../assets/icons/unicorn-solid-white.png',
-  '../assets/icons/home.svg',
-  '../assets/icons/contact.svg',
-  '../assets/icons/mail.svg',
-  '../assets/icons/tools.svg',
-  '../assets/icons/notes.svg',
-  '../assets/icons/folder.svg',
-  '../assets/icons/settings.svg',
-  '../assets/loading/we_loading.png',
-  'we-iframe/dashboard.html',
-  'we-iframe/contacts.html',
-  'we-iframe/templates.html',
-  'we-iframe/tool-widgets.html',
-  'we-iframe/notes.html',
-  'we-iframe/evidenz.html'
+  'web-mywebsite/unicorn/',
+  'web-mywebsite/unicorn/work-tools.html',
+  'web-mywebsite/assets/icons/unicorn-solid-white.png',
+  'web-mywebsite/assets/icons/home.svg',
+  'web-mywebsite/assets/icons/contact.svg',
+  'web-mywebsite/assets/icons/mail.svg',
+  'web-mywebsite/assets/icons/tools.svg',
+  'web-mywebsite/assets/icons/notes.svg',
+  'web-mywebsite/assets/icons/folder.svg',
+  'web-mywebsite/assets/icons/settings.svg',
+  'web-mywebsite/assets/loading/we_loading.png',
+  'web-mywebsite/unicorn/we-iframe/dashboard.html',
+  'web-mywebsite/unicorn/we-iframe/contacts.html',
+  'web-mywebsite/unicorn/we-iframe/templates.html',
+  'web-mywebsite/unicorn/we-iframe/tool-widgets.html',
+  'web-mywebsite/unicorn/we-iframe/notes.html',
+  'web-mywebsite/unicorn/we-iframe/evidenz.html'
 ];
 
 self.addEventListener('install', event => {

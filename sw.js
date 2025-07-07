@@ -1,11 +1,11 @@
 const CACHE_NAME = 'axismea-app-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/script.js',
-  '/style.css',
-  '/assets/icons/unicorn.svg',
-  '/assets/icons/unicorn-solid-white.png'
+  '/web-mywebsite/',
+  '/web-mywebsite/index.html',
+  '/web-mywebsite/script.js',
+  '/web-mywebsite/style.css',
+  '/web-mywebsite/assets/icons/unicorn.svg',
+  '/web-mywebsite/assets/icons/unicorn-solid-white.png'
 ];
 
 self.addEventListener('install', event => {
