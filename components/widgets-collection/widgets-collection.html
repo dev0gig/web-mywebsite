@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
 
     <style>
         :root {
@@ -30,6 +30,11 @@
             /* violet-100 */
             --link-active-text: #5b21b6;
             /* violet-700 */
+            --overlay-bg: rgba(0, 0, 0, 0.7);
+            /* Dark overlay background */
+            --overlay-nav-bg: #ffffff;
+            /* Navigation background inside overlay */
+            --overlay-nav-text: #111827;
         }
 
         html[data-theme='dark'] {
@@ -45,6 +50,9 @@
             /* violet-900 */
             --link-active-text: #ddd6fe;
             /* violet-200 */
+            --overlay-bg: rgba(0, 0, 0, 0.8);
+            --overlay-nav-bg: #262626;
+            --overlay-nav-text: #fafafa;
         }
 
         body {
@@ -64,7 +72,8 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
+            background-color: var(--sidebar-border);
+            /* Changed to sidebar-border for better contrast */
             border-radius: 10px;
             border: 3px solid var(--bg-color);
         }
@@ -107,8 +116,37 @@
             transition: opacity 0.3s ease-in-out;
         }
 
-        #mobile-sidebar {
+        /* Full-Screen Overlay Styles */
+        #fullscreen-overlay {
+            background-color: var(--overlay-bg);
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        #overlay-nav {
+            background-color: var(--overlay-nav-bg);
+            color: var(--overlay-nav-text);
             transition: transform 0.3s ease-in-out;
+        }
+
+        .overlay-link {
+            color: var(--text-color);
+            /* Use text-color for overlay links */
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .overlay-link:hover {
+            background-color: var(--link-active-bg);
+            color: var(--link-active-text);
+        }
+
+        .overlay-link.active {
+            background-color: var(--link-active-bg);
+            color: var(--link-active-text);
+            font-weight: 600;
+        }
+
+        .overlay-link.active i {
+            color: var(--link-active-text);
         }
     </style>
 </head>
@@ -130,69 +168,63 @@
                 style="border-color: var(--sidebar-border); background-color: var(--sidebar-bg);">
                 <h2 id="mobile-widget-title" class="text-xl font-bold" style="color: var(--header-text-color);">Wähle
                     ein Widget</h2>
-                <!-- Hamburger button removed from header -->
+                <button id="open-overlay-btn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <span class="material-symbols-outlined" style="color: var(--text-color);">menu</span>
+                </button>
             </header>
 
             <!-- Content Area -->
             <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8">
                 <div id="widget-container"
                     class="w-full h-[85vh] rounded-2xl shadow-lg flex items-center justify-center p-1">
-                    <!-- CHANGE: Added the 'hidden' class to the iframe to hide it by default -->
                     <iframe id="widget-iframe" class="w-full h-full rounded-xl opacity-0 hidden"
                         title="Widget-Anzeige"></iframe>
                     <div id="placeholder-text" class="text-center">
-                        <i data-lucide="layout-dashboard" class="w-16 h-16 mx-auto mb-4"
-                            style="color: var(--text-color-light);"></i>
+                        <span class="material-symbols-outlined text-6xl mx-auto mb-4" style="color: var(--text-color-light);">dashboard</span>
                         <h3 class="text-xl font-semibold">Willkommen bei den Widgets!</h3>
-                        <p class="mt-2" style="color: var(--text-color-light);">Wähle ein Widget aus der Seitenleiste,
-                            um es hier anzuzeigen.</p>
+                        <p class="mt-2" style="color: var(--text-color-light);">Wähle ein Widget aus der Seitenleiste
+                            (Desktop) oder dem Menü (Mobile), um es hier anzuzeigen.</p>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Mobile Sidebar -->
-    <div id="mobile-sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"></div>
-    <aside id="mobile-sidebar" class="fixed top-0 left-0 h-full w-72 sidebar transform -translate-x-full z-40">
-        <div class="flex justify-between items-center p-4 border-b" style="border-color: var(--sidebar-border);">
-            <h2 class="text-2xl font-bold" style="color: var(--header-text-color);">Widgets</h2>
-            <button id="close-mobile-menu-btn" class="p-2">
-                <i data-lucide="x" class="w-6 h-6"></i>
+    <!-- Full-Screen Overlay Navigation for Mobile -->
+    <div id="fullscreen-overlay"
+        class="fixed inset-0 z-50 flex flex-col items-center justify-center opacity-0 invisible">
+        <div id="overlay-nav"
+            class="relative w-full max-w-md mx-auto p-6 rounded-lg shadow-2xl transform scale-95 transition-transform duration-300 ease-out">
+            <button id="close-overlay-btn"
+                class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span class="material-symbols-outlined" style="color: var(--text-color);">close</span>
             </button>
+            <h2 class="text-2xl font-bold mb-6 text-center" style="color: var(--header-text-color);">Widgets</h2>
+            <nav id="widget-nav-overlay" class="flex flex-col space-y-3"></nav>
         </div>
-        <nav id="widget-nav-mobile" class="flex-1 p-4 space-y-2"></nav>
-    </aside>
-
-    <!-- Floating Action Button (FAB) for Mobile -->
-    <button id="fab-open-sidebar"
-        class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20 transition-transform transform hover:scale-110 active:scale-100"
-        style="background-color: var(--accent-color);">
-        <i data-lucide="menu" class="h-7 w-7"></i>
-    </button>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const widgets = [
-                { id: 'widget-jap-kana', title: 'Japanisch Kana', src: 'widgets/jap-kana.html', icon: 'languages' },
-                { id: 'widget-calculator', title: 'Taschenrechner', src: 'widgets/calculator.html', icon: 'calculator' },
-                { id: 'widget-clock', title: 'Uhr', src: 'widgets/clock.html', icon: 'clock' },
-                { id: 'widget-easy-math', title: 'Einfache Mathematik', src: 'widgets/easy-math.html', icon: 'superscript' },
-                { id: 'widget-tariff', title: 'Tarifrechner', src: 'widgets/tariff.html', icon: 'receipt' },
-                { id: 'widget-capital-city-eu', title: 'EU-Hauptstädte Quiz', src: 'widgets/capital-city-EU.html', icon: 'map' },
-                { id: 'widget-weather', title: 'Wetter', src: 'widgets/weather.html', icon: 'cloud-sun' }
+                { id: 'widget-jap-kana', title: 'Japanisch Kana', src: 'widgets/jap-kana.html', icon: 'translate' },
+                { id: 'widget-calculator', title: 'Taschenrechner', src: 'widgets/calculator.html', icon: 'calculate' },
+                { id: 'widget-clock', title: 'Uhr', src: 'widgets/clock.html', icon: 'schedule' },
+                { id: 'widget-easy-math', title: 'Einfache Mathematik', src: 'widgets/easy-math.html', icon: 'functions' },
+                { id: 'widget-tariff', title: 'Tarifrechner', src: 'widgets/tariff.html', icon: 'receipt_long' },
+                { id: 'widget-capital-city-eu', title: 'EU-Hauptstädte Quiz', src: 'widgets/capital-city-EU.html', icon: 'quiz' },
+                { id: 'widget-weather', title: 'Wetter', src: 'widgets/weather.html', icon: 'cloudy' }
             ];
 
             const desktopNav = document.getElementById('widget-nav-desktop');
-            const mobileNav = document.getElementById('widget-nav-mobile');
             const widgetIframe = document.getElementById('widget-iframe');
             const placeholder = document.getElementById('placeholder-text');
             const mobileWidgetTitle = document.getElementById('mobile-widget-title');
 
-            const mobileSidebar = document.getElementById('mobile-sidebar');
-            const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
-            const fabOpenSidebar = document.getElementById('fab-open-sidebar');
-            const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
+            const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+            const overlayNav = document.getElementById('widget-nav-overlay');
+            const openOverlayBtn = document.getElementById('open-overlay-btn');
+            const closeOverlayBtn = document.getElementById('close-overlay-btn');
 
             let currentTheme = 'light';
             let activeWidgetId = null;
@@ -216,27 +248,43 @@
                 }
             }
 
-            // --- Widget Navigation ---
-            function createNavButton(widget) {
+            // --- Widget Navigation for Desktop Sidebar ---
+            function createDesktopNavButton(widget) {
                 const button = document.createElement('button');
                 button.className = 'sidebar-link w-full flex items-center p-3 rounded-lg text-left';
                 button.dataset.widgetId = widget.id;
                 button.innerHTML = `
-                    <i data-lucide="${widget.icon}" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                    <span class="material-symbols-outlined mr-3">${widget.icon}</span>
                     <span>${widget.title}</span>
                 `;
                 button.addEventListener('click', () => loadWidget(widget.id));
                 return button;
             }
 
+            // --- Widget Navigation for Full-Screen Overlay ---
+            function createOverlayNavItem(widget) {
+                const button = document.createElement('button');
+                button.className = 'overlay-link w-full flex items-center p-4 rounded-lg text-left text-lg';
+                button.dataset.widgetId = widget.id;
+                button.innerHTML = `
+                    <span class="material-symbols-outlined mr-4">${widget.icon}</span>
+                    <span>${widget.title}</span>
+                `;
+                button.addEventListener('click', () => {
+                    loadWidget(widget.id);
+                    closeOverlay(); // Close overlay after selecting a widget
+                });
+                return button;
+            }
+
             function renderNav() {
                 desktopNav.innerHTML = '';
-                mobileNav.innerHTML = '';
+                overlayNav.innerHTML = ''; // Clear previous items
+
                 widgets.forEach(widget => {
-                    desktopNav.appendChild(createNavButton(widget));
-                    mobileNav.appendChild(createNavButton(widget));
+                    desktopNav.appendChild(createDesktopNavButton(widget));
+                    overlayNav.appendChild(createOverlayNavItem(widget)); // Add to overlay nav
                 });
-                lucide.createIcons();
             }
 
             function loadWidget(widgetId) {
@@ -244,60 +292,79 @@
                 if (!widget) return;
 
                 placeholder.classList.add('hidden');
-                // CHANGE: Remove 'hidden' to show the iframe in the layout
                 widgetIframe.classList.remove('hidden');
-                widgetIframe.classList.add('opacity-0'); // Keep it transparent while loading
+                widgetIframe.classList.add('opacity-0');
 
                 widgetIframe.src = widget.src;
 
                 widgetIframe.onload = () => {
-                    updateActiveWidgetTheme(); // Send theme message after load
-                    widgetIframe.classList.remove('opacity-0'); // Fade it in when loaded
+                    updateActiveWidgetTheme();
+                    widgetIframe.classList.remove('opacity-0');
                 };
 
                 widgetIframe.onerror = () => {
                     widgetIframe.classList.add('opacity-0');
-                    // CHANGE: Hide the iframe again if it fails to load
                     widgetIframe.classList.add('hidden');
                     placeholder.classList.remove('hidden');
                     placeholder.innerHTML = `
                         <div class="text-center p-4">
-                            <i data-lucide="alert-triangle" class="w-16 h-16 mx-auto mb-4 text-red-500"></i>
+                            <span class="material-symbols-outlined text-6xl mx-auto mb-4 text-red-500">error</span>
                             <h3 class="text-xl font-semibold">Fehler beim Laden</h3>
                             <p class="mt-2" style="color: var(--text-color-light);">Das Widget unter <code>${widget.src}</code> konnte nicht gefunden werden. Bitte überprüfe den Dateipfad.</p>
                         </div>
                     `;
-                    lucide.createIcons();
                 };
 
-                mobileWidgetTitle.textContent = widget.title;
+                mobileWidgetTitle.textContent = widget.title; // Update mobile header title
                 setActiveLink(widget.id);
                 localStorage.setItem('lastActiveWidget', widget.id);
                 activeWidgetId = widget.id;
-
-                if (window.innerWidth < 1024) {
-                    closeMobileMenu();
-                }
             }
 
             function setActiveLink(widgetId) {
-                document.querySelectorAll('.sidebar-link').forEach(link => {
+                // For Desktop Sidebar
+                document.querySelectorAll('#desktop-sidebar .sidebar-link').forEach(link => {
                     link.classList.toggle('active', link.dataset.widgetId === widgetId);
+                });
+                // For Full-Screen Overlay Navigation
+                document.querySelectorAll('#widget-nav-overlay .overlay-link').forEach(item => {
+                    item.classList.toggle('active', item.dataset.widgetId === widgetId);
                 });
             }
 
-            // --- Mobile Menu ---
-            function openMobileMenu() {
-                mobileSidebarOverlay.classList.remove('hidden');
-                mobileSidebar.classList.remove('-translate-x-full');
+            // --- Full-Screen Overlay Functions ---
+            function openOverlay() {
+                fullscreenOverlay.classList.remove('invisible', 'opacity-0');
+                fullscreenOverlay.classList.add('opacity-100');
+                // Animate the inner nav panel slightly
+                document.getElementById('overlay-nav').classList.remove('scale-95');
+                document.getElementById('overlay-nav').classList.add('scale-100');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling body when overlay is open
             }
-            function closeMobileMenu() {
-                mobileSidebarOverlay.classList.add('hidden');
-                mobileSidebar.classList.add('-translate-x-full');
+
+            function closeOverlay() {
+                fullscreenOverlay.classList.remove('opacity-100');
+                fullscreenOverlay.classList.add('opacity-0');
+                // Animate the inner nav panel back
+                document.getElementById('overlay-nav').classList.remove('scale-100');
+                document.getElementById('overlay-nav').classList.add('scale-95');
+                // Use a timeout to hide visibility after transition
+                setTimeout(() => {
+                    fullscreenOverlay.classList.add('invisible');
+                    document.body.style.overflow = ''; // Restore body scrolling
+                }, 300); // Match transition duration
             }
-            fabOpenSidebar.addEventListener('click', openMobileMenu);
-            closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
-            mobileSidebarOverlay.addEventListener('click', closeMobileMenu);
+
+            // Event Listeners for Overlay
+            openOverlayBtn.addEventListener('click', openOverlay);
+            closeOverlayBtn.addEventListener('click', closeOverlay);
+            // Close overlay if clicking on the dimmed background
+            fullscreenOverlay.addEventListener('click', (event) => {
+                if (event.target === fullscreenOverlay) {
+                    closeOverlay();
+                }
+            });
+
 
             // --- Initialization ---
             function initialize() {
@@ -305,8 +372,9 @@
                 const lastWidget = localStorage.getItem('lastActiveWidget');
                 if (lastWidget) {
                     loadWidget(lastWidget);
+                } else if (widgets.length > 0) {
+                    loadWidget(widgets[0].id); // Load the first widget by default
                 }
-                lucide.createIcons();
             }
 
             initialize();

@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
 
     <style>
         body {
@@ -27,6 +28,11 @@
 
     <!-- Hauptcontainer für das Quiz-Widget -->
     <div class="widget-container bg-gray-800 text-white rounded-2xl w-full max-w-sm p-8 text-center">
+        
+        <div class="flex items-center justify-center text-2xl font-bold mb-6">
+            <span class="material-symbols-outlined mr-3 text-3xl">calculate</span>
+            <h2>Kopfrechnen</h2>
+        </div>
         
         <!-- Bereich für die Aufgabe -->
         <div class="task-area mb-8">
@@ -67,28 +73,48 @@
 
             // Generiert eine neue Rechenaufgabe
             generateNewTask() {
-                const num1 = Math.floor(Math.random() * 20) + 1;
-                const num2 = Math.floor(Math.random() * 20) + 1;
-                const operators = ['+', '-', '*'];
+                const operators = ['+', '-', '*', '÷'];
                 let operator = operators[Math.floor(Math.random() * operators.length)];
                 
                 let question = '';
                 let answer = 0;
 
-                // Stellt sicher, dass das Ergebnis bei Subtraktion nicht negativ wird
-                if (operator === '-' && num1 < num2) {
-                    // Tausche die Zahlen, um ein positives Ergebnis zu gewährleisten
-                    [question, answer] = [`${num2} - ${num1} = ?`, num2 - num1];
-                } else if (operator === '*') {
-                     // Kleinere Zahlen für die Multiplikation, um das Ergebnis überschaubar zu halten
-                    const smallNum1 = Math.floor(Math.random() * 10) + 1;
-                    const smallNum2 = Math.floor(Math.random() * 10) + 1;
-                    question = `${smallNum1} × ${smallNum2} = ?`;
-                    answer = smallNum1 * smallNum2;
-                }
-                else {
-                    question = `${num1} ${operator} ${num2} = ?`;
-                    answer = eval(`${num1} ${operator} ${num2}`); // eval() sicher, da wir die Eingaben kontrollieren
+                switch (operator) {
+                    case '+': {
+                        const num1 = Math.floor(Math.random() * 90) + 10; // 10-99
+                        const num2 = Math.floor(Math.random() * 90) + 10; // 10-99
+                        question = `${num1} + ${num2} = ?`;
+                        answer = num1 + num2;
+                        break;
+                    }
+                    case '-': {
+                        const num1 = Math.floor(Math.random() * 90) + 10; // 10-99
+                        const num2 = Math.floor(Math.random() * 90) + 10; // 10-99
+                        if (num1 < num2) {
+                            // Swap to ensure positive result
+                            question = `${num2} - ${num1} = ?`;
+                            answer = num2 - num1;
+                        } else {
+                            question = `${num1} - ${num2} = ?`;
+                            answer = num1 - num2;
+                        }
+                        break;
+                    }
+                    case '*': {
+                        const num1 = Math.floor(Math.random() * 11) + 2; // 2-12
+                        const num2 = Math.floor(Math.random() * 19) + 2; // 2-20
+                        question = `${num1} × ${num2} = ?`;
+                        answer = num1 * num2;
+                        break;
+                    }
+                    case '÷': {
+                        const divisor = Math.floor(Math.random() * 11) + 2; // 2-12
+                        const quotient = Math.floor(Math.random() * 11) + 2; // 2-12
+                        const dividend = divisor * quotient;
+                        question = `${dividend} ÷ ${divisor} = ?`;
+                        answer = quotient;
+                        break;
+                    }
                 }
                 
                 this.currentCorrectAnswer = answer;
