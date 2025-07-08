@@ -132,15 +132,15 @@
 
 <body class="antialiased min-h-screen flex flex-col">
 
-    <div class="px-4 sm:px-6 lg:px-8 flex flex-col flex-grow">
+    <div class="flex flex-col flex-grow">
 
-        <header class="text-center pt-8 pb-4 flex-shrink-0">
+        <header class="text-center pt-8 pb-4 flex-shrink-0 px-4 sm:px-6 lg:px-8">
             <h1 class="text-5xl font-bold mb-2" style="color: var(--header-color);">HabitMea</h1>
             <p class="text-lg" style="color: var(--text-color-light);">Verfolge deine Gewohnheiten, Bücher, Filme,
                 Serien usw. an einem Ort.</p>
         </header>
 
-        <div class="text-center pb-6 flex-shrink-0 flex flex-wrap justify-center gap-4">
+        <div class="text-center pb-6 flex-shrink-0 flex flex-wrap justify-center gap-4 px-4 sm:px-6 lg:px-8">
             <button id="export-btn"
                 class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
                 <i class="material-icons sm:mr-2">file_download</i>
@@ -165,10 +165,10 @@
         </div>
 
         <main id="main-grid"
-            class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto">
+            class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto lg:px-8">
 
             <section id="habits"
-                class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col"
+                class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="habit">
                 <div class="flex items-center mb-4"><i class="material-icons text-3xl text-emerald-500 mr-4"
@@ -213,7 +213,8 @@
                         class="material-icons mr-2">settings</i>Gewohnheiten verwalten</button>
             </section>
 
-            <section id="books" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col"
+            <section id="books"
+                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="book">
                 <div class="flex justify-between items-center mb-6">
@@ -234,7 +235,8 @@
                     class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg"><i
                         class="material-icons mr-2">add_circle_outline</i>Neues Buch</button>
             </section>
-            <section id="media" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col"
+            <section id="media"
+                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="media">
                 <div class="flex justify-between items-center mb-6">
@@ -754,7 +756,7 @@
                 const title = newListTitleInput.value.trim();
                 if (!title) return;
                 const newListHTML = `
-                <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
+                <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2>
                         <div class="flex items-center gap-1">
@@ -854,7 +856,7 @@
                         let section = document.querySelector(`#main-grid section[data-list-type="${listData.type}"]`);
                         if (!section && listData.type !== 'book' && listData.type !== 'media') {
                             const newListHTML = `
-                            <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
+                            <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
                                 <div class="flex justify-between items-center mb-6">
                                     <h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2>
                                     <div class="flex items-center gap-1">
