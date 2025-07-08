@@ -215,8 +215,18 @@
 
 <body class="overflow-x-hidden">
     <div class="min-h-full">
+        <!-- Mobile Header -->
+        <header class="lg:hidden flex justify-between items-center p-4 border-b"
+            style="border-color: var(--border-color); background-color: var(--card-bg);">
+            <h2 id="mobile-feed-title" class="text-xl font-bold" style="color: var(--text-color);">RSS Reader</h2>
+            <button id="open-mobile-menu-btn" class="p-2 rounded-lg">
+                <i data-lucide="menu" class="h-6 w-6"></i>
+            </button>
+        </header>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-            <header class="mb-8 flex justify-between items-start relative">
+            <!-- Desktop Header -->
+            <header class="hidden lg:block mb-8">
                 <div>
                     <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">RSS Reader</h1>
                     <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
@@ -261,18 +271,19 @@
         </div>
     </div>
 
-    <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"></div>
-
-    <aside id="mobile-sidebar"
-        class="fixed top-0 right-0 h-full w-80 max-w-[85vw] transform translate-x-full lg:hidden p-4 z-40"
-        style="background-color: var(--card-bg);">
-    </aside>
-
-    <button id="fab-open-sidebar"
-        class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20"
-        style="background-color: var(--accent-color);">
-        <i data-lucide="menu" class="h-7 w-7"></i>
-    </button>
+    <!-- Full-Screen Overlay Navigation for Mobile -->
+    <div id="mobile-nav-overlay" class="fixed inset-0 z-50 flex-col items-center justify-center hidden"
+        style="background-color: rgba(0,0,0,0.7);">
+        <div id="mobile-nav-content" class="relative w-full max-w-md mx-auto p-6 rounded-lg shadow-2xl"
+            style="background-color: var(--card-bg);">
+            <button id="close-mobile-menu-btn" class="absolute top-4 right-4 p-2 rounded-full">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+            <div id="mobile-sidebar-content">
+                <!-- The sidebar content will be injected here by JS -->
+            </div>
+        </div>
+    </div>
 
     <div id="reader-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
@@ -444,9 +455,11 @@
 
             // Sidebar elements
             const desktopSidebarContent = document.getElementById('desktop-sidebar-content');
-            const mobileSidebar = document.getElementById('mobile-sidebar');
-            const fabOpenSidebar = document.getElementById('fab-open-sidebar');
-            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const mobileSidebarContent = document.getElementById('mobile-sidebar-content');
+            const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
+            const openMobileMenuBtn = document.getElementById('open-mobile-menu-btn');
+            const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
+            const mobileFeedTitle = document.getElementById('mobile-feed-title');
 
             // Reader Modal Elements
             const readerModal = document.getElementById('reader-modal');
@@ -541,13 +554,15 @@
             };
 
             // --- SIDEBAR LOGIC ---
-            const openMobileSidebar = () => {
-                sidebarBackdrop.classList.remove('hidden');
-                mobileSidebar.classList.remove('translate-x-full');
+            const openMobileMenu = () => {
+                mobileNavOverlay.classList.remove('hidden');
+                mobileNavOverlay.classList.add('flex');
+                document.body.style.overflow = 'hidden';
             };
-            const closeMobileSidebar = () => {
-                sidebarBackdrop.classList.add('hidden');
-                mobileSidebar.classList.add('translate-x-full');
+            const closeMobileMenu = () => {
+                mobileNavOverlay.classList.add('hidden');
+                mobileNavOverlay.classList.remove('flex');
+                document.body.style.overflow = '';
             };
             const setActiveSidebarItem = (url) => {
                 activeUrl = url;
@@ -630,7 +645,7 @@
                     </div>`;
 
                 desktopSidebarContent.innerHTML = sidebarHtml;
-                mobileSidebar.innerHTML = sidebarHtml;
+                mobileSidebarContent.innerHTML = sidebarHtml;
 
                 // Re-create icons after injecting HTML
                 lucide.createIcons({
@@ -638,7 +653,7 @@
                     attributes: { 'stroke-width': 2 }
                 });
                 lucide.createIcons({
-                    container: mobileSidebar,
+                    container: mobileSidebarContent,
                     attributes: { 'stroke-width': 2 }
                 });
 
@@ -650,21 +665,21 @@
             const addSidebarEventListeners = () => {
                 document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => {
                     loadAllFeeds();
-                    closeMobileSidebar();
+                    closeMobileMenu();
                 }));
                 document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => {
                     loadFavorites();
-                    closeMobileSidebar();
+                    closeMobileMenu();
                 }));
 
                 // Listeners for new import/export buttons in sidebar
                 document.querySelectorAll('#import-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
                     document.getElementById('import-modal').classList.remove('hidden');
-                    closeMobileSidebar();
+                    closeMobileMenu();
                 }));
                 document.querySelectorAll('#export-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
                     handleExportClick();
-                    closeMobileSidebar();
+                    closeMobileMenu();
                 }));
 
 
@@ -675,7 +690,7 @@
                         return;
                     }
                     loadFeed(item.dataset.url).catch(err => console.error(err));
-                    closeMobileSidebar();
+                    closeMobileMenu();
                 }));
                 // Dedicated listener for delete buttons
                 document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async (e) => {
@@ -804,6 +819,9 @@
                 wrapper.className = 'p-6 rounded-lg';
                 wrapper.style.backgroundColor = 'var(--card-bg)';
                 wrapper.style.border = '1px solid var(--border-color)';
+
+                if (mobileFeedTitle) mobileFeedTitle.textContent = title;
+
                 const titleWrapper = document.createElement('div');
                 titleWrapper.className = 'flex items-center justify-between gap-4 mb-4 pb-4 border-b';
                 titleWrapper.style.borderColor = 'var(--border-color)';
@@ -1149,6 +1167,7 @@
                 }
                 currentFilter = 'unread';
                 setActiveSidebarItem('all');
+                if (mobileFeedTitle) mobileFeedTitle.textContent = 'Alle Feeds';
                 showLoading();
                 currentArticles = await fetchAllArticles();
                 currentPage = 1; // Reset to first page
@@ -1160,6 +1179,7 @@
             const loadFavorites = async () => {
                 currentFilter = 'all'; // Favorites view shows all (read/unread) favorites
                 setActiveSidebarItem('favorites');
+                if (mobileFeedTitle) mobileFeedTitle.textContent = 'Favoriten';
                 showLoading();
                 // First, ensure favorites are clean
                 await cleanupOrphanedFavorites();
@@ -1299,8 +1319,13 @@
                 if (e.key === 'Enter') loadFeed(urlInput.value).catch(err => console.error(err));
             });
 
-            fabOpenSidebar.addEventListener('click', openMobileSidebar);
-            sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+            openMobileMenuBtn.addEventListener('click', openMobileMenu);
+            closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+            mobileNavOverlay.addEventListener('click', (event) => {
+                if (event.target === mobileNavOverlay) {
+                    closeMobileMenu();
+                }
+            });
 
             feedContainer.addEventListener('click', (e) => {
                 const favoriteBtn = e.target.closest('.favorite-btn');

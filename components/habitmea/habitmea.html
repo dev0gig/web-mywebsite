@@ -73,12 +73,14 @@
         .modal.flex { display: flex; }
 
         .calendar-day { transition: background-color 0.2s ease-in-out; }
+        .cursor-grabbing { cursor: grabbing; }
+        .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
     </style>
 </head>
-<body class="antialiased h-screen flex flex-col overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col">
 
     <!-- Main Container - Removed container and mx-auto for full width -->
-    <div class="px-4 sm:px-6 lg:px-8 flex flex-col flex-grow min-h-0">
+    <div class="px-4 sm:px-6 lg:px-8 flex flex-col flex-grow">
 
         <!-- Header Section -->
         <header class="text-center pt-8 pb-4 flex-shrink-0">
@@ -88,47 +90,65 @@
 
         <!-- Action Buttons Section -->
         <div class="text-center pb-6 flex-shrink-0 flex flex-wrap justify-center gap-4">
-            <button id="export-btn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons mr-2">file_download</i>
-                Exportieren
+            <button id="export-btn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+                <i class="material-icons sm:mr-2">file_download</i>
+                <span class="hidden sm:inline">Exportieren</span>
             </button>
-            <button id="import-btn" class="bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons mr-2">file_upload</i>
-                Importieren
+            <button id="import-btn" class="bg-violet-600 hover:bg-violet-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+                <i class="material-icons sm:mr-2">file_upload</i>
+                <span class="hidden sm:inline">Importieren</span>
             </button>
-            <button id="open-add-list-modal-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons mr-2">playlist_add</i>
-                Eigene Liste hinzufügen
+            <button id="open-add-list-modal-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+                <i class="material-icons sm:mr-2">playlist_add</i>
+                <span class="hidden sm:inline">Eigene Liste hinzufügen</span>
             </button>
-            <button id="delete-all-data-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons mr-2">delete_sweep</i>
-                Alle Daten löschen
+            <button id="delete-all-data-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+                <i class="material-icons sm:mr-2">delete_sweep</i>
+                <span class="hidden sm:inline">Alle Daten löschen</span>
             </button>
             <input type="file" id="import-file-input" class="hidden" accept=".json">
         </div>
 
         <!-- Horizontally Scrolling Content -->
-        <main id="main-grid" class="flex-grow flex overflow-x-auto space-x-8 pb-4 min-h-0">
+        <main id="main-grid" class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto">
 
             <!-- Section 1: Habit Tracker with Calendar -->
-            <section id="habits" class="w-[800px] flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="habit">
+            <!-- Section 1: Habit Tracker with Calendar - Responsive Update -->
+            <section id="habits" class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="habit">
                 <div class="flex items-center mb-4"><i class="material-icons text-3xl text-emerald-500 mr-4" style="color: var(--text-color-light);">task_alt</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">Tägliche Gewohnheiten</h2></div>
                 
-                <div class="flex flex-grow gap-6 min-h-0">
-                    <div class="w-3/5 flex flex-col"><div class="flex items-center justify-between mb-4"><button id="prev-month-btn" class="p-2 rounded-full hover:bg-slate-200" style="background-color: var(--item-bg-hover);"><i class="material-icons">chevron_left</i></button><h3 id="month-year-header" class="text-lg font-semibold" style="color: var(--header-color);"></h3><button id="next-month-btn" class="p-2 rounded-full" style="background-color: var(--item-bg-hover);"><i class="material-icons">chevron_right</i></button></div><div class="grid grid-cols-7 gap-1 text-center text-xs font-medium mb-2" style="color: var(--text-color-light);"><div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div></div><div id="calendar-grid" class="grid grid-cols-7 gap-1"></div></div>
-                    <div class="w-2/5 border-l pl-6 flex flex-col" style="border-color: var(--card-border-color);"><h3 class="text-lg font-semibold mb-3 flex-shrink-0" style="color: var(--header-color);">Heutige Gewohnheiten</h3><div id="todays-habits-list" class="space-y-3 flex-grow overflow-y-auto pr-2"></div></div>
+                <div class="flex flex-col md:flex-row flex-grow gap-6 min-h-0">
+                    <!-- Calendar Part -->
+                    <div class="w-full md:w-3/5 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prev-month-btn" class="p-2 rounded-full" style="background-color: var(--item-bg-hover);"><i class="material-icons">chevron_left</i></button>
+                            <h3 id="month-year-header" class="text-lg font-semibold" style="color: var(--header-color);"></h3>
+                            <button id="next-month-btn" class="p-2 rounded-full" style="background-color: var(--item-bg-hover);"><i class="material-icons">chevron_right</i></button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium mb-2" style="color: var(--text-color-light);">
+                            <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+                            <!-- Calendar days will be injected here -->
+                        </div>
+                    </div>
+                    <!-- Today's Habits Part -->
+                    <div class="w-full md:w-2/5 border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-6 flex flex-col" style="border-color: var(--card-border-color);">
+                        <h3 class="text-lg font-semibold mb-3 flex-shrink-0" style="color: var(--header-color);">Heutige Gewohnheiten</h3>
+                        <div id="todays-habits-list" class="space-y-3 flex-grow overflow-y-auto pr-2"></div>
+                    </div>
                 </div>
                 <button id="open-manage-habits-modal-btn" class="mt-6 w-full flex-shrink-0 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">settings</i>Gewohnheiten verwalten</button>
             </section>
 
             <!-- Other sections -->
-            <section id="books" class="w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="book">
+            <section id="books" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="book">
                 <div class="flex items-center mb-6"><i class="material-icons text-3xl text-sky-500 mr-4" style="color: var(--text-color-light);">menu_book</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">Meine Bücher</h2></div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
                 <button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neues Buch</button>
             </section>
-            <section id="media" class="w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="media">
+            <section id="media" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="media">
                 <div class="flex items-center mb-6"><i class="material-icons text-3xl text-rose-500 mr-4" style="color: var(--text-color-light);">theaters</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">Filme & Serien</h2></div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
@@ -243,10 +263,15 @@
                 const progress = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
                 const isToday = new Date().toDateString() === date.toDateString();
                 const todayStyle = isToday ? `background-color: var(--today-bg);` : `background-color: var(--item-bg);`;
-                const radius = 18;
-                const circumference = 2 * Math.PI * radius;
-                const offsetProgress = circumference - (progress / 100) * circumference;
-                const dayCellHTML = `<div class="calendar-day rounded-lg flex items-center justify-center aspect-square cursor-pointer" style="${todayStyle}" data-date="${dateStr}"><div class="relative w-12 h-12 flex items-center justify-center"><svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 44 44"><circle style="color: var(--progress-bg);" stroke-width="4" stroke="currentColor" fill="transparent" r="${radius}" cx="22" cy="22" /><circle class="text-emerald-500 transition-all duration-300" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="22" cy="22" stroke-dasharray="${circumference}" stroke-dashoffset="${offsetProgress}" transform="rotate(-90 22 22)" /></svg><span class="relative font-semibold" style="color: var(--header-color);">${day}</span></div></div>`;
+                const progressColor = progress > 0 ? 'bg-emerald-500' : 'bg-transparent';
+                const dayCellHTML = `
+                    <div class="calendar-day rounded-lg flex flex-col justify-start p-1 aspect-square cursor-pointer" style="${todayStyle}" data-date="${dateStr}">
+                        <span class="font-semibold text-sm" style="color: var(--header-color);">${day}</span>
+                        <div class="flex-grow"></div>
+                        <div class="w-full h-1.5 rounded-full" style="background-color: var(--progress-bg);">
+                            <div class="h-1.5 rounded-full ${progressColor}" style="width: ${progress}%;"></div>
+                        </div>
+                    </div>`;
                 calendarGrid.insertAdjacentHTML('beforeend', dayCellHTML);
             }
         };
@@ -342,11 +367,16 @@
             const listItem = e.target.closest('.list-item');
             const addItemBtn = e.target.closest('.add-item-btn');
             const deleteListBtn = e.target.closest('.delete-list-btn');
-            if (listItem) { handleOpenDetailsModal(listItem); } 
+            const editListBtn = e.target.closest('.edit-list-btn');
+
+            if (listItem) { handleOpenDetailsModal(listItem); }
             else if (addItemBtn) { handleOpenAddItemModal(addItemBtn); }
             else if (deleteListBtn) {
                 const listSection = deleteListBtn.closest('section');
                 openConfirmModal(`Soll die Liste "${listSection.querySelector('h2').textContent}" wirklich gelöscht werden?`, () => listSection.remove());
+            }
+            else if (editListBtn) {
+                handleEditListTitle(editListBtn);
             }
         });
 
@@ -360,6 +390,45 @@
             Object.keys(availableStatuses).forEach(status => detailsModalStatusOptions.insertAdjacentHTML('beforeend', `<div><input type="radio" id="status-${status.replace(/\s/g, '-')}" name="status" value="${status}" class="hidden peer" ${data.status === status ? 'checked' : ''}><label for="status-${status.replace(/\s/g, '-')}" class="inline-flex items-center justify-center w-full px-3 py-1 rounded-full cursor-pointer peer-checked:border-indigo-500 peer-checked:text-indigo-400" style="color: var(--text-color-light); background-color: var(--item-bg-hover); border: 2px solid transparent;"><div class="w-full text-sm font-semibold text-center">${status}</div></label></div>`));
             detailsModalNotes.value = data.note || '';
             openModal(detailsModal);
+        };
+
+        const handleEditListTitle = (editBtn) => {
+            const headerDiv = editBtn.closest('.flex.justify-between');
+            const h2 = headerDiv.querySelector('h2');
+            if (!h2) return;
+
+            const currentTitle = h2.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentTitle;
+            input.className = 'text-2xl font-bold w-full bg-transparent focus:outline-none border-b-2';
+            input.style.borderColor = 'var(--input-border-color)';
+            input.style.color = 'var(--header-color)';
+
+            h2.replaceWith(input);
+            input.focus();
+            input.select();
+
+            const finishEditing = (save) => {
+                const newTitle = input.value.trim();
+                if (save && newTitle) {
+                    h2.textContent = newTitle;
+                } else {
+                    h2.textContent = currentTitle;
+                }
+                if (document.body.contains(input)) {
+                    input.replaceWith(h2);
+                }
+            };
+
+            input.addEventListener('blur', () => finishEditing(true), { once: true });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    finishEditing(true);
+                } else if (e.key === 'Escape') {
+                    finishEditing(false);
+                }
+            });
         };
 
         detailsModalSaveBtn.addEventListener('click', () => {
@@ -391,7 +460,7 @@
             const title = newListTitleInput.value.trim();
             const icon = newListIconInput.value.trim() || 'list';
             if (!title) return;
-            mainGrid.insertAdjacentHTML('beforeend', `<section class="w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default"><div class="flex justify-between items-center mb-6"> <div class="flex items-center"><i class="material-icons text-3xl text-cyan-500 mr-4" style="color: var(--text-color-light);">${icon}</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2></div> <button class="delete-list-btn" style="color: var(--text-color-light);"><i class="material-icons">delete</i></button> </div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
+            mainGrid.insertAdjacentHTML('beforeend', `<section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default"><div class="flex justify-between items-center mb-6"><div class="flex items-center mr-2"><i class="material-icons text-3xl text-cyan-500 mr-4" style="color: var(--text-color-light);">${icon}</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2></div><div class="flex items-center gap-1"><button class="edit-list-btn p-2 rounded-full" style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i class="material-icons text-base">edit</i></button><button class="delete-list-btn p-2 rounded-full" style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i class="material-icons text-base">delete</i></button></div></div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
             newListTitleInput.value = ''; newListIconInput.value = '';
             closeModal(addListModal);
         });
@@ -466,7 +535,7 @@
             (data.lists || []).forEach(listData => {
                 let section = document.querySelector(`#main-grid section[data-list-type="${listData.type}"]`);
                 if (!section) {
-                    mainGrid.insertAdjacentHTML('beforeend', `<section class="w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}"><div class="flex justify-between items-center mb-6"> <div class="flex items-center"><i class="material-icons text-3xl text-cyan-500 mr-4" style="color: var(--text-color-light);">${listData.icon}</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2></div> <button class="delete-list-btn" style="color: var(--text-color-light);"><i class="material-icons">delete</i></button> </div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
+                    mainGrid.insertAdjacentHTML('beforeend', `<section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}"><div class="flex justify-between items-center mb-6"><div class="flex items-center mr-2"><i class="material-icons text-3xl text-cyan-500 mr-4" style="color: var(--text-color-light);">${listData.icon}</i><h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2></div><div class="flex items-center gap-1"><button class="edit-list-btn p-2 rounded-full" style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i class="material-icons text-base">edit</i></button><button class="delete-list-btn p-2 rounded-full" style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i class="material-icons text-base">delete</i></button></div></div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
                     section = mainGrid.lastElementChild;
                 }
                 const container = section.querySelector('.item-container');
@@ -516,6 +585,38 @@
 
         // --- INITIALIZE ---
         renderAllHabits();
+
+        // --- DRAG TO SCROLL FOR MAIN GRID ---
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        mainGrid.addEventListener('mousedown', (e) => {
+            // Prevent drag on inputs, buttons, or scrollbars
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.offsetX > mainGrid.clientWidth) return;
+            isDown = true;
+            mainGrid.classList.add('cursor-grabbing');
+            document.body.classList.add('noselect');
+            startX = e.pageX - mainGrid.offsetLeft;
+            scrollLeft = mainGrid.scrollLeft;
+        });
+        mainGrid.addEventListener('mouseleave', () => {
+            isDown = false;
+            mainGrid.classList.remove('cursor-grabbing');
+            document.body.classList.remove('noselect');
+        });
+        mainGrid.addEventListener('mouseup', () => {
+            isDown = false;
+            mainGrid.classList.remove('cursor-grabbing');
+            document.body.classList.remove('noselect');
+        });
+        mainGrid.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - mainGrid.offsetLeft;
+            const walk = (x - startX) * 2; //scroll-fast
+            mainGrid.scrollLeft = scrollLeft - walk;
+        });
 
         // --- GLOBAL BACKUP/RESTORE INTEGRATION ---
         window.addEventListener('message', (event) => {
