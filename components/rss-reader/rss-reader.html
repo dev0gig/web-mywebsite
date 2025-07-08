@@ -5,14 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSS Reader</title>
-    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Add a serif font for reader mode -->
     <link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     <style>
         /* Color variables for theme consistency */
@@ -218,35 +215,20 @@
 
 <body class="overflow-x-hidden">
     <div class="min-h-full">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
             <header class="mb-8 flex justify-between items-start relative">
                 <div>
                     <h1 class="text-4xl font-bold tracking-tight" style="color: var(--text-color);">RSS Reader</h1>
                     <p class="mt-2 text-lg" style="color: var(--text-color-light);">Füge eine RSS-Feed-URL hinzu, um die
                         neuesten Beiträge anzuzeigen.</p>
                 </div>
-                <!-- Adjusted button container for responsive two-row layout -->
-                <div class="flex flex-wrap gap-2 md:flex-nowrap md:space-x-2">
-                    <button id="export-btn-top"
-                        class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors"
-                        style="background-color: #3b82f6;" title="Feeds exportieren">
-                        <i data-lucide="upload" class="h-5 w-5 mr-1 inline-block align-text-bottom"></i>Export
-                    </button>
-                    <button id="import-btn-top"
-                        class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors"
-                        style="background-color: #10b981;" title="Feeds importieren">
-                        <i data-lucide="download" class="h-5 w-5 mr-1 inline-block align-text-bottom"></i>Import
-                    </button>
-                </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Main Content Area -->
                 <div class="lg:col-span-2">
-                    <!-- Input Section -->
                     <div class="mb-8 p-4 rounded-lg"
                         style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                        <div class="flex gap-2">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <input type="url" id="rss-url-input"
                                 class="flex-grow block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
                                 style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
@@ -261,7 +243,6 @@
                         </div>
                     </div>
 
-                    <!-- Feed Content Section -->
                     <main id="feed-container">
                         <div class="text-center p-6 rounded-lg"
                             style="color: var(--text-color-light); background-color: var(--card-bg); border: 1px solid var(--border-color);">
@@ -271,41 +252,33 @@
                     </main>
                 </div>
 
-                <!-- Sidebar (Desktop) -->
                 <aside class="hidden lg:block lg:col-span-1">
                     <div id="desktop-sidebar-content" class="p-4 rounded-lg sticky top-8"
                         style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                        <!-- Sidebar content gets injected here -->
                     </div>
                 </aside>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Sidebar Backdrop -->
     <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"></div>
 
-    <!-- Mobile Sidebar Panel -->
     <aside id="mobile-sidebar"
         class="fixed top-0 right-0 h-full w-80 max-w-[85vw] transform translate-x-full lg:hidden p-4 z-40"
         style="background-color: var(--card-bg);">
-        <!-- Mobile sidebar content gets injected here -->
     </aside>
 
-    <!-- Floating Action Button (FAB) for Mobile -->
     <button id="fab-open-sidebar"
         class="lg:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center z-20"
         style="background-color: var(--accent-color);">
         <i data-lucide="menu" class="h-7 w-7"></i>
     </button>
 
-    <!-- Reader Mode Modal -->
     <div id="reader-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
         <div id="reader-modal-content"
             class="relative flex flex-col h-full w-full sm:max-h-[95vh] sm:w-full sm:max-w-3xl sm:rounded-lg shadow-xl"
             style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-            <!-- Previous Article Button -->
             <button id="reader-prev-btn"
                 class="absolute left-0 sm:-left-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -313,7 +286,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
-            <!-- Next Article Button -->
             <button id="reader-next-btn"
                 class="absolute right-0 sm:-right-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -322,10 +294,18 @@
                 </svg>
             </button>
 
-            <header class="flex-shrink-0 p-4 border-b" style="border-color: var(--border-color);">
+            <header class="relative flex-shrink-0 p-4 border-b" style="border-color: var(--border-color);">
+                <button id="reader-close-btn" title="Schließen"
+                    class="absolute top-2 right-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    style="color: var(--text-color-light);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
                 <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center gap-2 max-w-[calc(100%-180px)]">
-                        <img id="reader-favicon" src="" alt="Favicon" class="w-6 h-6 rounded hidden flex-shrink-0"
+                    <div class="flex items-center gap-2 max-w-[calc(100%-80px)]"> <img id="reader-favicon" src=""
+                            alt="Favicon" class="w-6 h-6 rounded hidden flex-shrink-0"
                             onerror="this.classList.add('hidden')">
                         <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate"
                             style="color: var(--text-color);"></h3>
@@ -333,18 +313,14 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
-                    <!-- Article counter display -->
                     <p id="article-counter" class="text-sm" style="color: var(--text-color-light);"></p>
                 </div>
             </header>
             <div id="reader-body" class="p-6 overflow-y-auto flex-grow" style="color: var(--text-color);">
-                <!-- Article content and image go here -->
             </div>
-            <!-- New fixed-position container for reader mode buttons at the bottom -->
             <div id="reader-controls-bottom"
                 class="flex flex-wrap justify-center gap-2 p-4 border-t sticky bottom-0 left-0 right-0 z-10"
                 style="border-color: var(--border-color); background-color: var(--card-bg);">
-                <!-- Font Size Controls -->
                 <div class="flex items-center space-x-1">
                     <button id="font-size-decrease" title="Schriftgröße verkleinern"
                         class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
@@ -357,7 +333,6 @@
                         <i data-lucide="plus" class="h-5 w-5"></i>
                     </button>
                 </div>
-                <!-- Favorite Button in Reader Mode -->
                 <button id="reader-favorite-btn"
                     class="favorite-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
                     title="Als Favorit markieren/entfernen">
@@ -372,19 +347,10 @@
                             d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                 </a>
-                <button id="reader-close-btn" title="Schließen"
-                    class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                    style="color: var(--text-color-light);">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- Import Confirmation Modal -->
     <div id="import-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
         aria-hidden="true">
@@ -418,7 +384,6 @@
         </div>
     </div>
 
-    <!-- Rename Export Modal -->
     <div id="rename-export-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
         aria-hidden="true">
@@ -504,7 +469,7 @@
             // Export/Rename Modal Elements
             const renameExportModal = document.getElementById('rename-export-modal');
             const exportFilenameInput = document.getElementById('export-filename-input');
-            const confirmExportNameBtn = document = document.getElementById('confirm-export-name-btn');
+            const confirmExportNameBtn = document.getElementById('confirm-export-name-btn');
             const cancelExportNameBtn = document.getElementById('cancel-export-name-btn');
 
 
@@ -641,6 +606,16 @@
                         <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="book-open" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
                         <button class="show-favorites-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="star" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span id="favorites-count">0</span>)</span></button>
                     </div>
+                     <div class="border-b my-2 py-2" style="border-color: var(--border-color);">
+                        <button id="import-btn-sidebar" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
+                            <i data-lucide="download" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i>
+                            <span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds importieren</span>
+                        </button>
+                        <button id="export-btn-sidebar" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
+                            <i data-lucide="upload" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i>
+                            <span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds exportieren</span>
+                        </button>
+                    </div>
                     <div class="max-h-[50vh] overflow-y-auto pr-2">
                         ${savedFeeds.length === 0 ? `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>` :
                         savedFeeds.map((feed, index) => {
@@ -681,6 +656,17 @@
                     loadFavorites();
                     closeMobileSidebar();
                 }));
+
+                // Listeners for new import/export buttons in sidebar
+                document.querySelectorAll('#import-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
+                    document.getElementById('import-modal').classList.remove('hidden');
+                    closeMobileSidebar();
+                }));
+                document.querySelectorAll('#export-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
+                    handleExportClick();
+                    closeMobileSidebar();
+                }));
+
 
                 document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', (e) => {
                     // Check if the click was on the delete button itself
@@ -1408,12 +1394,6 @@
                 document.getElementById('import-modal').classList.add('hidden');
             });
 
-            // Event listeners for the new top-right import/export buttons
-            document.getElementById('import-btn-top').addEventListener('click', () => {
-                document.getElementById('import-modal').classList.remove('hidden');
-            });
-            document.getElementById('export-btn-top').addEventListener('click', handleExportClick); // Now calls the new handler
-
             // Event listeners for the Rename Export Modal
             confirmExportNameBtn.addEventListener('click', () => {
                 const filename = exportFilenameInput.value;
@@ -1434,7 +1414,6 @@
     </script>
 </body>
 
-<!-- Add this at the end of the <body> tag in rss-reader.html -->
 <script>
     window.addEventListener('message', (event) => {
         // Security check: only respond to messages from the parent window
@@ -1444,7 +1423,7 @@
 
         const message = event.data;
 
-        if (message && message.type === 'getBackupData') {
+        if (message && message.type === 'backupDataRequest') {
             // Collect all relevant data for the RSS reader.
             const feedsData = localStorage.getItem('savedRssFeeds');
             const visitedData = localStorage.getItem('rssVisitedLinks');

@@ -1804,7 +1804,7 @@
             return;
         }
         const message = event.data;
-        if (message && message.type === 'getBackupData') {
+        if (message && message.type === 'backupDataRequest') {
             const transactionsData = localStorage.getItem('aurimea-transactions');
             window.parent.postMessage({
                 type: 'backupDataResponse',

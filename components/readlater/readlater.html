@@ -972,7 +972,7 @@
 
         const message = event.data;
 
-        if (message && message.type === 'getBackupData') {
+        if (message && message.type === 'backupDataRequest') {
             // Collect "read later" links from localStorage.
             const linksData = localStorage.getItem('readLaterLinks');
 

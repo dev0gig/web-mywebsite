@@ -195,18 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let backupData = {};
         const failedApps = [];
 
-        // This is a global listener that accumulates data.
-        const messageListener = (event) => {
-            const { type, key, data } = event.data;
-            if (type === 'backupDataResponse') {
-                if (key && data) {
-                    backupData[key] = data;
-                    console.log(`Backup data received for: ${key}`);
-                }
-            }
-        };
-        window.addEventListener('message', messageListener);
-
         for (const frame of framesToBackup) {
             const key = frame.dataset.key;
             showToast(`Sichere ${key}...`, 'info', 0);
@@ -225,14 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2. Request backup data and wait for its specific response
                 await new Promise((resolve, reject) => {
                     const timeoutId = setTimeout(() => {
-                        // Cleanup the specific listener on timeout
                         window.removeEventListener('message', specificMessageListener);
                         reject(new Error(`Timeout waiting for backup response from ${key}`));
                     }, 5000); // 5-second timeout for response
 
                     const specificMessageListener = (event) => {
-                        const { type, key: responseKey } = event.data;
+                        const { type, key: responseKey, data } = event.data;
                         if (type === 'backupDataResponse' && responseKey === key) {
+                            if (data) {
+                                backupData[key] = data;
+                                console.log(`Backup data received for: ${key}`);
+                            }
                             clearTimeout(timeoutId);
                             window.removeEventListener('message', specificMessageListener);
                             resolve();
@@ -248,9 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 failedApps.push(key);
             }
         }
-
-        // Cleanup global listener
-        window.removeEventListener('message', messageListener);
 
         // 3. Create ZIP file
         if (Object.keys(backupData).length > 0) {

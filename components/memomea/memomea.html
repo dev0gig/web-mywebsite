@@ -1363,7 +1363,7 @@
 
         const message = event.data;
 
-        if (message && message.type === 'getBackupData') {
+        if (message && message.type === 'backupDataRequest') {
             const journalData = localStorage.getItem('markdownJournalEntries');
             window.parent.postMessage({
                 type: 'backupDataResponse',
