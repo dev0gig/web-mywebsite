@@ -10,9 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
     <style>
-        /* Color variables for theme consistency */
         :root {
             --bg-color: #f9fafb;
             --text-color: #111827;
@@ -22,9 +22,7 @@
             --accent-color: #7c3aed;
             --accent-color-hover: #8b5cf6;
             --favorite-color: #facc15;
-            /* yellow-400 */
             --reader-font-size: 20px;
-            /* Default font size for reader mode, now 20px */
         }
 
         html[data-theme='dark'] {
@@ -35,7 +33,6 @@
             --border-color: #404040;
         }
 
-        /* Base styles */
         body {
             font-family: 'Ubuntu', sans-serif;
             background-color: var(--bg-color);
@@ -43,7 +40,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Simple animation for loading spinner */
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -59,7 +55,6 @@
             animation: spin 1s linear infinite;
         }
 
-        /* --- Benutzerdefinierte Scrollbar-Stile (von AuriMea/MemoMea übernommen) --- */
         ::-webkit-scrollbar {
             width: 12px;
         }
@@ -78,7 +73,6 @@
             background-color: var(--text-color-light);
         }
 
-        /* Style for visited links */
         .visited-title {
             color: var(--text-color-light);
             opacity: 0.7;
@@ -89,23 +83,19 @@
             opacity: 1;
         }
 
-        /* Style for active sidebar item */
         .sidebar-item-active {
             background-color: var(--accent-color);
         }
 
         .sidebar-item-active span,
-        .sidebar-item-active i[data-lucide] {
+        .sidebar-item-active .material-icons {
             color: white !important;
             font-weight: 600;
         }
 
-        /* Reader mode content styling */
         #reader-body {
             font-size: var(--reader-font-size);
-            /* Apply custom font size */
             font-family: 'Georgia', serif;
-            /* Apply serif font for readability */
         }
 
         #reader-body p {
@@ -118,7 +108,6 @@
             text-decoration: underline;
         }
 
-        /* Ensure images inside reader-body are responsive and styled */
         #reader-body img {
             max-width: 100%;
             height: auto;
@@ -126,16 +115,11 @@
             margin: 1rem 0;
         }
 
-        /* Specific style for the single image shown below the text */
         #reader-body-image {
             display: block;
-            /* Ensure it takes its own line */
             margin-top: 1.5rem;
-            /* More space above the image */
             margin-bottom: 1.5rem;
-            /* More space below the image */
         }
-
 
         #reader-body h1,
         #reader-body h2,
@@ -168,7 +152,6 @@
             font-style: italic;
         }
 
-        /* Filter button styling */
         .filter-btn {
             background-color: transparent;
             color: var(--text-color-light);
@@ -181,46 +164,49 @@
             border-color: var(--accent-color);
         }
 
-        /* Favorite button styling */
-        .favorite-btn i[data-lucide] {
+        .favorite-btn .material-icons {
             color: var(--favorite-color);
-            /* Star icon is always yellow (outline by default) */
             transition: color 0.2s, transform 0.2s;
         }
 
-        .favorite-btn:hover i[data-lucide] {
+        .favorite-btn:hover .material-icons {
             transform: scale(1.1);
         }
 
-        /* When the button is a favorite, target the SVG and its path to modify stroke and fill */
         .favorite-btn.is-favorite svg {
             fill: var(--favorite-color);
             color: var(--favorite-color);
-            /* Fallback/consistency for currentColor */
         }
 
         .favorite-btn.is-favorite svg path {
             fill: var(--favorite-color);
-            /* Explicitly fill the path */
             stroke: none;
-            /* Remove the stroke/outline */
         }
 
-        /* Mobile Sidebar Transition */
-        #mobile-sidebar {
-            transition: transform 0.3s ease-in-out;
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        .favorite-btn.is-favorite .material-icons {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        [x-cloak] {
+            display: none !important;
         }
     </style>
 </head>
 
-<body class="overflow-x-hidden">
+<body class="overflow-x-hidden" x-data="rssReader" x-init="init()" x-cloak @keydown.escape.window="isReaderOpen = false"
+    @keydown.arrow-left.window="if(isReaderOpen) showPreviousArticle()"
+    @keydown.arrow-right.window="if(isReaderOpen) showNextArticle()">
     <div class="min-h-full">
         <!-- Mobile Header -->
         <header class="lg:hidden flex justify-between items-center p-4 border-b"
             style="border-color: var(--border-color); background-color: var(--card-bg);">
-            <h2 id="mobile-feed-title" class="text-xl font-bold" style="color: var(--text-color);">RSS Reader</h2>
-            <button id="open-mobile-menu-btn" class="p-2 rounded-lg">
-                <i data-lucide="menu" class="h-6 w-6"></i>
+            <h2 x-text="mobileFeedTitle" class="text-xl font-bold" style="color: var(--text-color);">RSS Reader</h2>
+            <button @click="isMobileMenuOpen = true" class="p-2 rounded-lg">
+                <span class="material-icons">menu</span>
             </button>
         </header>
 
@@ -239,11 +225,11 @@
                     <div class="mb-8 p-4 rounded-lg"
                         style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
                         <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="url" id="rss-url-input"
+                            <input type="url" x-model="urlInput" @keypress.enter="addFeed"
                                 class="flex-grow block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
                                 style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
                                 placeholder="https://example.com/feed.xml">
-                            <button id="load-feed-btn"
+                            <button @click="addFeed"
                                 class="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-white rounded-md shadow-sm transition-colors whitespace-nowrap"
                                 style="background-color: var(--accent-color); border-color: transparent;"
                                 onmouseover="this.style.backgroundColor='var(--accent-color-hover)'"
@@ -253,1239 +239,704 @@
                         </div>
                     </div>
 
-                    <main id="feed-container">
-                        <div class="text-center p-6 rounded-lg"
-                            style="color: var(--text-color-light); background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                            <p>Bitte gib oben eine RSS-Feed-URL ein oder wähle einen gespeicherten Feed aus der Liste.
-                            </p>
+                    <main>
+                        <div x-show="isLoading" class="flex justify-center items-center py-10 rounded-lg"
+                            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                            <div class="loader"></div>
+                        </div>
+                        <div x-show="message.text" x-text="message.text" class="text-center p-6 rounded-md"
+                            :style="message.isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);'"
+                            style="border: 1px solid var(--border-color);"></div>
+
+                        <div x-show="!isLoading && !message.text" class="p-6 rounded-lg"
+                            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                            <!-- Feed Header -->
+                            <div class="flex items-center justify-between gap-4 mb-4 pb-4 border-b"
+                                style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div x-html="currentFeedIcon"></div>
+                                    <h2 x-text="currentFeedTitle" class="text-2xl font-bold truncate"
+                                        style="color: var(--text-color);"></h2>
+                                </div>
+                                <button @click="handleRefresh"
+                                    class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700 flex-shrink-0"
+                                    title="Neu laden">
+                                    <span class="material-icons h-6 w-6"
+                                        :class="{ 'animate-spin': isRefreshing }">refresh</span>
+                                </button>
+                            </div>
+
+                            <!-- Filters -->
+                            <div x-show="activeView !== 'favorites'" class="flex items-center gap-2 py-4">
+                                <button @click="setFilter('unread')"
+                                    class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors"
+                                    :class="{'filter-btn-active': currentFilter === 'unread'}">
+                                    Ungelesen (<span x-text="unreadCount"></span>)
+                                </button>
+                                <button @click="setFilter('read')"
+                                    class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors"
+                                    :class="{'filter-btn-active': currentFilter === 'read'}">
+                                    Gelesen (<span x-text="readCount"></span>)
+                                </button>
+                            </div>
+
+                            <!-- Articles -->
+                            <div id="articles-wrapper">
+                                <template x-for="(item, index) in paginatedArticles" :key="item.link">
+                                    <article class="border-b py-6 last:border-b-0 group"
+                                        style="border-color: var(--border-color);">
+                                        <div class="flex flex-col sm:flex-row gap-5 relative group/item">
+                                            <button @click.stop="toggleFavorite(item.link)"
+                                                class="favorite-btn p-2 rounded-full absolute top-3 right-2 z-10"
+                                                :class="{'is-favorite': isFavorite(item.link)}"
+                                                title="Als Favorit markieren">
+                                                <span class="material-icons w-6 h-6">star</span>
+                                            </button>
+                                            <div x-show="item.imageUrl"
+                                                class="sm:w-1/3 flex-shrink-0 cursor-pointer"
+                                                @click="openReaderMode(getGlobalIndex(item))">
+                                                <img :src="item.imageUrl"
+                                                    class="w-full h-32 object-cover rounded-lg bg-neutral-200 dark:bg-neutral-700"
+                                                    alt="Artikelbild" onerror="this.parentElement.style.display='none'">
+                                            </div>
+                                            <div class="sm:w-2/3 flex flex-col">
+                                                <div class="flex-1 cursor-pointer"
+                                                    @click="openReaderMode(getGlobalIndex(item))">
+                                                    <h3 class="text-xl font-semibold transition-colors"
+                                                        :class="isVisited(item.link) ? 'visited-title' : 'group-hover/item:text-violet-600'"
+                                                        style="color: var(--text-color);" x-text="item.title"></h3>
+                                                    <p class="text-sm mt-1 mb-3" style="color: var(--text-color-light);"
+                                                        x-text="new Date(item.pubDate).toLocaleString('de-DE')"></p>
+                                                    <p class="line-clamp-2" style="color: var(--text-color);"
+                                                        x-text="item.description.substring(0, 150)"></p>
+                                                    <div x-show="item.sourceTitle"
+                                                        class="flex items-center gap-2 mt-3 text-xs"
+                                                        style="color: var(--text-color-light);">
+                                                        <img :src="item.sourceFavicon" class="w-4 h-4 rounded"
+                                                            :onerror="`this.src='${placeholderFavicon}'`" />
+                                                        <span x-text="item.sourceTitle"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </template>
+                                <p x-show="paginatedArticles.length === 0" class="text-center py-4"
+                                    style="color: var(--text-color-light);" x-text="emptyStateMessage"></p>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div x-show="totalPages > 1"
+                                class="flex justify-center items-center gap-4 mt-6 pt-4 border-t"
+                                style="border-color: var(--border-color);">
+                                <button @click="prevPage" :disabled="currentPage === 1"
+                                    class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style="background-color: var(--accent-color);">Zurück</button>
+                                <span class="text-sm" style="color: var(--text-color-light);"
+                                    x-text="`Seite ${currentPage} / ${totalPages}`"></span>
+                                <button @click="nextPage" :disabled="currentPage === totalPages"
+                                    class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style="background-color: var(--accent-color);">Weiter</button>
+                            </div>
                         </div>
                     </main>
                 </div>
 
+                <!-- Desktop Sidebar -->
                 <aside class="hidden lg:block lg:col-span-1">
-                    <div id="desktop-sidebar-content" class="p-4 rounded-lg sticky top-8"
+                    <div class="p-4 rounded-lg sticky top-8"
                         style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div x-html="sidebarHtml" @click.outside="null"></div>
                     </div>
                 </aside>
             </div>
         </div>
     </div>
 
-    <!-- Full-Screen Overlay Navigation for Mobile -->
-    <div id="mobile-nav-overlay" class="fixed inset-0 z-50 flex-col items-center justify-center hidden"
-        style="background-color: rgba(0,0,0,0.7);">
-        <div id="mobile-nav-content" class="relative w-full max-w-md mx-auto p-6 rounded-lg shadow-2xl"
-            style="background-color: var(--card-bg);">
-            <button id="close-mobile-menu-btn" class="absolute top-4 right-4 p-2 rounded-full">
-                <i data-lucide="x" class="h-6 w-6"></i>
+    <!-- Mobile Sidebar -->
+    <div x-show="isMobileMenuOpen" @click.away="isMobileMenuOpen = false"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70" x-cloak>
+        <div x-transition:enter="transition-all ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition-all ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="relative w-full max-w-md mx-auto p-6 rounded-lg shadow-2xl" style="background-color: var(--card-bg);">
+            <button @click="isMobileMenuOpen = false" class="absolute top-4 right-4 p-2 rounded-full">
+                <span class="material-icons">close</span>
             </button>
-            <div id="mobile-sidebar-content">
-                <!-- The sidebar content will be injected here by JS -->
-            </div>
+            <div x-html="sidebarHtml"></div>
         </div>
     </div>
 
-    <div id="reader-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity75 transition-opacity z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
-        <div id="reader-modal-content"
+    <!-- Reader Modal -->
+    <div x-show="isReaderOpen"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
+        <div @click.away="isReaderOpen = false"
+            x-transition:enter="transition-all ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition-all ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
             class="relative flex flex-col h-full w-full sm:max-h-[95vh] sm:w-full sm:max-w-3xl sm:rounded-lg shadow-xl"
             style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-            <button id="reader-prev-btn"
+            <button @click="showPreviousArticle" x-show="currentReaderGlobalIndex > 0"
                 class="absolute left-0 sm:-left-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
+                <span class="material-icons">chevron_left</span>
             </button>
-            <button id="reader-next-btn"
+            <button @click="showNextArticle" x-show="currentReaderGlobalIndex < filteredArticles.length - 1"
                 class="absolute right-0 sm:-right-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white z-10 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <span class="material-icons">chevron_right</span>
             </button>
 
             <header class="relative flex-shrink-0 p-4 border-b" style="border-color: var(--border-color);">
-                <button id="reader-close-btn" title="Schließen"
+                <button @click="isReaderOpen = false" title="Schließen"
                     class="absolute top-2 right-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
                     style="color: var(--text-color-light);">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <span class="material-icons">close</span>
                 </button>
                 <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center gap-2 max-w-[calc(100%-80px)]"> <img id="reader-favicon" src=""
-                            alt="Favicon" class="w-6 h-6 rounded hidden flex-shrink-0"
-                            onerror="this.classList.add('hidden')">
-                        <h3 id="reader-title" class="text-lg md:text-xl font-bold truncate"
+                    <div class="flex items-center gap-2 max-w-[calc(100%-80px)]">
+                        <img x-show="readerArticle.sourceFavicon" :src="readerArticle.sourceFavicon" alt="Favicon"
+                            class="w-6 h-6 rounded flex-shrink-0" :onerror="`this.style.display='none'`">
+                        <h3 x-text="readerArticle.title" class="text-lg md:text-xl font-bold truncate"
                             style="color: var(--text-color);"></h3>
                     </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <p id="reader-source-title" class="text-sm" style="color: var(--text-color-light);"></p>
-                    <p id="article-counter" class="text-sm" style="color: var(--text-color-light);"></p>
+                    <p x-text="readerArticle.sourceTitle" class="text-sm" style="color: var(--text-color-light);"></p>
+                    <p x-text="`Artikel ${currentReaderGlobalIndex + 1} / ${filteredArticles.length}`" class="text-sm"
+                        style="color: var(--text-color-light);"></p>
                 </div>
             </header>
-            <div id="reader-body" class="p-6 overflow-y-auto flex-grow" style="color: var(--text-color);">
+            <div id="reader-body" class="p-6 overflow-y-auto flex-grow" style="color: var(--text-color);"
+                x-html="readerArticle.content" :style="`--reader-font-size: ${currentReaderFontSize}px`">
             </div>
-            <div id="reader-controls-bottom"
-                class="flex flex-wrap justify-center gap-2 p-4 border-t sticky bottom-0 left-0 right-0 z-10"
+            <div class="flex flex-wrap justify-center gap-2 p-4 border-t sticky bottom-0 left-0 right-0 z-10"
                 style="border-color: var(--border-color); background-color: var(--card-bg);">
                 <div class="flex items-center space-x-1">
-                    <button id="font-size-decrease" title="Schriftgröße verkleinern"
+                    <button @click="adjustReaderFontSize(-1)" title="Schriftgröße verkleinern"
                         class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
                         style="color: var(--text-color-light);">
-                        <i data-lucide="minus" class="h-5 w-5"></i>
+                        <span class="material-icons" style="font-size: 20px;">remove</span>
                     </button>
-                    <button id="font-size-increase" title="Schriftgröße vergrößern"
+                    <button @click="adjustReaderFontSize(1)" title="Schriftgröße vergrößern"
                         class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
                         style="color: var(--text-color-light);">
-                        <i data-lucide="plus" class="h-5 w-5"></i>
+                        <span class="material-icons" style="font-size: 20px;">add</span>
                     </button>
                 </div>
-                <button id="reader-favorite-btn"
+                <button @click.stop="toggleFavorite(readerArticle.link)"
                     class="favorite-btn p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
-                    title="Als Favorit markieren/entfernen">
-                    <i data-lucide="star" class="h-6 w-6"></i>
+                    :class="{'is-favorite': isFavorite(readerArticle.link)}" title="Als Favorit markieren/entfernen">
+                    <span class="material-icons">star</span>
                 </button>
-                <a id="reader-original-link" href="#" target="_blank" rel="noopener noreferrer"
-                    title="Originalartikel öffnen" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
+                <a :href="readerArticle.link" target="_blank" rel="noopener noreferrer" title="Originalartikel öffnen"
+                    class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700"
                     style="color: var(--text-color-light);">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    <span class="material-icons">open_in_new</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div id="import-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
-        aria-hidden="true">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
-                style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                <div class="text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-yellow-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Feeds überschreiben?</h3>
-                    <p class="text-sm mt-2" style="color: var(--text-color-light);">
-                        Möchtest du wirklich eine neue Feed-Liste importieren? Alle deine aktuell gespeicherten Feeds,
-                        Gelesen-Markierungen und Favoriten werden dabei permanent gelöscht.
-                    </p>
-                </div>
-                <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
-                    <button id="confirm-import-btn" type="button"
-                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        Überschreiben
-                    </button>
-                    <button id="cancel-import-btn" type="button"
-                        class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
-                        style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
-                        Abbrechen
-                    </button>
-                </div>
+    <!-- Import/Export Modals -->
+    <div x-show="isImportModalOpen"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center" x-cloak>
+        <div @click.away="isImportModalOpen = false"
+            x-transition:enter="transition-all ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition-all ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
+            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+            <div class="text-center">
+                <span class="material-icons mx-auto text-yellow-400" style="font-size: 48px;">warning</span>
+                <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Feeds überschreiben?</h3>
+                <p class="text-sm mt-2" style="color: var(--text-color-light);">
+                    Möchtest du wirklich eine neue Feed-Liste importieren? Alle deine aktuell gespeicherten Feeds,
+                    Gelesen-Markierungen und Favoriten werden dabei permanent gelöscht.
+                </p>
+            </div>
+            <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
+                <button @click="triggerImport"
+                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700">
+                    Überschreiben
+                </button>
+                <button @click="isImportModalOpen = false"
+                    class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
+                    style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
+                    Abbrechen
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="rename-export-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-75 transition-opacity z-50 flex justify-center items-center"
-        aria-hidden="true">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
-                style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
-                <div class="text-center">
-                    <i data-lucide="file-text" class="mx-auto h-12 w-12 text-blue-400"></i>
-                    <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Export-Dateiname</h3>
-                    <p class="text-sm mt-2" style="color: var(--text-color-light);">
-                        Bitte geben Sie einen Dateinamen für den Export Ihrer RSS-Daten ein.
-                    </p>
-                    <input type="text" id="export-filename-input"
-                        class="mt-4 block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
-                        style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
-                        placeholder="rss_reader_backup.json">
-                </div>
-                <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
-                    <button id="confirm-export-name-btn" type="button"
-                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Exportieren
-                    </button>
-                    <button id="cancel-export-name-btn" type="button"
-                        class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
-                        style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
-                        Abbrechen
-                    </button>
-                </div>
+    <div x-show="isExportModalOpen"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center" x-cloak>
+        <div @click.away="isExportModalOpen = false"
+            x-transition:enter="transition-all ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition-all ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="rounded-lg shadow-xl p-6 m-4 max-w-sm w-full"
+            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+            <div class="text-center">
+                <span class="material-icons mx-auto text-blue-400" style="font-size: 48px;">description</span>
+                <h3 class="text-lg font-medium mt-2" style="color: var(--text-color);">Export-Dateiname</h3>
+                <p class="text-sm mt-2" style="color: var(--text-color-light);">
+                    Bitte geben Sie einen Dateinamen für den Export Ihrer RSS-Daten ein.
+                </p>
+                <input type="text" x-model="exportFilename"
+                    class="mt-4 block w-full px-3 py-2 text-base rounded-md focus:outline-none focus:ring-2"
+                    style="background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); --tw-ring-color: var(--accent-color);"
+                    placeholder="rss_reader_backup.json">
+            </div>
+            <div class="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
+                <button @click="performExport"
+                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700">
+                    Exportieren
+                </button>
+                <button @click="isExportModalOpen = false"
+                    class="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 text-base font-medium"
+                    style="border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color);">
+                    Abbrechen
+                </button>
             </div>
         </div>
     </div>
-
+    <input type="file" id="import-file-input" class="hidden" accept=".json,application/json" @change="handleFileImport">
 
     <script>
-        // --- THEME SWITCHING LISTENER ---
-        window.addEventListener('message', (event) => {
-            if (event.data === 'set-theme-dark') {
-                document.documentElement.dataset.theme = 'dark';
-                lucide.createIcons(); // Re-render Lucide icons for theme change
-            } else if (event.data === 'set-theme-light') {
-                document.documentElement.dataset.theme = 'light';
-                lucide.createIcons(); // Re-render Lucide icons for theme change
-            }
-        });
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('rssReader', () => ({
+                // --- STATE ---
+                savedFeeds: [],
+                visitedLinks: [],
+                favoriteLinks: [],
+                urlInput: '',
+                isLoading: true,
+                isRefreshing: false,
+                message: { text: '', isError: false },
+                activeView: 'all', // 'all', 'favorites', or a feed URL
+                currentArticles: [],
+                currentFilter: 'unread', // 'all', 'read', 'unread'
+                currentPage: 1,
+                articlesPerPage: 10,
+                isMobileMenuOpen: false,
+                isReaderOpen: false,
+                readerArticle: {},
+                currentReaderGlobalIndex: -1,
+                currentReaderFontSize: 20,
+                isImportModalOpen: false,
+                isExportModalOpen: false,
+                exportFilename: '',
+                placeholderFavicon: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6' /%3E%3C/svg%3E`,
+                defaultFeeds: [
+                    { url: "https://www.heise.de/rss/heise.rdf", title: "heise online News" },
+                    { url: "https://static.winfuture.de/feeds/WinFuture-News-rss2.0.xml", title: "WinFuture News" },
+                    { url: "https://www.hardwareluxx.de/hwl.feed", title: "Hardwareluxx RSS Feed" },
+                    { url: "https://www.pcgameshardware.de/feed.cfm?menu_alias=home/", title: "PCGameshardware" },
+                    { url: "https://feeds.feedburner.com/netzwelt", title: "netzwelt.de" },
+                    { url: "https://feeds.feedburner.com/caschysblog", title: "Caschys Blog" },
+                    { url: "https://partner-feeds.20min.ch/rss/20minuten", title: "20 Minuten | Front" },
+                    { url: "https://www.derstandard.at/rss/web", title: "derStandard.at" }
+                ],
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Lucide icons for all static content
-            lucide.createIcons({
-                attributes: {
-                    'stroke-width': 2
-                }
-            });
-
-            // --- DOM ELEMENT SELECTORS ---
-            const feedContainer = document.getElementById('feed-container');
-            const urlInput = document.getElementById('rss-url-input');
-            const loadBtn = document.getElementById('load-feed-btn');
-
-            // Sidebar elements
-            const desktopSidebarContent = document.getElementById('desktop-sidebar-content');
-            const mobileSidebarContent = document.getElementById('mobile-sidebar-content');
-            const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
-            const openMobileMenuBtn = document.getElementById('open-mobile-menu-btn');
-            const closeMobileMenuBtn = document.getElementById('close-mobile-menu-btn');
-            const mobileFeedTitle = document.getElementById('mobile-feed-title');
-
-            // Reader Modal Elements
-            const readerModal = document.getElementById('reader-modal');
-            const readerModalContent = document.getElementById('reader-modal-content');
-            const readerTitle = document.getElementById('reader-title');
-            const readerSourceTitle = document.getElementById('reader-source-title'); // Source title element
-            const readerBody = document.getElementById('reader-body');
-            const readerCloseBtn = document.getElementById('reader-close-btn');
-            const readerOriginalLink = document.getElementById('reader-original-link');
-            const readerPrevBtn = document.getElementById('reader-prev-btn');
-            const readerNextBtn = document.getElementById('reader-next-btn');
-            const readerFavicon = document.getElementById('reader-favicon'); // Reader favicon element
-            const readerFavoriteBtn = document.getElementById('reader-favorite-btn'); // New favorite button in reader mode
-            const articleCounterElement = document.getElementById('article-counter'); // Article counter element
-
-            // Font size controls
-            const fontSizeDecreaseBtn = document.getElementById('font-size-decrease');
-            const fontSizeIncreaseBtn = document.getElementById('font-size-increase');
-
-            // Export/Rename Modal Elements
-            const renameExportModal = document.getElementById('rename-export-modal');
-            const exportFilenameInput = document.getElementById('export-filename-input');
-            const confirmExportNameBtn = document.getElementById('confirm-export-name-btn');
-            const cancelExportNameBtn = document.getElementById('cancel-export-name-btn');
-
-
-            // --- HELPER FUNCTIONS (EARLY) ---
-            const getFaviconUrl = (url) => {
-                try {
-                    const domain = new URL(url).hostname;
-                    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-                } catch (e) {
-                    return placeholderFavicon;
-                }
-            };
-
-            // --- STATE MANAGEMENT ---
-            const feedsStorageKey = 'savedRssFeeds';
-            const visitedLinksKey = 'rssVisitedLinks';
-            const favoritesKey = 'rssFavoriteLinks';
-            const readerFontSizeKey = 'readerFontSize'; // Key for font size
-            const placeholderFavicon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6' /%3E%3C/svg%3E`;
-
-            const defaultFeeds = [
-                { url: "https://www.heise.de/rss/heise.rdf", title: "heise online News" },
-                { url: "https://static.winfuture.de/feeds/WinFuture-News-rss2.0.xml", title: "WinFuture News" },
-                { url: "https://www.hardwareluxx.de/hwl.feed", title: "Hardwareluxx RSS Feed" },
-                { url: "https://www.pcgameshardware.de/feed.cfm?menu_alias=home/", title: "PCGameshardware: Computer, IT-Technik und Spiele" },
-                { url: "https://feeds.feedburner.com/netzwelt", title: "netzwelt.de - News, Downloads & Tests" },
-                { url: "https://feeds.feedburner.com/caschysblog", title: "Caschys Blog" },
-                { url: "https://partner-feeds.20min.ch/rss/20minuten", title: "20 Minuten | Front" },
-                { url: "https://www.derstandard.at/rss/web", title: "Web - derStandard.at" }
-            ];
-            const defaultFeedUrls = new Set(defaultFeeds.map(f => f.url));
-
-            let savedFeeds = JSON.parse(localStorage.getItem(feedsStorageKey));
-            if (savedFeeds === null) {
-                // On first run, populate with default feeds.
-                savedFeeds = defaultFeeds.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
-                localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
-            }
-
-            let visitedLinks = new Set(JSON.parse(localStorage.getItem(visitedLinksKey)) || []);
-            let favoriteLinks = new Set(JSON.parse(localStorage.getItem(favoritesKey)) || []);
-            let activeUrl = null;
-            let currentArticles = []; // All articles fetched for the current feed/view (before filtering/pagination)
-            let filteredArticles = []; // All articles after applying read/unread filter (before pagination)
-            let articlesToDisplay = []; // Articles to display on the current page
-            let currentReaderGlobalIndex = -1; // Global index of the article currently open in reader mode.
-
-            let currentFilter = 'unread';
-
-            // Pagination state
-            let articlesPerPage = 10;
-            let currentPage = 1;
-            let totalFilteredArticles = 0; // Total articles after applying filters (read/unread)
-
-            // Load saved font size or default to 20.0 (representing 20px)
-            let currentReaderFontSize = parseFloat(localStorage.getItem(readerFontSizeKey) || 20.0);
-
-            // --- HELPER FUNCTIONS ---
-            const saveFeeds = () => localStorage.setItem(feedsStorageKey, JSON.stringify(savedFeeds));
-            const saveVisitedLinks = () => localStorage.setItem(visitedLinksKey, JSON.stringify(Array.from(visitedLinks)));
-            const saveFavoriteLinks = () => localStorage.setItem(favoritesKey, JSON.stringify(Array.from(favoriteLinks)));
-            const saveReaderFontSize = () => localStorage.setItem(readerFontSizeKey, currentReaderFontSize.toString()); // Save font size
-            const showLoading = () => {
-                feedContainer.innerHTML = `<div class="flex justify-center items-center py-10 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--border-color);"><div class="loader"></div></div>`;
-            };
-            const showMessage = (message, isError = false) => {
-                const colorStyle = isError ? 'background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);' : 'background-color: var(--card-bg); color: var(--text-color-light);';
-                feedContainer.innerHTML = `<div class="text-center p-6 rounded-md" style="${colorStyle} border: 1px solid var(--border-color);"><p>${message}</p></div>`;
-            };
-
-            // --- SIDEBAR LOGIC ---
-            const openMobileMenu = () => {
-                mobileNavOverlay.classList.remove('hidden');
-                mobileNavOverlay.classList.add('flex');
-                document.body.style.overflow = 'hidden';
-            };
-            const closeMobileMenu = () => {
-                mobileNavOverlay.classList.add('hidden');
-                mobileNavOverlay.classList.remove('flex');
-                document.body.style.overflow = '';
-            };
-            const setActiveSidebarItem = (url) => {
-                activeUrl = url;
-                document.querySelectorAll('.sidebar-item-active').forEach(el => el.classList.remove('sidebar-item-active'));
-                let activeItems = [];
-                if (url === 'all') {
-                    activeItems = document.querySelectorAll('.show-all-btn');
-                } else if (url === 'favorites') {
-                    activeItems = document.querySelectorAll('.show-favorites-btn');
-                } else {
-                    activeItems = document.querySelectorAll(`.sidebar-item[data-url="${url}"]`);
-                }
-                activeItems.forEach(item => item.classList.add('sidebar-item-active'));
-            };
-
-            // --- IMAGE FINDING LOGIC ---
-            const findImageInFeedItem = (item) => {
-                if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) return item.thumbnail;
-                if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image')) return item.enclosure.link;
-                const content = item.description || item.content || '';
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = content;
-                const firstImage = tempDiv.querySelector('img');
-                return firstImage ? firstImage.src : null;
-            };
-
-            const findImageFromUrl = async (url) => {
-                if (!url) return null;
-                try {
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                    const response = await fetch(proxyUrl);
-                    if (!response.ok) return null;
-                    const htmlText = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlText, 'text/html');
-                    const ogImage = doc.querySelector('meta[property="og:image"]');
-                    if (ogImage && ogImage.content) return ogImage.content;
-                    const twitterImage = doc.querySelector('meta[name="twitter:image"]');
-                    if (twitterImage && twitterImage.content) return twitterImage.content;
-                    const highResLink = doc.querySelector('link[rel="image_src"]');
-                    if (highResLink && highResLink.href) return highResLink.href;
-                    return null;
-                } catch (e) {
-                    console.error(`Error fetching or parsing article for image from ${url}:`, e);
-                    return null;
-                }
-            };
-
-            // --- RENDER FUNCTIONS ---
-            const renderSidebar = () => {
-                const sidebarHtml = `
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-xl font-bold" style="color: var(--text-color);">Gespeicherte Feeds</h2>
-                    </div>
-                    <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
-                        <button class="show-all-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="book-open" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
-                        <button class="show-favorites-btn w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><i data-lucide="star" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span id="favorites-count">0</span>)</span></button>
-                    </div>
-                     <div class="border-b my-2 py-2" style="border-color: var(--border-color);">
-                        <button id="import-btn-sidebar" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
-                            <i data-lucide="download" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i>
-                            <span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds importieren</span>
-                        </button>
-                        <button id="export-btn-sidebar" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group">
-                            <i data-lucide="upload" class="h-5 w-5 group-hover:text-violet-600" style="color: var(--text-color-light);"></i>
-                            <span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds exportieren</span>
-                        </button>
-                    </div>
-                    <div class="max-h-[50vh] overflow-y-auto pr-2">
-                        ${savedFeeds.length === 0 ? `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>` :
-                        savedFeeds.map((feed, index) => {
-                            const isDefault = defaultFeedUrls.has(feed.url);
-                            const deleteButtonHtml = isDefault ? '' : `<button data-index="${index}" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="trash-2" class="h-5 w-5"></i></button>`;
-                            return `
-                            <div class="flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group sidebar-item" data-url="${feed.url}">
-                                <div class="flex items-center gap-3 truncate"><img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'"><span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span></div>
-                                ${deleteButtonHtml}
-                            </div>`;
-                        }).join('')}
-                    </div>`;
-
-                desktopSidebarContent.innerHTML = sidebarHtml;
-                mobileSidebarContent.innerHTML = sidebarHtml;
-
-                // Re-create icons after injecting HTML
-                lucide.createIcons({
-                    container: desktopSidebarContent,
-                    attributes: { 'stroke-width': 2 }
-                });
-                lucide.createIcons({
-                    container: mobileSidebarContent,
-                    attributes: { 'stroke-width': 2 }
-                });
-
-                addSidebarEventListeners();
-                updateSidebarCounts();
-                setActiveSidebarItem(activeUrl);
-            };
-
-            const addSidebarEventListeners = () => {
-                document.querySelectorAll('.show-all-btn').forEach(btn => btn.addEventListener('click', () => {
-                    loadAllFeeds();
-                    closeMobileMenu();
-                }));
-                document.querySelectorAll('.show-favorites-btn').forEach(btn => btn.addEventListener('click', () => {
-                    loadFavorites();
-                    closeMobileMenu();
-                }));
-
-                // Listeners for new import/export buttons in sidebar
-                document.querySelectorAll('#import-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
-                    document.getElementById('import-modal').classList.remove('hidden');
-                    closeMobileMenu();
-                }));
-                document.querySelectorAll('#export-btn-sidebar').forEach(btn => btn.addEventListener('click', () => {
-                    handleExportClick();
-                    closeMobileMenu();
-                }));
-
-
-                document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', (e) => {
-                    // Check if the click was on the delete button itself
-                    if (e.target.closest('.delete-btn')) {
-                        // The delete logic is now handled in its own listener, so we do nothing here to prevent feed loading.
-                        return;
+                // --- COMPUTED ---
+                get filteredArticles() {
+                    if (this.activeView === 'favorites') {
+                        return this.currentArticles.filter(item => this.isFavorite(item.link));
                     }
-                    loadFeed(item.dataset.url).catch(err => console.error(err));
-                    closeMobileMenu();
-                }));
-                // Dedicated listener for delete buttons
-                document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', async (e) => {
-                    e.stopPropagation(); // Prevent the parent .sidebar-item click
-                    const index = parseInt(btn.dataset.index, 10);
-                    if (isNaN(index)) return;
-
-                    // Provide visual feedback
-                    btn.disabled = true;
-                    btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 A7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-
-                    savedFeeds.splice(index, 1);
-                    await cleanupOrphanedFavorites();
-
-                    saveFeeds();
-                    saveFavoriteLinks(); // Save the potentially cleaned-up favorites
-                    renderSidebar(); // Re-render the whole sidebar
-
-                    // If the currently active feed was the one deleted, show a message
-                    if (activeUrl === btn.closest('.sidebar-item').dataset.url) {
-                        showMessage("Der ausgewählte Feed wurde gelöscht.");
-                        activeUrl = null; // Reset active URL
-                    }
-                }));
-            };
-
-            const updateSidebarCounts = () => {
-                document.querySelectorAll('#favorites-count').forEach(el => {
-                    el.textContent = favoriteLinks.size;
-                });
-            };
-
-            const createArticleHtml = (item, index) => {
-                const imageUrl = findImageInFeedItem(item);
-                const isVisited = visitedLinks.has(item.link);
-                const isFavorite = favoriteLinks.has(item.link);
-                const titleHtml = `<h3 class="text-xl font-semibold transition-colors ${isVisited ? 'visited-title' : 'group-hover/item:text-violet-600'}" style="color: var(--text-color);">${item.title}</h3>`;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = item.description;
-                const sanitizedDescription = (tempDiv.textContent || tempDiv.innerText || "").substring(0, 150);
-                let pubDate = new Date(item.pubDate).toLocaleString('de-DE');
-                const metaHtml = `<p class="text-sm mt-1 mb-3" style="color: var(--text-color-light);">${pubDate}</p><p class="line-clamp-2" style="color: var(--text-color);">${sanitizedDescription}</p>`;
-                const sourceHtml = item.sourceTitle ? `<div class="flex items-center gap-2 mt-3 text-xs" style="color: var(--text-color-light);"><img src="${item.sourceFavicon}" class="w-4 h-4 rounded" onerror="this.src='${placeholderFavicon}'"/><span>${item.sourceTitle}</span></div>` : '';
-                // Use <i data-lucide="star"></i> for the favorite button
-                const favoriteBtnHtml = `<button class="favorite-btn p-2 rounded-full absolute top-3 right-2 z-10 ${isFavorite ? 'is-favorite' : ''}" data-link="${item.link}" title="Als Favorit markieren"><i data-lucide="star" class="w-6 h-6"></i></button>`;
-
-                let imageContainerHtml = '';
-                if (imageUrl) {
-                    imageContainerHtml = `<div class="sm:w-1/3 flex-shrink-0 cursor-pointer article-item-content" data-index="${index}"><img src="${imageUrl}" class="w-full h-32 object-cover rounded-lg bg-neutral-200 dark:bg-neutral-700" alt="Artikelbild" onerror="this.parentElement.remove()"></div>`;
-                } else if (item.link) {
-                    imageContainerHtml = `<div class="article-image-container sm:w-1/3 flex-shrink-0 cursor-pointer article-item-content" data-link="${item.link}" data-index="${index}"><div class="w-full h-32 rounded-lg bg-neutral-200 dark:bg-neutral-700"></div></div>`;
-                }
-
-                const textContentHtml = `<div class="sm:w-2/3 flex flex-col"><div class="article-item-content flex-1 cursor-pointer" data-index="${index}">${titleHtml}${metaHtml}${sourceHtml}</div></div>`;
-
-                // Swapped the order of imageContainerHtml and textContentHtml for left alignment
-                return `<div class="flex flex-col sm:flex-row gap-5 relative group/item">${favoriteBtnHtml}${imageContainerHtml}${textContentHtml}</div>`;
-            };
-
-            const rerenderArticleList = () => {
-                const articlesWrapper = document.getElementById('articles-wrapper');
-                if (!articlesWrapper) return;
-
-                // Apply filters to get the set of articles relevant to the current view (read/unread/all)
-                filteredArticles = currentArticles.filter(item => {
-                    const isVisited = visitedLinks.has(item.link);
-                    if (currentFilter === 'unread') return !isVisited;
-                    if (currentFilter === 'read') return isVisited;
-                    return true; // 'all' filter
-                });
-
-                totalFilteredArticles = filteredArticles.length;
-
-                // Calculate pagination indices
-                const startIndex = (currentPage - 1) * articlesPerPage;
-                const endIndex = Math.min(startIndex + articlesPerPage, totalFilteredArticles);
-
-                // Slice the articles for the current page
-                articlesToDisplay = filteredArticles.slice(startIndex, endIndex);
-
-                const unreadCount = currentArticles.filter(i => !visitedLinks.has(i.link)).length;
-                const readCount = currentArticles.length - unreadCount;
-                const unreadEl = document.getElementById('unread-count');
-                const readEl = document.getElementById('read-count');
-                if (unreadEl) unreadEl.textContent = unreadCount;
-                if (readEl) readEl.textContent = readCount;
-
-                if (articlesToDisplay.length > 0) {
-                    articlesWrapper.innerHTML = articlesToDisplay.map((item, index) => `<article class="border-b py-6 last:border-b-0 group" style="border-color: var(--border-color);">${createArticleHtml(item, index)}</article>`).join('');
-                } else {
-                    let message = `Keine ${currentFilter === 'unread' ? 'ungelesenen' : 'gelesenen'} Artikel in dieser Ansicht.`;
-                    if (activeUrl === 'favorites') message = 'Du hast noch keine Favoriten markiert.';
-                    articlesWrapper.innerHTML = `<p class="text-center py-4" style="color: var(--text-color-light);">${message}</p>`;
-                }
-
-                // Update pagination controls
-                updatePaginationControls();
-
-                // Re-create icons after injecting HTML
-                lucide.createIcons({
-                    container: articlesWrapper,
-                    attributes: { 'stroke-width': 2 }
-                });
-
-
-                document.querySelectorAll('.article-image-container').forEach(async (container) => {
-                    const link = container.dataset.link;
-                    const imageUrl = await findImageFromUrl(link);
-                    if (imageUrl) {
-                        const img = document.createElement('img');
-                        img.src = imageUrl;
-                        img.className = 'w-full h-32 object-cover rounded-lg bg-neutral-200 dark:bg-neutral-700';
-                        img.alt = 'Artikelbild';
-                        img.onerror = () => container.remove();
-                        container.innerHTML = '';
-                        container.appendChild(img);
-                    } else {
-                        container.remove();
-                    }
-                });
-            };
-
-            const renderFeedLayout = (title, iconHtml, showFilters = true) => {
-                feedContainer.innerHTML = '';
-                const wrapper = document.createElement('div');
-                wrapper.className = 'p-6 rounded-lg';
-                wrapper.style.backgroundColor = 'var(--card-bg)';
-                wrapper.style.border = '1px solid var(--border-color)';
-
-                if (mobileFeedTitle) mobileFeedTitle.textContent = title;
-
-                const titleWrapper = document.createElement('div');
-                titleWrapper.className = 'flex items-center justify-between gap-4 mb-4 pb-4 border-b';
-                titleWrapper.style.borderColor = 'var(--border-color)';
-                titleWrapper.innerHTML = `
-                    <div class="flex items-center gap-4 min-w-0">
-                        ${iconHtml}
-                        <h2 class="text-2xl font-bold truncate" style="color: var(--text-color);">${title}</h2>
-                    </div>
-                    <button id="refresh-feed-btn" onclick="handleRefresh()" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-neutral-700 flex-shrink-0" title="Neu laden">
-                        <i data-lucide="refresh-cw" class="h-6 w-6"></i>
-                    </button>
-                `;
-                wrapper.appendChild(titleWrapper);
-
-                if (showFilters) {
-                    const filterWrapper = document.createElement('div');
-                    filterWrapper.className = 'flex items-center gap-2 py-4';
-                    filterWrapper.innerHTML = `<button id="filter-unread-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Ungelesen (<span id="unread-count">0</span>)</button><button id="filter-read-btn" class="filter-btn px-3 py-1 text-sm font-semibold rounded-full transition-colors">Gelesen (<span id="read-count">0</span>)</button>`;
-                    wrapper.appendChild(filterWrapper);
-                }
-
-                const articlesWrapper = document.createElement('div');
-                articlesWrapper.id = 'articles-wrapper';
-                wrapper.appendChild(articlesWrapper);
-
-                // Pagination controls
-                const paginationWrapper = document.createElement('div');
-                paginationWrapper.id = 'pagination-controls';
-                paginationWrapper.className = 'flex justify-center items-center gap-4 mt-6 pt-4 border-t';
-                paginationWrapper.style.borderColor = 'var(--border-color)';
-                paginationWrapper.innerHTML = `
-                    <button id="prev-page-btn" class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors" style="background-color: var(--accent-color); hover:background-color: var(--accent-color-hover);">Zurück</button>
-                    <span id="page-info" class="text-sm" style="color: var(--text-color-light);">Seite 1 / 1</span>
-                    <button id="next-page-btn" class="px-4 py-2 rounded-md shadow-sm text-white font-medium transition-colors" style="background-color: var(--accent-color); hover:background-color: var(--accent-color-hover);">Weiter</button>
-                `;
-                wrapper.appendChild(paginationWrapper);
-
-                feedContainer.appendChild(wrapper);
-
-                if (showFilters) {
-                    document.getElementById('filter-unread-btn').addEventListener('click', () => {
-                        currentFilter = 'unread';
-                        currentPage = 1; // Reset to first page on filter change
-                        updateFilterButtons();
-                        rerenderArticleList();
+                    if (this.currentFilter === 'all') return this.currentArticles;
+                    return this.currentArticles.filter(item => {
+                        const isVisited = this.isVisited(item.link);
+                        return this.currentFilter === 'unread' ? !isVisited : isVisited;
                     });
-                    document.getElementById('filter-read-btn').addEventListener('click', () => {
-                        currentFilter = 'read';
-                        currentPage = 1; // Reset to first page on filter change
-                        updateFilterButtons();
-                        rerenderArticleList();
-                    });
-                    updateFilterButtons();
-                }
-
-                // Add event listeners for pagination buttons
-                document.getElementById('prev-page-btn').addEventListener('click', prevPage);
-                document.getElementById('next-page-btn').addEventListener('click', nextPage);
-
-
-                // Create lucide icons for the newly added content
-                lucide.createIcons({
-                    container: wrapper,
-                    attributes: { 'stroke-width': 2 }
-                });
-            }
-
-            const updateFilterButtons = () => {
-                const unreadBtn = document.getElementById('filter-unread-btn');
-                const readBtn = document.getElementById('filter-read-btn');
-                if (!unreadBtn || !readBtn) return;
-                unreadBtn.classList.toggle('filter-btn-active', currentFilter === 'unread');
-                readBtn.classList.toggle('filter-btn-active', currentFilter === 'read');
-            };
-
-            const updatePaginationControls = () => {
-                const pageInfo = document.getElementById('page-info');
-                const prevBtn = document.getElementById('prev-page-btn');
-                const nextBtn = document.getElementById('next-page-btn');
-
-                const totalPages = Math.ceil(totalFilteredArticles / articlesPerPage);
-
-                if (pageInfo) {
-                    pageInfo.textContent = `Seite ${currentPage} / ${totalPages || 1}`;
-                }
-
-                if (prevBtn) {
-                    prevBtn.disabled = currentPage === 1;
-                    prevBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
-                    prevBtn.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
-                }
-                if (nextBtn) {
-                    nextBtn.disabled = currentPage >= totalPages;
-                    nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
-                    nextBtn.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
-                }
-            };
-
-            const goToPage = (page) => {
-                const totalPages = Math.ceil(totalFilteredArticles / articlesPerPage);
-                if (page < 1) currentPage = 1;
-                else if (page > totalPages) currentPage = totalPages;
-                else currentPage = page;
-                rerenderArticleList();
-            };
-
-            const nextPage = () => {
-                goToPage(currentPage + 1);
-            };
-
-            const prevPage = () => {
-                goToPage(currentPage - 1);
-            };
-
-
-            // --- READER MODAL LOGIC ---
-            const applyReaderFontSize = () => {
-                document.documentElement.style.setProperty('--reader-font-size', `${currentReaderFontSize}px`);
-            };
-
-            const adjustReaderFontSize = (increment) => {
-                const minFontSize = 12; // Minimum font size in pixels
-                const maxFontSize = 24; // Maximum font size in pixels
-                let newSize = currentReaderFontSize + increment;
-                if (newSize < minFontSize) newSize = minFontSize;
-                if (newSize > maxFontSize) newSize = maxFontSize;
-                currentReaderFontSize = newSize;
-                applyReaderFontSize();
-                saveReaderFontSize();
-            };
-
-            const updateArticleCounter = (globalIndex, totalCount) => {
-                if (articleCounterElement && totalCount > 0) {
-                    articleCounterElement.textContent = `Artikel ${globalIndex + 1} / ${totalCount}`;
-                } else if (articleCounterElement) {
-                    articleCounterElement.textContent = ''; // Clear if no articles
-                }
-            };
-
-            const openReaderMode = (globalArticleIndex) => {
-                if (globalArticleIndex < 0 || globalArticleIndex >= filteredArticles.length) return;
-
-                currentReaderGlobalIndex = globalArticleIndex; // Set the global index
-
-                const item = filteredArticles[currentReaderGlobalIndex]; // Get item using global index
-
-                readerTitle.textContent = item.title;
-                readerBody.innerHTML = ''; // Clear existing content first
-
-                // Set source title
-                if (item.sourceTitle) {
-                    readerSourceTitle.textContent = item.sourceTitle;
-                    readerSourceTitle.classList.remove('hidden');
-                } else {
-                    readerSourceTitle.classList.add('hidden');
-                }
-
-                // Create a temporary div to parse the article content
-                const tempContentDiv = document.createElement('div');
-                tempContentDiv.innerHTML = item.content || item.description;
-
-                // Remove all img tags from the content
-                tempContentDiv.querySelectorAll('img').forEach(img => img.remove());
-
-                // Append the cleaned content to readerBody
-                readerBody.appendChild(tempContentDiv);
-
-                // Add image if available, AFTER the text content
-                const articleImageUrl = findImageInFeedItem(item);
-                if (articleImageUrl) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = articleImageUrl;
-                    imgElement.alt = 'Artikelbild';
-                    imgElement.className = 'w-full h-auto mb-4 rounded-lg'; // Apply existing styling
-                    imgElement.id = 'reader-body-image'; // Assign ID for specific styling
-                    imgElement.onerror = function () {
-                        this.classList.add('hidden');
-                    }; // Hide on error
-                    readerBody.appendChild(imgElement); // Append the image element after the text
-                }
-
-                readerBody.scrollTop = 0; // Scroll to top when opening a new article
-                readerOriginalLink.href = item.link;
-
-                // Set favicon if available
-                if (item.sourceFavicon) {
-                    readerFavicon.src = item.sourceFavicon;
-                    readerFavicon.classList.remove('hidden');
-                } else {
-                    readerFavicon.classList.add('hidden');
-                }
-
-                // Update favorite button state in reader mode
-                if (favoriteLinks.has(item.link)) {
-                    readerFavoriteBtn.classList.add('is-favorite');
-                } else {
-                    readerFavoriteBtn.classList.remove('is-favorite');
-                }
-                readerFavoriteBtn.dataset.link = item.link; // Set the link for the favorite button
-
-                // Apply the saved font size when opening the reader mode
-                applyReaderFontSize();
-
-                if (!visitedLinks.has(item.link)) {
-                    visitedLinks.add(item.link);
-                    saveVisitedLinks();
-                }
-
-                // Update previous/next buttons for reader mode based on global index
-                readerPrevBtn.classList.toggle('hidden', currentReaderGlobalIndex === 0);
-                readerNextBtn.classList.toggle('hidden', currentReaderGlobalIndex === filteredArticles.length - 1);
-
-                // Update the article counter with global position
-                updateArticleCounter(currentReaderGlobalIndex, filteredArticles.length);
-
-                if (readerModal.classList.contains('hidden')) {
-                    readerModal.classList.remove('hidden');
-                    document.body.style.overflow = 'hidden';
-                }
-                // Re-create lucide icons for font size buttons and favorite button
-                lucide.createIcons({
-                    container: document.getElementById('reader-controls-bottom'), // Target the new container
-                    attributes: { 'stroke-width': 2 }
-                });
-            };
-
-            const showNextArticle = async () => {
-                if (currentReaderGlobalIndex + 1 < filteredArticles.length) {
-                    const nextGlobalIndex = currentReaderGlobalIndex + 1;
-                    const nextPageIndex = Math.floor(nextGlobalIndex / articlesPerPage) + 1;
-
-                    if (nextPageIndex !== currentPage) {
-                        currentPage = nextPageIndex;
-                        await rerenderArticleList(); // Ensure articlesToDisplay is updated for the new page
-                    }
-                    openReaderMode(nextGlobalIndex);
-                }
-            };
-
-            const showPreviousArticle = async () => {
-                if (currentReaderGlobalIndex > 0) {
-                    const prevGlobalIndex = currentReaderGlobalIndex - 1;
-                    const prevPageIndex = Math.floor(prevGlobalIndex / articlesPerPage) + 1;
-
-                    if (prevPageIndex !== currentPage) {
-                        currentPage = prevPageIndex;
-                        await rerenderArticleList(); // Ensure articlesToDisplay is updated for the new page
-                    }
-                    openReaderMode(prevGlobalIndex);
-                }
-            };
-
-            const closeReaderMode = () => {
-                readerModal.classList.add('hidden');
-                document.body.style.overflow = '';
-                rerenderArticleList(); // Re-render the list to update visited status
-                if (document.getElementById('filter-unread-btn')) updateFilterButtons();
-            };
-
-            const fetchAllArticles = async () => {
-                if (savedFeeds.length === 0) return [];
-                const fetchPromises = savedFeeds.map(feed => {
-                    // Add a cache-busting parameter to ensure fresh data
-                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&_=${new Date().getTime()}`;
-                    return fetch(apiUrl).then(response => response.json());
-                });
-                const results = await Promise.allSettled(fetchPromises);
-                let allItems = [];
-                results.forEach((result, index) => {
-                    if (result.status === 'fulfilled' && result.value.status === 'ok') {
-                        const feedInfo = savedFeeds[index];
-                        if (!feedInfo) return;
-                        const itemsWithSource = result.value.items.map(item => ({ ...item, sourceTitle: feedInfo.title, sourceFavicon: feedInfo.favicon, sourceUrl: feedInfo.url }));
-                        allItems.push(...itemsWithSource);
+                },
+                get totalPages() {
+                    return Math.ceil(this.filteredArticles.length / this.articlesPerPage);
+                },
+                get paginatedArticles() {
+                    const start = (this.currentPage - 1) * this.articlesPerPage;
+                    const end = start + this.articlesPerPage;
+                    return this.filteredArticles.slice(start, end);
+                },
+                get unreadCount() {
+                    return this.currentArticles.filter(i => !this.isVisited(i.link)).length;
+                },
+                get readCount() {
+                    return this.currentArticles.length - this.unreadCount;
+                },
+                get mobileFeedTitle() {
+                    if (this.activeView === 'all') return 'Alle Feeds';
+                    if (this.activeView === 'favorites') return 'Favoriten';
+                    const feed = this.savedFeeds.find(f => f.url === this.activeView);
+                    return feed ? feed.title : 'RSS Reader';
+                },
+                get currentFeedTitle() {
+                    if (this.activeView === 'all') return 'Alle Feeds (Neueste zuerst)';
+                    if (this.activeView === 'favorites') return 'Favoriten';
+                    const feed = this.savedFeeds.find(f => f.url === this.activeView);
+                    return feed ? feed.title : 'Feed';
+                },
+                get currentFeedIcon() {
+                    let icon;
+                    if (this.activeView === 'all') {
+                        icon = 'book-open';
+                    } else if (this.activeView === 'favorites') {
+                        icon = 'star';
                     } else {
-                        console.error(`Error fetching feed ${savedFeeds[index]?.url || 'unknown'}:`, result.reason);
-                    }
-                });
-                // Removed the .slice(0, 100) limitation here
-                return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-            }
-
-            // --- CLEANUP LOGIC ---
-            const cleanupOrphanedFavorites = async () => {
-                // This function ensures that the `favoriteLinks` set only contains links
-                // from articles that are actually in the user's saved feeds.
-                const allCurrentArticles = await fetchAllArticles();
-                const validArticleLinks = new Set(allCurrentArticles.map(item => item.link));
-
-                const originalCount = favoriteLinks.size;
-                favoriteLinks = new Set([...favoriteLinks].filter(favLink => validArticleLinks.has(favLink)));
-
-                // Only write to localStorage if a change occurred
-                if (favoriteLinks.size !== originalCount) {
-                    saveFavoriteLinks();
-                }
-            };
-
-            // --- REFRESH LOGIC ---
-            const handleRefresh = async () => {
-                const refreshBtn = document.getElementById('refresh-feed-btn');
-                // Prevent re-triggering if already in progress
-                if (!refreshBtn || refreshBtn.disabled) return;
-
-                const icon = refreshBtn.querySelector('i');
-                if (icon) {
-                    // Use Tailwind's spin animation class
-                    icon.classList.add('animate-spin');
-                }
-                refreshBtn.disabled = true;
-
-                // The called function will eventually re-render the button,
-                // which resets its state (not spinning, enabled).
-                try {
-                    if (activeUrl === 'all') {
-                        await loadAllFeeds();
-                    } else if (activeUrl === 'favorites') {
-                        await loadFavorites();
-                    } else if (activeUrl) {
-                        await loadFeed(activeUrl);
-                    } else {
-                        // Fallback if somehow activeUrl is null
-                        await loadAllFeeds();
-                    }
-                } catch (error) {
-                    console.error("Failed to refresh feed(s):", error);
-                    // The error message will be shown by the loadFeed/showMessage function.
-                } finally {
-                    if (icon) {
-                        icon.classList.remove('animate-spin');
-                    }
-                    refreshBtn.disabled = false;
-                }
-            };
-            window.handleRefresh = handleRefresh;
-
-
-            // --- CORE LOGIC & EVENT HANDLERS ---
-            const loadAllFeeds = async () => {
-                if (savedFeeds.length === 0) {
-                    showMessage('Es sind keine Feeds zum Anzeigen gespeichert.');
-                    return;
-                }
-                currentFilter = 'unread';
-                setActiveSidebarItem('all');
-                if (mobileFeedTitle) mobileFeedTitle.textContent = 'Alle Feeds';
-                showLoading();
-                currentArticles = await fetchAllArticles();
-                currentPage = 1; // Reset to first page
-                const allFeedsIcon = `<i data-lucide="book-open" class="h-8 w-8" style="color: var(--accent-color);"></i>`;
-                renderFeedLayout('Alle Feeds (Neueste zuerst)', allFeedsIcon);
-                rerenderArticleList();
-            };
-
-            const loadFavorites = async () => {
-                currentFilter = 'all'; // Favorites view shows all (read/unread) favorites
-                setActiveSidebarItem('favorites');
-                if (mobileFeedTitle) mobileFeedTitle.textContent = 'Favoriten';
-                showLoading();
-                // First, ensure favorites are clean
-                await cleanupOrphanedFavorites();
-                updateSidebarCounts();
-
-                const allArticles = await fetchAllArticles();
-                currentArticles = allArticles.filter(item => favoriteLinks.has(item.link));
-                currentPage = 1; // Reset to first page
-                const favIcon = `<i data-lucide="star" class="h-8 w-8" style="color: var(--favorite-color);"></i>`;
-                renderFeedLayout('Favoriten', favIcon, false); // No filters for favorites view
-                rerenderArticleList();
-            };
-
-            const loadFeed = (rssUrl) => {
-                return new Promise((resolve, reject) => {
-                    if (!rssUrl || !rssUrl.trim()) {
-                        showMessage('Bitte gib eine gültige URL ein.', true);
-                        return reject(new Error('Invalid URL'));
-                    }
-
-                    currentFilter = 'unread';
-                    setActiveSidebarItem(rssUrl);
-                    showLoading();
-
-                    // Add a cache-busting parameter to ensure fresh data
-                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&_=${new Date().getTime()}`;
-                    fetch(apiUrl).then(response => response.json()).then(data => {
-                        if (data.status === 'ok') {
-                            const iconHtml = `<img src="${getFaviconUrl(data.feed.url || rssUrl)}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${placeholderFavicon}'">`;
-                            currentArticles = (data.items || []).map(item => ({ ...item, sourceTitle: data.feed.title, sourceFavicon: getFaviconUrl(data.feed.url || rssUrl), sourceUrl: rssUrl }));
-                            currentPage = 1; // Reset to first page
-
-                            renderFeedLayout(data.feed.title, iconHtml);
-                            rerenderArticleList();
-
-                            urlInput.value = '';
-                            if (!savedFeeds.some(feed => feed.url === rssUrl)) {
-                                savedFeeds.unshift({ url: rssUrl, title: data.feed.title, favicon: getFaviconUrl(rssUrl) });
-                                saveFeeds();
-                                renderSidebar();
-                            }
-
-                            resolve();
-                        } else {
-                            showMessage(`Fehler beim Laden des Feeds: ${data.message}`, true);
-                            reject(new Error(data.message));
+                        const feed = this.savedFeeds.find(f => f.url === this.activeView);
+                        if (feed) {
+                            return `<img src="${feed.favicon}" alt="Favicon" class="w-8 h-8 rounded flex-shrink-0" onerror="this.src='${this.placeholderFavicon}'">`;
                         }
-                    }).catch(error => {
-                        showMessage(`Ein Netzwerkfehler ist aufgetreten: ${error.message}. Überprüfe die URL und deine Verbindung.`, true);
-                        reject(error);
+                    }
+                    let materialIcon = icon === 'book-open' ? 'menu_book' : 'star';
+                    return `<span class="material-icons" style="color: var(--accent-color); font-size: 32px;">${materialIcon}</span>`;
+                },
+                get emptyStateMessage() {
+                    if (this.activeView === 'favorites' && this.filteredArticles.length === 0) {
+                        return 'Du hast noch keine Favoriten markiert.';
+                    }
+                    if (this.filteredArticles.length === 0) {
+                        return `Keine ${this.currentFilter === 'unread' ? 'ungelesenen' : 'gelesenen'} Artikel in dieser Ansicht.`;
+                    }
+                    return '';
+                },
+                get sidebarHtml() {
+                    const defaultUrls = new Set(this.defaultFeeds.map(f => f.url));
+                    const feedsHtml = this.savedFeeds.length === 0
+                        ? `<p class="text-sm p-2" style="color: var(--text-color-light);">Noch keine Feeds gespeichert.</p>`
+                        : this.savedFeeds.map((feed, index) => {
+                            const isDefault = defaultUrls.has(feed.url);
+                            const deleteBtn = isDefault ? '' : `<button @click.stop.prevent="deleteFeed(${index})" class="delete-btn flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-icons" style="font-size: 20px;">delete</span></button>`;
+                            return `
+                            <div @click="loadFeed('${feed.url}')" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group" :class="{'sidebar-item-active': activeView === '${feed.url}'}">
+                                <div class="flex items-center gap-3 truncate">
+                                    <img src="${feed.favicon}" alt="Favicon" class="w-5 h-5 rounded flex-shrink-0" onerror="this.src='${this.placeholderFavicon}'">
+                                    <span class="font-medium truncate group-hover:text-violet-600" style="color: var(--text-color);">${feed.title}</span>
+                                </div>
+                                ${deleteBtn}
+                            </div>`;
+                        }).join('');
+
+                    const html = `
+                        <h2 class="text-xl font-bold mb-2" style="color: var(--text-color);">Gespeicherte Feeds</h2>
+                        <div class="border-t border-b my-2 py-2" style="border-color: var(--border-color);">
+                            <button @click="loadAllFeeds" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group" :class="{'sidebar-item-active': activeView === 'all'}"><span class="material-icons group-hover:text-violet-600" style="color: var(--text-color-light); font-size: 20px;">menu_book</span><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Alle Feeds anzeigen</span></button>
+                            <button @click="loadFavorites" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group" :class="{'sidebar-item-active': activeView === 'favorites'}"><span class="material-icons group-hover:text-violet-600" style="color: var(--text-color-light); font-size: 20px;">star</span><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Favoriten (<span x-text="favoriteLinks.length"></span>)</span></button>
+                        </div>
+                        <div class="border-b my-2 py-2" style="border-color: var(--border-color);">
+                            <button @click="isImportModalOpen = true" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><span class="material-icons group-hover:text-violet-600" style="color: var(--text-color-light); font-size: 20px;">file_download</span><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds importieren</span></button>
+                            <button @click="handleExportClick" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-gray-500/10 cursor-pointer group"><span class="material-icons group-hover:text-violet-600" style="color: var(--text-color-light); font-size: 20px;">file_upload</span><span class="font-medium group-hover:text-violet-600" style="color: var(--text-color);">Feeds exportieren</span></button>
+                        </div>
+                        <div class="max-h-[50vh] overflow-y-auto pr-2">${feedsHtml}</div>`;
+
+                    return html;
+                },
+
+                // --- METHODS ---
+                init() {
+                    this.loadState();
+                    this.loadAllFeeds();
+                    this.currentReaderFontSize = parseFloat(localStorage.getItem('readerFontSize') || 20.0);
+
+                    window.addEventListener('message', (event) => {
+                        if (event.data === 'set-theme-dark') {
+                            document.documentElement.dataset.theme = 'dark';
+                        } else if (event.data === 'set-theme-light') {
+                            document.documentElement.dataset.theme = 'light';
+                        }
+                        // Backup/Restore logic can be added here if needed
                     });
-                });
-            };
+                },
+                loadState() {
+                    let feeds = JSON.parse(localStorage.getItem('savedRssFeeds'));
+                    if (!feeds) {
+                        feeds = this.defaultFeeds.map(feed => ({ ...feed, favicon: this.getFaviconUrl(feed.url) }));
+                    }
+                    this.savedFeeds = feeds;
+                    this.visitedLinks = JSON.parse(localStorage.getItem('rssVisitedLinks')) || [];
+                    this.favoriteLinks = JSON.parse(localStorage.getItem('rssFavoriteLinks')) || [];
+                    this.saveState();
+                },
+                saveState() {
+                    localStorage.setItem('savedRssFeeds', JSON.stringify(this.savedFeeds));
+                    localStorage.setItem('rssVisitedLinks', JSON.stringify(this.visitedLinks));
+                    localStorage.setItem('rssFavoriteLinks', JSON.stringify(this.favoriteLinks));
+                    localStorage.setItem('readerFontSize', this.currentReaderFontSize);
+                },
+                getFaviconUrl(url) {
+                    try {
+                        const domain = new URL(url).hostname;
+                        return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                    } catch (e) {
+                        return this.placeholderFavicon;
+                    }
+                },
+                async fetchArticles(urls) {
+                    this.isRefreshing = true;
+                    const fetchPromises = urls.map(url => {
+                        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&_=${new Date().getTime()}`;
+                        return fetch(apiUrl).then(res => res.json());
+                    });
 
-            // Main function to initiate the export process (shows the rename modal)
-            const handleExportClick = () => {
-                if (savedFeeds.length === 0 && visitedLinks.size === 0 && favoriteLinks.size === 0) {
-                    showMessage('Keine Daten zum Exportieren vorhanden.');
-                    return;
-                }
-                const defaultFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
-                exportFilenameInput.value = defaultFilename; // Set default value in input
-                renameExportModal.classList.remove('hidden'); // Show the modal
-                lucide.createIcons({
-                    container: renameExportModal,
-                    attributes: { 'stroke-width': 2 }
-                }); // Re-render icons for modal
-            };
-
-            // Function to perform the actual download based on the provided filename
-            const performExport = (filename) => {
-                let finalFilename = filename.trim();
-                if (finalFilename === '') {
-                    finalFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`; // Fallback to default if empty
-                }
-                if (!finalFilename.toLowerCase().endsWith('.json')) {
-                    finalFilename += '.json';
-                }
-
-                const exportData = {
-                    feeds: savedFeeds.map(({ url, title }) => ({ url, title })),
-                    visited: Array.from(visitedLinks),
-                    favorites: Array.from(favoriteLinks)
-                };
-                const dataStr = JSON.stringify(exportData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: "application/json" });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = finalFilename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                showMessage(`Daten erfolgreich als "${finalFilename}" exportiert.`);
-            };
-
-            const triggerImport = () => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json,application/json';
-                input.onchange = e => {
-                    const file = e.target.files[0];
+                    const results = await Promise.allSettled(fetchPromises);
+                    let allItems = [];
+                    results.forEach((result, index) => {
+                        if (result.status === 'fulfilled' && result.value.status === 'ok') {
+                            const feedInfo = this.savedFeeds.find(f => f.url === urls[index]);
+                            const items = result.value.items.map(item => ({
+                                ...item,
+                                description: new DOMParser().parseFromString(item.description, 'text/html').body.textContent || '',
+                                imageUrl: this.findImageInFeedItem(item),
+                                sourceTitle: feedInfo.title,
+                                sourceFavicon: feedInfo.favicon,
+                                sourceUrl: feedInfo.url
+                            }));
+                            allItems.push(...items);
+                        } else {
+                            this.setTemporaryMessage(`Fehler beim Laden von ${urls[index]}`, true);
+                        }
+                    });
+                    this.isRefreshing = false;
+                    return allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+                },
+                findImageInFeedItem(item) {
+                    if (item.thumbnail && typeof item.thumbnail === 'string' && item.thumbnail.startsWith('http')) return item.thumbnail;
+                    if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image')) return item.enclosure.link;
+                    const content = item.description || item.content || '';
+                    const match = content.match(/<img[^>]+src="([^">]+)"/);
+                    return match ? match[1] : null;
+                },
+                async addFeed() {
+                    if (!this.urlInput.trim()) return;
+                    const url = this.urlInput.trim();
+                    this.urlInput = '';
+                    this.isLoading = true;
+                    this.message.text = '';
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+                    try {
+                        const res = await fetch(apiUrl);
+                        const data = await res.json();
+                        if (data.status === 'ok') {
+                            if (!this.savedFeeds.some(f => f.url === url)) {
+                                this.savedFeeds.unshift({ url: url, title: data.feed.title, favicon: this.getFaviconUrl(url) });
+                                this.saveState();
+                            }
+                            this.loadFeed(url);
+                        } else {
+                            this.setTemporaryMessage(`Fehler: ${data.message}`, true);
+                            this.isLoading = false;
+                        }
+                    } catch (error) {
+                        this.setTemporaryMessage('Netzwerkfehler beim Hinzufügen des Feeds.', true);
+                        this.isLoading = false;
+                    }
+                },
+                deleteFeed(index) {
+                    const feedUrl = this.savedFeeds[index].url;
+                    this.savedFeeds.splice(index, 1);
+                    this.saveState();
+                    if (this.activeView === feedUrl) {
+                        this.loadAllFeeds();
+                    }
+                },
+                async loadFeed(url) {
+                    this.isMobileMenuOpen = false;
+                    this.isLoading = true;
+                    this.message.text = '';
+                    this.activeView = url;
+                    this.currentFilter = 'unread';
+                    this.currentPage = 1;
+                    this.currentArticles = await this.fetchArticles([url]);
+                    this.isLoading = false;
+                },
+                async loadAllFeeds() {
+                    this.isMobileMenuOpen = false;
+                    this.isLoading = true;
+                    this.message.text = '';
+                    this.activeView = 'all';
+                    this.currentFilter = 'unread';
+                    this.currentPage = 1;
+                    const urls = this.savedFeeds.map(f => f.url);
+                    this.currentArticles = await this.fetchArticles(urls);
+                    this.isLoading = false;
+                },
+                async loadFavorites() {
+                    this.isMobileMenuOpen = false;
+                    this.isLoading = true;
+                    this.message.text = '';
+                    this.activeView = 'favorites';
+                    this.currentFilter = 'all';
+                    this.currentPage = 1;
+                    const urls = this.savedFeeds.map(f => f.url);
+                    this.currentArticles = await this.fetchArticles(urls);
+                    this.isLoading = false;
+                },
+                handleRefresh() {
+                    if (this.activeView === 'all') this.loadAllFeeds();
+                    else if (this.activeView === 'favorites') this.loadFavorites();
+                    else this.loadFeed(this.activeView);
+                },
+                setFilter(filter) {
+                    this.currentFilter = filter;
+                    this.currentPage = 1;
+                },
+                nextPage() {
+                    if (this.currentPage < this.totalPages) this.currentPage++;
+                },
+                prevPage() {
+                    if (this.currentPage > 1) this.currentPage--;
+                },
+                isVisited(link) {
+                    return this.visitedLinks.includes(link);
+                },
+                isFavorite(link) {
+                    return this.favoriteLinks.includes(link);
+                },
+                toggleFavorite(link) {
+                    if (this.isFavorite(link)) {
+                        this.favoriteLinks = this.favoriteLinks.filter(l => l !== link);
+                    } else {
+                        this.favoriteLinks.push(link);
+                    }
+                    this.saveState();
+                },
+                getGlobalIndex(item) {
+                    return this.filteredArticles.findIndex(a => a.link === item.link);
+                },
+                openReaderMode(index) {
+                    if (index === -1) return;
+                    this.currentReaderGlobalIndex = index;
+                    const item = this.filteredArticles[index];
+                    const tempContentDiv = document.createElement('div');
+                    tempContentDiv.innerHTML = item.content || item.description;
+                    tempContentDiv.querySelectorAll('img').forEach(img => img.remove());
+                    const articleImageUrl = this.findImageInFeedItem(item);
+                    if (articleImageUrl) {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = articleImageUrl;
+                        imgElement.alt = 'Artikelbild';
+                        imgElement.className = 'w-full h-auto mb-4 rounded-lg';
+                        imgElement.id = 'reader-body-image';
+                        tempContentDiv.appendChild(imgElement);
+                    }
+                    this.readerArticle = { ...item, content: tempContentDiv.innerHTML };
+                    this.isReaderOpen = true;
+                    if (!this.isVisited(item.link)) {
+                        this.visitedLinks.push(item.link);
+                        this.saveState();
+                    }
+                    this.$nextTick(() => {
+                        document.getElementById('reader-body').scrollTop = 0;
+                    });
+                },
+                showNextArticle() {
+                    if (this.currentReaderGlobalIndex < this.filteredArticles.length - 1) {
+                        this.openReaderMode(this.currentReaderGlobalIndex + 1);
+                    }
+                },
+                showPreviousArticle() {
+                    if (this.currentReaderGlobalIndex > 0) {
+                        this.openReaderMode(this.currentReaderGlobalIndex - 1);
+                    }
+                },
+                adjustReaderFontSize(increment) {
+                    const newSize = this.currentReaderFontSize + increment;
+                    if (newSize >= 12 && newSize <= 28) {
+                        this.currentReaderFontSize = newSize;
+                        this.saveState();
+                    }
+                },
+                handleExportClick() {
+                    this.exportFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    this.isExportModalOpen = true;
+                },
+                performExport() {
+                    const exportData = {
+                        feeds: this.savedFeeds.map(({ url, title }) => ({ url, title })),
+                        visited: this.visitedLinks,
+                        favorites: this.favoriteLinks
+                    };
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = this.exportFilename.endsWith('.json') ? this.exportFilename : `${this.exportFilename}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.isExportModalOpen = false;
+                },
+                triggerImport() {
+                    this.isImportModalOpen = false;
+                    document.getElementById('import-file-input').click();
+                },
+                handleFileImport(event) {
+                    const file = event.target.files[0];
                     if (!file) return;
                     const reader = new FileReader();
-                    reader.onload = (event) => {
+                    reader.onload = (e) => {
                         try {
-                            const importedData = JSON.parse(event.target.result);
-                            if (Array.isArray(importedData)) {
-                                savedFeeds = importedData.map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
-                                visitedLinks = new Set();
-                                favoriteLinks = new Set();
-                            } else if (typeof importedData === 'object' && importedData.feeds) {
-                                savedFeeds = (importedData.feeds || []).map(feed => ({ ...feed, favicon: getFaviconUrl(feed.url) }));
-                                visitedLinks = new Set(importedData.visited || []);
-                                favoriteLinks = new Set(importedData.favorites || []);
+                            const data = JSON.parse(e.target.result);
+                            if (data.feeds && data.visited && data.favorites) {
+                                this.savedFeeds = data.feeds.map(f => ({ ...f, favicon: this.getFaviconUrl(f.url) }));
+                                this.visitedLinks = data.visited;
+                                this.favoriteLinks = data.favorites;
+                                this.saveState();
+                                this.loadAllFeeds();
+                                this.setTemporaryMessage('Import erfolgreich!', false);
                             } else {
-                                throw new Error('Ungültiges Dateiformat.');
+                                throw new Error('Invalid file format');
                             }
-                            saveFeeds();
-                            saveVisitedLinks();
-                            saveFavoriteLinks();
-                            renderSidebar();
-                            showMessage(`${savedFeeds.length} Feed(s) und zugehörige Daten erfolgreich importiert.`, false);
                         } catch (error) {
-                            showMessage(`Import fehlgeschlagen: ${error.message}`, true);
+                            this.setTemporaryMessage('Import fehlgeschlagen.', true);
                         }
                     };
                     reader.readAsText(file);
-                };
-                input.click();
-            };
-
-            // --- GLOBAL EVENT LISTENERS ---
-            loadBtn.addEventListener('click', () => loadFeed(urlInput.value).catch(err => console.error(err)));
-            urlInput.addEventListener('keypress', e => {
-                if (e.key === 'Enter') loadFeed(urlInput.value).catch(err => console.error(err));
-            });
-
-            openMobileMenuBtn.addEventListener('click', openMobileMenu);
-            closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
-            mobileNavOverlay.addEventListener('click', (event) => {
-                if (event.target === mobileNavOverlay) {
-                    closeMobileMenu();
+                    event.target.value = '';
+                },
+                setTemporaryMessage(text, isError) {
+                    this.message = { text, isError };
+                    setTimeout(() => {
+                        this.message.text = '';
+                    }, 3000);
                 }
-            });
-
-            feedContainer.addEventListener('click', (e) => {
-                const favoriteBtn = e.target.closest('.favorite-btn');
-                if (favoriteBtn) {
-                    e.stopPropagation();
-                    const link = favoriteBtn.dataset.link;
-                    if (!link) return;
-                    if (favoriteLinks.has(link)) {
-                        favoriteLinks.delete(link);
-                    } else {
-                        favoriteLinks.add(link);
-                    }
-                    saveFavoriteLinks();
-                    updateSidebarCounts();
-                    favoriteBtn.classList.toggle('is-favorite');
-                    if (activeUrl === 'favorites') loadFavorites(); // Re-load favorites to update list if needed
-                    return;
-                }
-                const articleContent = e.target.closest('.article-item-content');
-                if (!articleContent) return;
-                const clickedLocalIndex = parseInt(articleContent.dataset.index, 10);
-                const clickedItem = articlesToDisplay[clickedLocalIndex];
-                const globalIndex = filteredArticles.findIndex(a => a.link === clickedItem.link);
-
-                if (globalIndex !== -1) {
-                    openReaderMode(globalIndex);
-                } else {
-                    console.error("Clicked article not found in filteredArticles.");
-                }
-            });
-
-            // Reader Modal Listeners
-            readerCloseBtn.addEventListener('click', closeReaderMode);
-            readerPrevBtn.addEventListener('click', showPreviousArticle);
-            readerNextBtn.addEventListener('click', showNextArticle);
-            fontSizeDecreaseBtn.addEventListener('click', () => adjustReaderFontSize(-1)); // Decrease by 1px
-            fontSizeIncreaseBtn.addEventListener('click', () => adjustReaderFontSize(1)); // Increase by 1px
-
-            // New listener for the favorite button in reader mode
-            readerFavoriteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const link = readerFavoriteBtn.dataset.link;
-                if (!link) return;
-                if (favoriteLinks.has(link)) {
-                    favoriteLinks.delete(link);
-                } else {
-                    favoriteLinks.add(link);
-                }
-                saveFavoriteLinks();
-                updateSidebarCounts();
-                readerFavoriteBtn.classList.toggle('is-favorite');
-            });
-
-            // Auto-advance on scroll to end
-            readerBody.addEventListener('scroll', () => {
-                const scrollThreshold = 100; // Pixels from the bottom to trigger next article
-                if (readerBody.scrollTop + readerBody.clientHeight >= readerBody.scrollHeight - scrollThreshold) {
-                    showNextArticle();
-                }
-            });
-
-
-            document.addEventListener('keydown', (e) => {
-                if (!readerModal.classList.contains('hidden')) {
-                    if (e.key === 'ArrowRight') showNextArticle();
-                    if (e.key === 'ArrowLeft') showPreviousArticle();
-                    if (e.key === 'Escape') closeReaderMode();
-                }
-            });
-
-            let touchStartX = 0;
-            let touchEndX = 0;
-            readerModalContent.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            readerModalContent.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, { passive: true });
-            const handleSwipe = () => {
-                if (touchEndX < touchStartX - 50) showNextArticle();
-                if (touchEndX > touchStartX + 50) showPreviousArticle();
-            };
-
-            // Import Modal Listeners
-            document.getElementById('confirm-import-btn').addEventListener('click', () => {
-                document.getElementById('import-modal').classList.add('hidden');
-                triggerImport();
-            });
-            document.getElementById('cancel-import-btn').addEventListener('click', () => {
-                document.getElementById('import-modal').classList.add('hidden');
-            });
-
-            // Event listeners for the Rename Export Modal
-            confirmExportNameBtn.addEventListener('click', () => {
-                const filename = exportFilenameInput.value;
-                renameExportModal.classList.add('hidden'); // Hide the modal
-                performExport(filename); // Perform the export with the chosen filename
-            });
-
-            cancelExportNameBtn.addEventListener('click', () => {
-                renameExportModal.classList.add('hidden'); // Just hide the modal
-            });
-
-            // --- INITIALIZATION ---
-            // Set initial font size from localStorage
-            applyReaderFontSize();
-            renderSidebar();
-            loadAllFeeds(); // Load "Alle Feeds" view by default
+            }));
         });
     </script>
 </body>
-
-<script>
-    window.addEventListener('message', (event) => {
-        // Security check: only respond to messages from the parent window
-        if (event.source !== window.parent) {
-            return;
-        }
-
-        const message = event.data;
-
-        if (message && message.type === 'backupDataRequest') {
-            // Collect all relevant data for the RSS reader.
-            const feedsData = localStorage.getItem('savedRssFeeds');
-            const visitedData = localStorage.getItem('rssVisitedLinks');
-            const favoritesData = localStorage.getItem('rssFavoriteLinks');
-
-            // Bundle all data into a single object.
-            const backupPayload = {
-                feeds: JSON.parse(feedsData || '[]'),
-                visited: JSON.parse(visitedData || '[]'),
-                favorites: JSON.parse(favoritesData || '[]')
-            };
-
-            // Send the object back to the main window (index.html).
-            window.parent.postMessage({
-                type: 'backupDataResponse',
-                key: 'rss',
-                data: backupPayload
-            }, '*'); // In a real application, you should specify the exact URL of the parent here.
-        }
-
-        if (message && message.type === 'restoreBackupData') {
-            // Receive the data object to be restored.
-            const restoredData = message.data;
-
-            // Check if the restored data has the expected format.
-            if (typeof restoredData === 'object' && restoredData !== null && 'feeds' in restoredData && 'visited' in restoredData && 'favorites' in restoredData) {
-                // Store each part of the data in its respective localStorage entry.
-                localStorage.setItem('savedRssFeeds', JSON.stringify(restoredData.feeds || []));
-                localStorage.setItem('rssVisitedLinks', JSON.stringify(restoredData.visited || []));
-                localStorage.setItem('rssFavoriteLinks', JSON.stringify(restoredData.favorites || []));
-
-                // Reload the page so that the changes become visible.
-                window.location.reload();
-            }
-        }
-    });
-</script>
-
 
 </html>

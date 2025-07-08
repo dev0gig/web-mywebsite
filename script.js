@@ -212,6 +212,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
+                // Special handling for habitmea to wait for its API
+                if (key === 'habitmea') {
+                    await new Promise((resolve, reject) => {
+                        const interval = 100;
+                        const timeout = 5000;
+                        let elapsedTime = 0;
+                        const checkApi = setInterval(() => {
+                            if (frame.contentWindow && frame.contentWindow.HabitMeaAPI) {
+                                clearInterval(checkApi);
+                                resolve();
+                            } else {
+                                elapsedTime += interval;
+                                if (elapsedTime >= timeout) {
+                                    clearInterval(checkApi);
+                                    reject(new Error(`Timeout waiting for HabitMeaAPI on ${key}`));
+                                }
+                            }
+                        }, interval);
+                    });
+                }
+
                 // 2. Request backup data and wait for its specific response
                 await new Promise((resolve, reject) => {
                     const timeoutId = setTimeout(() => {
@@ -274,7 +295,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (frame) {
                             const content = await zip.file(filename).async('string');
                             const dataToRestore = JSON.parse(content);
-                            const sendMessageOnLoad = () => {
+                            const sendMessageOnLoad = async () => {
+                                if (key === 'habitmea') {
+                                    await new Promise((resolve, reject) => {
+                                        const interval = 100;
+                                        const timeout = 5000;
+                                        let elapsedTime = 0;
+                                        const checkApi = setInterval(() => {
+                                            if (frame.contentWindow && frame.contentWindow.HabitMeaAPI) {
+                                                clearInterval(checkApi);
+                                                resolve();
+                                            } else {
+                                                elapsedTime += interval;
+                                                if (elapsedTime >= timeout) {
+                                                    clearInterval(checkApi);
+                                                    reject(new Error(`Timeout waiting for HabitMeaAPI on ${key}`));
+                                                }
+                                            }
+                                        }, interval);
+                                    });
+                                }
                                 frame.contentWindow.postMessage({ type: 'restoreBackupData', data: dataToRestore }, '*');
                                 frame.removeEventListener('load', sendMessageOnLoad);
                             };
