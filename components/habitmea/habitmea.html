@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitMea - Verfolge deine Gewohnheiten</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Ubuntu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Ubuntu', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #171717; }
+        ::-webkit-scrollbar-thumb { background: #404040; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #525252; }
+        
+        .modal { display: none; }
+        .modal.flex { display: flex; }
+
+        .calendar-day { transition: background-color 0.2s ease-in-out; }
+        .calendar-day:not(.other-month):hover { background-color: #262626; }
+    </style>
+    
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Ubuntu', 'sans-serif'],
+            },
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-neutral-900 text-neutral-200 antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Main Container - Removed container and mx-auto for full width -->
+    <div class="px-4 sm:px-6 lg:px-8 flex flex-col flex-grow min-h-0">
+
+        <!-- Header Section -->
+        <header class="text-center pt-8 pb-4 flex-shrink-0">
+            <h1 class="text-5xl font-bold text-white mb-2">HabitMea</h1>
+            <p class="text-lg text-neutral-400">Verfolge deine Gewohnheiten, Bücher, Filme, Serien usw. an einem Ort.</p>
+        </header>
+
+        <!-- Action Buttons Section -->
+        <div class="text-center pb-6 flex-shrink-0 flex flex-wrap justify-center gap-4">
+            <button id="export-btn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg shadow-sky-900/50">
+                <i class="material-icons mr-2">file_download</i>
+                Exportieren
+            </button>
+            <button id="import-btn" class="bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg shadow-violet-900/50">
+                <i class="material-icons mr-2">file_upload</i>
+                Importieren
+            </button>
+            <button id="open-add-list-modal-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg shadow-indigo-900/50">
+                <i class="material-icons mr-2">playlist_add</i>
+                Eigene Liste hinzufügen
+            </button>
+            <input type="file" id="import-file-input" class="hidden" accept=".json">
+        </div>
+
+        <!-- Horizontally Scrolling Content -->
+        <main id="main-grid" class="flex-grow flex overflow-x-auto space-x-8 pb-4 min-h-0">
+
+            <!-- Section 1: Habit Tracker with Calendar -->
+            <section id="habits" class="w-[800px] flex-shrink-0 bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 shadow-2xl shadow-neutral-950/50 flex flex-col" data-list-type="habit">
+                <div class="flex items-center mb-4"><i class="material-icons text-3xl text-emerald-400 mr-4">task_alt</i><h2 class="text-2xl font-bold text-white">Tägliche Gewohnheiten</h2></div>
+                
+                <div class="flex flex-grow gap-6 min-h-0">
+                    <div class="w-3/5 flex flex-col"><div class="flex items-center justify-between mb-4"><button id="prev-month-btn" class="p-2 rounded-full hover:bg-neutral-700"><i class="material-icons">chevron_left</i></button><h3 id="month-year-header" class="text-lg font-semibold text-white"></h3><button id="next-month-btn" class="p-2 rounded-full hover:bg-neutral-700"><i class="material-icons">chevron_right</i></button></div><div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-neutral-400 mb-2"><div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div></div><div id="calendar-grid" class="grid grid-cols-7 gap-1"></div></div>
+                    <div class="w-2/5 border-l border-neutral-700/50 pl-6 flex flex-col"><h3 class="text-lg font-semibold text-white mb-3 flex-shrink-0">Heutige Gewohnheiten</h3><div id="todays-habits-list" class="space-y-3 flex-grow overflow-y-auto pr-2"></div></div>
+                </div>
+                <button id="open-manage-habits-modal-btn" class="mt-6 w-full flex-shrink-0 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">settings</i>Gewohnheiten verwalten</button>
+            </section>
+
+            <!-- Other sections -->
+            <section id="books" class="w-96 flex-shrink-0 bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 shadow-2xl shadow-neutral-950/50 flex flex-col" data-list-type="book">
+                <div class="flex items-center mb-6"><i class="material-icons text-3xl text-sky-400 mr-4">menu_book</i><h2 class="text-2xl font-bold text-white">Meine Bücher</h2></div>
+                <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
+                    <div class="list-item bg-neutral-900 p-4 rounded-lg cursor-pointer hover:bg-neutral-800" data-type="book" data-title="Der Herr der Ringe" data-subtitle="J.R.R. Tolkien" data-status="Gelesen" data-note="Ein Meisterwerk."><div class="flex items-center"><p class="font-semibold text-neutral-100 item-title">Der Herr der Ringe</p><i class="material-icons text-neutral-400 text-sm ml-2 note-indicator">subject</i></div><p class="text-sm text-neutral-400 mb-2 item-subtitle">J.R.R. Tolkien</p><span class="item-status text-xs font-medium px-2.5 py-1 rounded-full bg-green-900 text-green-300">Gelesen</span></div>
+                </div>
+                <button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neues Buch</button>
+            </section>
+            <section id="media" class="w-96 flex-shrink-0 bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 shadow-2xl shadow-neutral-950/50 flex flex-col" data-list-type="media">
+                <div class="flex items-center mb-6"><i class="material-icons text-3xl text-rose-400 mr-4">theaters</i><h2 class="text-2xl font-bold text-white">Filme & Serien</h2></div>
+                <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
+                    <div class="list-item bg-neutral-900 p-4 rounded-lg cursor-pointer hover:bg-neutral-800" data-type="media" data-title="Blade Runner 2049" data-subtitle="Film" data-status="Gesehen" data-note=""><div class="flex justify-between items-start"><div><div class="flex items-center"><p class="font-semibold text-neutral-100 item-title">Blade Runner 2049</p><i class="material-icons text-neutral-400 text-sm ml-2 note-indicator hidden">subject</i></div><p class="text-sm text-neutral-400 item-subtitle">Film</p></div><span class="item-status text-xs font-medium px-2.5 py-1 rounded-full bg-green-900 text-green-300 mt-1">Gesehen</span></div></div>
+                </div>
+                <button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS CONTAINER -->
+    <div id="day-habits-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-700"><div class="flex justify-between items-center p-4 border-b border-neutral-700"><h3 id="day-habits-modal-title" class="text-xl font-bold text-white">Gewohnheiten für</h3><button class="modal-close-btn text-neutral-400 hover:text-white"><i class="material-icons">close</i></button></div><div id="day-habits-list" class="p-6 max-h-96 overflow-y-auto space-y-4"></div></div></div>
+    <div id="manage-habits-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-700"><div class="flex justify-between items-center p-4 border-b border-neutral-700"><h3 class="text-xl font-bold text-white">Gewohnheiten verwalten</h3><button class="modal-close-btn text-neutral-400 hover:text-white"><i class="material-icons">close</i></button></div><div id="manage-habits-list" class="p-6 max-h-80 overflow-y-auto space-y-3"></div><div class="p-6 border-t border-neutral-700"><label for="new-habit-def-title" class="block mb-2 text-sm font-medium">Neue Gewohnheit hinzufügen</label><div class="flex gap-2"><input type="text" id="new-habit-def-title" class="w-full bg-neutral-900 border border-neutral-600 rounded-lg p-2.5" placeholder="z.B. Meditieren"><button id="add-habit-def-save-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-lg"><i class="material-icons">add</i></button></div></div></div></div>
+    <div id="details-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-700"><div class="flex justify-between items-center p-4 border-b border-neutral-700"><h3 id="modal-title" class="text-xl font-bold text-white">Details</h3><button class="modal-close-btn text-neutral-400 hover:text-white"><i class="material-icons">close</i></button></div><div class="p-6"><div class="mb-6"><h4 class="text-lg font-semibold mb-3">Status</h4><div id="modal-status-options" class="flex flex-wrap gap-3"></div></div><div><h4 class="text-lg font-semibold mb-3">Meine Notizen</h4><textarea id="modal-notes" rows="4" class="w-full bg-neutral-900 border border-neutral-600 rounded-lg p-3"></textarea></div></div><div class="flex justify-between p-4 bg-neutral-800/50 border-t border-neutral-700"><button id="delete-item-btn" class="bg-rose-800 hover:bg-rose-700 text-rose-100 font-bold py-2 px-4 rounded-lg"><i class="material-icons text-base mr-1">delete</i>Löschen</button><button id="modal-save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg">Speichern</button></div></div></div>
+    <div id="add-list-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-700"><div class="flex justify-between items-center p-4 border-b border-neutral-700"><h3 class="text-xl font-bold text-white">Neue Liste erstellen</h3><button class="modal-close-btn text-neutral-400 hover:text-white"><i class="material-icons">close</i></button></div><div class="p-6 space-y-4"><div><label for="new-list-title" class="block mb-2 text-sm font-medium">Titel der Liste</label><input type="text" id="new-list-title" class="w-full bg-neutral-900 border border-neutral-600 rounded-lg p-2.5" placeholder="z.B. Meine Videospiele"></div><div><label for="new-list-icon" class="block mb-2 text-sm font-medium">Material Icon Name</label><input type="text" id="new-list-icon" class="w-full bg-neutral-900 border border-neutral-600 rounded-lg p-2.5" placeholder="z.B. sports_esports"></div></div><div class="flex justify-end p-4 bg-neutral-800/50 border-t border-neutral-700"><button id="add-list-save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg">Erstellen</button></div></div></div>
+    <div id="add-item-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-700"><div class="flex justify-between items-center p-4 border-b border-neutral-700"><h3 id="add-item-modal-title" class="text-xl font-bold text-white">Neuen Eintrag</h3><button class="modal-close-btn text-neutral-400 hover:text-white"><i class="material-icons">close</i></button></div><form id="add-item-form" class="p-6 space-y-4"></form><div class="flex justify-end p-4 bg-neutral-800/50 border-t border-neutral-700"><button id="add-item-save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg">Hinzufügen</button></div></div></div>
+    <div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50"><div class="bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-sm border border-neutral-700"><div class="p-6 text-center"><i class="material-icons text-5xl text-amber-500 mb-4">warning_amber</i><h3 id="confirm-modal-text" class="text-lg text-neutral-200 mb-6">Möchtest du das wirklich löschen?</h3><div class="flex justify-center gap-4"><button id="confirm-cancel-btn" class="bg-neutral-600 hover:bg-neutral-500 text-white font-bold py-2 px-6 rounded-lg">Abbrechen</button><button id="confirm-delete-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-6 rounded-lg">Löschen</button></div></div></div></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA STORE ---
+        let allHabits = ["30 Minuten lesen", "Sport treiben"];
+        let dailyLog = {};
+        let currentDate = new Date();
+
+        // --- GLOBAL ELEMENTS ---
+        const mainGrid = document.getElementById('main-grid');
+        const allModals = document.querySelectorAll('.modal');
+        
+        // --- CALENDAR ELEMENTS ---
+        const calendarGrid = document.getElementById('calendar-grid');
+        const monthYearHeader = document.getElementById('month-year-header');
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+        const todaysHabitsList = document.getElementById('todays-habits-list');
+        
+        // --- MODAL ELEMENTS ---
+        const dayHabitsModal = document.getElementById('day-habits-modal');
+        const dayHabitsModalTitle = document.getElementById('day-habits-modal-title');
+        const dayHabitsList = document.getElementById('day-habits-list');
+        const manageHabitsModal = document.getElementById('manage-habits-modal');
+        const openManageHabitsModalBtn = document.getElementById('open-manage-habits-modal-btn');
+        const manageHabitsList = document.getElementById('manage-habits-list');
+        const addHabitDefSaveBtn = document.getElementById('add-habit-def-save-btn');
+        const newHabitDefTitleInput = document.getElementById('new-habit-def-title');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalText = document.getElementById('confirm-modal-text');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        
+        // --- IMPORT/EXPORT ELEMENTS ---
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const importFileInput = document.getElementById('import-file-input');
+
+        // --- HELPER ---
+        const getDateString = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+        // --- MODAL & ACTION LOGIC ---
+        const closeModal = (modal) => modal.classList.remove('flex');
+        const openModal = (modal) => modal.classList.add('flex');
+
+        allModals.forEach(modal => {
+            modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(modal); });
+            modal.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => closeModal(modal)));
+        });
+
+        let onConfirmCallback = null;
+        const openConfirmModal = (text, callback) => {
+            confirmModalText.textContent = text;
+            onConfirmCallback = callback;
+            openModal(confirmModal);
+        };
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (onConfirmCallback) onConfirmCallback();
+            closeModal(confirmModal);
+        });
+        confirmCancelBtn.addEventListener('click', () => closeModal(confirmModal));
+
+        // --- HABIT & CALENDAR LOGIC ---
+        const updateHabitLog = (dateStr, habit, isChecked) => {
+            if (!dailyLog[dateStr]) dailyLog[dateStr] = {};
+            dailyLog[dateStr][habit] = isChecked;
+            renderAllHabits();
+        };
+
+        const renderTodaysHabits = () => {
+            todaysHabitsList.innerHTML = '';
+            const todayStr = getDateString(new Date());
+            const todayLog = dailyLog[todayStr] || {};
+            if (allHabits.length === 0) { todaysHabitsList.innerHTML = `<p class="text-neutral-400 text-sm">Definiere eine Gewohnheit.</p>`; } 
+            else { allHabits.forEach(habit => {
+                    const isChecked = todayLog[habit] || false;
+                    todaysHabitsList.insertAdjacentHTML('beforeend', `<div class="flex items-center bg-neutral-900 p-3 rounded-lg"><input type="checkbox" id="today-habit-${habit.replace(/\s/g, '')}" class="habit-checkbox form-checkbox h-5 w-5 bg-neutral-700" data-habit="${habit}" data-date="${todayStr}" ${isChecked ? 'checked' : ''}><label for="today-habit-${habit.replace(/\s/g, '')}" class="ml-3 text-base flex-grow cursor-pointer">${habit}</label></div>`);
+                });
+            }
+        };
+
+        const renderCalendar = () => {
+            calendarGrid.innerHTML = '';
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            monthYearHeader.textContent = currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const offset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+            for (let i = 0; i < offset; i++) calendarGrid.insertAdjacentHTML('beforeend', '<div></div>');
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = getDateString(date);
+                const log = dailyLog[dateStr] || {};
+                const totalHabits = allHabits.length;
+                const completedHabits = totalHabits > 0 ? Object.values(log).filter(Boolean).length : 0;
+                const progress = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
+                const isToday = new Date().toDateString() === date.toDateString();
+                const todayClass = isToday ? 'bg-indigo-800/50' : 'bg-neutral-900/50';
+                const radius = 18;
+                const circumference = 2 * Math.PI * radius;
+                const offsetProgress = circumference - (progress / 100) * circumference;
+                const dayCellHTML = `<div class="calendar-day rounded-lg flex items-center justify-center aspect-square cursor-pointer ${todayClass}" data-date="${dateStr}"><div class="relative w-12 h-12 flex items-center justify-center"><svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 44 44"><circle class="text-neutral-700" stroke-width="4" stroke="currentColor" fill="transparent" r="${radius}" cx="22" cy="22" /><circle class="text-emerald-500 transition-all duration-300" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="22" cy="22" stroke-dasharray="${circumference}" stroke-dashoffset="${offsetProgress}" transform="rotate(-90 22 22)" /></svg><span class="relative font-semibold text-white">${day}</span></div></div>`;
+                calendarGrid.insertAdjacentHTML('beforeend', dayCellHTML);
+            }
+        };
+
+        const renderAllHabits = () => { renderCalendar(); renderTodaysHabits(); };
+        prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+        document.getElementById('habits').addEventListener('change', (e) => { if (e.target.classList.contains('habit-checkbox')) updateHabitLog(e.target.dataset.date, e.target.dataset.habit, e.target.checked); });
+        calendarGrid.addEventListener('click', (e) => {
+            const dayCell = e.target.closest('.calendar-day');
+            if (!dayCell) return;
+            const dateStr = dayCell.dataset.date;
+            const [year, month, day] = dateStr.split('-');
+            dayHabitsModalTitle.textContent = `Gewohnheiten für den ${new Date(year, month - 1, day).toLocaleDateString('de-DE', {dateStyle: 'long'})}`;
+            dayHabitsList.innerHTML = '';
+            const dayLog = dailyLog[dateStr] || {};
+            if (allHabits.length === 0) { dayHabitsList.innerHTML = `<p class="text-neutral-400">Keine Gewohnheiten definiert.</p>`; } 
+            else { allHabits.forEach(habit => dayHabitsList.insertAdjacentHTML('beforeend', `<div class="flex items-center bg-neutral-900 p-4 rounded-lg"><input type="checkbox" id="modal-habit-${habit.replace(/\s/g, '')}-${day}" class="habit-checkbox form-checkbox h-5 w-5 bg-neutral-700" data-habit="${habit}" data-date="${dateStr}" ${dayLog[habit] || false ? 'checked' : ''}><label for="modal-habit-${habit.replace(/\s/g, '')}-${day}" class="ml-4 text-lg flex-grow cursor-pointer">${habit}</label></div>`)); }
+            openModal(dayHabitsModal);
+        });
+
+        const renderManageHabitsList = () => {
+            manageHabitsList.innerHTML = '';
+            allHabits.forEach(habit => manageHabitsList.insertAdjacentHTML('beforeend', `<div class="flex justify-between items-center bg-neutral-900 p-3 rounded-lg"><span>${habit}</span><button class="delete-habit-btn text-neutral-500 hover:text-rose-500" data-habit="${habit}"><i class="material-icons">delete</i></button></div>`));
+        };
+        openManageHabitsModalBtn.addEventListener('click', () => { renderManageHabitsList(); openModal(manageHabitsModal); });
+        addHabitDefSaveBtn.addEventListener('click', () => {
+            const newHabit = newHabitDefTitleInput.value.trim();
+            if (newHabit && !allHabits.includes(newHabit)) {
+                allHabits.push(newHabit);
+                renderManageHabitsList();
+                renderAllHabits();
+            }
+            newHabitDefTitleInput.value = '';
+        });
+        newHabitDefTitleInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addHabitDefSaveBtn.click(); });
+        manageHabitsList.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-habit-btn');
+            if (!deleteBtn) return;
+            const habitToDelete = deleteBtn.dataset.habit;
+            openConfirmModal(`Soll die Gewohnheit "${habitToDelete}" wirklich gelöscht werden? Alle Einträge dazu gehen verloren.`, () => {
+                allHabits = allHabits.filter(h => h !== habitToDelete);
+                for (const date in dailyLog) { delete dailyLog[date][habitToDelete]; }
+                renderManageHabitsList();
+                renderAllHabits();
+            });
+        });
+
+        // --- GENERAL LIST & ITEM LOGIC ---
+        const detailsModal = document.getElementById('details-modal');
+        const addListModal = document.getElementById('add-list-modal');
+        const addItemModal = document.getElementById('add-item-modal');
+        const detailsModalTitle = document.getElementById('modal-title');
+        const detailsModalStatusOptions = document.getElementById('modal-status-options');
+        const detailsModalNotes = document.getElementById('modal-notes');
+        const detailsModalSaveBtn = document.getElementById('modal-save-btn');
+        const deleteItemBtn = document.getElementById('delete-item-btn');
+        let currentItemElement = null;
+        const openAddListModalBtn = document.getElementById('open-add-list-modal-btn');
+        const addListSaveBtn = document.getElementById('add-list-save-btn');
+        const newListTitleInput = document.getElementById('new-list-title');
+        const newListIconInput = document.getElementById('new-list-icon');
+        const addItemModalTitle = document.getElementById('add-item-modal-title');
+        const addItemForm = document.getElementById('add-item-form');
+        const addItemSaveBtn = document.getElementById('add-item-save-btn');
+        let currentListContainer = null;
+        const statusMap = { book: {"Gelesen": "bg-green-900 text-green-300", "Lese ich": "bg-yellow-900 text-yellow-300", "Warteliste": "bg-gray-700 text-gray-300"}, media: {"Gesehen": "bg-green-900 text-green-300", "Schaue ich": "bg-yellow-900 text-yellow-300", "Warteliste": "bg-gray-700 text-gray-300"}, default: {"Erledigt": "bg-green-900 text-green-300", "In Arbeit": "bg-yellow-900 text-yellow-300", "Geplant": "bg-gray-700 text-gray-300"}};
+
+        mainGrid.addEventListener('click', (e) => {
+            const listItem = e.target.closest('.list-item');
+            const addItemBtn = e.target.closest('.add-item-btn');
+            const deleteListBtn = e.target.closest('.delete-list-btn');
+            if (listItem) { handleOpenDetailsModal(listItem); } 
+            else if (addItemBtn) { handleOpenAddItemModal(addItemBtn); }
+            else if (deleteListBtn) {
+                const listSection = deleteListBtn.closest('section');
+                openConfirmModal(`Soll die Liste "${listSection.querySelector('h2').textContent}" wirklich gelöscht werden?`, () => listSection.remove());
+            }
+        });
+
+        const handleOpenDetailsModal = (itemElement) => {
+            currentItemElement = itemElement;
+            const data = itemElement.dataset;
+            detailsModalTitle.textContent = data.title;
+            const statusType = data.type || 'default';
+            const availableStatuses = statusMap[statusType] || statusMap.default;
+            detailsModalStatusOptions.innerHTML = '';
+            Object.keys(availableStatuses).forEach(status => detailsModalStatusOptions.insertAdjacentHTML('beforeend', `<div><input type="radio" id="status-${status.replace(/\s/g, '-')}" name="status" value="${status}" class="hidden peer" ${data.status === status ? 'checked' : ''}><label for="status-${status.replace(/\s/g, '-')}" class="inline-flex items-center justify-center w-full px-3 py-1 text-neutral-300 bg-neutral-700 border-2 border-neutral-700 rounded-full cursor-pointer peer-checked:border-indigo-500 peer-checked:text-indigo-400 hover:text-neutral-100 hover:bg-neutral-600"><div class="w-full text-sm font-semibold text-center">${status}</div></label></div>`));
+            detailsModalNotes.value = data.note || '';
+            openModal(detailsModal);
+        };
+
+        detailsModalSaveBtn.addEventListener('click', () => {
+            if (!currentItemElement) return;
+            const newStatus = detailsModal.querySelector('input[name="status"]:checked').value;
+            const newNote = detailsModalNotes.value.trim();
+            currentItemElement.dataset.status = newStatus;
+            currentItemElement.dataset.note = newNote;
+            const statusElement = currentItemElement.querySelector('.item-status');
+            const noteIndicator = currentItemElement.querySelector('.note-indicator');
+            const statusType = currentItemElement.dataset.type || 'default';
+            const statusClasses = (statusMap[statusType] || statusMap.default)[newStatus];
+            statusElement.textContent = newStatus;
+            statusElement.className = `item-status text-xs font-medium px-2.5 py-1 rounded-full ${statusClasses}`;
+            if (noteIndicator) noteIndicator.classList.toggle('hidden', !newNote);
+            closeModal(detailsModal);
+        });
+        deleteItemBtn.addEventListener('click', () => {
+            if (!currentItemElement) return;
+            openConfirmModal(`Soll der Eintrag "${currentItemElement.dataset.title}" wirklich gelöscht werden?`, () => {
+                currentItemElement.remove();
+                closeModal(detailsModal);
+            });
+        });
+        detailsModalNotes.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); detailsModalSaveBtn.click(); } });
+        
+        openAddListModalBtn.addEventListener('click', () => openModal(addListModal));
+        addListSaveBtn.addEventListener('click', () => {
+            const title = newListTitleInput.value.trim();
+            const icon = newListIconInput.value.trim() || 'list';
+            if (!title) return;
+            mainGrid.insertAdjacentHTML('beforeend', `<section class="w-96 flex-shrink-0 bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 flex flex-col" data-list-type="default"><div class="flex justify-between items-center mb-6"> <div class="flex items-center"><i class="material-icons text-3xl text-cyan-400 mr-4">${icon}</i><h2 class="text-2xl font-bold text-white">${title}</h2></div> <button class="delete-list-btn text-neutral-500 hover:text-rose-500"><i class="material-icons">delete</i></button> </div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
+            newListTitleInput.value = ''; newListIconInput.value = '';
+            closeModal(addListModal);
+        });
+        [newListTitleInput, newListIconInput].forEach(input => { input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addListSaveBtn.click(); }); });
+        
+        const handleOpenAddItemModal = (button) => {
+            const listSection = button.closest('section');
+            currentListContainer = listSection.querySelector('.item-container');
+            const listType = listSection.dataset.listType;
+            addItemModalTitle.textContent = `Neuen ${listType === 'book' ? 'Buch' : 'Eintrag'} erstellen`;
+            addItemForm.innerHTML = ''; 
+            let formFields = '';
+            if (listType === 'book') { formFields = `<div><label for="new-item-title" class="block mb-2 text-sm">Buchtitel</label><input type="text" id="new-item-title" class="w-full bg-neutral-900 border rounded-lg p-2.5" required></div><div><label for="new-item-subtitle" class="block mb-2 text-sm">Author</label><input type="text" id="new-item-subtitle" class="w-full bg-neutral-900 border rounded-lg p-2.5"></div>`; }
+            else if (listType === 'media') { formFields = `<div><label for="new-item-title" class="block mb-2 text-sm">Titel</label><input type="text" id="new-item-title" class="w-full bg-neutral-900 border rounded-lg p-2.5" required></div><div><label for="new-item-subtitle" class="block mb-2 text-sm">Typ (Film/Serie)</label><input type="text" id="new-item-subtitle" class="w-full bg-neutral-900 border rounded-lg p-2.5"></div>`; }
+            else { formFields = `<div><label for="new-item-title" class="block mb-2 text-sm">Titel</label><input type="text" id="new-item-title" class="w-full bg-neutral-900 border rounded-lg p-2.5" required></div>`; }
+            addItemForm.innerHTML = formFields;
+            openModal(addItemModal);
+        };
+        
+        addItemSaveBtn.addEventListener('click', () => {
+            if (!currentListContainer) return;
+            const listType = currentListContainer.closest('section').dataset.listType;
+            const title = addItemForm.querySelector('#new-item-title')?.value.trim();
+            const subtitle = addItemForm.querySelector('#new-item-subtitle')?.value.trim() || '';
+            if (!title) return;
+            const statusType = listType || 'default';
+            const initialStatus = Object.keys(statusMap[statusType] || statusMap.default)[2];
+            const statusClasses = (statusMap[statusType] || statusMap.default)[initialStatus];
+            currentListContainer.insertAdjacentHTML('beforeend', `<div class="list-item bg-neutral-900 p-4 rounded-lg cursor-pointer hover:bg-neutral-800" data-type="${listType}" data-title="${title}" data-subtitle="${subtitle}" data-status="${initialStatus}" data-note=""><div class="flex items-center"><p class="font-semibold text-neutral-100 item-title">${title}</p><i class="material-icons text-neutral-400 text-sm ml-2 note-indicator hidden">subject</i></div><p class="text-sm text-neutral-400 mb-2 item-subtitle">${subtitle}</p><span class="item-status text-xs font-medium px-2.5 py-1 rounded-full ${statusClasses}">${initialStatus}</span></div>`);
+            addItemForm.reset();
+            closeModal(addItemModal);
+        });
+        addItemForm.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addItemSaveBtn.click(); } });
+
+        // --- IMPORT / EXPORT LOGIC ---
+        const gatherDataForExport = () => {
+            const lists = [];
+            document.querySelectorAll('#main-grid > section:not(#habits)').forEach(section => {
+                const listData = {
+                    title: section.querySelector('h2').textContent,
+                    icon: section.querySelector('.material-icons').textContent,
+                    type: section.dataset.listType,
+                    items: []
+                };
+                section.querySelectorAll('.list-item').forEach(item => {
+                    listData.items.push({
+                        title: item.dataset.title,
+                        subtitle: item.dataset.subtitle,
+                        status: item.dataset.status,
+                        note: item.dataset.note
+                    });
+                });
+                lists.push(listData);
+            });
+            return {
+                habits: allHabits,
+                log: dailyLog,
+                lists: lists
+            };
+        };
+
+        const renderImportedData = (data) => {
+            allHabits = data.habits || [];
+            dailyLog = data.log || {};
+            
+            document.querySelectorAll('#main-grid > section:not(#habits):not(#books):not(#media)').forEach(el => el.remove());
+            document.querySelectorAll('#books .item-container, #media .item-container').forEach(el => el.innerHTML = '');
+
+            (data.lists || []).forEach(listData => {
+                let section = document.querySelector(`#main-grid section[data-list-type="${listData.type}"]`);
+                if (!section) {
+                    mainGrid.insertAdjacentHTML('beforeend', `<section class="w-96 flex-shrink-0 bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 flex flex-col" data-list-type="${listData.type}"><div class="flex justify-between items-center mb-6"> <div class="flex items-center"><i class="material-icons text-3xl text-cyan-400 mr-4">${listData.icon}</i><h2 class="text-2xl font-bold text-white">${listData.title}</h2></div> <button class="delete-list-btn text-neutral-500 hover:text-rose-500"><i class="material-icons">delete</i></button> </div><div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div><button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg"><i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button></section>`);
+                    section = mainGrid.lastElementChild;
+                }
+                const container = section.querySelector('.item-container');
+                container.innerHTML = '';
+                (listData.items || []).forEach(item => {
+                    const statusType = listData.type || 'default';
+                    const statusClasses = (statusMap[statusType] || statusMap.default)[item.status];
+                    container.insertAdjacentHTML('beforeend', `<div class="list-item bg-neutral-900 p-4 rounded-lg cursor-pointer hover:bg-neutral-800" data-type="${listData.type}" data-title="${item.title}" data-subtitle="${item.subtitle}" data-status="${item.status}" data-note="${item.note}"><div class="flex items-center"><p class="font-semibold text-neutral-100 item-title">${item.title}</p><i class="material-icons text-neutral-400 text-sm ml-2 note-indicator ${item.note ? '' : 'hidden'}">subject</i></div><p class="text-sm text-neutral-400 mb-2 item-subtitle">${item.subtitle}</p><span class="item-status text-xs font-medium px-2.5 py-1 rounded-full ${statusClasses}">${item.status}</span></div>`);
+                });
+            });
+
+            renderAllHabits();
+        };
+
+        exportBtn.addEventListener('click', () => {
+            const data = gatherDataForExport();
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'HabitMea_Backup.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        importBtn.addEventListener('click', () => importFileInput.click());
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    openConfirmModal("Möchtest du wirklich importieren? Alle aktuellen Daten werden überschrieben.", () => {
+                        renderImportedData(importedData);
+                    });
+                } catch (error) {
+                    alert("Fehler: Die Datei konnte nicht gelesen werden. Stelle sicher, dass es eine gültige Backup-Datei ist.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        });
+
+        // --- INITIALIZE ---
+        renderAllHabits();
+    });
+    </script>
+</body>
+</html>
