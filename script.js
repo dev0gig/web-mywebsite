@@ -56,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { key: 'rss', target: 'frame-rss', href: 'components/rss-reader/rss-reader.html', icon: 'assets/icons/rss.svg', text: 'RSS Reader' },
         { key: 'memomea', target: 'frame-memomea', href: 'components/memomea/memomea.html', icon: 'assets/icons/memomea.svg', text: 'MemoMea' },
         { key: 'actamea', target: 'frame-actamea', href: 'components/actamea/actamea.html', icon: 'assets/icons/notes.svg', text: 'ActaMea' },
+        { key: 'agenda', target: 'frame-agenda', href: 'components/agenda/agenda.html', icon: 'assets/icons/agenda.svg', text: 'Agenda' },
+        { key: 'habitmea', target: 'frame-habitmea', href: 'components/habitmea/habitmea.html', icon: 'assets/icons/habitmea.svg', text: 'HabitMea' },
         { key: 'widgets', target: 'frame-widgets', href: 'components/widgets-collection/widgets-collection.html', icon: 'assets/icons/widgets.svg', text: 'Widgets' },
         { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'assets/icons/unicorn.svg', text: 'Unicorn', isExternal: true },
         { key: 'settings', target: 'settings-modal', icon: 'assets/icons/settings.svg', text: 'Einstellungen' }
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backupAllData = async () => {
         showToast('Backup wird gestartet...', 'info', 0); // Show indefinite toast
 
-        const contentFrames = Array.from(document.querySelectorAll('.content-iframe')).filter(f => f.dataset.key && f.dataset.key !== 'widgets');
+        const contentFrames = Array.from(document.querySelectorAll('.content-iframe')).filter(f => f.dataset.key && f.dataset.key !== 'widgets' && f.dataset.key !== 'agenda');
         const appdrawerIframe = document.getElementById('frame-appdrawer');
         const framesToBackup = [...contentFrames];
         if (appdrawerIframe) {
@@ -532,9 +534,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- INITIALIZATION ---
+    function preloadAppdrawer() {
+        if (appdrawerFrame && !appdrawerFrame.src) {
+            console.log('Preloading Appdrawer...');
+            appdrawerFrame.addEventListener('load', () => {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                applyThemeToFrame(appdrawerFrame, savedTheme);
+                console.log('Appdrawer preloaded.');
+            }, { once: true });
+            appdrawerFrame.src = appdrawerFrame.dataset.src;
+        }
+    }
+
     renderAppDock();
     renderMobileSidebar();
     startClock();
+    preloadAppdrawer(); // Appdrawer im Hintergrund laden
 
     // Event Listeners for settings
     closeModalBtn.addEventListener('click', closeSettingsModal);

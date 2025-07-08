@@ -48,11 +48,6 @@
     <!-- Schwebende Aktionsbuttons -->
     <div class="fixed bottom-6 right-6 flex flex-col items-center space-y-4 z-10">
         
-        <!-- Theme-Toggle Button -->
-        <button id="theme-toggle-button" title="Modus wechseln" 
-           class="bg-gray-500 hover:bg-gray-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 no-focus-outline">
-            <span id="theme-icon" class="material-icons" style="font-size: 28px;">light_mode</span>
-        </button>
 
         <!-- Google Tasks Button -->
         <a href="https://tasks.google.com/" target="_blank" rel="noopener noreferrer" title="Google Tasks öffnen" 
@@ -70,22 +65,21 @@
 
     <script>
         // Elemente aus dem DOM holen
-        const themeToggleButton = document.getElementById('theme-toggle-button');
         const calendarIframe = document.getElementById('calendar-iframe');
-        const themeIcon = document.getElementById('theme-icon');
 
-        // Event-Listener für den Klick auf den Button hinzufügen
-        themeToggleButton.addEventListener('click', () => {
-            // Die 'calendar-dark-mode'-Klasse auf dem iFrame umschalten (hinzufügen/entfernen)
-            calendarIframe.classList.toggle('calendar-dark-mode');
-
-            // Prüfen, ob der Dark-Mode jetzt aktiv ist, und das Icon entsprechend ändern
-            if (calendarIframe.classList.contains('calendar-dark-mode')) {
-                // Wenn Dark-Mode an ist, zeige das "Sonne"-Icon an, um zum Light-Mode zu wechseln
-                themeIcon.textContent = 'light_mode';
-            } else {
-                // Wenn Dark-Mode aus ist, zeige das "Mond"-Icon an, um zum Dark-Mode zu wechseln
-                themeIcon.textContent = 'dark_mode';
+        // Listen for theme changes from the parent window
+        window.addEventListener('message', (event) => {
+            if (event.source !== window.parent) {
+                return;
+            }
+            const message = event.data;
+            if (typeof message === 'string' && message.startsWith('set-theme-')) {
+                const theme = message.split('-')[2];
+                if (theme === 'dark') {
+                    calendarIframe.classList.add('calendar-dark-mode');
+                } else {
+                    calendarIframe.classList.remove('calendar-dark-mode');
+                }
             }
         });
     </script>
