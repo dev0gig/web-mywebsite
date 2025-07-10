@@ -171,9 +171,22 @@
                 class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="habit">
-                <div class="flex items-center mb-4"><i class="material-icons text-3xl text-emerald-500 mr-4"
-                        style="color: var(--text-color-light);">task_alt</i>
-                    <h2 class="text-2xl font-bold" style="color: var(--header-color);">Tägliche Gewohnheiten</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <i class="material-icons text-3xl text-emerald-500 mr-4"
+                            style="color: var(--text-color-light);">task_alt</i>
+                        <h2 class="text-2xl font-bold" style="color: var(--header-color);">Tägliche Gewohnheiten</h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="open-manage-habits-modal-btn" class="p-2 rounded-full" title="Gewohnheiten verwalten"
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">add</i>
+                        </button>
+                        <button class="open-completed-btn p-2 rounded-full" title="Erledigte anzeigen"
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">done_all</i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex flex-col md:flex-row flex-grow gap-6 min-h-0">
@@ -208,8 +221,8 @@
                         <div id="todays-habits-list" class="space-y-3 flex-grow overflow-y-auto pr-2"></div>
                     </div>
                 </div>
-                <button id="open-manage-habits-modal-btn"
-                    class="mt-6 w-full flex-shrink-0 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg"><i
+                <button id="open-manage-habits-modal-btn-mobile"
+                    class="mt-6 w-full h-12 flex-shrink-0 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
                         class="material-icons mr-2">settings</i>Gewohnheiten verwalten</button>
             </section>
 
@@ -224,15 +237,20 @@
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">Meine Bücher</h2>
                     </div>
                     <div class="flex items-center gap-1">
+                        <button class="add-item-btn p-2 rounded-full" title="Neues Buch"
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">add</i>
+                        </button>
                         <button class="open-completed-btn p-2 rounded-full" title="Erledigte anzeigen"
-                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i
-                                class="material-icons text-base">done_all</i></button>
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">done_all</i>
+                        </button>
                     </div>
                 </div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
                 <button
-                    class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg"><i
+                    class="add-item-btn mt-6 flex-shrink-0 w-full h-12 flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
                         class="material-icons mr-2">add_circle_outline</i>Neues Buch</button>
             </section>
             <section id="media"
@@ -246,15 +264,20 @@
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">Filme & Serien</h2>
                     </div>
                     <div class="flex items-center gap-1">
+                        <button class="add-item-btn p-2 rounded-full" title="Neuer Eintrag"
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">add</i>
+                        </button>
                         <button class="open-completed-btn p-2 rounded-full" title="Erledigte anzeigen"
-                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);"><i
-                                class="material-icons text-base">done_all</i></button>
+                            style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                            <i class="material-icons text-base">done_all</i>
+                        </button>
                     </div>
                 </div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
                 <button
-                    class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-lg"><i
+                    class="add-item-btn mt-6 flex-shrink-0 w-full h-12 flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
                         class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button>
             </section>
         </main>
@@ -302,7 +325,7 @@
                 <div class="flex gap-2"><input type="text" id="new-habit-def-title" class="w-full rounded-lg p-2.5"
                         style="background-color: var(--input-bg); border: 1px solid var(--input-border-color);"
                         placeholder="z.B. Meditieren"><button id="add-habit-def-save-btn"
-                        class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-lg"><i
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg"><i
                             class="material-icons">add</i></button></div>
             </div>
         </div>
@@ -416,6 +439,7 @@
             const dayHabitsList = document.getElementById('day-habits-list');
             const manageHabitsModal = document.getElementById('manage-habits-modal');
             const openManageHabitsModalBtn = document.getElementById('open-manage-habits-modal-btn');
+            const openManageHabitsModalBtnMobile = document.getElementById('open-manage-habits-modal-btn-mobile');
             const manageHabitsList = document.getElementById('manage-habits-list');
             const addHabitDefSaveBtn = document.getElementById('add-habit-def-save-btn');
             const newHabitDefTitleInput = document.getElementById('new-habit-def-title');
@@ -554,6 +578,7 @@
                 allHabits.forEach(habit => manageHabitsList.insertAdjacentHTML('beforeend', `<div class="flex justify-between items-center p-3 rounded-lg" style="background-color: var(--item-bg);"><span>${habit}</span><button class="delete-habit-btn" style="color: var(--text-color-light);" data-habit="${habit}"><i class="material-icons">delete</i></button></div>`));
             };
             openManageHabitsModalBtn.addEventListener('click', () => { renderManageHabitsList(); openModal(manageHabitsModal); });
+            openManageHabitsModalBtnMobile.addEventListener('click', () => { renderManageHabitsList(); openModal(manageHabitsModal); });
             addHabitDefSaveBtn.addEventListener('click', () => {
                 const newHabit = newHabitDefTitleInput.value.trim();
                 if (newHabit && !allHabits.includes(newHabit)) {
@@ -760,6 +785,9 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2>
                         <div class="flex items-center gap-1">
+                            <button class="add-item-btn p-2 rounded-full" title="Neuer Eintrag" style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                                <i class="material-icons text-base">add</i>
+                            </button>
                             <button class="open-completed-btn p-2 rounded-full" title="Erledigte anzeigen" style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
                                 <i class="material-icons text-base">done_all</i>
                             </button>
@@ -772,9 +800,6 @@
                         </div>
                     </div>
                     <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div>
-                    <button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg">
-                        <i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag
-                    </button>
                 </section>`;
                 mainGrid.insertAdjacentHTML('beforeend', newListHTML);
                 newListTitleInput.value = '';
@@ -860,6 +885,9 @@
                                 <div class="flex justify-between items-center mb-6">
                                     <h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2>
                                     <div class="flex items-center gap-1">
+                                        <button class="add-item-btn p-2 rounded-full" title="Neuer Eintrag" style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
+                                            <i class="material-icons text-base">add</i>
+                                        </button>
                                         <button class="open-completed-btn p-2 rounded-full" title="Erledigte anzeigen" style="color: var(--text-color-light); background-color: var(--item-bg-hover);">
                                             <i class="material-icons text-base">done_all</i>
                                         </button>
@@ -872,9 +900,6 @@
                                     </div>
                                 </div>
                                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div>
-                                <button class="add-item-btn mt-8 flex-shrink-0 w-full flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg">
-                                    <i class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag
-                                </button>
                             </section>`;
                             mainGrid.insertAdjacentHTML('beforeend', newListHTML);
                             section = mainGrid.lastElementChild;
