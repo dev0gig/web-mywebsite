@@ -1061,55 +1061,45 @@
                 openModal(tableOfContentsModal);
             });
 
+            // --- GLOBAL API & BACKUP/RESTORE INTEGRATION ---
+            window.HabitMeaAPI = {
+                gatherDataForExport
+            };
 
-        });
+            window.addEventListener('message', (event) => {
+                const { type, data } = event.data;
 
-        // --- GLOBAL BACKUP/RESTORE INTEGRATION ---
-        window.addEventListener('message', (event) => {
-            const { type, data } = event.data;
-
-            if (type === 'backupDataRequest') {
-                if (window.HabitMeaAPI) {
-                    const backupData = window.HabitMeaAPI.gatherDataForExport();
+                if (type === 'backupDataRequest') {
+                    const backupData = gatherDataForExport();
                     event.source.postMessage({
                         type: 'backupDataResponse',
                         key: 'habitmea',
                         data: backupData
                     }, event.origin);
                 }
-            }
-        });
 
-        // --- GLOBAL BACKUP/RESTORE INTEGRATION ---
-        window.addEventListener('message', (event) => {
-            const { type, data } = event.data;
-
-            if (type === 'backupDataRequest') {
-                if (window.HabitMeaAPI) {
-                    const backupData = window.HabitMeaAPI.gatherDataForExport();
-                    event.source.postMessage({
-                        type: 'backupDataResponse',
-                        key: 'habitmea',
-                        data: backupData
-                    }, event.origin);
+                if (type === 'restoreBackupData') {
+                    if (data) {
+                        try {
+                            // Use the robust method from memomea: save to localStorage and reload.
+                            localStorage.setItem('habitmea_data', JSON.stringify(data));
+                            window.location.reload();
+                        } catch (e) {
+                            console.error("Error saving restored habitmea data:", e);
+                            alert("Fehler beim Wiederherstellen der HabitMea-Daten.");
+                        }
+                    }
                 }
-            }
 
-            if (type === 'restoreBackupData') {
-                if (data && window.HabitMeaAPI) {
-                    // The confirmation is already handled by the main script.
-                    // Directly import the data, no need for a second confirm.
-                    window.HabitMeaAPI.renderImportedData(data, false);
+                // Theme handling
+                const message = event.data;
+                if (typeof message === 'string' && message.startsWith('set-theme-')) {
+                    const theme = message.split('-')[2];
+                    if (theme === 'light' || theme === 'dark') {
+                        document.documentElement.dataset.theme = theme;
+                    }
                 }
-            }
-
-            const message = event.data;
-            if (typeof message === 'string' && message.startsWith('set-theme-')) {
-                const theme = message.split('-')[2];
-                if (theme === 'light' || theme === 'dark') {
-                    document.documentElement.dataset.theme = theme;
-                }
-            }
+            });
         });
     </script>
 </body>
