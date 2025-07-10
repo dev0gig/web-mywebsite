@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="h-full">
+<html lang="de" class="h-full" data-theme="dark">
 
 <head>
     <meta charset="UTF-8" />
@@ -7,25 +7,7 @@
     <title>Mail-Vorlagen</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* CSS-Variablen für Farben und Design (bleiben unverändert) */
         :root {
-            --bg-color: #f9fafb;
-            --text-color: #1f2937;
-            --text-color-light: #6b7280;
-            --header-text-color: #111827;
-            --widget-bg: #ffffff;
-            --widget-header-bg: rgba(0, 0, 0, 0.02);
-            --widget-border: #e5e7eb;
-            --button-bg: #f3f4f6;
-            --button-border: #d1d5db;
-            --button-hover-bg: #f97316;
-            --input-bg: #ffffff;
-            --accent-color: #f97316;
-            --scrollbar-thumb: #d1d5db;
-            --scrollbar-thumb-hover: #9ca3af;
-        }
-
-        html[data-theme='dark'] {
             --bg-color: #171717;
             --text-color: #d4d4d4;
             --text-color-light: #a3a3a3;
@@ -37,8 +19,11 @@
             --button-border: #525252;
             --button-hover-bg: #f97316;
             --input-bg: #262626;
+            --accent-color: #f97316;
             --scrollbar-thumb: #404040;
             --scrollbar-thumb-hover: #525252;
+            --danger-color: #ef4444;
+            --danger-hover-color: #dc2626;
         }
 
         html {
@@ -87,7 +72,6 @@
             border-radius: 12px;
             margin-bottom: 1rem;
             overflow: hidden;
-            /* Wichtig, um den Inhalt abzuschneiden, wenn max-height gesetzt wird */
         }
 
         .box-mail summary {
@@ -103,25 +87,32 @@
             color: var(--text-color-light);
         }
 
-        /* Stil für den Inhalt der Details, um die Höhe zu animieren */
-        .box-mail .button-group-mail {
+        .button-group-mail {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.75rem;
             padding: 0 1rem 1rem 1rem;
         }
 
         .button-single {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background-color: var(--button-bg);
             border: 1px solid var(--button-border);
             border-radius: 0.5rem;
             padding: 0.5rem;
-            text-align: center;
+            text-align: left;
             font-weight: 500;
             font-size: 0.875rem;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s;
             word-break: break-word;
+        }
+
+        .button-actions {
+            display: flex;
+            gap: 0.25rem;
         }
 
         .button-single:hover {
@@ -130,42 +121,46 @@
             transform: translateY(-2px);
         }
 
+        .icon-button {
+            flex-shrink: 0;
+            padding: 0.3rem;
+            border-radius: 0.3rem;
+            transition: background-color 0.2s;
+        }
+
+        .icon-button:hover {
+            background-color: var(--button-border);
+        }
+        
+        .icon-button.delete:hover {
+            background-color: var(--danger-color);
+        }
+
         #search-input-container {
             position: -webkit-sticky;
-            /* Für Safari */
             position: sticky;
             top: 0;
             z-index: 10;
             background-color: var(--bg-color);
-            /* Hintergrund, um durchscrollenden Text zu verdecken */
             padding-bottom: 1rem;
-            /* Ersetzt margin-bottom, um den Abstand zu halten */
             flex-shrink: 0;
-            /* margin-bottom: 1rem; */
-            /* Wird durch padding-bottom ersetzt */
         }
 
-        #search-input {
+        #search-input, #nameInput, #template-title, #template-category, #template-content-editor {
             width: 100%;
             padding: 0.75rem;
-            padding-left: 2.5rem;
             border: 1px solid var(--widget-border);
             border-radius: 0.5rem;
             font-size: 1rem;
             background-color: var(--input-bg);
             color: var(--text-color);
             outline: none;
+        }
+        #search-input {
+             padding-left: 2.5rem;
         }
 
         #nameInput {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--widget-border);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            outline: none;
             margin-bottom: 0.5rem;
         }
 
@@ -204,6 +199,55 @@
         .mail-main--left:hover::-webkit-scrollbar-thumb {
             background-color: var(--scrollbar-thumb-hover);
         }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: var(--widget-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            z-index: 50;
+            border: 1px solid var(--widget-border);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            top: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -214,23 +258,58 @@
     <main>
         <section class="mail-main">
             <div class="mail-main--left">
-                <div id="search-input-container">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+               <div id="search-input-container" class="flex items-center gap-2 py-2">
+                   <div class="relative flex-grow">
+                       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                           <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                        </div>
-                        <input type="text" id="search-input" placeholder="Vorlagen durchsuchen...">
-                        <div class="absolute inset-y-0 right-0 flex items-center">
-                            <button id="clear-search-btn" class="hidden h-full px-3 text-gray-400 hover:text-white">
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                           </svg>
+                       </div>
+                       <input type="text" id="search-input" placeholder="Vorlagen durchsuchen..." class="w-full">
+                       <div class="absolute inset-y-0 right-0 flex items-center pr-2 space-x-1">
+                           <button id="clear-search-btn" class="hidden h-full px-2 text-gray-400 hover:text-white">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                                 </svg>
+                           </button>
+                       </div>
+                   </div>
+                    <div class="flex items-center justify-end gap-2">
+                        <div class="tooltip">
+                            <button id="new-template-btn" class="h-10 w-10 flex items-center justify-center text-white rounded-md" style="background-color: var(--accent-color);">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
                             </button>
+                            <span class="tooltiptext">Neue Vorlage</span>
+                        </div>
+                        <div class="tooltip">
+                            <button id="backup-btn" class="h-10 w-10 flex items-center justify-center rounded-md" style="background-color: var(--button-bg); border: 1px solid var(--button-border); color: var(--text-color);">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                </svg>
+                            </button>
+                            <span class="tooltiptext">Backup</span>
+                        </div>
+                         <div class="tooltip">
+                            <label for="import-input" class="h-10 w-10 flex items-center justify-center rounded-md cursor-pointer" style="background-color: var(--button-bg); border: 1px solid var(--button-border); color: var(--text-color);">
+                                 <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                            </label>
+                            <input type="file" id="import-input" class="hidden" accept=".json">
+                            <span class="tooltiptext">Import</span>
+                        </div>
+                        <div class="tooltip">
+                            <button id="delete-all-btn" class="h-10 w-10 flex items-center justify-center text-white rounded-md" style="background-color: var(--danger-color);">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 0 0-2.09 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+                            <span class="tooltiptext">Alle löschen</span>
                         </div>
                     </div>
                 </div>
@@ -244,106 +323,74 @@
                 <input type="text" id="nameInput" placeholder="Dein Name...">
                 <label for="outputArea" class="mt-4 mb-1 text-sm font-medium"
                     style="color: var(--text-color-light)">Mail-Vorlage (zum Kopieren klicken):</label>
-                <textarea id="outputArea" placeholder="Wähle links eine Vorlage aus..."></textarea>
+                <textarea id="outputArea" placeholder="Wähle links eine Vorlage aus oder importiere welche..."></textarea>
                 <div id="copy-toast"
                     class="absolute bottom-4 right-4 bg-green-500 text-white text-sm font-bold py-2 px-4 rounded-lg opacity-0 transform translate-y-2">
                     Kopiert!</div>
             </div>
         </section>
     </main>
+
+    <div id="template-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4">Neue Vorlage erstellen</h2>
+            <input type="hidden" id="template-id">
+            <div class="mb-4">
+                <label for="template-title" class="block mb-1 text-sm font-medium">Titel</label>
+                <input type="text" id="template-title" placeholder="Titel der Vorlage">
+            </div>
+            <div class="mb-4">
+                <label for="template-category" class="block mb-1 text-sm font-medium">Kategorie</label>
+                <input type="text" id="template-category" placeholder="Name der Kategorie">
+            </div>
+            <div class="mb-4">
+                <label for="template-content-editor" class="block mb-1 text-sm font-medium">Inhalt</label>
+                <textarea id="template-content-editor" rows="8" placeholder="Inhalt der Vorlage..."></textarea>
+            </div>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-template-btn" class="py-2 px-4 rounded-md" style="background-color: var(--button-bg); border: 1px solid var(--button-border);">Abbrechen</button>
+                <button id="save-template-btn" class="py-2 px-4 rounded-md text-white" style="background-color: var(--accent-color);">Speichern</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const templateContainer = document.getElementById('template-container');
             const templateTextArea = document.getElementById('outputArea');
             const nameInput = document.getElementById('nameInput');
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search-btn');
+            const backupBtn = document.getElementById('backup-btn');
+            const importInput = document.getElementById('import-input');
+            const newTemplateBtn = document.getElementById('new-template-btn');
+            const modal = document.getElementById('template-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const templateIdInput = document.getElementById('template-id');
+            const templateTitleInput = document.getElementById('template-title');
+            const templateCategoryInput = document.getElementById('template-category');
+            const templateContentEditor = document.getElementById('template-content-editor');
+            const saveTemplateBtn = document.getElementById('save-template-btn');
+            const cancelTemplateBtn = document.getElementById('cancel-template-btn');
+            const deleteAllBtn = document.getElementById('delete-all-btn');
+
             let templateCache = [];
 
-            // Die Struktur der Vorlagen (bleibt unverändert)
-            const templateStructure = [
-                {
-                    category: 'Allgemein', buttons: [
-                        { title: 'Grundgerüst', file: 'grundgeruest.txt' },
-                        { title: 'Tois-Vorlage', file: 'tois_vorlage.txt' },
-                        { title: 'Anliegen nicht klar', file: 'anliegen-nicht-klar.txt' },
-                        { title: 'Kundennummer benötigt', file: 'kdnr_benötigt.txt' }
-                    ]
-                },
-                {
-                    category: 'Strom & Gas', buttons: [
-                        { title: 'Anmeldung', file: 'anmeldung.txt' },
-                        { title: 'Abmeldung', file: 'abmeldung.txt' },
-                        { title: 'RE Korrektur, falsche Zählerstände', file: 're-korr-falsche-zählerstände.txt' },
-                        { title: 'PV - kein Zählpunkt', file: 'pv-kein-zp.txt' },
-                        { title: 'PV - fehlende Unterlagen', file: 'pv-fehlende-unterlagen.txt' },
-                        { title: 'PV angemeldet', file: 'pv-angemeldet.txt' },
-                        { title: 'Verlassenschaft', file: 'verlassenschaft.txt' },
-                        { title: 'Tarifwechsel', file: 'tw.txt' },
-                        { title: 'Trockenlegungbrief', file: 'trockenlegungsbrief.txt' },
-                        { title: 'Ummeldung erfolgreich', file: 'ummeldung_erfolgreich.txt' },
-                        { title: 'ANM PV', file: 'anm_pv.txt' },
-                        { title: 'WIES Anfrage', file: 'wies-anfrage.txt' },
-                        { title: 'WIES durchgeführt', file: 'wies-dgf.txt' }
-                    ]
-                },
-                {
-                    category: 'Guthaben', buttons: [
-                        { title: 'ID fehlt', file: 'gh_auszahlung_ausweis_fehlt.txt' },
-                        { title: 'GH Auszahlung', file: 'gh_auszahlung.txt' },
-                        { title: 'Allgemeines Wording', file: 'gh_allgemein.txt' },
-                        { title: 'GH Verlassenschaft', file: 'gh-verlassenschaft.txt' },
-                        { title: 'Auszahlung - ID NICHT notwendig', file: 'GH-ID-nicht-nötig.txt' }
-                    ]
-                },
-                {
-                    category: 'Wärme', buttons: [
-                        { title: 'Anmeldung', file: 'waerme_anm.txt' },
-                        { title: 'An-/Abmeldung', file: 'waerme_an_abm.txt' },
-                        { title: 'Mieterwechsel', file: 'waerme_mieterwechsel.txt' },
-                        { title: 'Heizkostenabrechnung', file: 'heizkostenabrechnung.txt' },
-                        { title: 'Mieterwechsel Untermieter', file: 'mw_untermieter.txt' },
-                        { title: 'Eigentümerwechsel', file: 'fw-eigentuemerwechsel.txt' }
-                    ]
-                },
-                {
-                    category: 'Wiener Netze', buttons: [
-                        { title: 'Einzelner Zäst gespeichert', file: 'Einzelner_Zäst_gespeichert.txt' },
-                        { title: 'Mehrere Zäst gespeichert', file: 'Mehrere_Zäst_gespeichert.txt' },
-                        { title: 'Smart Meter/ Keine ZÄST benötigt', file: 'SmartMeter_Keine_ZÄST_benötigt.txt' },
-                        { title: 'Wenn der Kunde SMART Meter Zäst schickt bei Ummeldung', file: 'Kunde_SMARTMeter_Zäst_schickt_bei_Ummeldung.txt' },
-                        { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt', file: 'KD_ZÄST_von_Gas_und_SMART_Meter_schickt.txt' },
-                        { title: 'Wenn KD ZÄST von Gas und SMART-Meter schickt und es gleichzeitig eine Ummeldung ist', file: 'KD_ZÄST_von_Gas_und_SMARTMeter_schickt_und_es_gleichzeitig_eine_Ummeldung.txt' }
-                    ]
-                }
-            ];
+            const generateUUID = () => crypto.randomUUID();
 
-            // Funktion zum Vorabladen der Vorlagen (bleibt unverändert)
-            async function prefetchTemplates() {
-                const promises = templateStructure.flatMap(category =>
-                    category.buttons.map(async button => {
-                        try {
-                            const response = await fetch(`./mail-template-txt/${button.file}`);
-                            if (!response.ok) throw new Error('Network response was not ok');
-                            const content = await response.text();
-                            return { category: category.category, title: button.title, content: content.trim() };
-                        } catch (error) {
-                            console.error(`Could not fetch ${button.file}:`, error);
-                            return { category: category.category, title: button.title, content: `Fehler beim Laden.` };
-                        }
-                    })
-                );
-                templateCache = await Promise.all(promises);
+            function saveTemplates() {
+                localStorage.setItem('templateCache', JSON.stringify(templateCache));
             }
 
-            // Funktion zum Rendern der UI mit Filter (leicht angepasst)
             function renderUI(filter = '') {
                 templateContainer.innerHTML = '';
                 const lowerFilter = filter.toLowerCase();
 
                 const filteredData = {};
                 templateCache.forEach(item => {
-                    if (filter === '' || item.content.toLowerCase().includes(lowerFilter)) {
+                    const titleMatch = item.title.toLowerCase().includes(lowerFilter);
+                    const contentMatch = item.content.toLowerCase().includes(lowerFilter);
+                    if (titleMatch || contentMatch) {
                         if (!filteredData[item.category]) {
                             filteredData[item.category] = [];
                         }
@@ -354,9 +401,7 @@
                 for (const categoryName in filteredData) {
                     const details = document.createElement('details');
                     details.className = 'box-mail';
-                    // Kategorien mit Suchergebnissen standardmäßig öffnen.
-                    // Ohne Filter sind alle geöffnet, außer 'Allgemein' und 'Wiener Netze'.
-                    details.open = (filter !== '') || (categoryName !== 'Allgemein' && categoryName !== 'Wiener Netze');
+                    details.open = true;
 
                     const summary = document.createElement('summary');
                     summary.textContent = categoryName;
@@ -368,10 +413,34 @@
                     filteredData[categoryName].forEach(template => {
                         const button = document.createElement('button');
                         button.className = 'button-single';
-                        button.textContent = template.title;
-                        button.addEventListener('click', () => {
+                        button.addEventListener('click', (e) => {
+                            if (e.target.closest('.icon-button')) {
+                                return;
+                            }
                             templateTextArea.value = template.content;
                         });
+
+                        const buttonText = document.createElement('span');
+                        buttonText.textContent = template.title;
+
+                        const buttonActions = document.createElement('div');
+                        buttonActions.className = 'button-actions';
+
+                        const editBtn = document.createElement('button');
+                        editBtn.className = 'icon-button edit';
+                        editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>`;
+                        editBtn.addEventListener('click', () => openTemplateModal(template.id));
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'icon-button delete';
+                        deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"/></svg>`;
+                        deleteBtn.addEventListener('click', () => deleteTemplate(template.id));
+
+                        button.appendChild(buttonText);
+                        buttonActions.appendChild(editBtn);
+                        buttonActions.appendChild(deleteBtn);
+                        button.appendChild(buttonActions);
+                        
                         buttonGroup.appendChild(button);
                     });
 
@@ -380,25 +449,74 @@
                 }
             }
 
-            // Event-Listener für die Suchleiste (bleiben unverändert)
+            function openTemplateModal(id = null) {
+                if (id) {
+                    const template = templateCache.find(t => t.id === id);
+                    modalTitle.textContent = 'Vorlage bearbeiten';
+                    templateIdInput.value = template.id;
+                    templateTitleInput.value = template.title;
+                    templateCategoryInput.value = template.category;
+                    templateContentEditor.value = template.content;
+                } else {
+                    modalTitle.textContent = 'Neue Vorlage erstellen';
+                    templateIdInput.value = '';
+                    templateTitleInput.value = '';
+                    templateCategoryInput.value = '';
+                    templateContentEditor.value = '';
+                }
+                modal.classList.remove('hidden');
+            }
+
+            function closeTemplateModal() {
+                modal.classList.add('hidden');
+            }
+
+            function saveTemplate() {
+                const id = templateIdInput.value;
+                const title = templateTitleInput.value.trim();
+                const category = templateCategoryInput.value.trim();
+                const content = templateContentEditor.value.trim();
+
+                if (!title || !category || !content) {
+                    alert('Bitte füllen Sie alle Felder aus.');
+                    return;
+                }
+
+                if (id) { // Edit
+                    const index = templateCache.findIndex(t => t.id === id);
+                    templateCache[index] = { ...templateCache[index], title, category, content };
+                } else { // Create
+                    templateCache.push({ id: generateUUID(), title, category, content });
+                }
+                
+                saveTemplates();
+                renderUI(searchInput.value);
+                closeTemplateModal();
+            }
+
+            function deleteTemplate(id) {
+                if (confirm('Möchten Sie diese Vorlage wirklich löschen?')) {
+                    templateCache = templateCache.filter(t => t.id !== id);
+                    saveTemplates();
+                    renderUI(searchInput.value);
+                }
+            }
+
             searchInput.addEventListener('input', () => {
-                const searchTerm = searchInput.value;
-                renderUI(searchTerm);
-                clearSearchBtn.classList.toggle('hidden', searchTerm === '');
+                renderUI(searchInput.value);
+                clearSearchBtn.classList.toggle('hidden', searchInput.value === '');
             });
 
-            // Event-Listener für den "Suchen löschen"-Button (bleibt unverändert)
             clearSearchBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 renderUI('');
                 clearSearchBtn.classList.add('hidden');
             });
 
-            // Event-Listener für das Textfeld zum Kopieren (bleibt unverändert)
             templateTextArea.addEventListener('click', () => {
                 if (templateTextArea.value.trim() === '') return;
                 const signatureName = nameInput.value.trim();
-                const finalSignature = `Freundliche Grüße und danke für Ihr Vertrauen,\n\n${signatureName}\n\nIhre Wien Energie Kundenberatung\n\nwww.wienenergie.at/kontakt\nwww.wienenergie.at/impressum`;
+                const finalSignature = `Freundliche Grüße und danke für Ihr Vertrauen,\n${signatureName}\n\nIhre Wien Energie Kundenberatung\n\nwww.wienenergie.at/kontakt`;
                 const textToCopy = `${templateTextArea.value}\n\n${finalSignature}`;
 
                 navigator.clipboard.writeText(textToCopy).then(() => {
@@ -407,31 +525,90 @@
                     setTimeout(() => {
                         toast.classList.add('opacity-0', 'translate-y-2');
                     }, 1500);
-                }).catch(err => {
-                    console.error('Kopieren fehlgeschlagen: ', err);
-                });
+                }).catch(err => console.error('Kopieren fehlgeschlagen: ', err));
             });
 
-            // Event-Listener für Nachrichten vom übergeordneten Fenster (für Themes) (bleibt unverändert)
-            window.addEventListener('message', (event) => {
-                if (event.data.startsWith('set-theme-')) {
-                    document.documentElement.dataset.theme = event.data.replace('set-theme-', '');
-                }
-            });
-
-            // Speichern des Namens im localStorage, wenn sich der Wert ändert
             nameInput.addEventListener('input', () => {
                 localStorage.setItem('signatureName', nameInput.value);
             });
 
-            // Beim Laden der Seite den gespeicherten Namen abrufen
             const savedName = localStorage.getItem('signatureName');
             if (savedName) {
                 nameInput.value = savedName;
             }
 
-            // Initialisierung: Vorlagen vorabladen und UI rendern
-            await prefetchTemplates();
+            function loadTemplates() {
+                const savedTemplates = localStorage.getItem('templateCache');
+                if (savedTemplates) {
+                    try {
+                        const parsed = JSON.parse(savedTemplates);
+                        if (Array.isArray(parsed)) {
+                            templateCache = parsed.map(t => ({...t, id: t.id || generateUUID() }));
+                            console.log('Vorlagen aus dem localStorage geladen.');
+                        }
+                    } catch (e) {
+                        console.error('Fehler beim Laden aus dem localStorage.', e);
+                        templateCache = [];
+                    }
+                } else {
+                    templateCache = [];
+                }
+            }
+
+            backupBtn.addEventListener('click', () => {
+                if (templateCache.length === 0) {
+                    alert('Keine Vorlagen zum Sichern vorhanden.');
+                    return;
+                }
+                const dataStr = JSON.stringify(templateCache, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mail-templates-backup-${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            importInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (!Array.isArray(imported) || (imported.length > 0 && (!imported[0].category || !imported[0].title || typeof imported[0].content === 'undefined'))) {
+                            throw new Error('Die Datei hat kein gültiges Format.');
+                        }
+                        templateCache = imported.map(t => ({...t, id: t.id || generateUUID() }));
+                        saveTemplates();
+                        renderUI();
+                        alert(`${imported.length} Vorlagen erfolgreich importiert.`);
+                    } catch (error) {
+                        alert(`Fehler beim Import: ${error.message}`);
+                        console.error(error);
+                    } finally {
+                        importInput.value = '';
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            newTemplateBtn.addEventListener('click', () => openTemplateModal());
+            cancelTemplateBtn.addEventListener('click', closeTemplateModal);
+            saveTemplateBtn.addEventListener('click', saveTemplate);
+            deleteAllBtn.addEventListener('click', () => {
+                if (confirm('Möchten Sie wirklich alle Vorlagen löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+                    templateCache = [];
+                    saveTemplates();
+                    renderUI();
+                }
+            });
+
+            loadTemplates();
             renderUI();
         });
     </script>
