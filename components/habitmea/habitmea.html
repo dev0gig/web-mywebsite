@@ -151,6 +151,11 @@
                 <i class="material-icons sm:mr-2">file_upload</i>
                 <span class="hidden sm:inline">Importieren</span>
             </button>
+            <button id="table-of-contents-btn"
+                class="bg-amber-600 hover:bg-amber-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+                <i class="material-icons sm:mr-2">list</i>
+                <span class="hidden sm:inline">Inhaltsverzeichnis</span>
+            </button>
             <button id="open-add-list-modal-btn"
                 class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
                 <i class="material-icons sm:mr-2">playlist_add</i>
@@ -165,10 +170,10 @@
         </div>
 
         <main id="main-grid"
-            class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto lg:px-8">
+            class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto px-4 sm:px-6 lg:px-8 mx-auto">
 
             <section id="habits"
-                class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
+                class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="habit">
                 <div class="flex justify-between items-center mb-4">
@@ -221,13 +226,10 @@
                         <div id="todays-habits-list" class="space-y-3 flex-grow overflow-y-auto pr-2"></div>
                     </div>
                 </div>
-                <button id="open-manage-habits-modal-btn-mobile"
-                    class="mt-6 w-full h-12 flex-shrink-0 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
-                        class="material-icons mr-2">settings</i>Gewohnheiten verwalten</button>
             </section>
 
             <section id="books"
-                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
+                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="book">
                 <div class="flex justify-between items-center mb-6">
@@ -249,12 +251,9 @@
                 </div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
-                <button
-                    class="add-item-btn mt-6 flex-shrink-0 w-full h-12 flex items-center justify-center bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
-                        class="material-icons mr-2">add_circle_outline</i>Neues Buch</button>
             </section>
             <section id="media"
-                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0"
+                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="media">
                 <div class="flex justify-between items-center mb-6">
@@ -276,9 +275,6 @@
                 </div>
                 <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
                 </div>
-                <button
-                    class="add-item-btn mt-6 flex-shrink-0 w-full h-12 flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-lg lg:hidden"><i
-                        class="material-icons mr-2">add_circle_outline</i>Neuer Eintrag</button>
             </section>
         </main>
     </div>
@@ -414,6 +410,19 @@
             </div>
         </div>
     </div>
+    <div id="table-of-contents-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-50">
+        <div class="rounded-2xl shadow-2xl w-full max-w-md border"
+            style="background-color: var(--modal-bg); border-color: var(--modal-border-color);">
+            <div class="flex justify-between items-center p-4 border-b"
+                style="border-color: var(--modal-border-color);">
+                <h3 class="text-xl font-bold" style="color: var(--header-color);">Inhaltsverzeichnis</h3>
+                <button class="modal-close-btn" style="color: var(--text-color-light);">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div id="table-of-contents-list" class="p-6 max-h-96 overflow-y-auto space-y-3"></div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -425,6 +434,11 @@
             // --- GLOBAL ELEMENTS ---
             const mainGrid = document.getElementById('main-grid');
             const allModals = document.querySelectorAll('.modal');
+
+            // --- TABLE OF CONTENTS ELEMENTS ---
+            const tableOfContentsBtn = document.getElementById('table-of-contents-btn');
+            const tableOfContentsModal = document.getElementById('table-of-contents-modal');
+            const tableOfContentsList = document.getElementById('table-of-contents-list');
 
             // --- CALENDAR ELEMENTS ---
             const calendarGrid = document.getElementById('calendar-grid');
@@ -439,7 +453,6 @@
             const dayHabitsList = document.getElementById('day-habits-list');
             const manageHabitsModal = document.getElementById('manage-habits-modal');
             const openManageHabitsModalBtn = document.getElementById('open-manage-habits-modal-btn');
-            const openManageHabitsModalBtnMobile = document.getElementById('open-manage-habits-modal-btn-mobile');
             const manageHabitsList = document.getElementById('manage-habits-list');
             const addHabitDefSaveBtn = document.getElementById('add-habit-def-save-btn');
             const newHabitDefTitleInput = document.getElementById('new-habit-def-title');
@@ -578,7 +591,6 @@
                 allHabits.forEach(habit => manageHabitsList.insertAdjacentHTML('beforeend', `<div class="flex justify-between items-center p-3 rounded-lg" style="background-color: var(--item-bg);"><span>${habit}</span><button class="delete-habit-btn" style="color: var(--text-color-light);" data-habit="${habit}"><i class="material-icons">delete</i></button></div>`));
             };
             openManageHabitsModalBtn.addEventListener('click', () => { renderManageHabitsList(); openModal(manageHabitsModal); });
-            openManageHabitsModalBtnMobile.addEventListener('click', () => { renderManageHabitsList(); openModal(manageHabitsModal); });
             addHabitDefSaveBtn.addEventListener('click', () => {
                 const newHabit = newHabitDefTitleInput.value.trim();
                 if (newHabit && !allHabits.includes(newHabit)) {
@@ -780,8 +792,9 @@
             addListSaveBtn.addEventListener('click', () => {
                 const title = newListTitleInput.value.trim();
                 if (!title) return;
+                const listId = 'list-' + Date.now();
                 const newListHTML = `
-                <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
+                <section id="${listId}" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2>
                         <div class="flex items-center gap-1">
@@ -847,6 +860,7 @@
                 document.querySelectorAll('#main-grid > section:not(#habits)').forEach(section => {
                     const iconEl = section.querySelector('.flex > .material-icons');
                     const listData = {
+                        id: section.id,
                         title: section.querySelector('h2').textContent,
                         icon: iconEl ? iconEl.textContent : null,
                         type: section.dataset.listType,
@@ -880,8 +894,9 @@
                     (data.lists || []).forEach(listData => {
                         let section = document.querySelector(`#main-grid section[data-list-type="${listData.type}"]`);
                         if (!section && listData.type !== 'book' && listData.type !== 'media') {
+                            const listId = listData.id || 'list-' + Date.now();
                             const newListHTML = `
-                            <section class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-4 lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
+                            <section id="${listId}" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
                                 <div class="flex justify-between items-center mb-6">
                                     <h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2>
                                     <div class="flex items-center gap-1">
@@ -991,42 +1006,62 @@
 
                 openModal(completedItemsModal);
             };
-            let isDown = false;
-            let startX;
-            let scrollLeft;
 
-            mainGrid.addEventListener('mousedown', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.offsetX > mainGrid.clientWidth) return;
-                isDown = true;
-                mainGrid.classList.add('cursor-grabbing');
-                document.body.classList.add('noselect');
-                startX = e.pageX - mainGrid.offsetLeft;
-                scrollLeft = mainGrid.scrollLeft;
-            });
-            mainGrid.addEventListener('mouseleave', () => {
-                isDown = false;
-                mainGrid.classList.remove('cursor-grabbing');
-                document.body.classList.remove('noselect');
-            });
-            mainGrid.addEventListener('mouseup', () => {
-                isDown = false;
-                mainGrid.classList.remove('cursor-grabbing');
-                document.body.classList.remove('noselect');
-            });
-            mainGrid.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - mainGrid.offsetLeft;
-                const walk = (x - startX) * 2; //scroll-fast
-                mainGrid.scrollLeft = scrollLeft - walk;
-            });
-
-            // --- EXPOSE API FOR PARENT WINDOW ---
-            window.HabitMeaAPI = {
-                gatherDataForExport,
-                renderImportedData,
-                openConfirmModal
+            // --- TABLE OF CONTENTS LOGIC ---
+            const populateTableOfContents = () => {
+                tableOfContentsList.innerHTML = '';
+                
+                // Add all sections to the table of contents
+                document.querySelectorAll('#main-grid > section').forEach(section => {
+                    const title = section.querySelector('h2')?.textContent || section.id;
+                    const sectionId = section.id;
+                    const icon = section.querySelector('.material-icons')?.textContent || '';
+                    
+                    tableOfContentsList.insertAdjacentHTML('beforeend', `
+                        <div class="toc-item p-3 rounded-lg cursor-pointer"
+                             style="background-color: var(--item-bg);"
+                             onmouseover="this.style.backgroundColor='var(--item-bg-hover)';"
+                             onmouseout="this.style.backgroundColor='var(--item-bg)';"
+                             data-section-id="${sectionId}">
+                            <div class="flex items-center">
+                                ${icon ? `<i class="material-icons mr-3" style="color: var(--text-color-light);">${icon}</i>` : ''}
+                                <span class="font-semibold" style="color: var(--header-color);">${title}</span>
+                            </div>
+                        </div>
+                    `);
+                });
             };
+            
+            // Handle clicking on a table of contents item
+            tableOfContentsList.addEventListener('click', (e) => {
+                const tocItem = e.target.closest('.toc-item');
+                if (!tocItem) return;
+                
+                const sectionId = tocItem.dataset.sectionId;
+                const section = document.getElementById(sectionId);
+                
+                if (section) {
+                    // Close the modal
+                    closeModal(tableOfContentsModal);
+                    
+                    // Scroll to the section
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // For horizontal scrolling in the main grid
+                    if (window.innerWidth >= 1024) { // lg breakpoint
+                        const sectionLeft = section.offsetLeft - mainGrid.offsetLeft;
+                        mainGrid.scrollLeft = sectionLeft;
+                    }
+                }
+            });
+            
+            // Open table of contents modal when button is clicked
+            tableOfContentsBtn.addEventListener('click', () => {
+                populateTableOfContents();
+                openModal(tableOfContentsModal);
+            });
+
+
         });
 
         // --- GLOBAL BACKUP/RESTORE INTEGRATION ---
@@ -1043,21 +1078,6 @@
                     }, event.origin);
                 }
             }
-
-            mainGrid.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - mainGrid.offsetLeft;
-                const walk = (x - startX) * 2; //scroll-fast
-                mainGrid.scrollLeft = scrollLeft - walk;
-            });
-
-            // --- EXPOSE API FOR PARENT WINDOW ---
-            window.HabitMeaAPI = {
-                gatherDataForExport,
-                renderImportedData,
-                openConfirmModal
-            };
         });
 
         // --- GLOBAL BACKUP/RESTORE INTEGRATION ---
