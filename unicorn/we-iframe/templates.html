@@ -64,6 +64,7 @@
         .mail-main--left {
             overflow-y: auto;
             padding-right: 0.5rem;
+            scrollbar-width: none; /* Firefox */
         }
 
         .box-mail {
@@ -183,7 +184,7 @@
         }
 
         .mail-main--left::-webkit-scrollbar {
-            width: 8px;
+            display: none; /* Webkit */
         }
 
         .mail-main--left::-webkit-scrollbar-track {
