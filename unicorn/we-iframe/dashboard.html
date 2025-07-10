@@ -160,30 +160,42 @@
         /* Styling for the lock button */
         #lock-button {
             position: absolute;
-            top: 1rem; /* Adjust as needed */
-            right: 1rem; /* Adjust as needed */
-            background-color: transparent; /* Changed to transparent */
-            color: var(--text-color-light); /* Changed for more subtlety */
-            border: none; /* Changed to none */
-            border-radius: 50%; /* Makes it circular */
-            padding: 0.75rem; /* Adjust padding for icon size */
+            top: 1rem;
+            /* Adjust as needed */
+            right: 1rem;
+            /* Adjust as needed */
+            background-color: transparent;
+            /* Changed to transparent */
+            color: var(--text-color-light);
+            /* Changed for more subtlety */
+            border: none;
+            /* Changed to none */
+            border-radius: 50%;
+            /* Makes it circular */
+            padding: 0.75rem;
+            /* Adjust padding for icon size */
             cursor: pointer;
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: none; /* Removed box shadow for subtlety */
+            box-shadow: none;
+            /* Removed box shadow for subtlety */
             transition: color 0.2s ease, transform 0.2s ease;
         }
 
         #lock-button:hover {
-            background-color: transparent; /* Keep transparent on hover */
-            color: var(--accent-color); /* Change color on hover for feedback */
-            transform: scale(1.1); /* Slightly larger on hover */
+            background-color: transparent;
+            /* Keep transparent on hover */
+            color: var(--accent-color);
+            /* Change color on hover for feedback */
+            transform: scale(1.1);
+            /* Slightly larger on hover */
         }
 
         #lock-button i {
-            font-size: 1.25rem; /* Icon size */
+            font-size: 1.25rem;
+            /* Icon size */
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -193,7 +205,8 @@
 
 <body class="p-4 md:p-8 pb-20 relative"> <!-- Added 'relative' to body for absolute positioning of button -->
     <h1 class="text-3xl font-bold text-center mb-2 main-header">Startseite</h1>
-    <h2 class="text-xl text-center mb-6 text-gray-600 dark:text-gray-400">Elemente können in der Größe verändert und verschoben werden</h2>
+    <h2 class="text-xl text-center mb-6 text-gray-600 dark:text-gray-400">Elemente können in der Größe verändert und
+        verschoben werden</h2>
 
     <!-- Lock/Unlock Button -->
     <button id="lock-button" aria-label="Layout sperren/entsperren">
@@ -205,7 +218,7 @@
     <script type="text/javascript">
         const initialLayoutData = [
             { id: 'zeitplaene', title: 'Zeitpläne', x: 0, y: 0, w: 2, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc2.aspx?action=edit&sourcedoc=%7B79c7fd17-3b8b-4f6b-9e7e-b6f96c0d6cd8%7D')">Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365-my.sharepoint.com/:x:/r/personal/nmuama_wstw_energy-it_net/_layouts/15/doc2.aspx?sourcedoc=%7BA77101AB-64A6-450B-9620-6FDE51765F08%7D')">HO/Flexi - Mittagsplan</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:x:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7B4A5869C9-A49F-41A1-8BB8-AC2A80484B92%7D')">Sitzplan-CB08</button><button class="button-single" onclick="window.open('https://apps.powerapps.com/play/e/0089faf5-df22-4012-a29b-93b3d081d5da/a/c9242c89-c412-4a5c-94fe-29e2a847c0d2?tenantId=2df2bcec-2017-4339-b493-e3d7b3a460c8')">DeskFinder</button></div>` },
-            { id: 'system', title: 'System', x: 2, y: 0, w: 4, h: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f&flags=themeOption%3Ddarkmode')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button><button class="button-single" onclick="window.open('https://aufrufsystem/nova/Tickets')">🎟 Aufrufsystem</button></div>` },
+            { id: 'system', title: 'System', x: 2, y: 0, w: 4, h: 3, content: `<div class="button-group-tools"><button class="button-single" style="background-color: orange; font-weight: bold; color: black" onclick="window.open('https://wienenergie.crm4.dynamics.com/main.aspx?appid=9e5c7650-9b9d-ed11-aad1-000d3adeae7f')">DCCP</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://wienenergie.sabio.de/')">iTWIIN</button><button class="button-single" style="border: dashed 3px red;" onclick="window.open('https://meine.wienenergie.at/mac/#/')">MAC</button><button class="button-single" onclick="window.open('https://tois/we-mysite/index.php')">tois</button><button class="button-single" onclick="window.open('https://intranet-holding.wstw.energy-it.net/dsgvo-zustimmungserklaerung/#/zustimmung')">Datenschutz</button><button class="button-single" onclick="window.open('https://m365.cloud.microsoft/chat/?auth=2')">Copilot</button><button class="button-single" onclick="window.open('https://aufrufsystem/nova/Tickets')">🎟 Aufrufsystem</button></div>` },
             { id: 'empfang', title: 'Empfang', x: 6, y: 0, w: 2, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/:w:/r/sites/msteams_8cb9ed-KSA-SPErdberg/_layouts/15/Doc.aspx?sourcedoc=%7BE431621F-EAB4-41A2-9455-918F13452C1D%7D')">Zeitbestätigung Erdberg</button><button class="button-single" onclick="window.open('https://intranet.wienerstadtwerke.at/speiseplan')">Kuchl Speiseplan</button></div>` },
             { id: 'stromgas', title: 'Strom & Gas', x: 8, y: 0, w: 4, h: 3, content: `<div class="button-group-tools"><button class="button-single" onclick="window.open('https://sapc2p.wstw.energy-it.net:8144/sap(bD1kZSZjPTIwMCZkPW1pbg==)/bc/bsp/sap/crm_ui_start/default.htm')">CRM</button><button class="button-single" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_412d4c/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F412d4c%2FFreigegebene%20Dokumente%2FiTWIIN%2FPreisbl%C3%A4tter')">Preisblätter</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('https://sarchpam30/pam4ws/frame/workplaceframe.aspx')">PAM</button></div><div class="text-sm mt-4 flex-shrink-0"><p>Dummy GP-Nr. 1250001023</p><p>PV-VK-Vorlage 228000183897</p></div>` },
             { id: 'fernwaerme', title: 'Fernwärme', x: 0, y: 3, w: 3, h: 3, content: `<div class="button-group-tools"><button class="button-single" style="border: dashed 3px red;" onclick="window.open('http://spam01/PAM4/frame/workplaceframe.aspx')">PAM</button><button class="button-single" style="background-color: #f58484; border: red solid 2px; color: black" onclick="window.open('https://wstw365.sharepoint.com/sites/msteams_8cb9ed/Freigegebene%20Dokumente/Forms/AllItems.aspx?id=%2Fsites%2Fmsteams%5F8cb9ed%2FFreigegebene%20Dokumente%2FGeneral%2FWiener%20Wohnen%20Vertr%C3%A4ge')">WiWo Verträge</button><button class="button-single" onclick="window.open('https://outlook.office.com/mail/rueckstand.waerme@wienenergie.at/')">Backlog</button><button class="button-single" onclick="window.open('http://wstw365.sharepoint.com/:x:/r/sites/msteams_412d4c/Freigegebene%20Dokumente/iTWIIN/Dokumente/Fernw%C3%A4rme/Kalkulation%20der%20Ersteinstufung%20W%C3%A4rme%20-TBs.xlsx')">Wärme Kalkulator</button><button class="button-single" onclick="window.open('https://webgis.wienit.at/WEB_P/synserver?project=fww&client=core')">WebGIS</button></div>` },
