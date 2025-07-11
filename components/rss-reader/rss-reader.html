@@ -386,13 +386,11 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 z-50 flex justify-center items-center p-0 sm:p-4 overflow-hidden">
-        <div @click.away="isReaderOpen = false"
-            x-transition:enter="transition-all ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition-all ease-in duration-200"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
+        <div @click.away="isReaderOpen = false" @touchstart.passive="touchStartX = $event.touches[0].clientX; touchEndX = 0"
+            @touchmove.passive="touchEndX = $event.touches[0].clientX" @touchend="handleSwipe"
+            x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition-all ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
             class="relative flex flex-col h-full w-full sm:max-h-[95vh] sm:w-full sm:max-w-3xl sm:rounded-lg shadow-xl"
             style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
             <button @click="showPreviousArticle" x-show="currentReaderGlobalIndex > 0"
@@ -559,6 +557,8 @@
                 readerArticle: {},
                 currentReaderGlobalIndex: -1,
                 currentReaderFontSize: 20,
+                touchStartX: 0,
+                touchEndX: 0,
                 isImportModalOpen: false,
                 isExportModalOpen: false,
                 exportFilename: '',
@@ -880,6 +880,20 @@
                         this.currentReaderFontSize = newSize;
                         this.saveState();
                     }
+                },
+                handleSwipe() {
+                    if (!this.isReaderOpen || this.touchEndX === 0) return;
+                    const swipeDistance = this.touchStartX - this.touchEndX;
+                    if (Math.abs(swipeDistance) > 50) { // Minimum swipe distance
+                        if (swipeDistance > 0) {
+                            this.showNextArticle();
+                        } else {
+                            this.showPreviousArticle();
+                        }
+                    }
+                    // Reset values to prevent accidental swipes
+                    this.touchStartX = 0;
+                    this.touchEndX = 0;
                 },
                 handleExportClick() {
                     this.exportFilename = `rss_reader_backup_${new Date().toISOString().split('T')[0]}.json`;
