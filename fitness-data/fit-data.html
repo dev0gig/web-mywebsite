@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Daten Analyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        body {
+            background-color: #111827; /* dark:bg-gray-900 */
+            color: #d1d5db; /* dark:text-gray-300 */
+        }
+        .litepicker {
+            background-color: #1f2937 !important;
+            border: 1px solid #374151 !important;
+            color: #d1d5db !important;
+        }
+        .litepicker .container__months .month-item-header,
+        .litepicker .container__months .month-item {
+            color: #d1d5db;
+        }
+        .litepicker .month-item-header .button,
+        .litepicker .calendar-header .button {
+            color: #d1d5db;
+        }
+        .litepicker .day-item:not(.is-start-date):not(.is-end-date):not(.is-in-range):hover {
+            background-color: #374151 !important;
+        }
+        .litepicker .button-apply, .litepicker .button-cancel {
+            color: #d1d5db;
+        }
+        .litepicker .button-apply:hover, .litepicker .button-cancel:hover {
+            background-color: #374151 !important;
+        }
+        #datepicker-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #2563eb; /* blue-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            top: 100%;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center my-8">Fitness Daten Analyse</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md col-span-1 h-[32rem] flex flex-col">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center"><span class="material-icons mr-2">date_range</span>Datum auswählen</h2>
+                    <span class="tooltip-text" style="width: 250px; margin-left: -125px;">Wählen Sie einen einzelnen Tag, einen Datumsbereich oder eine vordefinierte Zeitspanne aus, um die angezeigten Daten zu filtern.</span>
+                </div>
+                <div class="flex-auto" id="datepicker-container"></div>
+                <div class="flex justify-center gap-2 mt-4">
+                    <button onclick="setDateRange(7)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md text-sm">7T</button>
+                    <button onclick="setDateRange(14)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md text-sm">14T</button>
+                    <button onclick="setDateRange(30)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md text-sm">30T</button>
+                    <button onclick="setDateRange('all')" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md text-sm">Alle</button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md col-span-1 md:col-span-2 lg:col-span-2 flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">directions_run</span>Aktivität (Schritte & Kalorien)</h2>
+                    <span class="tooltip-text" style="width: 300px; margin-left: -150px;">Dieses Diagramm visualisiert Ihre tägliche körperliche Aktivität, aufgeteilt in die Anzahl der zurückgelegten Schritte und die dabei verbrannten Kilokalorien (kcal).</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">bedtime</span>Schlafdauer (Minuten)</h2>
+                    <span class="tooltip-text">Hier sehen Sie die Gesamtdauer Ihres Schlafs für jede Nacht im ausgewählten Zeitraum, um Schlafmuster zu erkennen.</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="sleepTimeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md col-span-1 md:col-span-1 lg:col-span-2 flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">layers</span>Schlafphasen</h2>
+                    <span class="tooltip-text" style="width: 300px; margin-left: -150px;">Dieses gestapelte Balkendiagramm zeigt die Verteilung Ihrer Schlafzeit auf die verschiedenen Phasen: Wach, REM (Rapid Eye Movement), Leichtschlaf und Tiefschlaf.</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="sleepStagesChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">monitor_heart</span>Herzfrequenz (bpm)</h2>
+                    <span class="tooltip-text" style="width: 250px; margin-left: -125px;">Verfolgen Sie Ihre Herzfrequenz (Schläge pro Minute) über den Tag, einschließlich des Durchschnitts sowie der minimalen und maximalen aufgezeichneten Werte.</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="heartRateChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">bloodtype</span>Blutsauerstoff (Spo2)</h2>
+                    <span class="tooltip-text" style="width: 250px; margin-left: -125px;">Dieses Diagramm zeigt die durchschnittliche Sauerstoffsättigung Ihres Blutes (Spo2). Werte zwischen 95% und 100% gelten als normal.</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="spo2Chart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col h-[32rem]">
+                <div class="tooltip">
+                    <h2 class="text-xl font-semibold mb-4 flex-none flex items-center"><span class="material-icons mr-2">ssid_chart</span>Herzfrequenzvariabilität (HRV)</h2>
+                    <span class="tooltip-text" style="width: 300px; margin-left: -150px;">Die HRV misst die zeitliche Variation zwischen Herzschlägen. Eine höhere HRV ist oft ein Indikator für gute Erholung und ein anpassungsfähiges Nervensystem.</span>
+                </div>
+                <div class="relative flex-auto">
+                    <canvas id="hrvChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let picker;
+        let minDate, maxDate;
+
+        function setDateRange(days) {
+            const end = new Date(maxDate);
+            let start;
+
+            if (days === 'all') {
+                start = new Date(minDate);
+            } else {
+                start = new Date(maxDate);
+                start.setDate(start.getDate() - (days - 1));
+            }
+            
+            picker.setDateRange(start, end);
+        }
+
+        function minutesToHoursAndMinutes(minutes) {
+            if (isNaN(minutes) || minutes === null) return '';
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return `${h}h ${m}min`;
+        }
+
+        async function fetchData(url) {
+            const response = await fetch(url);
+            const text = await response.text();
+            return Papa.parse(text, { header: true, dynamicTyping: true }).data;
+        }
+
+        function updateCharts(startDate, endDate) {
+            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            for (const chartKey in charts) {
+                const chart = charts[chartKey].chart;
+                const originalData = charts[chartKey].originalData;
+                const dateKey = charts[chartKey].dateKey;
+
+                const filteredData = originalData.filter(row => {
+                    if (!row[dateKey]) return false;
+                    const rowDate = new Date(row[dateKey].split(' ')[0]);
+                    return rowDate >= startDate && rowDate <= endDate;
+                });
+
+                chart.data.labels = filteredData.map(d => {
+                    const dateStr = d[dateKey].split(' ')[0];
+                    const date = new Date(dateStr);
+                    const dayName = days[date.getDay()];
+                    return `${dateStr} (${dayName})`;
+                });
+                
+                if (chartKey === 'activityChart') {
+                    chart.data.datasets[0].data = filteredData.map(d => d.Steps);
+                    chart.data.datasets[1].data = filteredData.map(d => d['Calories(kcal)']);
+                } else if (chartKey === 'sleepTimeChart') {
+                    chart.data.datasets[0].data = filteredData.map(d => d['Time Asleep(min)']);
+                } else if (chartKey === 'sleepStagesChart') {
+                    chart.data.datasets[0].data = filteredData.map(d => d['Sleep Stages - Awake(min)']);
+                    chart.data.datasets[1].data = filteredData.map(d => d['Sleep Stages - REM(min)']);
+                    chart.data.datasets[2].data = filteredData.map(d => d['Sleep Stages - Light Sleep(min)']);
+                    chart.data.datasets[3].data = filteredData.map(d => d['Sleep Stages - Deep Sleep(min)']);
+                } else if (chartKey === 'heartRateChart') {
+                    chart.data.datasets[0].data = filteredData.map(d => d['Avg. Heart Rate(bpm)']);
+                    chart.data.datasets[1].data = filteredData.map(d => d['Min. Heart Rate(bpm)']);
+                    chart.data.datasets[2].data = filteredData.map(d => d['Max. Heart Rate(bpm)']);
+                } else if (chartKey === 'spo2Chart') {
+                    chart.data.datasets[0].data = filteredData.map(d => parseFloat(d['Avg. Spo2(%)']));
+                } else if (chartKey === 'hrvChart') {
+                    chart.data.datasets[0].data = filteredData.map(d => d['Avg. HRV(ms)']);
+                }
+
+                chart.update();
+            }
+        }
+
+        async function createCharts() {
+            const activityData = (await fetchData('../assets/fitness-data/Activity-Giga-2025-01-01-2025-07-09.csv')).filter(r => r.Date);
+            const sleepData = (await fetchData('../assets/fitness-data/Sleep-Giga-2025-01-01-2025-07-09.csv')).filter(r => r['Start Time']);
+            const vitalData = (await fetchData('../assets/fitness-data/Vital Sings-Giga-2025-01-01-2025-07-09.csv')).filter(r => r.Date);
+
+            const allDates = [...activityData.map(d=>new Date(d.Date)), ...sleepData.map(d=>new Date(d['Start Time'].split(' ')[0])), ...vitalData.map(d=>new Date(d.Date))].filter(d => !isNaN(d));
+            minDate = new Date(Math.min.apply(null,allDates));
+            maxDate = new Date(Math.max.apply(null,allDates));
+
+            picker = new Litepicker({
+                element: document.getElementById('datepicker-container'),
+                singleMode: false,
+                inlineMode: true,
+                setup: (picker) => {
+                    picker.on('selected', (date1, date2) => {
+                        updateCharts(new Date(date1.dateInstance), new Date(date2.dateInstance));
+                    });
+                }
+            });
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#d1d5db' // dark:text-gray-300
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { 
+                            color: '#d1d5db'
+                        },
+                        grid: { color: '#374151' } // dark:border-gray-700
+                    },
+                    y: {
+                        ticks: { color: '#d1d5db' },
+                        grid: { color: '#374151' }
+                    }
+                }
+            };
+
+            // Activity Chart
+            const activityChart = new Chart(document.getElementById('activityChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Schritte',
+                        data: [],
+                        borderColor: '#3b82f6', // blue-500
+                        yAxisID: 'y',
+                    }, {
+                        label: 'Kalorien (kcal)',
+                        data: [],
+                        borderColor: '#ef4444', // red-500
+                        yAxisID: 'y1',
+                    }]
+                },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y1: { type: 'linear', display: true, position: 'right', ticks: { color: '#d1d5db' }, grid: { drawOnChartArea: false } } } }
+            });
+            charts.activityChart = { chart: activityChart, originalData: activityData, dateKey: 'Date' };
+
+            // Sleep Time Chart
+            const sleepTimeChart = new Chart(document.getElementById('sleepTimeChart'), {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Schlafzeit (Minuten)',
+                        data: [],
+                        backgroundColor: '#8b5cf6' // violet-500
+                    }]
+                },
+                options: { 
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: {
+                            ...chartOptions.scales.y,
+                            ticks: {
+                                ...chartOptions.scales.y.ticks,
+                                callback: function(value, index, values) {
+                                    return minutesToHoursAndMinutes(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += minutesToHoursAndMinutes(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            charts.sleepTimeChart = { chart: sleepTimeChart, originalData: sleepData, dateKey: 'Start Time' };
+
+            // Sleep Stages Chart
+            const sleepStagesChart = new Chart(document.getElementById('sleepStagesChart'), {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Wach (min)', data: [], backgroundColor: '#f97316' }, // orange-500
+                        { label: 'REM (min)', data: [], backgroundColor: '#06b6d4' }, // cyan-500
+                        { label: 'Leichtschlaf (min)', data: [], backgroundColor: '#60a5fa' }, // blue-400
+                        { label: 'Tiefschlaf (min)', data: [], backgroundColor: '#3b82f6' } // blue-600
+                    ]
+                },
+                options: { 
+                    ...chartOptions, 
+                    scales: { 
+                        x: { ...chartOptions.scales.x, stacked: true }, 
+                        y: { 
+                            ...chartOptions.scales.y, 
+                            stacked: true,
+                            ticks: {
+                                ...chartOptions.scales.y.ticks,
+                                callback: function(value, index, values) {
+                                    // Only show labels for certain steps to avoid clutter
+                                    if (value % 60 === 0) {
+                                        return minutesToHoursAndMinutes(value);
+                                    }
+                                    return '';
+                                }
+                            }
+                        } 
+                    },
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += minutesToHoursAndMinutes(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            charts.sleepStagesChart = { chart: sleepStagesChart, originalData: sleepData, dateKey: 'Start Time' };
+
+            // Heart Rate Chart
+            const heartRateChart = new Chart(document.getElementById('heartRateChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Avg. Herzfrequenz (bpm)', data: [], borderColor: '#22c55e' }, // green-500
+                        { label: 'Min. Herzfrequenz (bpm)', data: [], borderColor: '#86efac' }, // green-300
+                        { label: 'Max. Herzfrequenz (bpm)', data: [], borderColor: '#15803d' }  // green-700
+                    ]
+                },
+                options: chartOptions
+            });
+            charts.heartRateChart = { chart: heartRateChart, originalData: vitalData, dateKey: 'Date' };
+
+            // Spo2 Chart
+            const spo2Chart = new Chart(document.getElementById('spo2Chart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{ label: 'Avg. Spo2 (%)', data: [], borderColor: '#f97316' }] // orange-500
+                },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { ...chartOptions.scales.y, suggestedMin: 90, suggestedMax: 100 } } }
+            });
+            charts.spo2Chart = { chart: spo2Chart, originalData: vitalData, dateKey: 'Date' };
+
+            // HRV Chart
+            const hrvChart = new Chart(document.getElementById('hrvChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{ label: 'Avg. HRV (ms)', data: [], borderColor: '#14b8a6' }] // teal-500
+                },
+                options: chartOptions
+            });
+            charts.hrvChart = { chart: hrvChart, originalData: vitalData, dateKey: 'Date' };
+            
+            // Initial load
+            picker.setDateRange(minDate, maxDate);
+        }
+
+        createCharts();
+    </script>
+
+</body>
+</html>
