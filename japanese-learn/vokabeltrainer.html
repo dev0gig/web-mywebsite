@@ -87,9 +87,32 @@
     </style>
 </head>
 
-<body class="bg-cyber-bg font-sans text-cyber-text h-screen">
+<body class="bg-cyber-bg font-sans text-cyber-text h-screen" x-data="{ mobileMenuOpen: false }">
 
-    <div class="container mx-auto p-4 h-full">
+    <!-- Mobile Header & Menu -->
+    <header
+        class="lg:hidden bg-cyber-surface/90 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 border-b border-cyber-border/50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h2 class="font-orbitron text-lg text-cyber-primary cyber-glow">JAPANISCH MENTOR</h2>
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-cyber-primary p-2">
+                <span x-show="!mobileMenuOpen" class="material-symbols-outlined text-3xl">menu</span>
+                <span x-show="mobileMenuOpen" style="display: none;"
+                    class="material-symbols-outlined text-3xl">close</span>
+            </button>
+        </div>
+        <!-- Mobile Nav -->
+        <nav x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" x-transition style="display: none;"
+            class="bg-cyber-surface p-4 border-t border-cyber-border/30">
+            <ul class="space-y-3">
+                <li><a href="japanisch-ueben.html"
+                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg"><span
+                            class="material-symbols-outlined">hub</span>ZUM MENTOR</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container mx-auto p-4 h-full pt-20 lg:pt-4">
 
         <div x-data="flashcardTrainer()" class="flex flex-col md:flex-row md:gap-8 w-full h-full">
 
@@ -103,6 +126,23 @@
                         </button>
                     </div>
 
+                    <div class="flex gap-2 mb-4">
+                        <button @click="exportWords()" title="Backup erstellen" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-cyber-surface border border-cyber-border hover:bg-cyber-primary hover:text-cyber-bg transition-colors text-sm">
+                            <span class="material-symbols-outlined">save</span> Export
+                        </button>
+                        <button @click="$refs.importInput.click()" title="Backup einspielen" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-cyber-surface border border-cyber-border hover:bg-cyber-primary hover:text-cyber-bg transition-colors text-sm">
+                            <span class="material-symbols-outlined">folder_open</span> Import
+                        </button>
+                        <input type="file" x-ref="importInput" @change="importWords($event)" class="hidden" accept=".json">
+                    </div>
+
+                    <!-- Add Word Button -->
+                    <div class="mb-4">
+                        <button @click="showAddWordModal = true" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow">
+                            <span class="material-symbols-outlined">add_circle</span> Neues Wort
+                        </button>
+                    </div>
+ 
                     <!-- Alphabet Index -->
                     <div x-show="alphabetIndexVisible" x-transition class="absolute inset-0 bg-cyber-surface/95 p-4 z-30 flex flex-col">
                          <h3 class="font-orbitron text-xl text-cyber-primary mb-4 text-center">Index</h3>
@@ -123,9 +163,19 @@
                                     <span x-text="group.letter"></span>
                                 </h3>
                                 <template x-for="word in group.words" :key="word.japanese">
-                                    <div @click="selectWord(word); wordListVisible = false" class="px-3 py-2 cursor-pointer hover:bg-cyber-primary hover:text-cyber-bg rounded-md text-sm flex justify-between items-center">
-                                        <span x-text="word.german"></span>
-                                        <span class="text-cyber-dim text-right" x-text="word.kanji ? `${word.japanese} (${word.kanji})` : word.japanese"></span>
+                                    <div class="flex justify-between items-center group">
+                                        <div @click="selectWord(word); wordListVisible = false" class="flex-grow px-3 py-2 cursor-pointer hover:bg-cyber-primary hover:text-cyber-bg rounded-md text-sm flex justify-between items-center">
+                                            <span x-text="word.german"></span>
+                                            <span class="text-cyber-dim text-right" x-text="word.kanji ? `${word.japanese} (${word.kanji})` : word.japanese"></span>
+                                        </div>
+                                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button @click.stop="editWord(word)" class="p-1 text-cyber-dim hover:text-cyber-primary">
+                                                <span class="material-symbols-outlined text-base">edit</span>
+                                            </button>
+                                            <button @click.stop="deleteWord(word)" class="p-1 text-cyber-dim hover:text-cyber-secondary">
+                                                <span class="material-symbols-outlined text-base">delete</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -215,15 +265,45 @@
                 </button>
             </div>
 
-            <footer class="text-center mt-8">
-                <a href="japanisch-ueben.html"
-                    class="text-cyber-dim hover:text-cyber-primary transition-colors duration-200 flex items-center gap-2 justify-center"><span
-                        class="material-symbols-outlined">arrow_back</span> Zurück zum Mentor</a>
-            </footer>
         </main>
 
         <!-- Overlay for mobile sidebar -->
         <div x-show="wordListVisible" @click="wordListVisible = false" class="fixed inset-0 bg-black/50 z-10 md:hidden" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+
+       <!-- Add/Edit Word Modal -->
+       <div x-show="showAddWordModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-cyber-bg bg-opacity-80 flex items-center justify-center z-50 p-4" style="display: none;">
+           <div @click.away="closeModal()" class="bg-cyber-surface border border-cyber-border rounded-lg shadow-cyber p-6 w-full max-w-md">
+               <h3 class="font-orbitron text-2xl text-cyber-primary mb-4" x-text="editingWord ? 'Wort bearbeiten' : 'Neues Wort hinzufügen'"></h3>
+               <form @submit.prevent="saveWord()">
+                   <div class="space-y-4">
+                       <div>
+                           <label for="newGerman" class="block text-cyber-dim mb-1">Deutsch</label>
+                           <input type="text" id="newGerman" x-model="newWord.german" required class="w-full px-3 py-2 bg-cyber-bg border border-cyber-border rounded-md focus:outline-none focus:ring-2 focus:ring-cyber-primary">
+                       </div>
+                       <div>
+                           <div class="flex justify-between items-center mb-1">
+                               <label for="newJapanese" class="block text-cyber-dim">Japanisch (Hiragana/Katakana)</label>
+                               <button type="button" @click="translateWord()" x-show="newWord.german.trim()" :disabled="loadingTranslation"
+                                  class="text-xs text-cyber-primary hover:underline flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                   <span x-show="!loadingTranslation">Automatisch Übersetzen</span>
+                                   <span x-show="loadingTranslation" style="display: none;">Übersetze...</span>
+                                   <span class="material-symbols-outlined text-sm" x-show="!loadingTranslation">translate</span>
+                               </button>
+                           </div>
+                           <input type="text" id="newJapanese" x-model="newWord.japanese" required class="w-full px-3 py-2 bg-cyber-bg border border-cyber-border rounded-md focus:outline-none focus:ring-2 focus:ring-cyber-primary">
+                       </div>
+                       <div>
+                           <label for="newKanji" class="block text-cyber-dim mb-1">Kanji (Optional)</label>
+                           <input type="text" id="newKanji" x-model="newWord.kanji" class="w-full px-3 py-2 bg-cyber-bg border border-cyber-border rounded-md focus:outline-none focus:ring-2 focus:ring-cyber-primary">
+                       </div>
+                   </div>
+                   <div class="flex justify-end gap-4 mt-6">
+                       <button type="button" @click="closeModal()" class="px-4 py-2 rounded-md text-cyber-dim hover:text-cyber-primary">Abbrechen</button>
+                       <button type="submit" class="px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber-sm">Speichern</button>
+                   </div>
+               </form>
+           </div>
+       </div>
 
     </div>
 
@@ -309,12 +389,36 @@
                 alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
                 drawing: false,
                 canvasContext: null,
+                showAddWordModal: false,
+                newWord: { german: '', japanese: '', kanji: '' },
+                editingWord: null,
+                loadingTranslation: false,
 
                 init() {
+                    const savedWords = localStorage.getItem('vokabeltrainer_words');
+                    if (savedWords) {
+                        try {
+                            const parsedWords = JSON.parse(savedWords);
+                            if (Array.isArray(parsedWords) && parsedWords.length > 0) {
+                                this.words = parsedWords;
+                            }
+                        } catch (e) {
+                            console.error("Fehler beim Laden der Wörter aus dem Speicher, Standardwerte werden verwendet.", e);
+                        }
+                    }
+
                     this.allWords = [...this.words];
+                    if (!savedWords) {
+                       localStorage.setItem('vokabeltrainer_words', JSON.stringify(this.allWords));
+                    }
+
                     this.groupAndSortWords();
                     this.shuffleWords();
-                    this.currentWord = this.words[0];
+                    if (this.words.length > 0) {
+                        this.currentWord = this.words[0];
+                    } else {
+                        this.currentWord = { german: 'Keine Wörter', japanese: '...', kanji: '' };
+                    }
                     this.updateProgress();
                     this.initCanvas();
                 },
@@ -391,9 +495,65 @@
                     this.updateProgress();
                 },
 
+                exportWords() {
+                    if (this.allWords.length === 0) {
+                        alert('Keine Wörter zum Exportieren vorhanden.');
+                        return;
+                    }
+                    const dataStr = JSON.stringify(this.allWords, null, 2);
+                    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(dataBlob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'vokabeltrainer-backup.json';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                },
+
+                importWords(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const importedWords = JSON.parse(e.target.result);
+                            // Validierung
+                            if (Array.isArray(importedWords) && (importedWords.length === 0 || (importedWords[0].german && importedWords[0].japanese))) {
+                                this.allWords = importedWords;
+                                localStorage.setItem('vokabeltrainer_words', JSON.stringify(this.allWords));
+
+                                // Status neu initialisieren
+                                this.words = [...this.allWords];
+                                this.groupAndSortWords();
+                                this.shuffleWords();
+                                this.currentIndex = 0;
+                                this.currentWord = this.words.length > 0 ? this.words[0] : { german: 'Keine Wörter', japanese: '...', kanji: '' };
+                                this.flipped = false;
+                                this.searchTerm = '';
+                                this.searchResults = [];
+                                this.updateProgress();
+                                this.clearCanvas();
+
+                                alert(`${importedWords.length} Wörter erfolgreich importiert!`);
+                            } else {
+                                alert('Ungültiges Dateiformat. Die Datei muss eine Liste von Wortobjekten mit "german" und "japanese" Schlüsseln sein.');
+                            }
+                        } catch (error) {
+                            alert('Fehler beim Lesen der Datei. Stellen Sie sicher, dass es sich um eine gültige JSON-Datei handelt.');
+                            console.error("Import fehlgeschlagen:", error);
+                        }
+                    };
+                    reader.readAsText(file);
+                    event.target.value = ''; // Damit die gleiche Datei erneut ausgewählt werden kann
+                },
+ 
                 groupAndSortWords() {
-                    const sorted = [...this.words].sort((a, b) => a.german.localeCompare(b.german));
+                    const sorted = [...this.allWords].sort((a, b) => a.german.localeCompare(b.german));
                     const groups = sorted.reduce((acc, word) => {
+                        if(!word.german) return acc;
                         const letter = word.german[0].toUpperCase();
                         if (!acc[letter]) {
                             acc[letter] = [];
@@ -418,6 +578,7 @@
                 initCanvas() {
                     this.$nextTick(() => {
                         const canvas = this.$refs.drawingCanvas;
+                        if(!canvas) return;
                         // Set canvas resolution to match its display size
                         canvas.width = canvas.offsetWidth;
                         canvas.height = canvas.offsetHeight;
@@ -477,6 +638,115 @@
                     if (this.canvasContext) {
                         this.canvasContext.clearRect(0, 0, this.$refs.drawingCanvas.width, this.$refs.drawingCanvas.height);
                     }
+                },
+
+                deleteWord(wordToDelete) {
+                    if (confirm(`Möchten Sie das Wort "${wordToDelete.german}" wirklich löschen?`)) {
+                        this.allWords = this.allWords.filter(word => word.japanese !== wordToDelete.japanese);
+                        localStorage.setItem('vokabeltrainer_words', JSON.stringify(this.allWords));
+
+                        // UI aktualisieren
+                        this.words = [...this.allWords];
+                        this.groupAndSortWords();
+                        this.shuffleWords();
+                        
+                        // Wenn das gelöschte Wort das aktuelle war, zum nächsten gehen
+                        if (this.currentWord.japanese === wordToDelete.japanese) {
+                            this.currentIndex = 0;
+                            this.currentWord = this.words.length > 0 ? this.words[0] : { german: 'Keine Wörter', japanese: '...', kanji: '' };
+                        }
+                        this.updateProgress();
+                        alert('Wort gelöscht.');
+                    }
+                },
+
+                editWord(word) {
+                    this.editingWord = word;
+                    this.newWord = { ...word };
+                    this.showAddWordModal = true;
+                },
+
+                closeModal() {
+                    this.showAddWordModal = false;
+                    this.editingWord = null;
+                    this.newWord = { german: '', japanese: '', kanji: '' };
+                },
+
+                async translateWord() {
+                    if (!this.newWord.german.trim()) {
+                        alert('Bitte geben Sie zuerst ein deutsches Wort ein.');
+                        return;
+                    }
+                    this.loadingTranslation = true;
+                    this.newWord.japanese = ''; // Clear previous results
+                    this.newWord.kanji = '';
+
+                    try {
+                        // Step 1: Translate German to Japanese using a general translation API
+                        const translationResponse = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(this.newWord.german)}&langpair=de|ja`);
+                        const translationData = await translationResponse.json();
+
+                        if (translationData.responseStatus !== 200 || !translationData.responseData.translatedText) {
+                            throw new Error('Translation from German failed.');
+                        }
+                        
+                        const translatedText = translationData.responseData.translatedText;
+
+                        // Step 2: Use Jisho.org's unofficial API to get detailed word info (Kanji and Kana)
+                        const jishoResponse = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(translatedText)}`);
+                        const jishoData = await jishoResponse.json();
+
+                        if (jishoData.data && jishoData.data.length > 0) {
+                            const firstResult = jishoData.data[0];
+                            const japaneseForm = firstResult.japanese[0];
+
+                            // Prefer the form that has both kanji and reading
+                            const bestForm = firstResult.japanese.find(j => j.word && j.reading) || japaneseForm;
+
+                            this.newWord.japanese = bestForm.reading;
+                            // Only assign kanji if it's different from the reading
+                            this.newWord.kanji = (bestForm.word && bestForm.word !== bestForm.reading) ? bestForm.word : '';
+                        } else {
+                            // Fallback if Jisho gives no result: just use the initial translation
+                            this.newWord.japanese = translatedText;
+                        }
+
+                    } catch (error) {
+                        console.error('Translation process error:', error);
+                        alert('Ein Fehler ist bei der automatischen Übersetzung aufgetreten. Bitte überprüfen Sie die Einträge manuell.');
+                    } finally {
+                        this.loadingTranslation = false;
+                    }
+                },
+
+                saveWord() {
+                    if (this.editingWord) {
+                        // Update existing word
+                        const index = this.allWords.findIndex(w => w.japanese === this.editingWord.japanese);
+                        if (index !== -1) {
+                            this.allWords[index] = { ...this.newWord };
+                        }
+                    } else {
+                        // Add new word
+                        if (!this.newWord.german.trim() || !this.newWord.japanese.trim()) {
+                            alert('Die Felder für Deutsch und Japanisch dürfen nicht leer sein.');
+                            return;
+                        }
+                        const exists = this.allWords.some(word => word.german.toLowerCase() === this.newWord.german.toLowerCase() || word.japanese.toLowerCase() === this.newWord.japanese.toLowerCase());
+                        if (exists) {
+                            alert('Dieses Wort existiert bereits in der Liste.');
+                            return;
+                        }
+                        this.allWords.push({ ...this.newWord });
+                    }
+
+                    localStorage.setItem('vokabeltrainer_words', JSON.stringify(this.allWords));
+                    this.words = [...this.allWords];
+                    this.groupAndSortWords();
+                    this.shuffleWords();
+                    this.updateProgress();
+                    this.closeModal();
+                    alert(this.editingWord ? 'Wort erfolgreich aktualisiert!' : 'Neues Wort erfolgreich hinzugefügt!');
                 }
             }
         }
