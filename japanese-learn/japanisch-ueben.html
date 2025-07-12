@@ -123,6 +123,21 @@
                                 <li><a href="#adjektive" @click="mobileMenuOpen = false"
                                         class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
                                                 class="material-symbols-outlined">palette</span>06 // ADJEKTIVE</a></li>
+                                <li><a href="#verben-vergangenheit" @click="mobileMenuOpen = false"
+                                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
+                                                class="material-symbols-outlined">history</span>07 // VERBEN (VERGANGENHEIT)</a></li>
+                                <li><a href="#adjektive-vergangenheit" @click="mobileMenuOpen = false"
+                                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
+                                                class="material-symbols-outlined">palette</span>08 // ADJEKTIVE (VERG.)</a></li>
+                                <li><a href="#ortsangaben" @click="mobileMenuOpen = false"
+                                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
+                                                class="material-symbols-outlined">place</span>09 // ORTSANGABEN</a></li>
+                                <li><a href="#richtung" @click="mobileMenuOpen = false"
+                                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
+                                                class="material-symbols-outlined">north_east</span>10 // RICHTUNG</a></li>
+                                <li><a href="#zeitangaben" @click="mobileMenuOpen = false"
+                                        class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 text-lg pl-4"><span
+                                                class="material-symbols-outlined">schedule</span>11 // ZEITANGABEN</a></li>
                         </ul>
                 </nav>
         </header>
@@ -171,6 +186,26 @@
                                                 class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
                                                         class="material-symbols-outlined text-sm">palette</span>06
                                                 // ADJEKTIVE</a></li>
+                                        <li><a href="#verben-vergangenheit"
+                                                class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
+                                                        class="material-symbols-outlined text-sm">history</span>07
+                                                // VERBEN (VERGANGENHEIT)</a></li>
+                                        <li><a href="#adjektive-vergangenheit"
+                                                class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
+                                                        class="material-symbols-outlined text-sm">palette</span>08
+                                                // ADJEKTIVE (VERG.)</a></li>
+                                        <li><a href="#ortsangaben"
+                                                class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
+                                                        class="material-symbols-outlined text-sm">place</span>09
+                                                // ORTSANGABEN</a></li>
+                                        <li><a href="#richtung"
+                                                class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
+                                                        class="material-symbols-outlined text-sm">north_east</span>10
+                                                // RICHTUNG</a></li>
+                                        <li><a href="#zeitangaben"
+                                                class="flex items-center gap-2 text-cyber-dim hover:text-cyber-primary transition-colors duration-200 pl-3"><span
+                                                        class="material-symbols-outlined text-sm">schedule</span>11
+                                                // ZEITANGABEN</a></li>
                                 </ul>
                         </div>
                 </aside>
@@ -884,6 +919,306 @@
                                                         <div class="overflow-x-auto">
                                                                 <p x-show="showF3" x-transition
                                                                         class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">この たべもの は おいしい です。</p>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </section>
+
+                        <section id="verben-vergangenheit"
+                                class="bg-cyber-surface p-4 sm:p-6 rounded-lg shadow-cyber-sm border border-cyber-border my-6"
+                                x-data="{ showG1: false, showG2: false, showG3: false }">
+                                <h2
+                                        class="font-orbitron text-2xl font-bold mb-4 text-cyber-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined">history</span>07 // VERBEN: VERGANGENHEIT
+                                </h2>
+                                <p class="mb-4 text-cyber-dim">Bisher haben wir nur in der Gegenwart gesprochen (`Ich esse`, `Ich sehe`). Über Dinge zu sprechen, die bereits passiert sind, ist zum Glück sehr einfach. Du musst nur die Endung des Verbs ändern.</p>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">Die höfliche Vergangenheitsform: -mashita (-ました)</h3>
+                                        <p class="mb-2 text-cyber-dim">Um ein Verb von der Gegenwartsform in die Vergangenheitsform zu setzen, ersetzt du einfach die Endung <span class="font-semibold text-cyber-text">-masu</span> durch <span class="font-semibold text-cyber-primary">-mashita</span>.</p>
+                                        <ul class="list-disc list-inside text-cyber-dim space-y-1 pl-4">
+                                                <li><span class="jp-vocab">たべます (tabemasu)</span> → <span class="jp-vocab text-cyber-primary">たべました (tabemashita)</span></li>
+                                                <li><span class="jp-vocab">みます (mimasu)</span> → <span class="jp-vocab text-cyber-primary">みました (mimashita)</span></li>
+                                                <li><span class="jp-vocab">かいます (kaimasu)</span> → <span class="jp-vocab text-cyber-primary">かいました (kaimashita)</span></li>
+                                        </ul>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">わたし は アニメ を み<span class="text-cyber-primary">ました</span>。</span> (Ich habe Anime geschaut.)</p>
+                                </div>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">Die negative Vergangenheitsform: -masen deshita (-ませんでした)</h3>
+                                        <p class="mb-2 text-cyber-dim">Um zu sagen, dass du etwas <strong>nicht</strong> getan hast, nimmst du die negative Gegenwartsform (<span class="font-semibold text-cyber-text">-masen</span>) und hängst einfach <span class="font-semibold text-cyber-primary">deshita</span> an.</p>
+                                        <ul class="list-disc list-inside text-cyber-dim space-y-1 pl-4">
+                                                <li><span class="jp-vocab">たべません (tabemasen)</span> → <span class="jp-vocab text-cyber-primary">たべませんでした (tabemasen deshita)</span></li>
+                                                <li><span class="jp-vocab">みません (mimasen)</span> → <span class="jp-vocab text-cyber-primary">みませんでした (mimasen deshita)</span></li>
+                                        </ul>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">わたし は すし を たべません <span class="text-cyber-primary">でした</span>。</span> (Ich habe kein Sushi gegessen.)</p>
+                                </div>
+
+                                <div class="mt-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">ÜBUNG: ZEITREISE</h3>
+                                        <div class="space-y-4">
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich habe ein Buch gekauft. (von `kaimasu`)</p>
+                                                        <p class="text-sm text-cyber-dim">Neues Asset: きのう (kinou) - gestern</p>
+                                                        <button @click="showG1 = !showG1"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span
+                                                                        class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showG1" x-transition
+                                                                        class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">きのう、わたし は ほん を かいました。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich habe Wasser getrunken. (von `nomimasu`)</p>
+                                                        <button @click="showG2 = !showG2"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span
+                                                                        class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showG2" x-transition
+                                                                        class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は みず を のみました。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Setze diesen Satz in die negative Vergangenheitsform: "Ich habe keinen Anime geschaut." (von `mimasu`)</p>
+                                                        <button @click="showG3 = !showG3"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span
+                                                                        class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showG3" x-transition
+                                                                        class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は アニメ を みませんでした。</p>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </section>
+
+                        <section id="adjektive-vergangenheit"
+                                class="bg-cyber-surface p-4 sm:p-6 rounded-lg shadow-cyber-sm border border-cyber-border my-6"
+                                x-data="{ showH1: false, showH2: false, showH3: false }">
+                                <h2
+                                        class="font-orbitron text-2xl font-bold mb-4 text-cyber-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined">palette</span>08 // ADJEKTIVE: VERGANGENHEIT
+                                </h2>
+                                <p class="mb-4 text-cyber-dim">Hier müssen wir wieder zwischen i-Adjektiven und na-Adjektiven unterscheiden, denn sie verändern sich unterschiedlich.</p>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">1. i-Adjektive in der Vergangenheit</h3>
+                                        <p class="mb-2 text-cyber-dim">Um ein i-Adjektiv in die Vergangenheit zu setzen, entfernst du das letzte <span class="font-semibold text-cyber-text">い (i)</span> und hängst stattdessen <span class="font-semibold text-cyber-primary">かった (katta)</span> an.</p>
+                                        <ul class="list-disc list-inside text-cyber-dim space-y-1 pl-4">
+                                                <li><span class="jp-vocab">おいしい (oishii)</span> → <span class="jp-vocab text-cyber-primary">おいしかった (oishikatta)</span></li>
+                                                <li><span class="jp-vocab">おもしろい (omoshiroi)</span> → <span class="jp-vocab text-cyber-primary">おもしろかった (omoshirokatta)</span></li>
+                                        </ul>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">この ほん は おもしろ<span class="text-cyber-primary">かった</span> です。</span> (Dieses Buch war interessant.)</p>
+                                </div>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">2. na-Adjektive in der Vergangenheit</h3>
+                                        <p class="mb-2 text-cyber-dim">Das Adjektiv selbst verändert sich nicht. Stattdessen veränderst du <span class="font-semibold text-cyber-text">です (desu)</span> am Ende des Satzes zu <span class="font-semibold text-cyber-primary">でした (deshita)</span>.</p>
+                                        <ul class="list-disc list-inside text-cyber-dim space-y-1 pl-4">
+                                                <li><span class="jp-vocab">しずか (shizuka)</span> です → <span class="jp-vocab text-cyber-primary">しずか でした</span></li>
+                                                <li><span class="jp-vocab">きれい (kirei)</span> です → <span class="jp-vocab text-cyber-primary">きれい でした</span></li>
+                                        </ul>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">あの へや は しずか <span class="text-cyber-primary">でした</span>。</span> (Jenes Zimmer war ruhig.)</p>
+                                </div>
+
+                                <div class="mt-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">ÜBUNG: ZUSTAND ÄNDERN</h3>
+                                        <div class="space-y-4">
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Setze den Satz in die Vergangenheit: "Das Essen war lecker."</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: たべもの, おいしい</p>
+                                                        <button @click="showH1 = !showH1"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showH1" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">たべもの は おいしかった です。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Setze den Satz in die Vergangenheit: "Das Zimmer war schön."</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: へや, きれい</p>
+                                                        <button @click="showH2 = !showH2"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showH2" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">へや は きれい でした。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ein neues i-Adjektiv ist `たのしい (tanoshii)` - "spaßig / unterhaltsam". Wie sagst du: "Der Anime war unterhaltsam."?</p>
+                                                        <button @click="showH3 = !showH3"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showH3" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">アニメ は たのしかった です。</p>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </section>
+
+                        <section id="ortsangaben"
+                                class="bg-cyber-surface p-4 sm:p-6 rounded-lg shadow-cyber-sm border border-cyber-border my-6"
+                                x-data="{ showI1: false, showI2: false, showI3: false }">
+                                <h2
+                                        class="font-orbitron text-2xl font-bold mb-4 text-cyber-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined">place</span>09 // ORTSANGABEN: に & で
+                                </h2>
+                                <p class="mb-4 text-cyber-dim">Im Japanischen gibt es Partikel, die *nach* dem Ort stehen. Die zwei wichtigsten sind <span class="font-semibold text-cyber-text">に (ni)</span> und <span class="font-semibold text-cyber-text">で (de)</span>. Es ist entscheidend, den Unterschied zu kennen.</p>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">1. Partikel に (ni) - Ort der Existenz</h3>
+                                        <p class="mb-2 text-cyber-dim">`に (ni)` markiert den Ort, an dem etwas **existiert** oder **sich befindet**. Die Schlüsselverben sind <span class="jp-vocab">あります</span> (für Dinge) und <span class="jp-vocab">います</span> (für Lebewesen).</p>
+                                        <p class="mt-3 text-cyber-dim">Struktur: <span class="text-cyber-text font-mono">[Ort] に [Ding/Person] が あります/います。</span></p>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">いえ に ねこ が います。</span> (Im Haus ist eine Katze.)</p>
+                                </div>
+
+                                <div class="mb-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">2. Partikel で (de) - Ort der Handlung</h3>
+                                        <p class="mb-2 text-cyber-dim">`で (de)` markiert den Ort, an dem eine **Handlung stattfindet**. Wenn du ein aktives Verb (essen, trinken, etc.) benutzt, brauchst du `で`.</p>
+                                        <p class="mt-3 text-cyber-dim">Struktur: <span class="text-cyber-text font-mono">[Ort] で [Objekt] を [Verb].</span></p>
+                                        <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">いえ で アニメ を みます。</span> (Ich schaue im Haus Anime.)</p>
+                                </div>
+
+                                <div class="mt-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">ÜBUNG: ORT BESTIMMEN</h3>
+                                        <div class="space-y-4">
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich lese **in** der Bibliothek ein Buch.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: としょかん (Bibliothek), よみます (lesen)</p>
+                                                        <button @click="showI1 = !showI1"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showI1" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は としょかん で ほん を よみます。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>**In** der Bibliothek gibt es viele Bücher.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: たくさん (viele)</p>
+                                                        <button @click="showI2 = !showI2"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showI2" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">としょかん に たくさん の ほん が あります。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich habe **in** Tokio einen Freund getroffen.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: ともだち (Freund), あいました (traf)</p>
+                                                        <button @click="showI3 = !showI3"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showI3" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は とうきょう で ともだち に あいました。</p>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </section>
+
+                        <section id="richtung"
+                                class="bg-cyber-surface p-4 sm:p-6 rounded-lg shadow-cyber-sm border border-cyber-border my-6"
+                                x-data="{ showJ1: false, showJ2: false, showJ3: false }">
+                                <h2
+                                        class="font-orbitron text-2xl font-bold mb-4 text-cyber-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined">north_east</span>10 // RICHTUNG & BEWEGUNG: へ (e)
+                                </h2>
+                                <p class="mb-4 text-cyber-dim">Um die Richtung anzugeben, in die du dich bewegst, benutzt du den Partikel <span class="font-semibold text-cyber-text">へ (e)</span>. Das Zeichen へ (he) wird hier "e" ausgesprochen.</p>
+                                <p class="mb-2 text-cyber-dim">Dieser Partikel wird mit Bewegungsverben verwendet:</p>
+                                <ul class="list-disc list-inside text-cyber-dim space-y-1 pl-4">
+                                        <li><span class="jp-vocab">いきます (ikimasu)</span> - gehen</li>
+                                        <li><span class="jp-vocab">きます (kimasu)</span> - kommen</li>
+                                        <li><span class="jp-vocab">かえります (kaerimasu)</span> - zurückkehren</li>
+                                </ul>
+                                <p class="mt-3 text-cyber-dim">Struktur: <span class="text-cyber-text font-mono">[Zielort] へ [Bewegungsverb].</span></p>
+                                <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">わたし は にほん へ いきます。</span> (Ich gehe nach Japan.)</p>
+
+                                <div class="mt-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">ÜBUNG: KURS SETZEN</h3>
+                                        <div class="space-y-4">
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich gehe zur Schule.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: がっこう (Schule)</p>
+                                                        <button @click="showJ1 = !showJ1"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showJ1" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は がっこう へ いきます。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Er kehrt nach Hause zurück.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: かれ (er), うち (Zuhause)</p>
+                                                        <button @click="showJ2 = !showJ2"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showJ2" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">かれ は うち へ かえります。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Bist du zur Bibliothek gekommen?</p>
+                                                        <button @click="showJ3 = !showJ3"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showJ3" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">あなた は としょかん へ きましたか。</p>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </section>
+
+                        <section id="zeitangaben"
+                                class="bg-cyber-surface p-4 sm:p-6 rounded-lg shadow-cyber-sm border border-cyber-border my-6"
+                                x-data="{ showK1: false, showK2: false, showK3: false }">
+                                <h2
+                                        class="font-orbitron text-2xl font-bold mb-4 text-cyber-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined">schedule</span>11 // ZEITANGABEN
+                                </h2>
+                                <p class="mb-4 text-cyber-dim">Um zu sagen, *wann* eine Handlung stattfindet, fügst du die Zeitangabe meist an den Anfang des Satzes. Der Partikel <span class="font-semibold text-cyber-text">に (ni)</span> wird nur bei **spezifischen Zeitpunkten** (z.B. 7 Uhr, Sonntag) benutzt, nicht bei relativen Angaben (z.B. heute, morgen).</p>
+                                
+                                <div class="overflow-x-auto rounded-lg border border-cyber-border/50 my-4">
+                                        <table class="w-full min-w-[300px] text-left">
+                                                <thead>
+                                                        <tr class="bg-cyber-border/20">
+                                                                <th class="p-3">Wort</th>
+                                                                <th class="p-3">Hiragana</th>
+                                                                <th class="p-3">Bedeutung</th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody>
+                                                        <tr><td class="p-3 border-t border-cyber-border/30">kyou</td><td class="p-3 border-t border-cyber-border/30 jp-vocab">きょう</td><td class="p-3 border-t border-cyber-border/30">heute</td></tr>
+                                                        <tr><td class="p-3 border-t border-cyber-border/30">ashita</td><td class="p-3 border-t border-cyber-border/30 jp-vocab">あした</td><td class="p-3 border-t border-cyber-border/30">morgen</td></tr>
+                                                        <tr><td class="p-3 border-t border-cyber-border/30">kinou</td><td class="p-3 border-t border-cyber-border/30 jp-vocab">きのう</td><td class="p-3 border-t border-cyber-border/30">gestern</td></tr>
+                                                        <tr><td class="p-3 border-t border-cyber-border/30">mainichi</td><td class="p-3 border-t border-cyber-border/30 jp-vocab">まいにち</td><td class="p-3 border-t border-cyber-border/30">jeden Tag</td></tr>
+                                                </tbody>
+                                        </table>
+                                </div>
+
+                                <p class="mt-3 text-cyber-dim">Beispiel: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">わたし は **きのう** アニメ を みました。</span> (Ich habe gestern Anime geschaut.)</p>
+                                <p class="mt-1 text-cyber-dim">Beispiel mit <span class="font-semibold text-cyber-text">に</span>: <span class="text-cyber-text font-mono inline-block max-w-full overflow-x-auto align-middle">しちじ **に** おきます。</span> (Ich stehe um 7 Uhr auf.)</p>
+
+                                <div class="mt-6">
+                                        <h3 class="text-xl font-semibold mb-2 text-cyber-secondary">ÜBUNG: ALLES KOMBINIEREN</h3>
+                                        <div class="space-y-4">
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich lerne heute Japanisch.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: にほんご (Japanisch), べんきょうします (lernen)</p>
+                                                        <button @click="showK1 = !showK1"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showK1" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は きょう にほんご を べんきょうします。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich habe gestern ein Buch gelesen.</p>
+                                                        <button @click="showK2 = !showK2"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showK2" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は きのう ほん を よみました。</p>
+                                                        </div>
+                                                </div>
+                                                <div class="p-4 border border-cyber-border/50 rounded-lg">
+                                                        <p>Ich stehe jeden Tag um 8 Uhr auf.</p>
+                                                        <p class="text-sm text-cyber-dim">Assets: はちじ (8 Uhr), おきます (aufstehen)</p>
+                                                        <button @click="showK3 = !showK3"
+                                                                class="flex items-center gap-2 mt-2 px-4 py-2 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow"><span class="material-symbols-outlined">visibility</span>DEKODIERE</button>
+                                                        <div class="overflow-x-auto">
+                                                                <p x-show="showK3" x-transition class="jp-vocab mt-2 text-cyber-primary whitespace-nowrap">わたし は まいにち はちじ に おきます。</p>
                                                         </div>
                                                 </div>
                                         </div>

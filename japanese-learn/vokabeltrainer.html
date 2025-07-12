@@ -230,6 +230,9 @@
                                 class="absolute w-full h-full card-face bg-cyber-surface border border-cyber-border rounded-lg flex items-center justify-center cursor-pointer shadow-cyber-sm">
                                 <p class="text-3xl md:text-4xl font-bold text-cyber-text px-4 text-center"
                                     x-text="currentWord.german"></p>
+                                <button @click.stop="speak(currentWord.german, 'de-DE')" class="absolute bottom-4 right-4 p-2 text-cyber-dim hover:text-cyber-primary">
+                                    <span class="material-symbols-outlined">volume_up</span>
+                                </button>
                             </div>
                             <div @click="flipped = !flipped"
                                 class="absolute w-full h-full card-face card-back bg-cyber-border/20 border border-cyber-border rounded-lg flex flex-col items-center justify-center cursor-pointer shadow-cyber-sm p-4">
@@ -237,6 +240,9 @@
                                     x-text="currentWord.japanese"></p>
                                 <p class="text-5xl md:text-6xl font-bold text-cyber-text text-center mt-2"
                                     x-show="currentWord.kanji" x-text="currentWord.kanji"></p>
+                                <button @click.stop="speak(currentWord.japanese, 'ja-JP')" class="absolute bottom-4 right-4 p-2 text-cyber-dim hover:text-cyber-primary">
+                                    <span class="material-symbols-outlined">volume_up</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -283,12 +289,10 @@
                        <div>
                            <div class="flex justify-between items-center mb-1">
                                <label for="newJapanese" class="block text-cyber-dim">Japanisch (Hiragana/Katakana)</label>
-                               <button type="button" @click="translateWord()" x-show="newWord.german.trim()" :disabled="loadingTranslation"
-                                  class="text-xs text-cyber-primary hover:underline flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
-                                   <span x-show="!loadingTranslation">Automatisch Übersetzen</span>
-                                   <span x-show="loadingTranslation" style="display: none;">Übersetze...</span>
-                                   <span class="material-symbols-outlined text-sm" x-show="!loadingTranslation">translate</span>
-                               </button>
+                               <a :href="`https://translate.google.com/?sl=de&tl=ja&text=${encodeURIComponent(newWord.german)}&op=translate`" target="_blank" x-show="newWord.german.trim()"
+                                  class="text-xs text-cyber-primary hover:underline flex items-center gap-1">
+                                   Übersetzen <span class="material-symbols-outlined text-sm">open_in_new</span>
+                               </a>
                            </div>
                            <input type="text" id="newJapanese" x-model="newWord.japanese" required class="w-full px-3 py-2 bg-cyber-bg border border-cyber-border rounded-md focus:outline-none focus:ring-2 focus:ring-cyber-primary">
                        </div>
@@ -392,7 +396,6 @@
                 showAddWordModal: false,
                 newWord: { german: '', japanese: '', kanji: '' },
                 editingWord: null,
-                loadingTranslation: false,
 
                 init() {
                     const savedWords = localStorage.getItem('vokabeltrainer_words');
@@ -672,51 +675,14 @@
                     this.newWord = { german: '', japanese: '', kanji: '' };
                 },
 
-                async translateWord() {
-                    if (!this.newWord.german.trim()) {
-                        alert('Bitte geben Sie zuerst ein deutsches Wort ein.');
+                speak(text, lang) {
+                    if (!text || typeof window.speechSynthesis === 'undefined') {
                         return;
                     }
-                    this.loadingTranslation = true;
-                    this.newWord.japanese = ''; // Clear previous results
-                    this.newWord.kanji = '';
-
-                    try {
-                        // Step 1: Translate German to Japanese using a general translation API
-                        const translationResponse = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(this.newWord.german)}&langpair=de|ja`);
-                        const translationData = await translationResponse.json();
-
-                        if (translationData.responseStatus !== 200 || !translationData.responseData.translatedText) {
-                            throw new Error('Translation from German failed.');
-                        }
-                        
-                        const translatedText = translationData.responseData.translatedText;
-
-                        // Step 2: Use Jisho.org's unofficial API to get detailed word info (Kanji and Kana)
-                        const jishoResponse = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(translatedText)}`);
-                        const jishoData = await jishoResponse.json();
-
-                        if (jishoData.data && jishoData.data.length > 0) {
-                            const firstResult = jishoData.data[0];
-                            const japaneseForm = firstResult.japanese[0];
-
-                            // Prefer the form that has both kanji and reading
-                            const bestForm = firstResult.japanese.find(j => j.word && j.reading) || japaneseForm;
-
-                            this.newWord.japanese = bestForm.reading;
-                            // Only assign kanji if it's different from the reading
-                            this.newWord.kanji = (bestForm.word && bestForm.word !== bestForm.reading) ? bestForm.word : '';
-                        } else {
-                            // Fallback if Jisho gives no result: just use the initial translation
-                            this.newWord.japanese = translatedText;
-                        }
-
-                    } catch (error) {
-                        console.error('Translation process error:', error);
-                        alert('Ein Fehler ist bei der automatischen Übersetzung aufgetreten. Bitte überprüfen Sie die Einträge manuell.');
-                    } finally {
-                        this.loadingTranslation = false;
-                    }
+                    window.speechSynthesis.cancel(); // Cancel any previous speech
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = lang;
+                    window.speechSynthesis.speak(utterance);
                 },
 
                 saveWord() {
