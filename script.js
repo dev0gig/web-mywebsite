@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { key: 'habitmea', target: 'frame-habitmea', href: 'components/habitmea/habitmea.html', icon: 'assets/icons/habitmea.svg', text: 'HabitMea' },
         { key: 'widgets', target: 'frame-widgets', href: 'components/widgets-collection/widgets-collection.html', icon: 'assets/icons/widgets.svg', text: 'Widgets' },
         { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'assets/icons/unicorn.svg', text: 'Unicorn', isExternal: true },
+        { key: 'jap-mentor', href: 'japanese-learn/japanisch-ueben.html', icon: 'assets/icons/jap-mentor.svg', text: 'Japanisch Mentor', isExternal: true },
         { key: 'settings', target: 'settings-modal', icon: 'assets/icons/settings.svg', text: 'Einstellungen' }
     ];
 

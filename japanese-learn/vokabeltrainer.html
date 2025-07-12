@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanisch Mentor - Vokabeltrainer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Ubuntu:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Ubuntu', 'sans-serif'],
+                        'orbitron': ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        'cyber-bg': '#0a0a1a',
+                        'cyber-surface': '#14142c',
+                        'cyber-border': '#6f42c1',
+                        'cyber-primary': '#00f0ff',
+                        'cyber-secondary': '#ff00ff',
+                        'cyber-text': '#e0e0ff',
+                        'cyber-dim': '#a0a0c0',
+                    },
+                    boxShadow: {
+                        'cyber': '0 0 5px #00f0ff, 0 0 10px #00f0ff, 0 0 15px #ff00ff',
+                        'cyber-sm': '0 0 3px #00f0ff, 0 0 6px #ff00ff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+
+        /* Card flip animation styles */
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar Styles */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #6f42c1; /* cyber-border */
+            border-radius: 4px;
+            border: 2px solid rgba(20, 20, 44, 0.95); /* cyber-surface from parent */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #00f0ff; /* cyber-primary */
+        }
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #6f42c1 transparent; /* thumb track */
+        }
+    </style>
+</head>
+
+<body class="bg-cyber-bg font-sans text-cyber-text h-screen overflow-hidden">
+
+    <div class="container mx-auto p-4 h-full">
+
+        <div x-data="flashcardTrainer()" class="flex flex-col md:flex-row md:gap-8 w-full h-full">
+
+            <!-- Word List (Sidebar) -->
+            <aside class="fixed top-0 left-0 h-full w-64 bg-cyber-surface/95 backdrop-blur-sm z-20 transform transition-transform duration-300 ease-in-out md:relative md:w-1/3 md:bg-transparent md:transform-none md:backdrop-filter-none" :class="{'translate-x-0': wordListVisible, '-translate-x-full': !wordListVisible}">
+                <div class="p-4 h-full flex flex-col relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-orbitron text-2xl text-cyber-primary">Wortliste</h2>
+                        <button @click="wordListVisible = false" class="md:hidden p-1 rounded-md hover:bg-cyber-border">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Alphabet Index -->
+                    <div x-show="alphabetIndexVisible" x-transition class="absolute inset-0 bg-cyber-surface/95 p-4 z-30 flex flex-col">
+                         <h3 class="font-orbitron text-xl text-cyber-primary mb-4 text-center">Index</h3>
+                        <div class="grid grid-cols-5 gap-2 flex-grow content-center">
+                            <template x-for="letter in alphabet" :key="letter">
+                                <button @click="scrollToLetter(letter)" class="p-2 rounded-md text-center font-bold bg-cyber-bg hover:bg-cyber-primary hover:text-cyber-bg transition-colors">
+                                    <span x-text="letter"></span>
+                                </button>
+                            </template>
+                        </div>
+                         <button @click="alphabetIndexVisible = false" class="mt-4 text-cyber-dim hover:text-cyber-primary">Schließen</button>
+                    </div>
+
+                    <div x-ref="wordListContainer" class="flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                        <template x-for="group in groupedWords" :key="group.letter">
+                            <div>
+                                <h3 @click="alphabetIndexVisible = true" :id="'group-' + group.letter" class="font-orbitron text-lg text-cyber-secondary py-2 sticky top-0 bg-cyber-surface/95 backdrop-blur-sm cursor-pointer">
+                                    <span x-text="group.letter"></span>
+                                </h3>
+                                <template x-for="word in group.words" :key="word.japanese">
+                                    <div @click="selectWord(word); wordListVisible = false" class="px-3 py-2 cursor-pointer hover:bg-cyber-primary hover:text-cyber-bg rounded-md text-sm flex justify-between items-center">
+                                        <span x-text="word.german"></span>
+                                        <span class="text-cyber-dim text-right" x-text="word.kanji ? `${word.japanese} (${word.kanji})` : word.japanese"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="w-full md:w-2/3 flex-shrink-0 flex flex-col p-2">
+                <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center mb-4">
+                        <button @click="wordListVisible = !wordListVisible" class="md:hidden p-2 rounded-md hover:bg-cyber-surface mr-4">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                        <h1 class="font-orbitron text-3xl md:text-4xl font-bold text-cyber-primary cyber-glow text-center">
+                            VOKABELTRAINER</h1>
+                    </div>
+                    <p class="text-center text-cyber-dim mb-6 md:mb-8">Klicke auf die Karte, um sie umzudrehen.</p>
+
+                    <div class="mb-4 w-full relative">
+                        <input type="text" x-model="searchTerm" @input.debounce.300ms="updateSearchResults()"
+                            placeholder="Wort suchen..."
+                            class="w-full px-4 py-2 bg-cyber-surface border border-cyber-border rounded-md focus:outline-none focus:ring-2 focus:ring-cyber-primary text-cyber-text">
+
+                        <div x-show="searchResults.length > 0" x-transition
+                            class="absolute z-10 w-full mt-1 bg-cyber-surface border border-cyber-border rounded-md max-h-60 overflow-y-auto shadow-lg">
+                            <template x-for="word in searchResults" :key="word.japanese">
+                                <div @click="selectWord(word)"
+                                    class="px-4 py-2 cursor-pointer hover:bg-cyber-primary hover:text-cyber-bg flex justify-between items-center">
+                                    <span x-text="word.german"></span>
+                                    <div class="text-right">
+                                        <span class="text-cyber-dim" x-text="word.japanese"></span>
+                                        <span class="text-cyber-dim ml-2 text-xs" x-show="word.kanji" x-text="word.kanji"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-cyber-surface rounded-full h-2.5 my-4 border border-cyber-border">
+                        <div class="bg-cyber-primary h-full rounded-full transition-all duration-300 ease-in-out" :style="`width: ${progress}%`"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Content Area -->
+                <div class="flex-grow flex flex-col gap-4 min-h-0">
+                    <div style="perspective: 1000px;" class="w-full flex-1 min-h-0">
+                        <div class="relative w-full h-full card" :class="{ 'is-flipped': flipped }">
+                            <div @click="flipped = !flipped"
+                                class="absolute w-full h-full card-face bg-cyber-surface border border-cyber-border rounded-lg flex items-center justify-center cursor-pointer shadow-cyber-sm">
+                                <p class="text-3xl md:text-4xl font-bold text-cyber-text px-4 text-center"
+                                    x-text="currentWord.german"></p>
+                            </div>
+                            <div @click="flipped = !flipped"
+                                class="absolute w-full h-full card-face card-back bg-cyber-border/20 border border-cyber-border rounded-lg flex flex-col items-center justify-center cursor-pointer shadow-cyber-sm p-4">
+                                <p class="text-3xl md:text-4xl font-bold text-cyber-primary text-center"
+                                    x-text="currentWord.japanese"></p>
+                                <p class="text-5xl md:text-6xl font-bold text-cyber-text text-center mt-2"
+                                    x-show="currentWord.kanji" x-text="currentWord.kanji"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drawing Canvas -->
+                    <div class="w-full flex-1 min-h-0">
+                        <canvas x-ref="drawingCanvas" class="w-full h-full bg-cyber-surface border border-cyber-border rounded-lg cursor-crosshair"></canvas>
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 mt-4">
+                    <div class="flex justify-center">
+                        <button @click="clearCanvas()" class="flex items-center gap-2 px-4 py-2 rounded-md bg-cyber-secondary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-sm">
+                            Feld leeren <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
+                <button @click="nextWord()"
+                    class="flex items-center gap-2 px-6 py-3 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-lg w-full sm:w-auto justify-center">
+                    Nächstes Wort <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <button @click="resetSearch()" x-show="searchTerm.trim() !== ''"
+                    class="flex items-center gap-2 px-6 py-3 rounded-md bg-cyber-secondary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-lg w-full sm:w-auto justify-center">
+                    Suche zurücksetzen <span class="material-symbols-outlined">refresh</span>
+                </button>
+            </div>
+
+            <footer class="text-center mt-8">
+                <a href="japanisch-ueben.html"
+                    class="text-cyber-dim hover:text-cyber-primary transition-colors duration-200 flex items-center gap-2 justify-center"><span
+                        class="material-symbols-outlined">arrow_back</span> Zurück zum Mentor</a>
+            </footer>
+        </main>
+
+        <!-- Overlay for mobile sidebar -->
+        <div x-show="wordListVisible" @click="wordListVisible = false" class="fixed inset-0 bg-black/50 z-10 md:hidden" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+
+    </div>
+
+    <script>
+        function flashcardTrainer() {
+            return {
+                words: [
+                    { german: 'Liebe', japanese: 'あい', kanji: '愛' },
+                    { german: 'Haus', japanese: 'いえ', kanji: '家' },
+                    { german: 'Oben', japanese: 'うえ', kanji: '上' },
+                    { german: 'Blau', japanese: 'あおい', kanji: '青い' },
+                    { german: 'Bahnhof', japanese: 'えき', kanji: '駅' },
+                    { german: 'Gesicht', japanese: 'かお', kanji: '顔' },
+                    { german: 'Rot', japanese: 'あかい', kanji: '赤い' },
+                    { german: 'Hören', japanese: 'きく', kanji: '聞く' },
+                    { german: 'Stimme', japanese: 'こえ', kanji: '声' },
+                    { german: 'Süß / Niedlich', japanese: 'かわいい', kanji: '可愛い' },
+                    { german: 'Sushi', japanese: 'すし', kanji: '寿司' },
+                    { german: 'Mögen', japanese: 'すき', kanji: '好き' },
+                    { german: 'Welt', japanese: 'せかい', kanji: '世界' },
+                    { german: 'Lüge', japanese: 'うそ', kanji: '嘘' },
+                    { german: 'Morgen', japanese: 'あさ', kanji: '朝' },
+                    { german: 'Klein', japanese: 'ちいさい', kanji: '小さい' },
+                    { german: 'Kalt (Objekt)', japanese: 'つめたい', kanji: '冷たい' },
+                    { german: 'Hand', japanese: 'て', kanji: '手' },
+                    { german: 'Dort', japanese: 'そこ', kanji: '' },
+                    { german: 'Kämpfen', japanese: 'たたかう', kanji: '戦う' },
+                    { german: 'Was?', japanese: 'なに', kanji: '何' },
+                    { german: 'Hund', japanese: 'いぬ', kanji: '犬' },
+                    { german: 'Katze', japanese: 'ねこ', kanji: '猫' },
+                    { german: 'Bauch', japanese: 'おなか', kanji: 'お腹' },
+                    { german: 'Fleisch', japanese: 'にく', kanji: '肉' },
+                    { german: 'Mensch', japanese: 'ひと', kanji: '人' },
+                    { german: 'Blume / Nase', japanese: 'はな', kanji: '花 / 鼻' },
+                    { german: 'Schiff', japanese: 'ふね', kanji: '船' },
+                    { german: 'Schlecht sein in', japanese: 'へた', kanji: '下手' },
+                    { german: 'Wollen', japanese: 'ほしい', kanji: '欲しい' },
+                    { german: 'Ohr', japanese: 'みみ', kanji: '耳' },
+                    { german: 'Laden', japanese: 'みせ', kanji: '店' },
+                    { german: 'Pfirsich', japanese: 'もも', kanji: '桃' },
+                    { german: 'Insekt', japanese: 'むし', kanji: '虫' },
+                    { german: 'Jeden Tag', japanese: 'まいにち', kanji: '毎日' },
+                    { german: 'Berg', japanese: 'やま', kanji: '山' },
+                    { german: 'Schnee', japanese: 'ゆき', kanji: '雪' },
+                    { german: 'Nacht', japanese: 'よる', kanji: '夜' },
+                    { german: 'Versprechen', japanese: 'やくそく', kanji: '約束' },
+                    { german: 'Kirschblüte', japanese: 'さくら', kanji: '桜' },
+                    { german: 'Weiß', japanese: 'しろい', kanji: '白い' },
+                    { german: 'Obst', japanese: 'くだもの', kanji: '果物' },
+                    { german: 'Wer?', japanese: 'だれ', kanji: '誰' },
+                    { german: 'Auf Wiedersehen', japanese: 'さようなら', kanji: '' },
+                    { german: 'Ich', japanese: 'わたし', kanji: '私' },
+                    { german: 'Schlecht', japanese: 'わるい', kanji: '悪い' },
+                    { german: 'Japan', japanese: 'にほん', kanji: '日本' },
+                    { german: 'Manga', japanese: 'まんが', kanji: '漫画' },
+                    { german: 'Du', japanese: 'あなた', kanji: '貴方' },
+                    { german: 'Das', japanese: 'これ', kanji: '' },
+                    { german: 'Wasser', japanese: 'みず', kanji: '水' },
+                    { german: 'Buch', japanese: 'ほん', kanji: '本' },
+                    { german: 'Neu', japanese: 'あたらしい', kanji: '新しい' },
+                    { german: 'Interessant / Lustig', japanese: 'おもしろい', kanji: '面白い' },
+                    { german: 'Lecker', japanese: 'おいしい', kanji: '美味しい' },
+                    { german: 'Teuer / Hoch', japanese: 'たかい', kanji: '高い' },
+                    { german: 'Dieses', japanese: 'この', kanji: '' },
+                    { german: 'Ruhig / Leise', japanese: 'しずか', kanji: '静か' },
+                    { german: 'Gesund / Munter', japanese: 'げんき', kanji: '元気' },
+                    { german: 'Schön / Sauber', japanese: 'きれい', kanji: '綺麗' },
+                    { german: 'Zimmer', japanese: 'へや', kanji: '部屋' },
+                    { german: 'Bild', japanese: 'え', kanji: '絵' },
+                    { german: 'Essen', japanese: 'たべもの', kanji: '食べ物' }
+                ],
+                allWords: [],
+                currentIndex: 0,
+                currentWord: { german: 'Lade...', japanese: '...', kanji: '' },
+                flipped: false,
+                searchTerm: '',
+                searchResults: [],
+                progress: 0,
+                wordListVisible: false,
+                sortedWords: [],
+                groupedWords: [],
+                alphabetIndexVisible: false,
+                alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+                drawing: false,
+                canvasContext: null,
+
+                init() {
+                    this.allWords = [...this.words];
+                    this.groupAndSortWords();
+                    this.shuffleWords();
+                    this.currentWord = this.words[0];
+                    this.updateProgress();
+                    this.initCanvas();
+                },
+
+                shuffleWords() {
+                    for (let i = this.words.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [this.words[i], this.words[j]] = [this.words[j], this.words[i]];
+                    }
+                },
+
+                nextWord() {
+                    this.flipped = false;
+                    this.clearCanvas();
+                    // Wait for flip animation to finish before changing the word
+                    setTimeout(() => {
+                        if (this.words.length === 0) return;
+                        this.currentIndex++;
+                        if (this.currentIndex >= this.words.length) {
+                            this.currentIndex = 0; // Loop back to the start
+                            if (this.searchTerm.trim() === '') {
+                                this.shuffleWords(); // Reshuffle for the next round if not searching
+                            }
+                        }
+                        this.currentWord = this.words[this.currentIndex];
+                        this.updateProgress();
+                    }, 300);
+                },
+
+                updateSearchResults() {
+                    const term = this.searchTerm.trim().toLowerCase();
+                    if (term === '') {
+                        this.searchResults = [];
+                        return;
+                    }
+                    this.searchResults = this.allWords.filter(word =>
+                        word.german.toLowerCase().includes(term) ||
+                        word.japanese.toLowerCase().includes(term) ||
+                        (word.kanji && word.kanji.toLowerCase().includes(term))
+                    ).slice(0, 10); // Limit to 10 results
+                },
+
+                selectWord(word) {
+                    this.currentWord = word;
+                    this.flipped = false;
+                    this.searchTerm = '';
+                    this.searchResults = [];
+                    // Optional: Find the selected word in the main list to keep nextWord() consistent
+                    const foundIndex = this.words.findIndex(w => w.japanese === word.japanese);
+                    if (foundIndex !== -1) {
+                        this.currentIndex = foundIndex;
+                    } else {
+                        // If word is not in the shuffled list (e.g. after a search), handle it
+                        // For simplicity, we just show the word, next will go from current index
+                    }
+                    this.updateProgress();
+                },
+
+                updateProgress() {
+                    if (this.words.length > 0) {
+                        this.progress = ((this.currentIndex + 1) / this.words.length) * 100;
+                    } else {
+                        this.progress = 0;
+                    }
+                },
+
+                resetSearch() {
+                    this.searchTerm = '';
+                    this.searchResults = [];
+                    this.words = [...this.allWords];
+                    this.shuffleWords();
+                    this.currentIndex = 0;
+                    this.currentWord = this.words[0];
+                    this.updateProgress();
+                },
+
+                groupAndSortWords() {
+                    const sorted = [...this.words].sort((a, b) => a.german.localeCompare(b.german));
+                    const groups = sorted.reduce((acc, word) => {
+                        const letter = word.german[0].toUpperCase();
+                        if (!acc[letter]) {
+                            acc[letter] = [];
+                        }
+                        acc[letter].push(word);
+                        return acc;
+                    }, {});
+                    this.groupedWords = Object.keys(groups).map(letter => ({
+                        letter,
+                        words: groups[letter]
+                    }));
+                },
+
+                scrollToLetter(letter) {
+                    const el = document.getElementById('group-' + letter);
+                    if (el) {
+                        el.scrollIntoView({ block: 'start' });
+                    }
+                    this.alphabetIndexVisible = false;
+                },
+
+                initCanvas() {
+                    this.$nextTick(() => {
+                        const canvas = this.$refs.drawingCanvas;
+                        // Set canvas resolution to match its display size
+                        canvas.width = canvas.offsetWidth;
+                        canvas.height = canvas.offsetHeight;
+
+                        this.canvasContext = canvas.getContext('2d');
+                        this.canvasContext.strokeStyle = '#00f0ff'; // cyber-primary
+                        this.canvasContext.lineWidth = 3;
+                        this.canvasContext.lineCap = 'round';
+                        this.canvasContext.lineJoin = 'round';
+
+                        const getPos = (e) => {
+                            const rect = canvas.getBoundingClientRect();
+                            const scaleX = canvas.width / rect.width;
+                            const scaleY = canvas.height / rect.height;
+                            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                            return {
+                                x: (clientX - rect.left) * scaleX,
+                                y: (clientY - rect.top) * scaleY
+                            };
+                        }
+
+                        const startDrawing = (e) => {
+                            e.preventDefault();
+                            this.drawing = true;
+                            const pos = getPos(e);
+                            this.canvasContext.beginPath();
+                            this.canvasContext.moveTo(pos.x, pos.y);
+                        }
+
+                        const draw = (e) => {
+                            if (!this.drawing) return;
+                            e.preventDefault();
+                            const pos = getPos(e);
+                            this.canvasContext.lineTo(pos.x, pos.y);
+                            this.canvasContext.stroke();
+                        }
+
+                        const stopDrawing = () => {
+                            this.drawing = false;
+                        }
+
+                        // Mouse events
+                        canvas.addEventListener('mousedown', startDrawing);
+                        canvas.addEventListener('mousemove', draw);
+                        canvas.addEventListener('mouseup', stopDrawing);
+                        canvas.addEventListener('mouseout', stopDrawing);
+
+                        // Touch events
+                        canvas.addEventListener('touchstart', startDrawing);
+                        canvas.addEventListener('touchmove', draw);
+                        canvas.addEventListener('touchend', stopDrawing);
+                    });
+                },
+
+                clearCanvas() {
+                    if (this.canvasContext) {
+                        this.canvasContext.clearRect(0, 0, this.$refs.drawingCanvas.width, this.$refs.drawingCanvas.height);
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
