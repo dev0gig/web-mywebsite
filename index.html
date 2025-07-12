@@ -420,6 +420,10 @@
             /* Innenabstand für die Sidebar */
             box-sizing: border-box;
             /* Padding in die Breite einbeziehen */
+            overflow-y: auto;
+            /* Macht die Sidebar auf Mobilgeräten scrollbar */
+            -webkit-overflow-scrolling: touch;
+            /* Verbessert das Scroll-Erlebnis auf iOS */
         }
 
         #mobile-sidebar.open {
@@ -803,7 +807,8 @@
                     children: [
                         { key: 'unicorn', href: 'unicorn/work-tools.html', icon: 'assets/icons/unicorn.svg', text: 'Unicorn', isExternal: true },
                         { key: 'jap-mentor', href: 'japanese-learn/japanisch-ueben.html', icon: 'assets/icons/jap-mentor.svg', text: 'Japanisch Mentor', isExternal: true },
-                        { key: 'fit-data', href: 'fitness-data/fit-data.html', icon: 'assets/icons/fit-data.svg', text: 'Fitness Data', isExternal: true }
+                        { key: 'fit-data', href: 'fitness-data/fit-data.html', icon: 'assets/icons/fit-data.svg', text: 'Fitness Data', isExternal: true },
+                        { key: 'discere', href: 'discere/discere.html', icon: 'assets/icons/discere.svg', text: 'Discere', isExternal: true }
                     ]
                 },
                 { key: 'settings', target: 'settings-modal', icon: 'assets/icons/settings.svg', text: 'Einstellungen' }

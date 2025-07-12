@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discere - Lernkarten</title>
+    <link rel="manifest" href="manifest.json">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Ubuntu', 'sans-serif'],
+                    },
+                    colors: {
+                        'neutral-bg': '#121212',
+                        'neutral-surface': '#1e1e1e',
+                        'neutral-border': '#444444',
+                        'neutral-primary': '#bb86fc',
+                        'neutral-secondary': '#03dac6',
+                        'neutral-text': '#e0e0e0',
+                        'neutral-dim': '#a0a0a0',
+                    },
+                    boxShadow: {
+                        'primary': '0 0 8px rgba(187, 134, 252, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #444444; /* neutral-border */
+            border-radius: 4px;
+            border: 2px solid #1e1e1e; /* neutral-surface */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #bb86fc; /* neutral-primary */
+        }
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #444444 transparent; /* thumb track */
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-bg font-sans text-neutral-text h-screen" x-data="{ mobileMenuOpen: false }">
+
+    <div class="container mx-auto p-4 h-full">
+
+        <div x-data="flashcardTrainer()" class="flex flex-col md:flex-row md:gap-8 w-full h-full">
+
+            <aside class="fixed top-0 left-0 h-full w-64 bg-neutral-surface/95 backdrop-blur-sm z-20 transform transition-transform duration-300 ease-in-out md:relative md:w-1/3 md:bg-transparent md:transform-none md:backdrop-filter-none" :class="{'translate-x-0': cardListVisible, '-translate-x-full': !cardListVisible}">
+                <div class="p-4 h-full flex flex-col relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-2xl text-neutral-primary">Kartenliste</h2>
+                        <button @click="cardListVisible = false" class="md:hidden p-1 rounded-md hover:bg-neutral-border">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div class="flex gap-2 mb-4">
+                        <button @click="exportCards()" title="Backup erstellen" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-neutral-surface border border-neutral-border hover:bg-neutral-primary hover:text-neutral-bg transition-colors text-sm">
+                            <span class="material-symbols-outlined">save</span> Export
+                        </button>
+                        <button @click="$refs.importInput.click()" title="Backup einspielen" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-neutral-surface border border-neutral-border hover:bg-neutral-primary hover:text-neutral-bg transition-colors text-sm">
+                            <span class="material-symbols-outlined">folder_open</span> Import
+                        </button>
+                        <input type="file" x-ref="importInput" @change="importCards($event)" class="hidden" accept=".json">
+                    </div>
+
+                    <div class="mb-4">
+                        <button @click="showAddCardModal = true" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-neutral-primary text-neutral-bg font-bold hover:shadow-primary transition-shadow">
+                            <span class="material-symbols-outlined">add_circle</span> Neue Karte
+                        </button>
+                    </div>
+ 
+                    <div x-ref="cardListContainer" class="flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                        <template x-for="card in sortedCards" :key="card.id">
+                            <div class="flex justify-between items-center group">
+                                <div @click="selectCard(card); cardListVisible = false" class="flex-grow px-3 py-2 cursor-pointer hover:bg-neutral-primary hover:text-neutral-bg rounded-md text-sm flex justify-between items-center">
+                                    <span x-text="card.front"></span>
+                                    <span class="text-neutral-dim text-right" x-text="card.back"></span>
+                                </div>
+                                <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button @click.stop="editCard(card)" class="p-1 text-neutral-dim hover:text-neutral-primary">
+                                        <span class="material-symbols-outlined text-base">edit</span>
+                                    </button>
+                                    <button @click.stop="deleteCard(card)" class="p-1 text-neutral-dim hover:text-neutral-secondary">
+                                        <span class="material-symbols-outlined text-base">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="w-full md:w-2/3 flex-shrink-0 flex flex-col p-2">
+                <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center mb-4">
+                        <button @click="cardListVisible = !cardListVisible" class="md:hidden p-2 rounded-md hover:bg-neutral-surface mr-4">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                        <h1 class="font-bold text-3xl md:text-4xl text-neutral-primary text-center">
+                            Discere</h1>
+                    </div>
+                    <p class="text-center text-neutral-dim mb-6 md:mb-8">Klicke auf die Karte, um sie umzudrehen.</p>
+
+                    <div class="mb-4 w-full relative">
+                        <input type="text" x-model="searchTerm" @input.debounce.300ms="updateSearchResults()"
+                            placeholder="Karte suchen..."
+                            class="w-full px-4 py-2 bg-neutral-surface border border-neutral-border rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-primary text-neutral-text">
+
+                        <div x-show="searchResults.length > 0" x-transition
+                            class="absolute z-10 w-full mt-1 bg-neutral-surface border border-neutral-border rounded-md max-h-60 overflow-y-auto shadow-lg">
+                            <template x-for="card in searchResults" :key="card.id">
+                                <div @click="selectCard(card)"
+                                    class="px-4 py-2 cursor-pointer hover:bg-neutral-primary hover:text-neutral-bg flex justify-between items-center">
+                                    <span x-text="card.front"></span>
+                                    <span class="text-neutral-dim text-right" x-text="card.back"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex-grow flex flex-col gap-4 min-h-0">
+                    <div @touchstart="handleTouchStart($event)" @touchend="handleTouchEnd($event)" style="perspective: 1000px;" class="w-full h-56 min-h-0 md:flex-1 relative">
+                        <!-- Mobile Nav Arrows -->
+                        <button @click="previousCard()" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-surface/50 text-neutral-dim hover:bg-neutral-primary hover:text-neutral-bg transition-colors sm:hidden">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button @click="nextCard()" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-neutral-surface/50 text-neutral-dim hover:bg-neutral-primary hover:text-neutral-bg transition-colors sm:hidden">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+
+                        <div class="relative w-full h-full card" :class="{ 'is-flipped': flipped }">
+                            <div @click="flipped = !flipped"
+                                class="absolute w-full h-full card-face bg-neutral-surface border border-neutral-border rounded-lg flex items-center justify-center cursor-pointer shadow-primary p-4">
+                                <p class="text-3xl md:text-4xl font-bold text-neutral-text text-center"
+                                    x-text="currentCard.front"></p>
+                            </div>
+                            <div @click="flipped = !flipped"
+                                class="absolute w-full h-full card-face card-back bg-neutral-border/20 border border-neutral-border rounded-lg flex flex-col items-center justify-center cursor-pointer shadow-primary p-4">
+                                <p class="text-3xl md:text-4xl font-bold text-neutral-primary text-center"
+                                    x-text="currentCard.back"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drawing Canvas -->
+                    <div class="w-full h-56 min-h-0 md:flex-1 relative">
+                        <canvas x-ref="drawingCanvas" class="w-full h-full bg-neutral-surface border border-neutral-border rounded-lg cursor-crosshair"></canvas>
+                        <button @click="clearCanvas()" title="Feld leeren" class="absolute bottom-2 right-2 p-2 rounded-full bg-neutral-surface/50 text-neutral-dim hover:bg-neutral-secondary hover:text-neutral-bg transition-colors">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 mt-4">
+                     <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
+                        <button @click="nextCard()"
+                            class="hidden sm:flex items-center gap-2 px-6 py-3 rounded-md bg-neutral-primary text-neutral-bg font-bold hover:shadow-primary transition-shadow text-lg w-full sm:w-auto justify-center">
+                            Nächste Karte <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                        <button @click="resetSearch()" x-show="searchTerm.trim() !== ''"
+                            class="flex items-center gap-2 px-6 py-3 rounded-md bg-neutral-secondary text-neutral-bg font-bold hover:shadow-primary transition-shadow text-lg w-full sm:w-auto justify-center">
+                            Suche zurücksetzen <span class="material-symbols-outlined">refresh</span>
+                        </button>
+                       <button @click="swapSides()" title="Seiten tauschen"
+                           class="flex items-center gap-2 px-4 py-3 rounded-md bg-neutral-surface border border-neutral-border text-neutral-dim hover:bg-neutral-primary hover:text-neutral-bg transition-colors">
+                           <span class="material-symbols-outlined">sync</span>
+                       </button>
+                    </div>
+                </div>
+            </main>
+
+            <div x-show="cardListVisible" @click="cardListVisible = false" class="fixed inset-0 bg-black/50 z-10 md:hidden" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+
+           <div x-show="showAddCardModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-neutral-bg bg-opacity-80 flex items-center justify-center z-50 p-4" style="display: none;">
+               <div @click.away="closeModal()" class="bg-neutral-surface border border-neutral-border rounded-lg shadow-primary p-6 w-full max-w-md">
+                   <h3 class="font-bold text-2xl text-neutral-primary mb-4" x-text="editingCard ? 'Karte bearbeiten' : 'Neue Karte hinzufügen'"></h3>
+                   <form @submit.prevent="saveCard()">
+                       <div class="space-y-4">
+                           <div>
+                               <label for="newFront" class="block text-neutral-dim mb-1">Vorderseite</label>
+                               <input type="text" id="newFront" x-model="newCard.front" required class="w-full px-3 py-2 bg-neutral-bg border border-neutral-border rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-primary">
+                           </div>
+                           <div>
+                               <label for="newBack" class="block text-neutral-dim mb-1">Rückseite</label>
+                               <input type="text" id="newBack" x-model="newCard.back" required class="w-full px-3 py-2 bg-neutral-bg border border-neutral-border rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-primary">
+                           </div>
+                       </div>
+                       <div class="flex justify-end gap-4 mt-6">
+                           <button type="button" @click="closeModal()" class="px-4 py-2 rounded-md text-neutral-dim hover:text-neutral-primary">Abbrechen</button>
+                           <button type="submit" class="px-4 py-2 rounded-md bg-neutral-primary text-neutral-bg font-bold hover:shadow-primary">Speichern</button>
+                       </div>
+                   </form>
+               </div>
+           </div>
+        </div>
+    </div>
+
+    <script>
+        function flashcardTrainer() {
+            return {
+                cards: [],
+                allCards: [],
+                currentIndex: 0,
+                currentCard: { id: 0, front: 'Lade...', back: '...' },
+                flipped: false,
+                searchTerm: '',
+                searchResults: [],
+                cardListVisible: false,
+                showAddCardModal: false,
+                newCard: { id: null, front: '', back: '' },
+                editingCard: null,
+                drawing: false,
+                canvasContext: null,
+                touchStartX: 0,
+
+                get sortedCards() {
+                    return [...this.allCards].sort((a, b) => a.front.localeCompare(b.front));
+                },
+
+                init() {
+                    const savedCards = localStorage.getItem('discere_cards');
+                    if (savedCards) {
+                        try {
+                            const parsedCards = JSON.parse(savedCards);
+                            if (Array.isArray(parsedCards)) {
+                                this.allCards = parsedCards;
+                            }
+                        } catch (e) {
+                            console.error("Fehler beim Laden der Karten.", e);
+                        }
+                    }
+                    
+                    this.cards = [...this.allCards];
+                    this.shuffleCards();
+                    if (this.cards.length > 0) {
+                        this.currentCard = this.cards[0];
+                    } else {
+                        this.currentCard = { id: 0, front: 'Keine Karten', back: 'Füge eine neue Karte hinzu!' };
+                    }
+                    this.initCanvas();
+                },
+
+                shuffleCards() {
+                    for (let i = this.cards.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+                    }
+                },
+
+                nextCard() {
+                    this.flipped = false;
+                    this.clearCanvas();
+                    setTimeout(() => {
+                        if (this.cards.length === 0) return;
+                        this.currentIndex++;
+                        if (this.currentIndex >= this.cards.length) {
+                            this.currentIndex = 0;
+                            if (this.searchTerm.trim() === '') {
+                                this.shuffleCards();
+                            }
+                        }
+                        this.currentCard = this.cards[this.currentIndex];
+                    }, 300);
+                },
+
+                previousCard() {
+                    this.flipped = false;
+                    this.clearCanvas();
+                    setTimeout(() => {
+                        if (this.cards.length === 0) return;
+                        this.currentIndex--;
+                        if (this.currentIndex < 0) {
+                            this.currentIndex = this.cards.length - 1; // Loop to the end
+                        }
+                        this.currentCard = this.cards[this.currentIndex];
+                    }, 300);
+                },
+
+                handleTouchStart(event) {
+                    this.touchStartX = event.touches[0].clientX;
+                },
+
+                handleTouchEnd(event) {
+                    const touchEndX = event.changedTouches[0].clientX;
+                    const swipeDiff = this.touchStartX - touchEndX;
+                    if (swipeDiff > 50) { // Swipe left
+                        this.nextCard();
+                    } else if (swipeDiff < -50) { // Swipe right
+                        this.previousCard();
+                    }
+                },
+
+                updateSearchResults() {
+                    const term = this.searchTerm.trim().toLowerCase();
+                    if (term === '') {
+                        this.searchResults = [];
+                        return;
+                    }
+                    this.searchResults = this.allCards.filter(card =>
+                        card.front.toLowerCase().includes(term) ||
+                        card.back.toLowerCase().includes(term)
+                    ).slice(0, 10);
+                },
+
+                selectCard(card) {
+                    this.currentCard = card;
+                    this.flipped = false;
+                    this.clearCanvas();
+                    this.searchTerm = '';
+                    this.searchResults = [];
+                    const foundIndex = this.cards.findIndex(c => c.id === card.id);
+                    if (foundIndex !== -1) {
+                        this.currentIndex = foundIndex;
+                    }
+                    this.cardListVisible = false;
+                },
+
+                resetSearch() {
+                    this.searchTerm = '';
+                    this.searchResults = [];
+                    this.cards = [...this.allCards];
+                    this.shuffleCards();
+                    this.currentIndex = 0;
+                    if (this.cards.length > 0) {
+                       this.currentCard = this.cards[0];
+                    }
+                },
+
+                exportCards() {
+                    if (this.allCards.length === 0) {
+                        alert('Keine Karten zum Exportieren vorhanden.');
+                        return;
+                    }
+                    const cardsToExport = this.allCards.map(({ id, ...rest }) => rest);
+                    const dataStr = JSON.stringify(cardsToExport, null, 2);
+                    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(dataBlob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'discere-backup.json';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                },
+
+                importCards(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            let content = e.target.result;
+                            // Remove BOM (Byte Order Mark) if present
+                            if (content.charCodeAt(0) === 0xFEFF) {
+                                content = content.slice(1);
+                            }
+                            const importedCards = JSON.parse(content);
+                            if (Array.isArray(importedCards) && (importedCards.length === 0 || (importedCards[0].front && importedCards[0].back))) {
+                                this.allCards = importedCards.map(c => ({...c, id: c.id || Date.now() + Math.random()}));
+                                this.saveToLocalStorage();
+                                this.init();
+                                alert(`${importedCards.length} Karten erfolgreich importiert!`);
+                            } else {
+                                alert('Ungültiges Dateiformat. Die Datei muss eine Liste von Objekten mit "front" und "back" Schlüsseln sein.');
+                            }
+                        } catch (error) {
+                            console.error("Import-Fehler:", error);
+                            alert('Fehler beim Verarbeiten der Datei. Stellen Sie sicher, dass es sich um eine gültige JSON-Datei im UTF-8 Format handelt.');
+                        }
+                    };
+                    reader.readAsText(file);
+                    event.target.value = '';
+                },
+                
+                saveToLocalStorage() {
+                    localStorage.setItem('discere_cards', JSON.stringify(this.allCards));
+                },
+
+                swapSides() {
+                    if (!confirm('Möchten Sie die Vorder- und Rückseiten aller Karten tauschen?')) return;
+                    
+                    this.allCards = this.allCards.map(card => {
+                        return { ...card, front: card.back, back: card.front };
+                    });
+
+                    this.saveToLocalStorage();
+                    this.init(); // Re-initialize the state to show changes
+                    alert('Die Seiten aller Karten wurden getauscht.');
+                },
+
+                deleteCard(cardToDelete) {
+                    if (confirm(`Möchten Sie die Karte "${cardToDelete.front}" wirklich löschen?`)) {
+                        this.allCards = this.allCards.filter(card => card.id !== cardToDelete.id);
+                        this.saveToLocalStorage();
+                        
+                        if (this.currentCard.id === cardToDelete.id) {
+                           this.currentIndex = 0;
+                        }
+                        this.init(); // Re-initialize to update state
+                        alert('Karte gelöscht.');
+                    }
+                },
+
+                editCard(card) {
+                    this.editingCard = card;
+                    this.newCard = { ...card };
+                    this.showAddCardModal = true;
+                },
+
+                closeModal() {
+                    this.showAddCardModal = false;
+                    this.editingCard = null;
+                    this.newCard = { id: null, front: '', back: '' };
+                },
+
+                saveCard() {
+                    if (!this.newCard.front.trim() || !this.newCard.back.trim()) {
+                        alert('Vorder- und Rückseite dürfen nicht leer sein.');
+                        return;
+                    }
+
+                    if (this.editingCard) {
+                        const index = this.allCards.findIndex(c => c.id === this.editingCard.id);
+                        if (index !== -1) {
+                            this.allCards[index] = { ...this.newCard };
+                        }
+                    } else {
+                        const exists = this.allCards.some(c => c.front.toLowerCase() === this.newCard.front.toLowerCase());
+                        if (exists) {
+                            if (!confirm('Eine Karte mit dieser Vorderseite existiert bereits. Trotzdem hinzufügen?')) {
+                                return;
+                            }
+                        }
+                        this.allCards.push({ ...this.newCard, id: Date.now() });
+                    }
+
+                    this.saveToLocalStorage();
+                    this.init();
+                    this.closeModal();
+                    alert(this.editingCard ? 'Karte erfolgreich aktualisiert!' : 'Neue Karte erfolgreich hinzugefügt!');
+                },
+
+               initCanvas() {
+                   this.$nextTick(() => {
+                       const canvas = this.$refs.drawingCanvas;
+                       if(!canvas) return;
+                       // Set canvas resolution to match its display size
+                       canvas.width = canvas.offsetWidth;
+                       canvas.height = canvas.offsetHeight;
+
+                       this.canvasContext = canvas.getContext('2d');
+                       this.canvasContext.strokeStyle = '#bb86fc'; // neutral-primary
+                       this.canvasContext.lineWidth = 3;
+                       this.canvasContext.lineCap = 'round';
+                       this.canvasContext.lineJoin = 'round';
+
+                       const getPos = (e) => {
+                           const rect = canvas.getBoundingClientRect();
+                           const scaleX = canvas.width / rect.width;
+                           const scaleY = canvas.height / rect.height;
+                           const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                           const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                           return {
+                               x: (clientX - rect.left) * scaleX,
+                               y: (clientY - rect.top) * scaleY
+                           };
+                       }
+
+                       const startDrawing = (e) => {
+                           e.preventDefault();
+                           this.drawing = true;
+                           const pos = getPos(e);
+                           this.canvasContext.beginPath();
+                           this.canvasContext.moveTo(pos.x, pos.y);
+                       }
+
+                       const draw = (e) => {
+                           if (!this.drawing) return;
+                           e.preventDefault();
+                           const pos = getPos(e);
+                           this.canvasContext.lineTo(pos.x, pos.y);
+                           this.canvasContext.stroke();
+                       }
+
+                       const stopDrawing = () => {
+                           this.drawing = false;
+                       }
+
+                       // Mouse events
+                       canvas.addEventListener('mousedown', startDrawing);
+                       canvas.addEventListener('mousemove', draw);
+                       canvas.addEventListener('mouseup', stopDrawing);
+                       canvas.addEventListener('mouseout', stopDrawing);
+
+                       // Touch events
+                       canvas.addEventListener('touchstart', startDrawing);
+                       canvas.addEventListener('touchmove', draw);
+                       canvas.addEventListener('touchend', stopDrawing);
+                   });
+               },
+
+               clearCanvas() {
+                   if (this.canvasContext) {
+                       this.canvasContext.clearRect(0, 0, this.$refs.drawingCanvas.width, this.$refs.drawingCanvas.height);
+                   }
+               }
+            }
+        }
+    </script>
+
+</body>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+</script>
+
+</html>

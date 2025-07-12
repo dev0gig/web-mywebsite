@@ -1,0 +1,15 @@
+{
+  "name": "Discere Lernkarten",
+  "short_name": "Discere",
+  "start_url": "discere.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#1e1e1e",
+  "description": "Eine einfache Lernkarten-Anwendung.",
+  "icons": [
+    {
+      "src": "../assets/icons/discere.svg",
+      "type": "image/svg+xml"
+    }
+  ]
+}
