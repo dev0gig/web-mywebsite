@@ -172,6 +172,14 @@
             cursor: pointer;
         }
 
+        #transaction-table-body tr:nth-child(even) {
+            background-color: rgba(128, 128, 128, 0.05);
+        }
+
+        #transaction-table-body tr:hover {
+            background-color: rgba(128, 128, 128, 0.1);
+        }
+
         /* --- NEUE KALENDER-STILE (adaptiert von MemoMea) --- */
         .calendar-day {
             width: 36px;
@@ -390,6 +398,142 @@
                 padding-top: 1rem;
             }
         }
+
+        /* --- NEUE MODAL-STILE --- */
+        .type-selector-btn {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--subtle-text);
+            transition: all 0.2s ease-in-out;
+            flex: 1;
+        }
+
+        .type-selector-btn.active {
+            color: white;
+        }
+
+        .type-selector-btn[data-type="Ausgabe"].active {
+            background-color: #ef4444;
+            /* red-500 */
+            border-color: #dc2626;
+            /* red-600 */
+        }
+
+        .type-selector-btn[data-type="Einnahme"].active {
+            background-color: #22c55e;
+            /* green-500 */
+            border-color: #16a34a;
+            /* green-600 */
+        }
+
+        .type-selector-btn[data-type="Überweisung"].active {
+            background-color: #3b82f6;
+            /* blue-500 */
+            border-color: #2563eb;
+            /* blue-600 */
+        }
+
+        .form-input,
+        .form-select {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            /* indigo-600 */
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+        }
+
+        .payment-method-radio-group label {
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .payment-method-radio-group input:checked+label {
+            background-color: #dbeafe;
+            /* blue-100 */
+            border-color: #3b82f6;
+            /* blue-500 */
+            color: #1e40af;
+            /* blue-800 */
+            font-weight: 600;
+        }
+
+        html[data-theme='dark'] .payment-method-radio-group input:checked+label {
+            background-color: #1e3a8a;
+            /* blue-900 */
+            border-color: #60a5fa;
+            /* blue-400 */
+            color: #eff6ff;
+            /* blue-50 */
+        }
+
+        .template-btn {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.2s;
+            position: relative;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .template-btn:hover {
+            border-color: #4f46e5;
+            /* indigo-600 */
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+
+        html[data-theme='dark'] .template-btn:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+            /* indigo-400 with alpha */
+        }
+
+        .template-btn .delete-template {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: transparent;
+            color: var(--subtle-text);
+            border-radius: 9999px;
+            padding: 2px;
+            opacity: 0;
+            transition: opacity 0.2s, color 0.2s, background-color 0.2s;
+        }
+
+        .template-btn:hover .delete-template {
+            opacity: 1;
+        }
+
+        .delete-template:hover {
+            background-color: #ef4444;
+            /* red-500 */
+            color: white;
+        }
+    </style>
+    <style>
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details>summary .icon {
+            transition: transform 0.2s;
+        }
+
+        details[open]>summary .icon {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 
@@ -397,61 +541,46 @@
     <h1 class="text-3xl md:text-4xl font-bold main-title mb-6 text-center">AuriMea</h1>
 
     <!-- HAUPTINHALTSBEREICH -->
-    <div class="w-full mx-auto flex flex-col gap-6 px-4 md:px-6">
+    <div class="w-full mx-auto flex flex-col lg:grid lg:grid-cols-5 lg:gap-6 px-4 md:px-6">
 
-        <!-- 1. ZEILE: KONTEN & KENNZAHLEN -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Konten-Filter -->
-            <div class="card p-4 rounded-xl shadow-md flex flex-col justify-center">
+        <!-- Rechte Spalte (wird auf Mobile zuerst/oben angezeigt) -->
+        <div class="lg:col-span-2 lg:order-2 flex flex-col gap-6">
+
+            <!-- Block 1: Kennzahlen -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <!-- Einnahmen -->
+                <div class="card p-4 rounded-xl shadow-md text-center flex flex-col justify-center">
+                    <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
+                    <p id="total-einnahmen" class="text-2xl font-bold text-green-500">0,00 €</p>
+                </div>
+                <!-- Ausgaben -->
+                <div class="card p-4 rounded-xl shadow-md text-center flex flex-col justify-center">
+                    <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
+                    <p id="total-ausgaben" class="text-2xl font-bold text-red-500">0,00 €</p>
+                </div>
+                <!-- Bilanz -->
+                <div class="card p-4 rounded-xl shadow-md text-center flex flex-col justify-center">
+                    <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
+                    <p id="bilanz" class="text-2xl font-bold">0,00 €</p>
+                </div>
+            </div>
+
+            <!-- Block 2: Konten-Filter -->
+            <div class="card p-4 rounded-xl shadow-md">
+                <h2 class="text-lg font-semibold subtle-text mb-3 text-center">Konten</h2>
                 <div id="account-filter" class="grid grid-cols-2 gap-2">
                     <button data-filter="all"
-                        class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle
-                        Konten</button>
+                        class="filter-btn active px-4 py-2 rounded-lg font-semibold transition">Alle</button>
                     <button data-filter="Erste Bank"
                         class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Erste Bank</button>
-                    <button data-filter="N26"
-                        class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
+                    <button data-filter="N26" class="filter-btn px-4 py-2 rounded-lg font-semibold transition">N26</button>
                     <button data-filter="Revolut"
                         class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Revolut</button>
                 </div>
             </div>
-            <!-- Einnahmen -->
-            <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
-                <h2 class="text-lg font-semibold subtle-text">Einnahmen</h2>
-                <p id="total-einnahmen" class="text-2xl font-bold text-green-500">0,00 €</p>
-            </div>
-            <!-- Ausgaben -->
-            <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
-                <h2 class="text-lg font-semibold subtle-text">Ausgaben</h2>
-                <p id="total-ausgaben" class="text-2xl font-bold text-red-500">0,00 €</p>
-            </div>
-            <!-- Bilanz -->
-            <div class="card p-4 md:p-6 rounded-xl shadow-md text-center flex flex-col justify-center h-full">
-                <h2 class="text-lg font-semibold subtle-text">Bilanz</h2>
-                <p id="bilanz" class="text-2xl font-bold">0,00 €</p>
-            </div>
-        </div>
 
-        <!-- 2. ZEILE: KALENDER & DIAGRAMME -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Ausgaben nach Kategorie -->
-            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
-                <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
-                <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
-            </div>
-            <!-- Einnahmen nach Kategorie -->
-            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
-                <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
-                <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div>
-            </div>
-            <!-- Ausgaben pro Konto -->
-            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col h-full">
-                <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
-                <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
-            </div>
-            <!-- Kalender (wird auf lg-Screens an den Anfang verschoben) -->
-            <div id="calendar-desktop-wrapper"
-                class="card p-4 md:p-6 rounded-xl shadow-md hidden lg:flex flex-col h-full lg:order-first">
+            <!-- Block 3: Kalender (nur Desktop) -->
+            <div id="calendar-desktop-wrapper" class="card p-4 md:p-6 rounded-xl shadow-md hidden lg:flex flex-col">
                 <div id="calendar-container-desktop" class="flex flex-col w-full h-full">
                     <div id="calendar-header-desktop" class="flex justify-between items-center mb-4 w-full">
                         <!-- Inhalt wird durch JS generiert -->
@@ -466,68 +595,88 @@
                         zurücksetzen</button>
                 </div>
             </div>
+
+            <!-- Block 4: Diagramme -->
+            <!-- Ausgaben nach Kategorie -->
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Ausgaben nach Kategorie</h2>
+                <div class="relative flex-grow h-64"><canvas id="ausgabenChart"></canvas></div>
+            </div>
+            <!-- Einnahmen nach Kategorie -->
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Einnahmen nach Kategorie</h2>
+                <div class="relative flex-grow h-64"><canvas id="einnahmenChart"></canvas></div>
+            </div>
+            <!-- Ausgaben pro Konto -->
+            <div class="card w-full p-4 md:p-6 rounded-xl shadow-md flex flex-col">
+                <h2 class="text-xl font-bold text-center mb-4">Ausgaben pro Konto</h2>
+                <div class="relative flex-grow h-64"><canvas id="kontoChart"></canvas></div>
+            </div>
         </div>
 
-        <!-- 3. ZEILE: TRANSAKTIONSTABELLE -->
-        <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto">
-            <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <h2 class="text-xl font-bold">Transaktionen</h2>
-                    <button id="add-transaction-btn" title="Neue Transaktion hinzufügen"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                        <i data-lucide="plus" class="h-4 w-4"></i><span>Neu</span>
-                    </button>
-                    <button id="import-csv-btn" title="Transaktionen aus CSV-Datei importieren"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                        <i data-lucide="file-down" class="h-4 w-4"></i><span>Importieren</span>
-                    </button>
-                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                    <button id="export-csv-btn" title="Transaktionen sichern"
-                        class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                        <i data-lucide="save" class="h-4 w-4"></i><span>Backup</span>
-                    </button>
-                    <button id="delete-all-transactions-btn" title="Alle Transaktionen löschen"
-                        class="filter-btn p-2 rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center">
-                        <i data-lucide="trash-2" class="h-4 w-4"></i>
-                    </button>
+        <!-- Linke Spalte (wird auf Mobile als letztes/unten angezeigt) -->
+        <div class="lg:col-span-3 lg:order-1">
+            <!-- 3. ZEILE: TRANSAKTIONSTABELLE -->
+            <div class="w-full card p-4 md:p-6 rounded-xl shadow-md overflow-x-auto h-full flex flex-col">
+                <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-xl font-bold">Transaktionen</h2>
+                        <button id="add-transaction-btn" title="Neue Transaktion hinzufügen"
+                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                            <i data-lucide="plus" class="h-4 w-4"></i><span>Neu</span>
+                        </button>
+                        <button id="import-csv-btn" title="Transaktionen aus CSV-Datei importieren"
+                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                            <i data-lucide="file-down" class="h-4 w-4"></i><span>Importieren</span>
+                        </button>
+                        <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                        <button id="export-csv-btn" title="Transaktionen sichern"
+                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
+                            <i data-lucide="save" class="h-4 w-4"></i><span>Backup</span>
+                        </button>
+                        <button id="delete-all-transactions-btn" title="Alle Transaktionen löschen"
+                            class="filter-btn p-2 rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><svg
+                                class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg></span>
+                        <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..."
+                            class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg"
+                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
+                        <button id="clear-search-btn"
+                            class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"><svg
+                                class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg></button>
+                    </div>
                 </div>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><svg
-                            class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg></span>
-                    <input type="text" id="transaction-search-input" placeholder="Transaktionen durchsuchen..."
-                        class="w-full md:w-72 pl-10 pr-10 py-2 rounded-lg"
-                        style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                    <button id="clear-search-btn"
-                        class="hidden absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"><svg
-                            class="w-5 h-5" style="color: var(--subtle-text);" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg></button>
+                <div class="overflow-x-auto flex-grow">
+                    <table class="w-full text-left responsive-table">
+                        <thead class="subtle-text uppercase text-xs">
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <th class="p-3 table-header-sortable" data-sort="Datum">Datum</th>
+                                <th class="p-3 table-header-sortable" data-sort="Betrag">Betrag</th>
+                                <th class="p-3 table-header-sortable" data-sort="Beschreibung">Beschreibung</th>
+                                <th class="p-3 table-header-sortable" data-sort="Kategorie">Kategorie</th>
+                                <th class="p-3 table-header-sortable" data-sort="Konto">Konto</th>
+                                <th class="p-3">Zahlungsmethode</th>
+                                <th class="p-3 table-header-sortable" data-sort="Wiederkehrend">Wiederkehrend</th>
+                                <th class="p-3 text-center">Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-table-body" class="divide-y" style="border-color: var(--border-color);"></tbody>
+                    </table>
                 </div>
+                <div id="pagination-controls" class="flex justify-between items-center mt-4 pt-4 border-t flex-shrink-0"
+                    style="border-color: var(--border-color);"></div>
             </div>
-            <table class="w-full text-left responsive-table">
-                <thead>
-                    <tr class="border-b" style="border-color: var(--border-color);">
-                        <th class="p-2 table-header-sortable" data-sort="Datum">Datum</th>
-                        <th class="p-2 table-header-sortable" data-sort="Art">Art</th>
-                        <th class="p-2 table-header-sortable" data-sort="Betrag">Betrag</th>
-                        <th class="p-2 table-header-sortable" data-sort="Beschreibung">Beschreibung</th>
-                        <th class="p-2 table-header-sortable" data-sort="Kategorie">Kategorie</th>
-                        <th class="p-2 table-header-sortable" data-sort="Konto">Konto</th>
-                        <th class="p-2">Zahlungsmethode</th>
-                        <th class="p-2 table-header-sortable" data-sort="Wiederkehrend">Wiederkehrend</th>
-                        <th class="p-2">Sonstige Infos</th>
-                        <th class="p-2 text-center">Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody id="transaction-table-body"></tbody>
-            </table>
-            <div id="pagination-controls" class="flex justify-between items-center mt-4 pt-4 border-t"
-                style="border-color: var(--border-color);"></div>
         </div>
     </div>
 
@@ -536,151 +685,151 @@
         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
     <div id="transaction-modal" class="fixed z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
-        <div class="card p-6 rounded-xl shadow-lg overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
+        <div class="card p-4 sm:p-6 rounded-xl shadow-lg overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 id="modal-title" class="text-2xl font-bold">Neue Transaktion</h2>
+                    <p class="subtle-text text-sm">Füge eine neue Buchung hinzu oder wähle eine Vorlage.</p>
+                </div>
                 <button id="close-modal-btn"
-                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition"><svg
-                        class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
+                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition -mt-1 -mr-1">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-            <form id="transaction-form">
-                <div class="mb-4">
-                    <label for="trans-vorlage" class="block text-sm font-medium subtle-text mb-1">Vorlage für
-                        Fixkosten</label>
-                    <div class="flex items-center gap-2">
-                        <select id="trans-vorlage" class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                            <option value="">Vorlage auswählen...</option>
-                        </select>
-                        <button type="button" id="delete-template-btn"
-                            class="p-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Vorlage löschen" disabled>
-                            <i data-lucide="trash-2" class="h-4 w-4 pointer-events-none"></i>
-                        </button>
+
+            <form id="transaction-form" class="space-y-6">
+                <!-- VORLAGEN -->
+                <details>
+                    <summary class="flex justify-between items-center text-sm font-medium subtle-text mb-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <span>Vorlage für Fixkosten</span>
+                        <i data-lucide="chevron-right" class="icon h-5 w-5"></i>
+                    </summary>
+                    <div id="template-container" class="grid grid-cols-2 gap-2 mt-2">
+                        <!-- Vorlagen werden hier per JS eingefügt -->
+                    </div>
+                    <p id="no-templates-message" class="hidden text-center subtle-text p-4 border-2 border-dashed rounded-lg mt-2">Keine Vorlagen gefunden.</p>
+                </details>
+
+
+                <!-- ART DER TRANSAKTION (TABS) -->
+                <div>
+                    <label class="block text-sm font-medium subtle-text mb-2">Art der Transaktion</label>
+                    <div id="type-selector" class="flex items-center gap-2">
+                        <input type="radio" id="trans-art-ausgabe" name="trans-art" value="Ausgabe" class="sr-only" checked>
+                        <label for="trans-art-ausgabe" data-type="Ausgabe"
+                            class="type-selector-btn p-3 rounded-lg cursor-pointer flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-down-circle" class="h-5 w-5"></i>
+                            <span>Ausgabe</span>
+                        </label>
+
+                        <input type="radio" id="trans-art-einnahme" name="trans-art" value="Einnahme" class="sr-only">
+                        <label for="trans-art-einnahme" data-type="Einnahme"
+                            class="type-selector-btn p-3 rounded-lg cursor-pointer flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-up-circle" class="h-5 w-5"></i>
+                            <span>Einnahme</span>
+                        </label>
+
+                        <input type="radio" id="trans-art-uberweisung" name="trans-art" value="Überweisung" class="sr-only">
+                        <label for="trans-art-uberweisung" data-type="Überweisung"
+                            class="type-selector-btn p-3 rounded-lg cursor-pointer flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-right-left" class="h-5 w-5"></i>
+                            <span>Überweisung</span>
+                        </label>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="trans-datum-display"
-                            class="block text-sm font-medium subtle-text mb-1">Datum</label>
+                <!-- DATUM & BETRAG -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="trans-datum-display" class="block text-sm font-medium subtle-text mb-1">Datum</label>
                         <div class="relative">
-                            <input type="date" id="trans-datum"
-                                class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" aria-hidden="true"
-                                required>
-                            <input type="text" id="trans-datum-display" placeholder="Datum auswählen" readonly
-                                class="w-full p-2 rounded-lg pr-10 cursor-pointer"
-                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                            <button type="button" id="open-date-picker-btn"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3" title="Datum auswählen">
-                                <svg data-lucide="calendar" class="h-5 w-5 calendar-icon"></svg>
+                            <input type="date" id="trans-datum" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" aria-hidden="true" required>
+                            <input type="text" id="trans-datum-display" placeholder="Datum auswählen" readonly class="form-input w-full p-2 rounded-lg pr-10 cursor-pointer">
+                            <button type="button" id="open-date-picker-btn" class="absolute inset-y-0 right-0 flex items-center pr-3" title="Datum auswählen">
+                                <i data-lucide="calendar" class="h-5 w-5 calendar-icon"></i>
                             </button>
                         </div>
                     </div>
-                    <div>
-                        <label for="trans-art" class="block text-sm font-medium subtle-text mb-1">Art</label>
-                        <select id="trans-art" required class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                            <option value="Ausgabe">Ausgabe</option>
-                            <option value="Einnahme">Einnahme</option>
-                            <option value="Überweisung">Überweisung</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="trans-betrag" class="block text-sm font-medium subtle-text mb-1">Betrag (€)</label>
-                        <input type="text" id="trans-betrag" required placeholder="z.B. 19,99"
-                            class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="trans-beschreibung"
-                            class="block text-sm font-medium subtle-text mb-1">Beschreibung</label>
-                        <input type="text" id="trans-beschreibung" required placeholder="z.B. Wocheneinkauf"
-                            class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                    </div>
-
-                    <div id="standard-fields-wrapper" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="trans-kategorie"
-                                class="block text-sm font-medium subtle-text mb-1">Kategorie</label>
-                            <select id="trans-kategorie" required class="w-full p-2 rounded-lg"
-                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></select>
+                    <div class="md:col-span-3">
+                        <label for="trans-betrag" class="block text-sm font-medium subtle-text mb-1">Betrag</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-lg subtle-text">€</span>
+                            <input type="text" id="trans-betrag" required placeholder="0,00" class="form-input w-full p-2 pl-8 pr-3 rounded-lg text-xl font-bold">
                         </div>
-                        <div>
-                            <label for="trans-konto" class="block text-sm font-medium subtle-text mb-1">Konto</label>
-                            <select id="trans-konto" required class="w-full p-2 rounded-lg transition-opacity"
-                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                                <option>Erste Bank</option>
-                                <option>N26</option>
-                                <option>Revolut</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="transfer-fields-wrapper"
-                        class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="trans-konto-von" class="block text-sm font-medium subtle-text mb-1">Von
-                                Konto</label>
-                            <select id="trans-konto-von" class="w-full p-2 rounded-lg"
-                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                                <option>Erste Bank</option>
-                                <option>N26</option>
-                                <option>Revolut</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="trans-konto-zu" class="block text-sm font-medium subtle-text mb-1">Zu
-                                Konto</label>
-                            <select id="trans-konto-zu" class="w-full p-2 rounded-lg"
-                                style="background-color: var(--bg-color); border: 1px solid var(--border-color);">
-                                <option>Erste Bank</option>
-                                <option>N26</option>
-                                <option>Revolut</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-2 grid grid-cols-2 gap-4 items-end">
-                        <div id="payment-method-wrapper">
-                            <label class="block text-sm font-medium subtle-text mb-1">Zahlungsmethode</label>
-                            <div class="flex items-center gap-x-4 mt-2">
-                                <div class="flex items-center">
-                                    <input id="trans-zahlungsmethode-karte" name="trans-zahlungsmethode" type="radio"
-                                        value="Karte" checked class="h-4 w-4"
-                                        style="border-color: var(--border-color);">
-                                    <label for="trans-zahlungsmethode-karte"
-                                        class="ml-2 block text-sm font-medium">Karte</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input id="trans-zahlungsmethode-bar" name="trans-zahlungsmethode" type="radio"
-                                        value="Bar" class="h-4 w-4" style="border-color: var(--border-color);">
-                                    <label for="trans-zahlungsmethode-bar"
-                                        class="ml-2 block text-sm font-medium">Bar</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 pb-1">
-                            <input type="checkbox" id="trans-wiederkehrend" class="h-4 w-4 rounded"
-                                style="border-color: var(--border-color);">
-                            <label for="trans-wiederkehrend" class="text-sm font-medium">Wiederkehrend</label>
-                        </div>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="trans-sonstige-infos" class="block text-sm font-medium subtle-text mb-1">Sonstige
-                            Infos</label>
-                        <textarea id="trans-sonstige-infos" rows="2" placeholder="Zusätzliche Notizen..."
-                            class="w-full p-2 rounded-lg"
-                            style="background-color: var(--bg-color); border: 1px solid var(--border-color);"></textarea>
                     </div>
                 </div>
-                <div class="mt-6 flex justify-end">
-                    <button type="submit"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition">Speichern</button>
+
+                <!-- BESCHREIBUNG -->
+                <div>
+                    <label for="trans-beschreibung" class="block text-sm font-medium subtle-text mb-1">Beschreibung</label>
+                    <input type="text" id="trans-beschreibung" required placeholder="z.B. Wocheneinkauf bei Billa" class="form-input w-full p-2 rounded-lg">
+                </div>
+
+                <!-- STANDARD-FELDER (Kategorie, Konto) -->
+                <div id="standard-fields-wrapper" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="trans-kategorie" class="block text-sm font-medium subtle-text mb-1">Kategorie</label>
+                        <select id="trans-kategorie" required class="form-select w-full p-2 rounded-lg"></select>
+                    </div>
+                    <div>
+                        <label for="trans-konto" class="block text-sm font-medium subtle-text mb-1">Konto</label>
+                        <select id="trans-konto" required class="form-select w-full p-2 rounded-lg transition-opacity">
+                            <option>Erste Bank</option>
+                            <option>N26</option>
+                            <option>Revolut</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ÜBERWEISUNGS-FELDER -->
+                <div id="transfer-fields-wrapper" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="trans-konto-von" class="block text-sm font-medium subtle-text mb-1">Von Konto</label>
+                        <select id="trans-konto-von" class="form-select w-full p-2 rounded-lg">
+                            <option>Erste Bank</option>
+                            <option>N26</option>
+                            <option>Revolut</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="trans-konto-zu" class="block text-sm font-medium subtle-text mb-1">Zu Konto</label>
+                        <select id="trans-konto-zu" class="form-select w-full p-2 rounded-lg">
+                            <option>Erste Bank</option>
+                            <option>N26</option>
+                            <option>Revolut</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ZAHLUNGSMETHODE & WIEDERKEHREND -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div id="payment-method-wrapper">
+                        <label class="block text-sm font-medium subtle-text mb-2">Zahlungsmethode</label>
+                        <div class="flex items-center gap-2 payment-method-radio-group">
+                            <input type="radio" id="trans-zahlungsmethode-karte" name="trans-zahlungsmethode" value="Karte" checked class="sr-only">
+                            <label for="trans-zahlungsmethode-karte" class="p-2 rounded-lg cursor-pointer flex-1 text-center">Karte</label>
+                            <input type="radio" id="trans-zahlungsmethode-bar" name="trans-zahlungsmethode" value="Bar" class="sr-only">
+                            <label for="trans-zahlungsmethode-bar" class="p-2 rounded-lg cursor-pointer flex-1 text-center">Bar</label>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 pt-6">
+                        <input type="checkbox" id="trans-wiederkehrend" class="h-5 w-5 rounded" style="border-color: var(--border-color);">
+                        <label for="trans-wiederkehrend" class="text-sm font-medium">Als wiederkehrende Vorlage speichern</label>
+                    </div>
+                </div>
+
+                <!-- SONSTIGE INFOS -->
+                <div>
+                    <label for="trans-sonstige-infos" class="block text-sm font-medium subtle-text mb-1">Sonstige Infos</label>
+                    <textarea id="trans-sonstige-infos" rows="2" placeholder="Zusätzliche Notizen, Rechnungsnummer etc." class="form-input w-full p-2 rounded-lg"></textarea>
+                </div>
+
+                <!-- SPEICHERN-BUTTON -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="h-5 w-5"></i>
+                        <span>Transaktion speichern</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -720,6 +869,26 @@
                     class="filter-btn px-4 py-2 rounded-lg font-semibold transition">Abbrechen</button>
                 <button id="backup-name-confirm-btn"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FÜR SONSTIGE INFOS -->
+    <div id="info-modal-overlay"
+        class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300">
+    </div>
+    <div id="info-modal"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg z-50 opacity-0 pointer-events-none scale-95 transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Zusätzliche Informationen</h3>
+                <button id="info-modal-close-btn"
+                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="info-modal-content" class="subtle-text whitespace-pre-wrap break-words max-h-[60vh] overflow-y-auto">
+                <!-- Inhalt wird durch JS eingefügt -->
             </div>
         </div>
     </div>
@@ -818,6 +987,11 @@
             const backupFilenameInput = document.getElementById('backup-filename-input');
             const backupNameCancelBtn = document.getElementById('backup-name-cancel-btn');
             const backupNameConfirmBtn = document.getElementById('backup-name-confirm-btn');
+
+            const infoModalOverlay = document.getElementById('info-modal-overlay');
+            const infoModal = document.getElementById('info-modal');
+            const infoModalContent = document.getElementById('info-modal-content');
+            const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
 
 
             // --- DATA HANDLING ---
@@ -977,33 +1151,37 @@
                 }
                 data.forEach(row => {
                     const tr = document.createElement('tr');
-                    tr.className = 'border-b hover:bg-gray-50 dark:hover:bg-gray-800/50 text-sm md:border-b-0';
+                    tr.className = 'text-sm border-b';
+                    tr.style.borderColor = 'var(--border-color)';
 
                     let betragClass = '';
                     if (row.Kategorie === 'Überweisung') {
                         betragClass = 'text-blue-500';
+                    } else if (row.Art === 'Einnahme') {
+                        betragClass = 'text-green-500';
                     } else {
-                        betragClass = row.Art === 'Einnahme' ? 'text-green-500' : 'text-red-500';
+                        betragClass = 'text-red-500';
                     }
 
                     tr.innerHTML = `
-                        <td data-label="Datum">${row.Datum || ''}</td>
-                        <td data-label="Art">${row.Art || ''}</td>
-                        <td class="${betragClass}" data-label="Betrag">${formatCurrency(row.Betrag)}</td>
-                        <td data-label="Beschreibung">${row.Beschreibung || ''}</td>
-                        <td data-label="Kategorie">${row.Kategorie || ''}</td>
-                        <td data-label="Konto">${row.Konto || ''}</td>
-                        <td data-label="Zahlungsmethode">${row.Zahlungsmethode || ''}</td>
-                        <td data-label="Wiederkehrend">${row.Wiederkehrend || ''}</td>
-                        <td data-label="Sonstige Infos">${row['Sonstige Infos'] || ''}</td>
-                        <td data-label="Aktionen">
-                            <div class="flex justify-end md:justify-center items-center gap-2">
+                        <td data-label="Datum" class="p-3">${row.Datum || ''}</td>
+                        <td class="${betragClass} font-semibold p-3" data-label="Betrag">${formatCurrency(row.Betrag)}</td>
+                        <td data-label="Beschreibung" class="p-3">${row.Beschreibung || ''}</td>
+                        <td data-label="Kategorie" class="p-3">${row.Kategorie || ''}</td>
+                        <td data-label="Konto" class="p-3">${row.Konto || ''}</td>
+                        <td data-label="Zahlungsmethode" class="p-3">${row.Zahlungsmethode || ''}</td>
+                        <td data-label="Wiederkehrend" class="p-3">${row.Wiederkehrend || ''}</td>
+                        <td data-label="Aktionen" class="p-3">
+                            <div class="flex justify-end items-center gap-2">
+                                ${row['Sonstige Infos'] ? `<button class="action-btn info-btn" data-info="${row['Sonstige Infos']}" title="Zusätzliche Infos anzeigen">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                </button>` : ''}
                                <button class="action-btn edit-btn" data-id="${row.id}" title="Transaktion bearbeiten">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                               </button>
+                                </button>
                                <button class="action-btn delete-btn" data-id="${row.id}" title="Transaktion löschen">
                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                               </button>
+                                </button>
                             </div>
                         </td>
                     `;
@@ -1390,7 +1568,12 @@
             document.getElementById('transaction-table-body').addEventListener('click', (e) => {
                 const editButton = e.target.closest('.edit-btn');
                 const deleteButton = e.target.closest('.delete-btn');
-                if (editButton) {
+                const infoButton = e.target.closest('.info-btn');
+
+                if (infoButton) {
+                    const infoText = infoButton.dataset.info;
+                    openInfoModal(infoText);
+                } else if (editButton) {
                     openModal(editButton.dataset.id);
                 } else if (deleteButton) {
                     openConfirmModal(
@@ -1409,12 +1592,28 @@
                 }
             });
 
+            // --- INFO MODAL LOGIC ---
+            function openInfoModal(infoText) {
+                infoModalContent.textContent = infoText;
+                infoModalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                infoModal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+                lucide.createIcons();
+            }
+
+            function closeInfoModal() {
+                infoModalOverlay.classList.add('opacity-0', 'pointer-events-none');
+                infoModal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            }
+
+            infoModalCloseBtn.addEventListener('click', closeInfoModal);
+            infoModalOverlay.addEventListener('click', closeInfoModal);
+
+
             // --- TRANSACTION MODAL LOGIC (ADD/EDIT) ---
             const modal = document.getElementById('transaction-modal');
             const modalOverlay = document.getElementById('transaction-modal-overlay');
             const modalForm = document.getElementById('transaction-form');
             const modalTitle = document.getElementById('modal-title');
-            const transArtSelect = document.getElementById('trans-art');
             const transKategorieSelect = document.getElementById('trans-kategorie');
             const transKontoSelect = document.getElementById('trans-konto');
             const paymentMethodRadios = document.querySelectorAll('input[name="trans-zahlungsmethode"]');
@@ -1429,18 +1628,19 @@
             const transKontoVonSelect = document.getElementById('trans-konto-von');
             const transKontoZuSelect = document.getElementById('trans-konto-zu');
 
-            const transVorlageSelect = document.getElementById('trans-vorlage');
-            const deleteTemplateBtn = document.getElementById('delete-template-btn');
+            const typeSelector = document.getElementById('type-selector');
+            const typeSelectorBtns = document.querySelectorAll('.type-selector-btn');
+
 
             function handlePaymentMethodChange() {
                 const isCash = document.getElementById('trans-zahlungsmethode-bar').checked;
                 transKontoSelect.disabled = isCash;
                 if (isCash) {
                     transKontoSelect.value = '';
-                    transKontoSelect.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    transKontoSelect.classList.add('opacity-50', 'cursor-not-allowed');
                     transKontoSelect.required = false;
                 } else {
-                    transKontoSelect.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    transKontoSelect.classList.remove('opacity-50', 'cursor-not-allowed');
                     transKontoSelect.required = true;
                     if (!transKontoSelect.value && transKontoSelect.options.length > 0) {
                         transKontoSelect.value = transKontoSelect.options[0].value;
@@ -1451,7 +1651,7 @@
             paymentMethodRadios.forEach(radio => radio.addEventListener('change', handlePaymentMethodChange));
 
             function updateCategoryOptions() {
-                const selectedArt = transArtSelect.value;
+                const selectedArt = document.querySelector('input[name="trans-art"]:checked').value;
                 const categories = selectedArt === 'Ausgabe' ? expenseCategories : incomeCategories;
                 transKategorieSelect.innerHTML = '';
                 categories.forEach(category => {
@@ -1463,7 +1663,16 @@
             }
 
             function handleArtChange() {
-                const selectedArt = transArtSelect.value;
+                const selectedArt = document.querySelector('input[name="trans-art"]:checked').value;
+
+                // Update active button style
+                typeSelectorBtns.forEach(btn => {
+                    const label = btn.closest('label');
+                    if (label) {
+                        label.classList.toggle('active', label.dataset.type === selectedArt);
+                    }
+                });
+
 
                 if (selectedArt === 'Überweisung') {
                     standardFieldsWrapper.classList.add('hidden');
@@ -1483,9 +1692,11 @@
                     transKontoZuSelect.required = false;
                     updateCategoryOptions();
                 }
+                lucide.createIcons();
             }
 
-            transArtSelect.addEventListener('change', handleArtChange);
+            typeSelector.addEventListener('change', handleArtChange);
+
 
             function formatGermanLongDate(isoDateString) {
                 if (!isoDateString) return '';
@@ -1499,81 +1710,104 @@
                 return new Intl.DateTimeFormat('de-DE', options).format(date);
             }
 
-            function populateTemplatesDropdown() {
-                transVorlageSelect.innerHTML = '<option value="">Vorlage auswählen...</option>';
-                recurringTemplates.forEach((template, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = `${template.Beschreibung} (${formatCurrency(template.Betrag)})`;
-                    transVorlageSelect.appendChild(option);
-                });
-            }
+            function renderTemplates() {
+                const container = document.getElementById('template-container');
+                const noTemplatesMsg = document.getElementById('no-templates-message');
+                container.innerHTML = '';
 
-            transVorlageSelect.addEventListener('change', (e) => {
-                const templateIndex = e.target.value;
-                deleteTemplateBtn.disabled = (templateIndex === "");
-
-                if (templateIndex === "") {
-                    modalForm.reset();
-                    const todayIso = new Date().toISOString().split('T')[0];
-                    transDatumInput.value = todayIso;
-                    transDatumDisplay.value = formatGermanLongDate(todayIso);
-                    handleArtChange();
+                if (recurringTemplates.length === 0) {
+                    noTemplatesMsg.classList.remove('hidden');
+                    container.classList.add('hidden');
                     return;
                 }
 
-                const template = recurringTemplates[templateIndex];
-                if (template) {
-                    document.getElementById('trans-art').value = template.Art;
-                    handleArtChange();
+                noTemplatesMsg.classList.add('hidden');
+                container.classList.remove('hidden');
 
-                    document.getElementById('trans-betrag').value = template.Betrag.toFixed(2).replace('.', ',');
-                    document.getElementById('trans-beschreibung').value = template.Beschreibung;
+                recurringTemplates.forEach((template, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'template-btn';
+                    btn.dataset.index = index;
 
-                    if (template.Art !== 'Überweisung') {
-                        document.getElementById('trans-kategorie').value = template.Kategorie;
-                        document.getElementById('trans-konto').value = template.Konto;
-                        if (template.Zahlungsmethode === 'Bar') {
-                            document.getElementById('trans-zahlungsmethode-bar').checked = true;
-                        } else {
-                            document.getElementById('trans-zahlungsmethode-karte').checked = true;
+                    let artIcon, artColor;
+                    if (template.Art === 'Ausgabe') {
+                        artIcon = 'arrow-down';
+                        artColor = 'text-red-500';
+                    } else if (template.Art === 'Einnahme') {
+                        artIcon = 'arrow-up';
+                        artColor = 'text-green-500';
+                    } else { // Überweisung
+                        artIcon = 'arrow-right-left';
+                        artColor = 'text-blue-500';
+                    }
+
+                    btn.innerHTML = `
+                        <button type="button" class="delete-template" data-index="${index}" title="Vorlage löschen">
+                            <i data-lucide="x" class="w-4 h-4 pointer-events-none"></i>
+                        </button>
+                        <div class="flex items-center gap-2 mb-1">
+                            <i data-lucide="${artIcon}" class="w-4 h-4 ${artColor} flex-shrink-0"></i>
+                            <span class="font-bold truncate">${template.Beschreibung}</span>
+                        </div>
+                        <div class="text-sm subtle-text">${formatCurrency(template.Betrag)}</div>
+                        <div class="text-xs subtle-text truncate">${template.Kategorie || ''} | ${template.Konto || ''}</div>
+                    `;
+                    container.appendChild(btn);
+                });
+                lucide.createIcons();
+            }
+
+
+            document.getElementById('template-container').addEventListener('click', (e) => {
+                const templateBtn = e.target.closest('.template-btn');
+                const deleteBtn = e.target.closest('.delete-template');
+
+                if (deleteBtn) {
+                    e.stopPropagation();
+                    const templateIndex = deleteBtn.dataset.index;
+                    const template = recurringTemplates[templateIndex];
+                    openConfirmModal(
+                        'Vorlage löschen',
+                        `Möchten Sie die Vorlage "${template.Beschreibung}" wirklich löschen?`,
+                        () => {
+                            recurringTemplates.splice(templateIndex, 1);
+                            saveTemplates();
+                            renderTemplates();
+                            showNotification('Vorlage erfolgreich gelöscht.');
                         }
-                        handlePaymentMethodChange();
-                    }
-
-                    document.getElementById('trans-wiederkehrend').checked = true;
-                }
-            });
-
-            deleteTemplateBtn.addEventListener('click', () => {
-                const templateIndex = transVorlageSelect.value;
-                if (templateIndex === "") return;
-
-                const template = recurringTemplates[templateIndex];
-                openConfirmModal(
-                    'Vorlage löschen',
-                    `Möchten Sie die Vorlage "${template.Beschreibung}" wirklich löschen?`,
-                    () => {
-                        recurringTemplates.splice(templateIndex, 1);
-                        saveTemplates();
-                        populateTemplatesDropdown();
-                        modalForm.reset();
-                        const todayIso = new Date().toISOString().split('T')[0];
-                        transDatumInput.value = todayIso;
-                        transDatumDisplay.value = formatGermanLongDate(todayIso);
+                    );
+                } else if (templateBtn) {
+                    const templateIndex = templateBtn.dataset.index;
+                    const template = recurringTemplates[templateIndex];
+                    if (template) {
+                        document.querySelector(`input[name="trans-art"][value="${template.Art}"]`).checked = true;
                         handleArtChange();
-                        deleteTemplateBtn.disabled = true;
-                        showNotification('Vorlage erfolgreich gelöscht.');
-                        lucide.createIcons();
+
+                        document.getElementById('trans-betrag').value = template.Betrag.toFixed(2).replace('.', ',');
+                        document.getElementById('trans-beschreibung').value = template.Beschreibung;
+
+                        if (template.Art !== 'Überweisung') {
+                            document.getElementById('trans-kategorie').value = template.Kategorie;
+                            document.getElementById('trans-konto').value = template.Konto;
+                            if (template.Zahlungsmethode === 'Bar') {
+                                document.getElementById('trans-zahlungsmethode-bar').checked = true;
+                            } else {
+                                document.getElementById('trans-zahlungsmethode-karte').checked = true;
+                            }
+                            handlePaymentMethodChange();
+                        }
+
+                        document.getElementById('trans-wiederkehrend').checked = true;
                     }
-                );
+                }
             });
 
             function openModal(transactionId = null) {
                 modalForm.reset();
-                deleteTemplateBtn.disabled = true;
+                document.getElementById('trans-art-ausgabe').checked = true;
                 document.getElementById('trans-zahlungsmethode-karte').checked = true;
-                populateTemplatesDropdown();
+                renderTemplates();
 
                 if (transactionId) {
                     modalTitle.textContent = "Transaktion bearbeiten";
@@ -1584,8 +1818,8 @@
                             return;
                         }
                         modalForm.dataset.editingId = transactionId;
-                        transArtSelect.value = transaction.Art;
-                        handleArtChange();
+
+                        document.querySelector(`input[name="trans-art"][value="${transaction.Art}"]`).checked = true;
 
                         transDatumInput.value = transaction.parsedDate;
                         transDatumDisplay.value = formatGermanLongDate(transaction.parsedDate);
@@ -1603,14 +1837,18 @@
                         document.getElementById('trans-sonstige-infos').value = transaction['Sonstige Infos'] || '';
                     }
                 } else {
-                    modalTitle.textContent = "Neue Transaktion hinzufügen";
+                    modalTitle.innerHTML = "Neue Transaktion";
+                    const titleSubtext = modalTitle.nextElementSibling;
+                    if (titleSubtext) {
+                        titleSubtext.textContent = "Füge eine neue Buchung hinzu oder wähle eine Vorlage.";
+                    }
                     delete modalForm.dataset.editingId;
                     const todayIso = new Date().toISOString().split('T')[0];
                     transDatumInput.value = todayIso;
                     transDatumDisplay.value = formatGermanLongDate(todayIso);
-                    handleArtChange();
                 }
 
+                handleArtChange();
                 handlePaymentMethodChange();
 
                 modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -1633,14 +1871,25 @@
             });
 
             transDatumDisplay.addEventListener('click', () => {
-                transDatumInput.showPicker();
+                try {
+                    transDatumInput.showPicker();
+                } catch (e) {
+                    console.log("showPicker() is not supported on this browser.");
+                }
             });
             openDatePickerBtn.addEventListener('click', () => {
-                transDatumInput.showPicker();
+                try {
+                    transDatumInput.showPicker();
+                } catch (e) {
+                    console.log("showPicker() is not supported on this browser.");
+                }
             });
 
             transBetragInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.replace(/,/, '.');
+                let value = e.target.value;
+                value = value.replace(/[^0-9,.]/g, ''); // Allow numbers, comma, dot
+                value = value.replace(/,/, '.'); // Convert comma to dot for processing
+                e.target.value = value;
             });
 
 
@@ -1653,7 +1902,7 @@
                 const beschreibung = document.getElementById('trans-beschreibung').value;
                 const isWiederkehrend = document.getElementById('trans-wiederkehrend').checked;
                 const sonstigeInfos = document.getElementById('trans-sonstige-infos').value;
-                const art = transArtSelect.value;
+                const art = document.querySelector('input[name="trans-art"]:checked').value;
 
                 if (art === 'Überweisung') {
                     const vonKonto = transKontoVonSelect.value;
@@ -1713,10 +1962,14 @@
                     if (editingId) {
                         const index = allTransactions.findIndex(t => t.id === editingId);
                         if (index !== -1) {
-                            allTransactions[index] = { ...allTransactions[index], ...transactionData };
+                            allTransactions[index] = { ...allTransactions[index],
+                                ...transactionData
+                            };
                         }
                     } else {
-                        allTransactions.push({ ...transactionData, id: crypto.randomUUID() });
+                        allTransactions.push({ ...transactionData,
+                            id: crypto.randomUUID()
+                        });
                     }
                 }
 
