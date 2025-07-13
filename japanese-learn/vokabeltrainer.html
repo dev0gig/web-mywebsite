@@ -224,7 +224,7 @@
 
                 <!-- Dynamic Content Area -->
                 <div class="flex-grow flex flex-col gap-4 min-h-0">
-                    <div style="perspective: 1000px;" class="w-full h-56 min-h-0 md:flex-1">
+                    <div style="perspective: 1000px;" class="w-full h-56 min-h-0 md:flex-1 relative group">
                         <div class="relative w-full h-full card" :class="{ 'is-flipped': flipped }">
                             <div @click="flipped = !flipped"
                                 class="absolute w-full h-full card-face bg-cyber-surface border border-cyber-border rounded-lg flex items-center justify-center cursor-pointer shadow-cyber-sm">
@@ -245,26 +245,30 @@
                                 </button>
                             </div>
                         </div>
+                        <!-- Navigation Arrows -->
+                        <button @click.stop="previousWord()" class="absolute top-1/2 -translate-y-1/2 left-2 p-2 bg-cyber-surface/50 rounded-full text-cyber-dim hover:text-cyber-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                           <span class="material-symbols-outlined">arrow_back_ios</span>
+                        </button>
+                        <button @click.stop="nextWord()" class="absolute top-1/2 -translate-y-1/2 right-2 p-2 bg-cyber-surface/50 rounded-full text-cyber-dim hover:text-cyber-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                           <span class="material-symbols-outlined">arrow_forward_ios</span>
+                        </button>
                     </div>
 
                     <!-- Drawing Canvas -->
-                    <div class="w-full h-56 min-h-0 md:flex-1">
+                    <div class="w-full h-56 min-h-0 md:flex-1 relative group">
                         <canvas x-ref="drawingCanvas" class="w-full h-full bg-cyber-surface border border-cyber-border rounded-lg cursor-crosshair"></canvas>
+                        <button @click="clearCanvas()" class="absolute top-2 right-2 z-10 p-2 bg-cyber-surface/50 rounded-full text-cyber-dim hover:text-cyber-secondary opacity-0 group-hover:opacity-100 transition-opacity" title="Zeichenfläche leeren">
+                           <span class="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
                 </div>
 
                 <div class="flex-shrink-0 mt-4">
                     <div class="flex justify-center">
-                        <button @click="clearCanvas()" class="flex items-center gap-2 px-4 py-2 rounded-md bg-cyber-secondary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-sm">
-                            Feld leeren <span class="material-symbols-outlined">delete</span>
-                        </button>
+                        
                     </div>
 
                     <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
-                <button @click="nextWord()"
-                    class="flex items-center gap-2 px-6 py-3 rounded-md bg-cyber-primary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-lg w-full sm:w-auto justify-center">
-                    Nächstes Wort <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
                 <button @click="resetSearch()" x-show="searchTerm.trim() !== ''"
                     class="flex items-center gap-2 px-6 py-3 rounded-md bg-cyber-secondary text-cyber-bg font-bold hover:shadow-cyber transition-shadow text-lg w-full sm:w-auto justify-center">
                     Suche zurücksetzen <span class="material-symbols-outlined">refresh</span>
@@ -381,6 +385,20 @@
                             if (this.searchTerm.trim() === '') {
                                 this.shuffleWords(); // Reshuffle for the next round if not searching
                             }
+                        }
+                        this.currentWord = this.words[this.currentIndex];
+                        this.updateProgress();
+                    }, 300);
+                },
+
+                previousWord() {
+                    this.flipped = false;
+                    this.clearCanvas();
+                    setTimeout(() => {
+                        if (this.words.length === 0) return;
+                        this.currentIndex--;
+                        if (this.currentIndex < 0) {
+                            this.currentIndex = this.words.length - 1; // Loop to the end
                         }
                         this.currentWord = this.words[this.currentIndex];
                         this.updateProgress();
