@@ -136,50 +136,44 @@
     </style>
 </head>
 
-<body class="antialiased min-h-screen flex flex-col">
+<body class="antialiased min-h-screen flex flex-col" style="background-color: var(--bg-color);">
 
     <div class="flex flex-col flex-grow">
 
         <header class="text-center pt-8 pb-4 flex-shrink-0 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-5xl font-bold mb-2" style="color: var(--header-color);">HabitMea</h1>
-            <p class="text-lg" style="color: var(--text-color-light);">Verfolge deine Gewohnheiten, Bücher, Filme,
-                Serien usw. an einem Ort.</p>
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2" style="color: var(--header-color);">HabitMea</h1>
+            <p class="text-md sm:text-lg" style="color: var(--text-color-light);">Ein Ort für deine Gewohnheiten, Medien und mehr.</p>
         </header>
 
-        <div class="text-center pb-6 flex-shrink-0 flex flex-wrap justify-center gap-4 px-4 sm:px-6 lg:px-8">
-            <button id="export-btn"
-                class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons sm:mr-2">file_download</i>
-                <span class="hidden sm:inline">Exportieren</span>
-            </button>
-            <button id="import-btn"
-                class="bg-violet-600 hover:bg-violet-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons sm:mr-2">file_upload</i>
-                <span class="hidden sm:inline">Importieren</span>
-            </button>
-            <button id="table-of-contents-btn"
-                class="bg-amber-600 hover:bg-amber-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
-                <i class="material-icons sm:mr-2">list</i>
-                <span class="hidden sm:inline">Inhaltsverzeichnis</span>
-            </button>
-            <button id="open-add-list-modal-btn"
-                class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+        <div class="pb-8 flex-shrink-0 flex flex-wrap justify-center items-center gap-2 sm:gap-4 px-4 sm:px-6 lg:px-8">
+            <button id="open-add-list-modal-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-all duration-300 inline-flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 <i class="material-icons sm:mr-2">playlist_add</i>
-                <span class="hidden sm:inline">Eigene Liste hinzufügen</span>
+                <span class="hidden sm:inline">Neue Liste</span>
             </button>
-            <button id="delete-all-data-btn"
-                class="bg-rose-600 hover:bg-rose-500 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-lg">
+            <button id="table-of-contents-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-bold p-3 sm:px-6 rounded-lg transition-colors duration-300 inline-flex items-center shadow-md">
+                <i class="material-icons sm:mr-2">list</i>
+                <span class="hidden sm:inline">Übersicht</span>
+            </button>
+            <button id="export-btn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 sm:px-4 rounded-lg transition-colors duration-300 inline-flex items-center shadow-md">
+                <i class="material-icons sm:mr-2">file_download</i>
+                <span class="hidden sm:inline">Export</span>
+            </button>
+            <button id="import-btn" class="bg-violet-600 hover:bg-violet-500 text-white font-bold p-3 sm:px-4 rounded-lg transition-colors duration-300 inline-flex items-center shadow-md">
+                <i class="material-icons sm:mr-2">file_upload</i>
+                <span class="hidden sm:inline">Import</span>
+            </button>
+            <button id="delete-all-data-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold p-3 sm:px-4 rounded-lg transition-colors duration-300 inline-flex items-center shadow-md">
                 <i class="material-icons sm:mr-2">delete_sweep</i>
-                <span class="hidden sm:inline">Alle Daten löschen</span>
+                <span class="hidden sm:inline">Reset</span>
             </button>
             <input type="file" id="import-file-input" class="hidden" accept=".json">
         </div>
 
-        <main id="main-grid"
-            class="flex-grow flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8 pb-4 min-h-0 lg:overflow-x-auto px-4 sm:px-6 lg:px-8 mx-auto">
+        <main class="flex-grow w-full px-4 sm:px-6 lg:px-8">
+            <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-screen-2xl mx-auto">
 
             <section id="habits"
-                class="w-full lg:w-[800px] flex-shrink-0 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
+                class="lg:col-span-2 xl:col-span-2 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="habit">
                 <div class="flex justify-between items-center mb-4">
@@ -235,7 +229,7 @@
             </section>
 
             <section id="books"
-                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
+                class="rounded-2xl p-6 shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="book">
                 <div class="flex justify-between items-center mb-6">
@@ -255,11 +249,11 @@
                         </button>
                     </div>
                 </div>
-                <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
+                <div class="space-y-3 list-none p-0 overflow-y-auto pr-2 item-container" style="max-height: 35rem;">
                 </div>
             </section>
             <section id="media"
-                class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0"
+                class="rounded-2xl p-6 shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl"
                 style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);"
                 data-list-type="media">
                 <div class="flex justify-between items-center mb-6">
@@ -279,9 +273,10 @@
                         </button>
                     </div>
                 </div>
-                <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container">
+                <div class="space-y-3 list-none p-0 overflow-y-auto pr-2 item-container" style="max-height: 35rem;">
                 </div>
             </section>
+            </div>
         </main>
     </div>
 
@@ -816,7 +811,7 @@
                 if (!title) return;
                 const listId = 'list-' + Date.now();
                 const newListHTML = `
-                <section id="${listId}" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
+                <section id="${listId}" class="rounded-2xl p-6 shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="default">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold" style="color: var(--header-color);">${title}</h2>
                         <div class="flex items-center gap-1">
@@ -834,7 +829,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div>
+                    <div class="space-y-3 list-none p-0 overflow-y-auto pr-2 item-container" style="max-height: 35rem;"></div>
                 </section>`;
                 mainGrid.insertAdjacentHTML('beforeend', newListHTML);
                 newListTitleInput.value = '';
@@ -918,7 +913,7 @@
                         if (!section && listData.type !== 'book' && listData.type !== 'media') {
                             const listId = listData.id || 'list-' + Date.now();
                             const newListHTML = `
-                            <section id="${listId}" class="w-full lg:w-96 flex-shrink-0 rounded-2xl p-6 shadow-lg flex flex-col mx-auto lg:mx-0" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
+                            <section id="${listId}" class="rounded-2xl p-6 shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl" style="background-color: var(--card-bg); border: 1px solid var(--card-border-color);" data-list-type="${listData.type}">
                                 <div class="flex justify-between items-center mb-6">
                                     <h2 class="text-2xl font-bold" style="color: var(--header-color);">${listData.title}</h2>
                                     <div class="flex items-center gap-1">
@@ -936,7 +931,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="space-y-3 list-none p-0 flex-grow overflow-y-auto pr-2 item-container"></div>
+                                <div class="space-y-3 list-none p-0 overflow-y-auto pr-2 item-container" style="max-height: 35rem;"></div>
                             </section>`;
                             mainGrid.insertAdjacentHTML('beforeend', newListHTML);
                             section = mainGrid.lastElementChild;
@@ -1067,13 +1062,7 @@
                     
                     // Scroll to the section
                     // Scroll to the section
-                    section.scrollIntoView({ behavior: 'smooth' });
-                    
-                    // For horizontal scrolling in the main grid
-                    if (window.innerWidth >= 1024) { // lg breakpoint
-                        const sectionLeft = section.offsetLeft - mainGrid.offsetLeft;
-                        mainGrid.scrollLeft = sectionLeft;
-                    }
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
             

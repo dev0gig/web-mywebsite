@@ -1033,6 +1033,9 @@
                     allTransactions = storedTransactions ? JSON.parse(storedTransactions) : [];
                     allTransactions.forEach(t => {
                         if (!t.id) t.id = crypto.randomUUID();
+                        if (t.parsedDate) {
+                            t.Datum = formatGermanDate(t.parsedDate);
+                        }
                     });
                     saveTransactions(); // Speichert die Daten mit ggf. neuen IDs
                 } catch (e) {
@@ -1729,16 +1732,19 @@
             typeSelector.addEventListener('change', handleArtChange);
 
 
-            function formatGermanLongDate(isoDateString) {
+            function formatGermanDate(isoDateString) {
                 if (!isoDateString) return '';
                 const date = new Date(isoDateString + 'T00:00:00');
+                const kanjiDays = ['日', '月', '火', '水', '木', '金', '土'];
+                const dayIndex = date.getDay();
+                const kanjiDay = kanjiDays[dayIndex];
                 const options = {
-                    weekday: 'long',
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 };
-                return new Intl.DateTimeFormat('de-DE', options).format(date);
+                const dateString = new Intl.DateTimeFormat('de-DE', options).format(date);
+                return `${kanjiDay} ${dateString}`;
             }
 
             function renderTemplates() {
@@ -1853,7 +1859,7 @@
                         document.querySelector(`input[name="trans-art"][value="${transaction.Art}"]`).checked = true;
 
                         transDatumInput.value = transaction.parsedDate;
-                        transDatumDisplay.value = formatGermanLongDate(transaction.parsedDate);
+                        transDatumDisplay.value = formatGermanDate(transaction.parsedDate);
                         transBetragInput.value = transaction.Betrag.toFixed(2).replace('.', ',');
                         document.getElementById('trans-beschreibung').value = transaction.Beschreibung;
                         updateCategoryOptions();
@@ -1876,7 +1882,7 @@
                     delete modalForm.dataset.editingId;
                     const todayIso = new Date().toISOString().split('T')[0];
                     transDatumInput.value = todayIso;
-                    transDatumDisplay.value = formatGermanLongDate(todayIso);
+                    transDatumDisplay.value = formatGermanDate(todayIso);
                 }
 
                 handleArtChange();
@@ -1898,7 +1904,7 @@
             modalOverlay.addEventListener('click', closeModal);
 
             transDatumInput.addEventListener('change', () => {
-                transDatumDisplay.value = formatGermanLongDate(transDatumInput.value);
+                transDatumDisplay.value = formatGermanDate(transDatumInput.value);
             });
 
             transDatumDisplay.addEventListener('click', () => {
@@ -1928,7 +1934,7 @@
                 e.preventDefault();
                 const editingId = modalForm.dataset.editingId;
                 const parsedDate = transDatumInput.value;
-                const displayDate = formatGermanLongDate(parsedDate);
+                const displayDate = formatGermanDate(parsedDate);
                 const betrag = parseFloat(transBetragInput.value.replace(',', '.'));
                 const beschreibung = document.getElementById('trans-beschreibung').value;
                 const isWiederkehrend = document.getElementById('trans-wiederkehrend').checked;

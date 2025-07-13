@@ -1195,7 +1195,7 @@
 
                 const createDockElement = (item) => {
                     const element = document.createElement((item.isExternal && !item.isGroup) ? 'a' : 'button');
-                    element.className = 'dock-link';
+                    element.className = 'dock-link relative';
                     element.dataset.key = item.key;
                     element.title = item.text;
 
@@ -1210,7 +1210,11 @@
                         element.addEventListener('click', handleNavLinkClick);
                     }
 
-                    element.innerHTML = `<img src="${item.icon}" alt="${item.text}" class="dock-icon">`;
+                    let innerHTML = `<img src="${item.icon}" alt="${item.text}" class="dock-icon">`;
+                    if (item.isGroup) {
+                        innerHTML += `<span class="material-symbols-outlined absolute top-0 right-0 text-base" style="transform: translate(20%, -20%); color: var(--text-color-light);">arrow_drop_up</span>`;
+                    }
+                    element.innerHTML = innerHTML;
                     return element;
                 };
 
