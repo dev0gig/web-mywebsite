@@ -399,6 +399,25 @@
             }
         }
 
+        /* --- Dashboard Modal für Mobile --- */
+        @media (max-width: 1023px) {
+            #dashboard-content-wrapper {
+                display: none; /* Standardmäßig aus dem Layout entfernen */
+            }
+
+            #dashboard-content-wrapper.is-open {
+                display: flex; /* Wenn offen, als Flex-Container anzeigen */
+                position: fixed;
+                inset: 0;
+                background-color: var(--bg-color);
+                z-index: 45;
+                overflow-y: auto;
+                padding: 1rem;
+                padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+            }
+        }
+        /* --- ENDE Dashboard Modal --- */
+
         /* --- NEUE MODAL-STILE --- */
         .type-selector-btn {
             background-color: var(--bg-color);
@@ -544,7 +563,14 @@
     <div class="w-full mx-auto flex flex-col lg:grid lg:grid-cols-5 lg:gap-6 px-4 md:px-6">
 
         <!-- Rechte Spalte (wird auf Mobile zuerst/oben angezeigt) -->
-        <div class="lg:col-span-2 lg:order-2 flex flex-col gap-6">
+        <div id="dashboard-content-wrapper" class="lg:col-span-2 lg:order-2 flex flex-col gap-6">
+            <!-- Close button for mobile modal view -->
+            <div class="lg:hidden flex justify-between items-center mb-4 w-full flex-shrink-0">
+                <h3 class="text-xl font-bold">Dashboard</h3>
+                <button id="close-dashboard-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
             <!-- Block 1: Kennzahlen -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -622,20 +648,20 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <h2 class="text-xl font-bold">Transaktionen</h2>
                         <button id="add-transaction-btn" title="Neue Transaktion hinzufügen"
-                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                            <i data-lucide="plus" class="h-4 w-4"></i><span>Neu</span>
+                            class="filter-btn rounded-md font-semibold transition text-sm flex items-center justify-center w-9 h-9 md:w-auto md:h-auto md:p-2 md:gap-2">
+                            <i data-lucide="plus" class="h-4 w-4"></i><span class="hidden md:inline">Neu</span>
                         </button>
                         <button id="import-csv-btn" title="Transaktionen aus CSV-Datei importieren"
-                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                            <i data-lucide="file-down" class="h-4 w-4"></i><span>Importieren</span>
+                            class="filter-btn rounded-md font-semibold transition text-sm flex items-center justify-center w-9 h-9 md:w-auto md:h-auto md:p-2 md:gap-2">
+                            <i data-lucide="file-down" class="h-4 w-4"></i><span class="hidden md:inline">Importieren</span>
                         </button>
                         <input type="file" id="csv-file-input" accept=".csv" class="hidden">
                         <button id="export-csv-btn" title="Transaktionen sichern"
-                            class="filter-btn p-2 rounded-md font-semibold transition text-sm flex items-center gap-2">
-                            <i data-lucide="save" class="h-4 w-4"></i><span>Backup</span>
+                            class="filter-btn rounded-md font-semibold transition text-sm flex items-center justify-center w-9 h-9 md:w-auto md:h-auto md:p-2 md:gap-2">
+                            <i data-lucide="save" class="h-4 w-4"></i><span class="hidden md:inline">Backup</span>
                         </button>
                         <button id="delete-all-transactions-btn" title="Alle Transaktionen löschen"
-                            class="filter-btn p-2 rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center">
+                            class="filter-btn rounded-md font-semibold transition bg-red-500 hover:bg-red-600 text-white flex items-center justify-center w-9 h-9 md:p-2">
                             <i data-lucide="trash-2" class="h-4 w-4"></i>
                         </button>
                     </div>
@@ -925,6 +951,11 @@
     </div>
 
     <!-- Schwebende Aktionsbuttons -->
+    <button id="fab-open-dashboard" title="Dashboard anzeigen"
+        class="lg:hidden fixed right-6 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100"
+        style="bottom: calc(10.5rem + env(safe-area-inset-bottom));">
+        <i data-lucide="layout-dashboard" class="h-7 w-7"></i>
+    </button>
     <button id="fab-open-calendar" title="Kalender anzeigen"
         class="lg:hidden fixed right-6 bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform transform hover:scale-110 active:scale-100">
         <i data-lucide="calendar" class="h-7 w-7"></i>
@@ -2018,6 +2049,32 @@
             openCalendarBtn.addEventListener('click', openCalendarSidebar);
             closeCalendarBtn.addEventListener('click', closeCalendarSidebar);
             calendarSidebarOverlay.addEventListener('click', closeCalendarSidebar);
+
+
+           // --- DASHBOARD MODAL LOGIC ---
+           const dashboardWrapper = document.getElementById('dashboard-content-wrapper');
+           const openDashboardBtn = document.getElementById('fab-open-dashboard');
+           const closeDashboardBtn = document.getElementById('close-dashboard-btn');
+
+           function openDashboardModal() {
+               if (dashboardWrapper) {
+                   dashboardWrapper.classList.add('is-open');
+                   // Re-render charts because their container was hidden
+                   const accountFilteredData = (currentFilter === 'all') ? allTransactions : allTransactions.filter(row => row.Konto === currentFilter);
+                   const financialSummary = processData(accountFilteredData);
+                   createOrUpdateCharts(financialSummary);
+                   lucide.createIcons();
+               }
+           }
+
+           function closeDashboardModal() {
+               if (dashboardWrapper) {
+                   dashboardWrapper.classList.remove('is-open');
+               }
+           }
+
+           openDashboardBtn.addEventListener('click', openDashboardModal);
+           closeDashboardBtn.addEventListener('click', closeDashboardModal);
 
 
             // --- THEME SYNCHRONISATION ---
