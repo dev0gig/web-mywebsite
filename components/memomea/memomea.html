@@ -834,14 +834,9 @@
 
                 textArea.addEventListener('blur', () => {
                     const newContent = textArea.value;
-                    const todayString = formatDate(new Date());
-
-                    if (newContent.trim() === '' && dateString !== todayString) {
-                        delete journalEntries[dateString];
-                    } else {
-                        journalEntries[dateString] = newContent;
-                    }
-
+                    // Einträge werden nicht mehr sofort gelöscht, sondern nur gespeichert.
+                    // Die Bereinigung erfolgt beim nächsten Laden der Seite.
+                    journalEntries[dateString] = newContent;
                     saveEntries(journalEntries);
                     updateAll();
                 });
@@ -934,9 +929,7 @@
 
             function handleDateClick(e) {
                 const dateString = e.currentTarget.dataset.date;
-                const wasJustCreated = journalEntries[dateString] === undefined;
-
-                if (wasJustCreated) {
+                if (journalEntries[dateString] === undefined) {
                     journalEntries[dateString] = '- ';
                     saveEntries(journalEntries);
                 }
@@ -1133,6 +1126,23 @@
 
                 okButton.addEventListener('click', handleOk);
                 cancelButton.addEventListener('click', handleCancel);
+            };
+
+            const cleanupOldEmptyEntries = () => {
+                const todayString = formatDate(new Date());
+                let changed = false;
+
+                for (const dateString in journalEntries) {
+                    const content = journalEntries[dateString]?.trim();
+                    if (dateString < todayString && (content === '' || content === '-')) {
+                        delete journalEntries[dateString];
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    saveEntries(journalEntries);
+                }
             };
 
             const updateAll = () => {
@@ -1350,6 +1360,7 @@
             closeCalendarBtn.addEventListener('click', closeCalendarSidebar);
             calendarSidebarOverlay.addEventListener('click', closeCalendarSidebar);
 
+            cleanupOldEmptyEntries();
             updateAll();
         });
     </script>
