@@ -943,13 +943,15 @@
                 summary.ausgabenByKonto = kontoSummary;
 
                 data.forEach(row => {
-                    if (row.Kategorie === 'Überweisung') return;
-
                     if (row.Art === 'Ausgabe') {
-                        summary.ausgabenByCat[row.Kategorie] = (summary.ausgabenByCat[row.Kategorie] || 0) + row.Betrag;
+                        if (row.Kategorie !== 'Überweisung') {
+                            summary.ausgabenByCat[row.Kategorie] = (summary.ausgabenByCat[row.Kategorie] || 0) + row.Betrag;
+                        }
                         summary.totalAusgaben += row.Betrag;
                     } else if (row.Art === 'Einnahme') {
-                        summary.einnahmenByCat[row.Kategorie] = (summary.einnahmenByCat[row.Kategorie] || 0) + row.Betrag;
+                        if (row.Kategorie !== 'Überweisung') {
+                            summary.einnahmenByCat[row.Kategorie] = (summary.einnahmenByCat[row.Kategorie] || 0) + row.Betrag;
+                        }
                         summary.totalEinnahmen += row.Betrag;
                     }
                 });
