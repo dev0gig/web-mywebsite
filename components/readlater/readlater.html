@@ -250,6 +250,13 @@
                 max-height: none;
             }
         }
+        .domain-header-group .chevron-icon {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .domain-header-group.collapsed .chevron-icon {
+            transform: rotate(-90deg);
+        }
     </style>
 </head>
 
@@ -343,7 +350,7 @@
             <div id="tag-filters-container" class="flex flex-wrap gap-2 items-center mt-2"></div>
         </div>
 
-        <main id="links-container" class="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:gap-4"></main>
+        <main id="links-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></main>
         <div id="empty-state" class="hidden text-center py-16 px-6 rounded-lg border-dashed"
             style="background-color: rgba(128,128,128,0.1); border: 1px solid var(--border-color);">
             <h3 id="empty-state-title" class="text-lg font-semibold"></h3>
@@ -365,16 +372,6 @@
         </div>
     </div>
 
-    <div id="link-group-modal-overlay" class="modal-overlay hidden"></div>
-    <div id="link-group-modal" class="modal-content hidden w-11/12 max-w-4xl rounded-lg shadow-lg p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h3 id="link-group-modal-title" class="text-xl font-bold"></h3>
-            <button id="link-group-modal-close-btn" class="transition" style="color: var(--text-color-light);">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-        </div>
-        <div id="link-group-modal-content" class="space-y-4"></div>
-    </div>
 
     <div id="add-tags-modal-overlay" class="modal-overlay hidden"></div>
     <div id="add-tags-modal" class="modal-content hidden w-11/12 max-w-md rounded-lg shadow-lg p-6">
@@ -462,11 +459,6 @@
             const confirmCancelBtn = document.getElementById('confirm-modal-cancel-btn');
             const confirmConfirmBtn = document.getElementById('confirm-modal-confirm-btn');
 
-            const linkGroupModalOverlay = document.getElementById('link-group-modal-overlay');
-            const linkGroupModal = document.getElementById('link-group-modal');
-            const linkGroupModalTitle = document.getElementById('link-group-modal-title');
-            const linkGroupModalContent = document.getElementById('link-group-modal-content');
-            const linkGroupModalCloseBtn = document.getElementById('link-group-modal-close-btn');
 
             const addTagsModalOverlay = document.getElementById('add-tags-modal-overlay');
             const addTagsModal = document.getElementById('add-tags-modal');
@@ -484,7 +476,7 @@
 
             // --- State ---
             let links = [];
-            window.viewState = { showArchived: false, searchTerm: '', filterTag: null };
+            window.viewState = { showArchived: false, searchTerm: '', filterTag: null, collapsedHostnames: new Set() };
             let isFetchingMetadata = false;
             let confirmCallback = null;
             let previewData = null;
@@ -516,6 +508,20 @@
                 metadataStatus: link.metadataStatus === 'failed' ? 'pending' : link.metadataStatus,
             }));
             const saveLinks = () => localStorage.setItem('readLaterLinks', JSON.stringify(links));
+            const getStoredViewState = () => {
+                const storedState = JSON.parse(localStorage.getItem('readLaterViewState'));
+                if (storedState && storedState.collapsedHostnames) {
+                    window.viewState.collapsedHostnames = new Set(storedState.collapsedHostnames);
+                }
+            };
+            const saveViewState = () => {
+                // Convert Set to Array for JSON serialization
+                const stateToStore = {
+                    ...window.viewState,
+                    collapsedHostnames: Array.from(window.viewState.collapsedHostnames)
+                };
+                localStorage.setItem('readLaterViewState', JSON.stringify(stateToStore));
+            };
 
             const openModal = (overlay, modal) => {
                 overlay.classList.remove('hidden');
@@ -534,18 +540,6 @@
                 openModal(confirmModalOverlay, confirmModal);
             };
 
-            const openLinkGroupModal = (hostname, linksInGroup) => {
-                linkGroupModalTitle.textContent = hostname;
-                linkGroupModalContent.innerHTML = '';
-                linksInGroup.forEach(link => {
-                    const linkCardElement = document.createElement('div');
-                    linkCardElement.className = 'link-card';
-                    linkCardElement.innerHTML = renderLinkCard(link);
-                    linkGroupModalContent.appendChild(linkCardElement);
-                });
-                openModal(linkGroupModalOverlay, linkGroupModal);
-                lucide.createIcons();
-            };
 
             const openAddTagsModal = (linkId) => {
                 currentEditLinkId = linkId;
@@ -579,11 +573,6 @@
                     saveLinks();
                     window.renderApp();
                     showToast('Tags gespeichert.', 'success');
-                    if (!linkGroupModal.classList.contains('hidden')) {
-                        const currentHostnameInModal = linkGroupModalTitle.textContent;
-                        const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
-                        openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
-                    }
                 }
                 closeModal(addTagsModalOverlay, addTagsModal);
             };
@@ -696,19 +685,43 @@
                         return acc;
                     }, {});
 
-                    Object.entries(groupedLinks).forEach(([hostname, domainLinks]) => {
-                        const domainStackElement = document.createElement('div');
-                        domainStackElement.className = 'domain-stack';
-                        const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${domainLinks[0].url}&size=32`;
-                        domainStackElement.innerHTML = `
-                            <div class="domain-stack-header flex items-center p-4 cursor-pointer" data-hostname="${hostname}">
-                                <img src="${faviconUrl}" class="mr-4 w-8 h-8" alt="Favicon" />
-                                <h3 class="text-lg font-semibold flex-grow">${hostname} (${domainLinks.length})</h3>
-                                <i data-lucide="chevron-down" class="w-5 h-5" style="color:var(--text-color-light);"></i>
-                            </div>
-                        `;
-                        linksContainer.appendChild(domainStackElement);
+                    const sortedHostnames = Object.keys(groupedLinks).sort((a, b) => {
+                        if (a === 'Unbekannt') return 1;
+                        if (b === 'Unbekannt') return -1;
+                        return a.localeCompare(b);
                     });
+
+                    for (const hostname of sortedHostnames) {
+                        const domainLinks = groupedLinks[hostname].sort((a, b) => b.id - a.id);
+                        const isCollapsed = window.viewState.collapsedHostnames.has(hostname);
+
+                        const domainHeader = document.createElement('div');
+                        domainHeader.className = `domain-header-group col-span-full flex items-center py-4 cursor-pointer ${isCollapsed ? 'collapsed' : ''}`;
+                        domainHeader.dataset.hostname = hostname;
+                        const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${domainLinks[0].url}&size=32`;
+                        domainHeader.innerHTML = `
+                            <i data-lucide="chevron-down" class="chevron-icon w-6 h-6 mr-2" style="color:var(--text-color-light);"></i>
+                            <img src="${faviconUrl}" class="mr-4 w-8 h-8 rounded-md" alt="Favicon" />
+                            <h3 class="text-xl font-bold">${hostname}</h3>
+                            <span class="ml-2 text-lg font-medium" style="color: var(--text-color-light);">(${domainLinks.length})</span>
+                            <div class="flex-grow h-px ml-4" style="background-color: var(--border-color);"></div>
+                        `;
+                        linksContainer.appendChild(domainHeader);
+
+                        const linksWrapper = document.createElement('div');
+                        linksWrapper.className = 'domain-links-wrapper col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6';
+                        if (isCollapsed) {
+                            linksWrapper.style.display = 'none';
+                        }
+
+                        domainLinks.forEach(link => {
+                            const linkCardElement = document.createElement('div');
+                            linkCardElement.className = 'link-card';
+                            linkCardElement.innerHTML = renderLinkCard(link);
+                            linksWrapper.appendChild(linkCardElement);
+                        });
+                        linksContainer.appendChild(linksWrapper);
+                    }
                 }
 
                 const sourceLinks = showArchived ? links.filter(l => l.status === 'archived') : links.filter(l => l.status === 'active');
@@ -795,18 +808,26 @@
                 if (linkData.metadataStatus === 'pending') processMetadataQueue();
             });
 
-            const setupActionDelegation = (container, modalRefreshCallback) => {
+            const setupActionDelegation = (container) => {
                 container.addEventListener('click', (e) => {
-                    const button = e.target.closest('button[data-action]');
-                    const header = e.target.closest('.domain-stack-header');
-
+                    const header = e.target.closest('.domain-header-group');
                     if (header) {
                         const hostname = header.dataset.hostname;
-                        const linksInGroup = links.filter(link => link.hostname === hostname && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
-                        openLinkGroupModal(hostname, linksInGroup);
+                        const wrapper = header.nextElementSibling;
+                        if (window.viewState.collapsedHostnames.has(hostname)) {
+                            window.viewState.collapsedHostnames.delete(hostname);
+                            header.classList.remove('collapsed');
+                            wrapper.style.display = 'grid';
+                        } else {
+                            window.viewState.collapsedHostnames.add(hostname);
+                            header.classList.add('collapsed');
+                            wrapper.style.display = 'none';
+                        }
+                        saveViewState();
                         return;
                     }
 
+                    const button = e.target.closest('button[data-action]');
                     if (!button) return;
 
                     const action = button.dataset.action;
@@ -821,18 +842,25 @@
                         case 'archive':
                             links[linkIndex].status = 'archived';
                             needsRerender = true;
+                            showToast('Link archiviert.');
                             break;
                         case 'restore':
                             links[linkIndex].status = 'active';
                             needsRerender = true;
+                            showToast('Link wiederhergestellt.');
                             break;
                         case 'delete':
-                            links.splice(linkIndex, 1);
-                            needsRerender = true;
+                            openConfirmModal('Link löschen', 'Möchten Sie diesen Link wirklich endgültig löschen?', () => {
+                                links.splice(linkIndex, 1);
+                                saveLinks();
+                                window.renderApp();
+                                showToast('Link gelöscht.', 'success');
+                            });
                             break;
                         case 'retry':
                             links[linkIndex].metadataStatus = 'pending';
                             processMetadataQueue();
+                            showToast('Metadaten-Abruf erneut gestartet.');
                             break;
                         case 'edit-tags':
                             openAddTagsModal(id);
@@ -842,27 +870,15 @@
                     if (needsRerender) {
                         saveLinks();
                         window.renderApp();
-                        modalRefreshCallback?.();
                     }
                 });
             };
 
             setupActionDelegation(linksContainer);
-            setupActionDelegation(linkGroupModalContent, () => {
-                const currentHostnameInModal = linkGroupModalTitle.textContent;
-                if (!currentHostnameInModal) return;
-                const updatedLinksInModal = links.filter(link => link.hostname === currentHostnameInModal && (window.viewState.showArchived ? link.status === 'archived' : link.status === 'active')).sort((a, b) => b.id - a.id);
-                if (updatedLinksInModal.length > 0) {
-                    openLinkGroupModal(currentHostnameInModal, updatedLinksInModal);
-                } else {
-                    closeModal(linkGroupModalOverlay, linkGroupModal);
-                }
-            });
 
             toggleArchiveBtn.addEventListener('click', () => {
                 window.viewState.showArchived = !window.viewState.showArchived;
                 window.viewState.filterTag = null;
-                closeModal(linkGroupModalOverlay, linkGroupModal);
                 window.renderApp();
             });
 
@@ -880,7 +896,6 @@
             // Modal close listeners
             [confirmCancelBtn, confirmModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(confirmModalOverlay, confirmModal)));
             confirmConfirmBtn.addEventListener('click', () => { if (confirmCallback) confirmCallback(); closeModal(confirmModalOverlay, confirmModal); });
-            [linkGroupModalCloseBtn, linkGroupModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(linkGroupModalOverlay, linkGroupModal)));
             [addTagsCancelBtn, addTagsModalOverlay].forEach(el => el.addEventListener('click', () => closeModal(addTagsModalOverlay, addTagsModal)));
             addTagsSaveBtn.addEventListener('click', saveTags);
             addTagsInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveTags(); } });
@@ -955,6 +970,7 @@
 
             // --- Initial Load ---
             links = getStoredLinks();
+            getStoredViewState();
             window.renderApp();
             renderPreview(null);
             processMetadataQueue();
