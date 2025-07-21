@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evidenzfälle</title>
+    <title>Evidenz Kanban Board</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons for symbols -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
         /* Google Font for clean typography */
@@ -29,6 +31,7 @@
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --modal-bg-overlay: rgba(0, 0, 0, 0.5);
+            --kanban-bg: #f1f5f9;
         }
 
         html[data-theme='dark'] {
@@ -45,6 +48,7 @@
             --input-bg: #404040;
             --input-border: #525252;
             --modal-bg-overlay: rgba(0, 0, 0, 0.7);
+            --kanban-bg: #363636;
         }
 
         body {
@@ -62,10 +66,55 @@
             color: var(--text-color-heading);
         }
 
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .kanban-column {
+            flex: 1 0 300px;
+            background-color: var(--kanban-bg);
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Ensures rounded corners are respected by children */
+        }
+
+        .kanban-column-title {
+            color: var(--text-color-heading);
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+
+        .kanban-column-title-neu {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+        }
+        .kanban-column-title-in-bearbeitung {
+            background-color: #f59e0b; /* amber-500 */
+            color: #1e293b; /* dark text for better readability on yellow */
+        }
+        .kanban-column-title-fertig {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+        }
+
+
+        .kanban-cards {
+            flex-grow: 1;
+            min-height: 150px;
+        }
+
         .evidence-card {
             background-color: var(--card-bg);
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
+            cursor: grab;
+        }
+        .evidence-card:active {
+            cursor: grabbing;
         }
 
         .evidence-card-header {
@@ -123,14 +172,18 @@
             transform: translateY(0);
             pointer-events: auto;
         }
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #a5b4fc;
+        }
     </style>
 </head>
 
 <body class="antialiased">
 
-    <div class="container mx-auto max-w-4xl px-4 py-8">
+    <div class="container mx-auto px-4 py-8">
         <header class="main-header flex justify-between items-center mb-8 pb-4 border-b">
-            <h1 class="text-3xl font-bold">Evidenzfälle</h1>
+            <h1 class="text-3xl font-bold">Evidenz Board</h1>
             <div class="flex items-center space-x-2">
                 <button id="import-button" title="Backup importieren"
                     class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -144,8 +197,8 @@
             </div>
         </header>
 
-        <main id="evidence-container">
-            <!-- Evidence cases will be dynamically inserted here -->
+        <main id="kanban-board" class="kanban-board">
+            <!-- Kanban columns will be dynamically inserted here -->
         </main>
 
         <div id="no-entries-message" class="hidden text-center py-16">
@@ -157,11 +210,17 @@
 
     </div>
 
-    <!-- Floating Action Button -->
-    <button id="add-entry-fab" title="Neuen Fall hinzufügen"
-        class="fab-button fixed bottom-8 right-8 w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30">
-        <i data-lucide="plus" class="h-8 w-8"></i>
-    </button>
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-8 right-8 z-30 flex flex-col space-y-4">
+        <button id="archive-fab" title="Archiv anzeigen"
+            class="fab-button w-16 h-16 rounded-full flex items-center justify-center shadow-lg bg-gray-500 hover:bg-gray-600">
+            <i data-lucide="archive" class="h-8 w-8"></i>
+        </button>
+        <button id="add-entry-fab" title="Neuen Fall hinzufügen"
+            class="fab-button w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+            <i data-lucide="plus" class="h-8 w-8"></i>
+        </button>
+    </div>
 
     <!-- Modal for new/edit entry -->
     <div id="entry-modal" class="modal-overlay fixed inset-0 h-full w-full hidden z-40 items-center justify-center">
@@ -177,7 +236,6 @@
                     </button>
                 </div>
                 <form id="entry-form" class="space-y-4">
-                    <!-- Hidden input to store timestamp for editing -->
                     <input type="hidden" id="entry-timestamp" name="entry-timestamp">
                     <div>
                         <label for="phone-number" class="block text-sm font-medium"
@@ -239,6 +297,21 @@
         </div>
     </div>
 
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="modal-overlay fixed inset-0 h-full w-full hidden z-40 items-center justify-center">
+        <div class="modal-content relative p-8 border w-full max-w-2xl shadow-lg rounded-md m-4 flex flex-col" style="max-height: 90vh;">
+            <div class="flex justify-between items-center mb-6 pb-3 border-b" style="border-color: var(--border-color);">
+                <h3 class="text-xl leading-6 font-medium" style="color: var(--text-color-heading);">Archivierte Fälle</h3>
+                <button id="close-archive-modal-button" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="archive-list" class="flex-grow overflow-y-auto space-y-4 pr-4 -mr-4">
+                <!-- Archived items will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Element -->
     <div id="notification"
         class="fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 -translate-y-12 z-50">
@@ -249,8 +322,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Element selectors
-            const evidenceContainer = document.getElementById('evidence-container');
+            const kanbanBoard = document.getElementById('kanban-board');
             const addEntryFab = document.getElementById('add-entry-fab');
+            const archiveFab = document.getElementById('archive-fab');
             const entryModal = document.getElementById('entry-modal');
             const modalTitle = document.getElementById('modal-title');
             const closeModalButton = document.getElementById('close-modal-button');
@@ -262,6 +336,11 @@
             const importButton = document.getElementById('import-button');
             const importFileInput = document.getElementById('import-file-input');
 
+            // Archive modal elements
+            const archiveModal = document.getElementById('archive-modal');
+            const closeArchiveModalButton = document.getElementById('close-archive-modal-button');
+            const archiveList = document.getElementById('archive-list');
+
             // Custom confirm modal elements
             const confirmModal = document.getElementById('confirm-modal');
             const confirmModalTitle = document.getElementById('confirm-modal-title');
@@ -271,8 +350,27 @@
             let confirmCallback = null;
 
             const STORAGE_KEY = 'evidenceCases';
+            const COLUMNS = {
+                'neu': 'Neu',
+                'in-bearbeitung': 'In Bearbeitung',
+                'fertig': 'Fertig'
+            };
 
             let evidenceEntries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+            // --- Data Migration: Add status if missing ---
+            const migrateData = () => {
+                let changed = false;
+                evidenceEntries.forEach(entry => {
+                    if (!entry.status) {
+                        entry.status = 'neu'; // Default status for old entries
+                        changed = true;
+                    }
+                });
+                if (changed) {
+                    saveEntries();
+                }
+            };
 
             // Listen for theme changes from parent window
             window.addEventListener('message', (event) => {
@@ -286,47 +384,94 @@
                 }
             });
 
+            const renderBoard = () => {
+                kanbanBoard.innerHTML = '';
+                const activeColumns = Object.keys(COLUMNS).filter(c => c !== 'archiv');
+                activeColumns.forEach(status => {
+                    const columnEl = document.createElement('div');
+                    columnEl.className = 'kanban-column';
+                    columnEl.dataset.status = status;
+                    
+                    const titleColorClass = `kanban-column-title-${status}`;
+
+                    columnEl.innerHTML = `
+                        <h2 class="kanban-column-title text-lg ${titleColorClass}">${COLUMNS[status]}</h2>
+                        <div class="kanban-cards space-y-4 p-4" data-status-list="${status}"></div>
+                    `;
+                    kanbanBoard.appendChild(columnEl);
+                });
+            };
+
             const renderEntries = () => {
-                evidenceContainer.innerHTML = '';
                 if (evidenceEntries.length === 0) {
                     noEntriesMessage.classList.remove('hidden');
+                    kanbanBoard.classList.add('hidden');
                 } else {
                     noEntriesMessage.classList.add('hidden');
+                    kanbanBoard.classList.remove('hidden');
                 }
 
-                const sortedEntries = evidenceEntries.sort((a, b) => b.timestamp - a.timestamp);
+                // Clear all cards from columns
+                document.querySelectorAll('.kanban-cards').forEach(list => list.innerHTML = '');
+
+                const activeEntries = evidenceEntries.filter(entry => entry.status !== 'archiv');
+                const sortedEntries = activeEntries.sort((a, b) => b.timestamp - a.timestamp);
+
+                if (activeEntries.length === 0) {
+                    noEntriesMessage.classList.remove('hidden');
+                    kanbanBoard.classList.add('hidden');
+                } else {
+                    noEntriesMessage.classList.add('hidden');
+                    kanbanBoard.classList.remove('hidden');
+                }
 
                 sortedEntries.forEach(entry => {
-                    const card = document.createElement('div');
-                    card.className = 'evidence-card mb-6 p-6 rounded-lg transition-all duration-300';
-                    const displayDate = new Date(entry.timestamp).toLocaleString('de-DE', {
-                        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-                    });
-                    card.innerHTML = `
-                        <div class="evidence-card-header flex justify-between items-center text-sm font-medium mb-3 pb-2 border-b">
-                            <span>${displayDate} Uhr</span>
-                            <div class="flex items-center space-x-2">
-                                <button class="edit-entry-button p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" data-timestamp="${entry.timestamp}" title="Diesen Fall bearbeiten">
-                                    <i data-lucide="file-pen-line" class="w-4 h-4 text-blue-500"></i>
-                                </button>
-                                <button class="delete-entry-button p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900" data-timestamp="${entry.timestamp}" title="Diesen Fall löschen">
-                                    <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            ${entry.phone ? `<p><strong class="font-semibold" style="color: var(--text-color-heading);">Tel:</strong> ${entry.phone}</p>` : ''}
-                            ${entry.customerId ? `<p><strong class="font-semibold" style="color: var(--text-color-heading);">GP/VK-Nr:</strong> ${entry.customerId}</p>` : ''}
-                            ${entry.text ? `<div class="prose prose-sm max-w-none" style="color: var(--text-color);"><p>${entry.text.replace(/\n/g, '<br>')}</p></div>` : ''}
-                        </div>
-                    `;
-                    evidenceContainer.appendChild(card);
+                    const card = createCardElement(entry);
+                    const columnList = kanbanBoard.querySelector(`[data-status-list="${entry.status}"]`);
+                    if (columnList) {
+                        columnList.appendChild(card);
+                    }
                 });
 
-                // Add event listener for edit buttons
+                addCardEventListeners();
+                lucide.createIcons();
+            };
+
+            const createCardElement = (entry) => {
+                const card = document.createElement('div');
+                card.className = 'evidence-card p-4 rounded-lg transition-all duration-300';
+                card.dataset.timestamp = entry.timestamp;
+
+                const displayDate = new Date(entry.timestamp).toLocaleString('de-DE', {
+                    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                });
+
+                card.innerHTML = `
+                    <div class="evidence-card-header flex justify-between items-center text-sm font-medium mb-3 pb-2 border-b">
+                        <span>${displayDate} Uhr</span>
+                        <div class="flex items-center space-x-1">
+                            <button class="edit-entry-button p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Diesen Fall bearbeiten">
+                                <i data-lucide="file-pen-line" class="w-4 h-4 text-blue-500"></i>
+                            </button>
+                            <button class="archive-entry-button p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Diesen Fall archivieren">
+                                <i data-lucide="archive" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        ${entry.phone ? `<p class="text-sm"><strong class="font-semibold" style="color: var(--text-color-heading);">Tel:</strong> ${entry.phone}</p>` : ''}
+                        ${entry.customerId ? `<p class="text-sm"><strong class="font-semibold" style="color: var(--text-color-heading);">GP/VK-Nr:</strong> ${entry.customerId}</p>` : ''}
+                        ${entry.text ? `<div class="prose prose-sm max-w-none mt-2" style="color: var(--text-color);"><p>${entry.text.replace(/\n/g, '<br>')}</p></div>` : ''}
+                    </div>
+                `;
+                return card;
+            };
+
+            const addCardEventListeners = () => {
                 document.querySelectorAll('.edit-entry-button').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const timestamp = parseInt(e.currentTarget.dataset.timestamp);
+                        e.stopPropagation();
+                        const timestamp = parseInt(e.currentTarget.closest('.evidence-card').dataset.timestamp);
                         const entryToEdit = evidenceEntries.find(entry => entry.timestamp === timestamp);
                         if (entryToEdit) {
                             showModal(entryToEdit);
@@ -334,19 +479,51 @@
                     });
                 });
 
-                // Add event listener for delete buttons
-                document.querySelectorAll('.delete-entry-button').forEach(button => {
+
+                document.querySelectorAll('.archive-entry-button').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const timestamp = e.currentTarget.dataset.timestamp;
+                        e.stopPropagation();
+                        const timestamp = parseInt(e.currentTarget.closest('.evidence-card').dataset.timestamp);
                         showCustomConfirm(
-                            'Eintrag löschen',
-                            'Möchten Sie diesen Eintrag wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
-                            () => { deleteEntry(parseInt(timestamp)); }
+                            'Fall archivieren',
+                            'Möchten Sie diesen Fall wirklich archivieren?',
+                            () => { archiveEntry(parseInt(timestamp)); }
                         );
                     });
                 });
+            };
 
-                lucide.createIcons();
+            const initSortable = () => {
+                const lists = document.querySelectorAll('.kanban-cards');
+                lists.forEach(list => {
+                    new Sortable(list, {
+                        group: 'kanban',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        onEnd: (evt) => {
+                            const itemEl = evt.item;
+                            const timestamp = parseInt(itemEl.dataset.timestamp);
+                            const newStatus = evt.to.dataset.statusList;
+                            
+                            const entry = evidenceEntries.find(e => e.timestamp === timestamp);
+                            if (entry && entry.status !== newStatus) {
+                                entry.status = newStatus;
+                                saveEntries();
+                                showNotification(`Fall nach "${COLUMNS[newStatus]}" verschoben.`, 'success');
+                            }
+                        }
+                    });
+                });
+            };
+
+            const archiveEntry = (timestamp) => {
+                const entry = evidenceEntries.find(e => e.timestamp === timestamp);
+                if (entry) {
+                    entry.status = 'archiv';
+                    saveEntries();
+                    renderEntries();
+                    showNotification(`Fall archiviert.`, 'success');
+                }
             };
 
             const deleteEntry = (timestamp) => {
@@ -376,9 +553,98 @@
 
             const hideModal = () => {
                 entryForm.reset();
-                entryTimestampInput.value = ''; // Clear the hidden timestamp
+                entryTimestampInput.value = '';
                 entryModal.classList.add('hidden');
                 entryModal.classList.remove('flex');
+            };
+
+            const showArchiveModal = () => {
+                archiveList.innerHTML = ''; // Clear previous list
+                const archivedEntries = evidenceEntries
+                    .filter(entry => entry.status === 'archiv')
+                    .sort((a, b) => b.timestamp - a.timestamp);
+
+                if (archivedEntries.length === 0) {
+                    archiveList.innerHTML = `<p class="text-center" style="color: var(--text-color-light);">Das Archiv ist leer.</p>`;
+                } else {
+                    archivedEntries.forEach(entry => {
+                        const item = createArchivedItemElement(entry);
+                        archiveList.appendChild(item);
+                    });
+                }
+                
+                lucide.createIcons();
+                addArchiveItemEventListeners();
+                archiveModal.classList.remove('hidden');
+                archiveModal.classList.add('flex');
+            };
+
+            const hideArchiveModal = () => {
+                archiveModal.classList.add('hidden');
+                archiveModal.classList.remove('flex');
+            };
+
+            const createArchivedItemElement = (entry) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 rounded-md border';
+                item.style.borderColor = 'var(--border-color)';
+                item.dataset.timestamp = entry.timestamp;
+
+                const displayDate = new Date(entry.timestamp).toLocaleString('de-DE', {
+                    year: 'numeric', month: '2-digit', day: '2-digit'
+                });
+
+                item.innerHTML = `
+                    <div class="flex-grow space-y-1">
+                        ${entry.phone ? `<p class="text-sm"><strong class="font-semibold" style="color: var(--text-color-heading);">Tel:</strong> ${entry.phone}</p>` : ''}
+                        ${entry.customerId ? `<p class="text-sm"><strong class="font-semibold" style="color: var(--text-color-heading);">GP/VK-Nr:</strong> ${entry.customerId}</p>` : ''}
+                        ${entry.text ? `<div class="prose prose-sm max-w-none mt-1" style="color: var(--text-color);"><p>${entry.text.replace(/\n/g, '<br>')}</p></div>` : ''}
+                        <p class="text-xs mt-2" style="color: var(--text-color-light);">Archiviert am: ${displayDate}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 ml-4">
+                        <button class="unarchive-entry-button p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Wiederherstellen">
+                            <i data-lucide="unarchive" class="w-5 h-5 text-green-500"></i>
+                        </button>
+                        <button class="delete-entry-button p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900" title="Endgültig löschen">
+                            <i data-lucide="trash-2" class="w-5 h-5 text-red-500"></i>
+                        </button>
+                    </div>
+                `;
+                return item;
+            };
+
+            const addArchiveItemEventListeners = () => {
+                document.querySelectorAll('#archive-list .unarchive-entry-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const timestamp = parseInt(e.currentTarget.closest('[data-timestamp]').dataset.timestamp);
+                        unarchiveEntry(timestamp);
+                    });
+                });
+
+                document.querySelectorAll('#archive-list .delete-entry-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const timestamp = parseInt(e.currentTarget.closest('[data-timestamp]').dataset.timestamp);
+                        showCustomConfirm(
+                            'Endgültig löschen',
+                            'Möchten Sie diesen Eintrag wirklich endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+                            () => {
+                                deleteEntry(timestamp);
+                                showArchiveModal(); // Refresh archive modal list
+                            }
+                        );
+                    });
+                });
+            };
+
+            const unarchiveEntry = (timestamp) => {
+                const entry = evidenceEntries.find(e => e.timestamp === timestamp);
+                if (entry) {
+                    entry.status = 'fertig'; // Move to "Fertig" column
+                    saveEntries();
+                    renderEntries();
+                    showArchiveModal(); // Refresh list
+                    showNotification('Fall wiederhergestellt.', 'success');
+                }
             };
 
             const showNotification = (message, type = 'success', duration = 3000) => {
@@ -397,7 +663,6 @@
                 setTimeout(() => { notification.classList.remove('show'); }, duration);
             };
 
-            // --- Custom Confirm Modal Logic ---
             const showCustomConfirm = (title, message, onConfirm) => {
                 confirmModalTitle.textContent = title;
                 confirmModalMessage.textContent = message;
@@ -413,7 +678,6 @@
                 confirmCallback = null;
             };
 
-            // --- Backup & Import Logic ---
             const exportData = () => {
                 if (evidenceEntries.length === 0) {
                     showNotification('Keine Daten zum Exportieren vorhanden.', 'warning');
@@ -454,6 +718,13 @@
                             importFileInput.value = '';
                             return;
                         }
+                        
+                        // Add default status to imported entries if missing
+                        newUniqueEntries.forEach(entry => {
+                            if (!entry.status) {
+                                entry.status = 'neu';
+                            }
+                        });
 
                         showCustomConfirm(
                             'Backup importieren',
@@ -476,10 +747,14 @@
             };
 
             // --- Event Listeners ---
-            addEntryFab.addEventListener('click', () => showModal()); // Pass no argument for new entry
+            addEntryFab.addEventListener('click', () => showModal());
             closeModalButton.addEventListener('click', hideModal);
             cancelButton.addEventListener('click', hideModal);
             entryModal.addEventListener('click', (e) => { if (e.target === entryModal) hideModal(); });
+
+            archiveFab.addEventListener('click', showArchiveModal);
+            closeArchiveModalButton.addEventListener('click', hideArchiveModal);
+            archiveModal.addEventListener('click', (e) => { if (e.target === archiveModal) hideArchiveModal(); });
 
             entryForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -494,7 +769,6 @@
                 }
 
                 if (timestamp) {
-                    // Editing existing entry
                     const entryIndex = evidenceEntries.findIndex(entry => entry.timestamp === timestamp);
                     if (entryIndex > -1) {
                         evidenceEntries[entryIndex].phone = phone;
@@ -503,8 +777,7 @@
                         showNotification('Fall erfolgreich aktualisiert.', 'success');
                     }
                 } else {
-                    // Creating new entry
-                    const newEntry = { timestamp: Date.now(), phone, customerId, text };
+                    const newEntry = { timestamp: Date.now(), phone, customerId, text, status: 'neu' };
                     evidenceEntries.push(newEntry);
                     showNotification('Neuer Fall erfolgreich gespeichert.', 'success');
                 }
@@ -524,8 +797,11 @@
             importButton.addEventListener('click', () => importFileInput.click());
             importFileInput.addEventListener('change', importData);
 
-            // Initial load
+            // --- Initial Load ---
+            migrateData();
+            renderBoard();
             renderEntries();
+            initSortable();
             lucide.createIcons();
         });
     </script>

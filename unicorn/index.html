@@ -57,16 +57,11 @@
             height: 100vh;
             z-index: 50;
             width: 4.5rem;
-            transition: width 0.3s;
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
-        }
-
-        #sidebar:hover {
-            width: 16rem;
         }
 
         #main-content {
@@ -85,21 +80,8 @@
             flex-shrink: 0;
         }
 
-        .sidebar-text {
-            opacity: 0;
-            max-width: 0;
-            transition: opacity 0.2s ease, max-width 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            margin-left: 0.75rem;
-        }
-
-        #sidebar:hover .sidebar-text {
-            opacity: 1;
-            max-width: 150px;
-        }
-
         .sidebar-link {
+        justify-content: center; /* Zentriert den Inhalt (Icon) standardmässig */
             color: var(--text-color-light);
         }
 
@@ -172,33 +154,23 @@
 
     <nav id="sidebar" class="p-2">
         <ul id="nav-links" class="space-y-2 mt-2">
-            <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
+            <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard" title="Dashboard"
                     class="sidebar-link flex items-center p-3 rounded-lg active">
-                    <span class="material-icons">home</span>
-                    <span class="sidebar-text font-medium">Dashboard</span></a></li>
-            <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
+                    <span class="material-icons">home</span></a></li>
+            <li><a href="we-iframe/contacts.html" data-target="frame-contacts" title="Kontakte"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <span class="material-icons">contacts</span>
-                    <span class="sidebar-text font-medium">Kontakte</span>
-                </a></li>
-            <li><a href="we-iframe/templates.html" data-target="frame-templates"
+                    <span class="material-icons">contacts</span></a></li>
+            <li><a href="we-iframe/templates.html" data-target="frame-templates" title="Mail-Vorlagen"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <span class="material-icons">email</span>
-                    <span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
-            <li><a href="we-iframe/notes.html" data-target="frame-notes"
+                    <span class="material-icons">email</span></a></li>
+            <li><a href="we-iframe/notes.html" data-target="frame-notes" title="Meine Notizen"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <span class="material-icons">description</span>
-                    <span class="sidebar-text font-medium">Meine Notizen</span>
-                </a></li>
-            <li><a href="we-iframe/evidenz.html" data-target="frame-evidence"
+                    <span class="material-icons">description</span></a></li>
+            <li><a href="we-iframe/evidenz.html" data-target="frame-evidence" title="Evidenzfälle"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <span class="material-icons">folder</span>
-                    <span class="sidebar-text font-medium">Evidenzfälle</span>
-                </a></li>
-            <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
-                    <span class="material-icons">settings</span>
-                    <span class="sidebar-text font-medium">Einstellungen</span>
-                </button></li>
+                    <span class="material-icons">folder</span></a></li>
+            <li><button id="settings-btn" title="Einstellungen" class="sidebar-link w-full flex items-center p-3 rounded-lg">
+                    <span class="material-icons">settings</span></button></li>
         </ul>
     </nav>
 
@@ -252,7 +224,7 @@
     </div>
 
     <div id="loader" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
-        <img src="../assets/loading/we_loading.png" alt="Loading Icon" class="h-48 animate-pulse">
+        <img src="assets/loading/we_loading.png" alt="Loading Icon" class="h-48 animate-pulse">
     </div>
 
     <script type="text/javascript">

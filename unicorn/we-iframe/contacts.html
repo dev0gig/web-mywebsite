@@ -71,6 +71,14 @@
             color: white;
         }
 
+        .fallback-initial {
+            color: var(--text-color-light);
+        }
+
+        .contact-list-item.active .fallback-initial {
+            color: white;
+        }
+
         .detail-card {
             background-color: var(--widget-bg);
             border: 1px solid var(--widget-border);
@@ -186,9 +194,15 @@
                 return;
             }
 
+            const logoHtml = contact.logoUrl && contact.logoUrl.trim() !== '-'
+                ? `<img src="${contact.logoUrl}" alt="${contact.name} Logo" class="w-16 h-16 rounded-full mr-6 object-contain">`
+                : `<div class="w-16 h-16 rounded-full mr-6 bg-gray-200 dark:bg-neutral-700 flex-shrink-0 flex items-center justify-center"><span class="text-2xl font-bold fallback-initial">${contact.name.charAt(0)}</span></div>`;
+
+
             contactDetailsEl.innerHTML = `
                 <div class="detail-card rounded-lg shadow-lg p-6">
                     <div class="flex items-center mb-6">
+                        ${logoHtml}
                         <h2 class="main-header text-3xl font-bold">${contact.name}</h2>
                     </div>
                     <div class="space-y-4">
@@ -219,9 +233,18 @@
             if (filteredKontakte.length > 0) {
                 filteredKontakte.forEach(contact => {
                     const item = document.createElement('div');
-                    item.className = 'contact-list-item p-4 cursor-pointer';
-                    item.textContent = contact.name;
+                    item.className = 'contact-list-item p-3 cursor-pointer flex items-center gap-4';
                     item.dataset.id = contact.id;
+
+                    const logoHtml = contact.logoUrl && contact.logoUrl.trim() !== '-'
+                        ? `<img src="${contact.logoUrl}" alt="${contact.name} Logo" class="w-10 h-10 rounded-full object-contain flex-shrink-0">`
+                        : `<div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-neutral-700 flex-shrink-0 flex items-center justify-center"><span class="text-lg font-bold fallback-initial">${contact.name.charAt(0)}</span></div>`;
+
+                    item.innerHTML = `
+                        ${logoHtml}
+                        <span class="font-medium truncate">${contact.name}</span>
+                    `;
+
                     item.addEventListener('click', () => displayContactDetails(contact.id));
                     contactListEl.appendChild(item);
                 });
