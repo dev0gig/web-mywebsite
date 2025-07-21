@@ -1,19 +1,19 @@
 {
-  "name": "Unicorn",
+  "name": "Unicorn PWA",
   "short_name": "Unicorn",
-  "start_url": "/web-mywebsite/unicorn/work-tools.html",
+  "description": "PWA for the Unicorn project.",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#171717",
-  "theme_color": "#f97316",
-  "description": "PWA for Unicorn",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "../assets/icons/unicorn-favicon.png",
+      "src": "assets/icons/unicorn-favicon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "../assets/icons/unicorn-favicon.png",
+      "src": "assets/icons/unicorn-favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }

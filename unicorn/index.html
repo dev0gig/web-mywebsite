@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unicorn</title>
-    <link rel="icon" href="../assets/icons/unicorn-favicon.png">
+    <link rel="icon" href="assets/icons/unicorn-favicon.png">
     <meta name="theme-color" content="#f97316"/>
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/unicorn-favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -35,9 +36,9 @@
         }
 
         /* Bilder im Dark Mode invertieren (z.B. schwarze Icons zu weißen Icons) */
-        html[data-theme='dark'] #sidebar img {
-            filter: invert(1) brightness(1.5) contrast(1.2);
-            /* Invertiert Farben, erhöht Helligkeit und Kontrast für bessere Sichtbarkeit */
+        html[data-theme='dark'] #sidebar .material-icons {
+            color: #fafafa;
+            /* Setzt die Iconfarbe im Dark Mode auf weiß */
         }
 
         html,
@@ -76,6 +77,12 @@
         /* Style to smoothly transition the iframes' opacity */
         .content-iframe {
             transition: opacity 200ms ease-in-out;
+        }
+
+        .material-icons {
+            font-size: 28px;
+            /* Corresponds to w-7/h-7 in Tailwind */
+            flex-shrink: 0;
         }
 
         .sidebar-text {
@@ -158,6 +165,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body data-theme="system">
@@ -166,29 +174,29 @@
         <ul id="nav-links" class="space-y-2 mt-2">
             <li><a href="we-iframe/dashboard.html" data-target="frame-dashboard"
                     class="sidebar-link flex items-center p-3 rounded-lg active">
-                    <img src="../assets/icons/home.svg" alt="Dashboard Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">home</span>
                     <span class="sidebar-text font-medium">Dashboard</span></a></li>
             <li><a href="we-iframe/contacts.html" data-target="frame-contacts"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="../assets/icons/contact.svg" alt="Kontakte Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">contacts</span>
                     <span class="sidebar-text font-medium">Kontakte</span>
                 </a></li>
             <li><a href="we-iframe/templates.html" data-target="frame-templates"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="../assets/icons/mail.svg" alt="Mail-Vorlagen Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">email</span>
                     <span class="sidebar-text font-medium">Mail-Vorlagen</span></a></li>
             <li><a href="we-iframe/notes.html" data-target="frame-notes"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="../assets/icons/notes.svg" alt="Notizen Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">description</span>
                     <span class="sidebar-text font-medium">Meine Notizen</span>
                 </a></li>
             <li><a href="we-iframe/evidenz.html" data-target="frame-evidence"
                     class="sidebar-link flex items-center p-3 rounded-lg">
-                    <img src="../assets/icons/folder.svg" alt="Evidenzfälle Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">folder</span>
                     <span class="sidebar-text font-medium">Evidenzfälle</span>
                 </a></li>
             <li><button id="settings-btn" class="sidebar-link w-full flex items-center p-3 rounded-lg">
-                    <img src="../assets/icons/settings.svg" alt="Einstellungen Icon" class="w-7 h-7 flex-shrink-0">
+                    <span class="material-icons">settings</span>
                     <span class="sidebar-text font-medium">Einstellungen</span>
                 </button></li>
         </ul>
@@ -391,7 +399,7 @@
             // Register Service Worker for Unicorn
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/unicorn/sw.js').then(registration => {
+                    navigator.serviceWorker.register('sw.js').then(registration => {
                         console.log('Unicorn ServiceWorker registration successful with scope: ', registration.scope);
                     }, err => {
                         console.log('Unicorn ServiceWorker registration failed: ', err);

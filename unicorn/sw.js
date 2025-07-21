@@ -1,30 +1,16 @@
-const CACHE_NAME = 'unicorn-work-tools-cache-v1';
+const CACHE_NAME = 'unicorn-pwa-cache-v1';
 const urlsToCache = [
-  'web-mywebsite/unicorn/',
-  'web-mywebsite/unicorn/work-tools.html',
-  'web-mywebsite/assets/icons/unicorn-solid-white.png',
-  'web-mywebsite/assets/icons/home.svg',
-  'web-mywebsite/assets/icons/contact.svg',
-  'web-mywebsite/assets/icons/mail.svg',
-  'web-mywebsite/assets/icons/tools.svg',
-  'web-mywebsite/assets/icons/notes.svg',
-  'web-mywebsite/assets/icons/folder.svg',
-  'web-mywebsite/assets/icons/settings.svg',
-  'web-mywebsite/assets/loading/we_loading.png',
-  'web-mywebsite/unicorn/we-iframe/dashboard.html',
-  'web-mywebsite/unicorn/we-iframe/contacts.html',
-  'web-mywebsite/unicorn/we-iframe/templates.html',
-  'web-mywebsite/unicorn/we-iframe/tool-widgets.html',
-  'web-mywebsite/unicorn/we-iframe/notes.html',
-  'web-mywebsite/unicorn/we-iframe/evidenz.html'
+  '/',
+  'index.html',
+  'assets/icons/unicorn-favicon.png',
+  'assets/loading/we_loading.png'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache for Unicorn');
-        // Use addAll with relative URLs. The browser resolves them against the service worker's location.
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
@@ -38,7 +24,8 @@ self.addEventListener('fetch', event => {
           return response;
         }
         return fetch(event.request);
-      })
+      }
+    )
   );
 });
 
@@ -48,7 +35,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1 && cacheName.startsWith('unicorn-work-tools')) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
         })
