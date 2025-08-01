@@ -169,6 +169,9 @@
             <li><a href="we-iframe/evidenz.html" data-target="frame-evidence" title="Evidenzfälle"
                     class="sidebar-link flex items-center p-3 rounded-lg">
                     <span class="material-icons">folder</span></a></li>
+            <li><a href="https://unicorn-737173134098.us-west1.run.app/" target="_blank" rel="noopener noreferrer" title="NEW!! Unicorn App öffnen"
+                    class="sidebar-link flex items-center p-3 rounded-lg">
+                    <span class="material-icons" style="color: #FFD700;">star</span></a></li>
             <li><button id="settings-btn" title="Einstellungen" class="sidebar-link w-full flex items-center p-3 rounded-lg">
                     <span class="material-icons">settings</span></button></li>
         </ul>
@@ -288,7 +291,8 @@
 
             // Attach event listener to all nav items (links and the button)
             navLinks.forEach(link => {
-                if (link.tagName === 'A') {
+                // Nur Event-Listener für interne Links hinzufügen, die ein Iframe-Ziel haben
+                if (link.tagName === 'A' && link.dataset.target) {
                     link.addEventListener('click', handleNavClick);
                 }
             });
